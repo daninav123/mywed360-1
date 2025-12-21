@@ -28,13 +28,28 @@ import { useWedding } from '../../context/WeddingContext';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import SupplierDetailModal from './SupplierDetailModal';
 import RequestQuoteModal from './RequestQuoteModal';
+import useFinance from '../../hooks/useFinance';
+import { normalizeBudgetCategoryKey } from '../../utils/budgetCategories';
+import { normalizePhoneForWhatsApp } from '../../utils/phoneUtils';
+import ServiceModalityBadges from './ServiceModalityBadges';
 
 export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
+  // Debug: ver categoría del supplier
+  if (supplier.name?.toLowerCase().includes('resona') || supplier.name?.toLowerCase().includes('alkilaudio')) {
+    console.log(`🎴 [SupplierCard] ${supplier.name}:`, {
+      category: supplier.category,
+      categoryName: supplier.categoryName,
+      categoryConfidence: supplier.categoryConfidence,
+      service: supplier.service
+    });
+  }
+  
   const { t, tPlural, format } = useTranslations();
   const { isFavorite, toggleFavorite } = useFavoritesWithAutoCategory();
   const { isInCompareList, addToCompare, removeFromCompare } = useSupplierCompare();
   const { logContact, getLastContact, needsFollowUp } = useSupplierContacts();
   const { info: weddingProfile } = useActiveWeddingInfo();
+  const { budget } = useFinance();
   const [showContactMenu, setShowContactMenu] = useState(false);
   const [isFavoriting, setIsFavoriting] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -81,6 +96,16 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
   const isCached = supplier.priority === 'cached';
   const isInternet = supplier.priority === 'internet';
 
+  // Verificar vinculación con presupuesto
+  const supplierService = supplier.category || supplier.service || '';
+  const serviceKey = normalizeBudgetCategoryKey(supplierService);
+  const hasLinkedBudgetCategory = budget?.categories?.some(
+    (cat) => normalizeBudgetCategoryKey(cat.name) === serviceKey
+  );
+  const linkedCategory = budget?.categories?.find(
+    (cat) => normalizeBudgetCategoryKey(cat.name) === serviceKey
+  );
+
   // Colores según tipo
   const borderColor = isRegistered
     ? 'border-green-500'
@@ -100,7 +125,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
 
   // Funciones de contacto
   const handleContactWhatsApp = () => {
-    const phone = supplier.contact?.phone?.replace(/\D/g, ''); // Solo números
+    const phone = normalizePhoneForWhatsApp(supplier.contact?.phone);
     if (!phone) return;
     const message = t('suppliers.card.hybrid.contact.whatsappMessage', {
       name: fallbackName,
@@ -150,9 +175,19 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
   const handleToggleFavorite = async (e) => {
     e?.stopPropagation?.(); // Evitar propagación al card (opcional)
 
+    console.log('💙 [SupplierCard] Intentando toggle favorito:', {
+      name: supplier.name,
+      id: supplier.id,
+      slug: supplier.slug,
+      category: supplier.category,
+      categoryName: supplier.categoryName,
+      service: supplier.service,
+      isFavoriteNow: isFav,
+      fullSupplier: supplier
+    });
+
     setIsFavoriting(true);
     try {
-      // console.log('🔍 [SupplierCard] Guardando favorito con:', { name: supplier.name, category: supplier.category, service: supplier.service, fullSupplier: supplier });
       await toggleFavorite(supplier);
 
       if (isFav) {
@@ -161,6 +196,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
         toast.success(t('suppliers.card.hybrid.toasts.added'));
       }
     } catch (error) {
+      console.error('💥 [SupplierCard] Error al gestionar favorito:', error);
       toast.error(error.message || t('suppliers.card.hybrid.toasts.error'));
     } finally {
       setIsFavoriting(false);
@@ -294,6 +330,16 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
             >
               🏷️ {supplier.categoryName}
               {supplier.categoryConfidence < 70 && ' ?'}
+            </span>
+          )}
+          {/* 💰 Badge Vinculado a Presupuesto */}
+          {hasLinkedBudgetCategory && linkedCategory && (
+            <span
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800"
+              title={`Vinculado a presupuesto: ${linkedCategory.name} (${linkedCategory.amount?.toLocaleString('es-ES')}€)`}
+            >
+              <DollarSign size={12} />
+              Presupuesto
             </span>
           )}
         </div>

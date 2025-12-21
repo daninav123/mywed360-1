@@ -13,11 +13,12 @@ const serviceIcon = (service = '') => {
 
 const statusMeta = (estado = '') => {
   const e = String(estado || '').toLowerCase();
-  if (e.includes('contrat')) return { color: '#16a34a20', border: '#16a34a', label: 'Contratado' };
-  if (e.includes('presup')) return { color: '#0ea5e920', border: '#0ea5e9', label: 'Presupuestos' };
-  if (e.includes('negoci') || e.includes('contact')) return { color: '#f59e0b20', border: '#f59e0b', label: 'En proceso' };
-  if (e.includes('rechaz')) return { color: '#ef444420', border: '#ef4444', label: 'Rechazado' };
-  return { color: 'transparent', border: '#9ca3af', label: 'Vacío' };
+  if (e.includes('contrat')) return { bg: 'var(--color-success-10)', border: 'var(--color-success)', label: 'Contratado' };
+  if (e.includes('presup')) return { bg: 'var(--color-info-10)', border: 'var(--color-info)', label: 'Presupuestos' };
+  if (e.includes('negoci') || e.includes('contact'))
+    return { bg: 'var(--color-warning-10)', border: 'var(--color-warning)', label: 'En proceso' };
+  if (e.includes('rechaz')) return { bg: 'var(--color-danger-10)', border: 'var(--color-danger)', label: 'Rechazado' };
+  return { bg: 'var(--color-surface-80)', border: 'var(--color-border)', label: 'Vacío' };
 };
 
 export default function ServicesBoard({ proveedores = [], onOpenSearch, onOpenNew, onOpenAI }) {
@@ -59,11 +60,17 @@ export default function ServicesBoard({ proveedores = [], onOpenSearch, onOpenNe
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {cards.map((c) => (
-        <div key={c.serv} className="rounded-lg border p-4 bg-white/80" style={{ borderColor: c.meta.border, background: c.meta.color }}>
+        <div
+          key={c.serv}
+          className="rounded-lg border p-4"
+          style={{ borderColor: c.meta.border, backgroundColor: c.meta.bg }}
+        >
           <div className="flex items-center gap-2 mb-2">
             <c.Icon className="h-5 w-5" />
             <div className="font-semibold">{c.serv}</div>
-            <span className="ml-auto text-xs px-2 py-0.5 rounded-full border" style={{ borderColor: c.meta.border }}>{c.meta.label}</span>
+            <span className="ml-auto text-xs px-2 py-0.5 rounded-full border" style={{ borderColor: c.meta.border }}>
+              {c.meta.label}
+            </span>
           </div>
           <div className="text-xs text-gray-600 flex items-center gap-4">
             <div>
@@ -82,9 +89,24 @@ export default function ServicesBoard({ proveedores = [], onOpenSearch, onOpenNe
             )}
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => onOpenSearch?.(c.serv)}>Buscar</button>
-            <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => onOpenAI?.(c.serv)}>IA</button>
-            <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50 ml-auto" onClick={() => onOpenNew?.(c.serv)}>Añadir</button>
+            <button
+              className="text-xs px-2 py-1 rounded border border-soft hover:bg-surface-muted"
+              onClick={() => onOpenSearch?.(c.serv)}
+            >
+              Buscar
+            </button>
+            <button
+              className="text-xs px-2 py-1 rounded border border-soft hover:bg-surface-muted"
+              onClick={() => onOpenAI?.(c.serv)}
+            >
+              IA
+            </button>
+            <button
+              className="text-xs px-2 py-1 rounded border border-soft hover:bg-surface-muted ml-auto"
+              onClick={() => onOpenNew?.(c.serv)}
+            >
+              Añadir
+            </button>
           </div>
         </div>
       ))}

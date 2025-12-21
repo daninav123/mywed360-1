@@ -14,7 +14,7 @@ export default function AuthDivider({ label }) {
         <span className="w-full border-t border-soft" />
       </div>
       <div className="relative flex justify-center text-xs uppercase">
-        <span className="px-2 bg-surface text-[color:var(--color-text-soft,#6b7280)] font-medium tracking-wide">
+        <span className="px-2 bg-surface text-[color:var(--color-text-soft)] font-medium tracking-wide">
           {text}
         </span>
       </div>

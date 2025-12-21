@@ -11,11 +11,15 @@
  *   node scripts/run-with-watch.js --timeout=600 --idle=30 -- npm run lint
  */
 
-const { spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { spawn } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // ---------- Utilidades ---------- //
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const ISO = () => new Date().toISOString();
 const logDir = path.resolve(__dirname, '..', 'logs');
 const logFile = path.join(logDir, 'tasks.log');
@@ -65,7 +69,7 @@ const commandArgs = cmdArgs.slice(1);
 appendLog({ timestamp: ISO(), pid: process.pid, childCmd: [command, ...commandArgs].join(' '), action: 'start' });
 
 const child = spawn(command, commandArgs, {
-  stdio: 'inherit',
+  stdio: ['inherit', 'pipe', 'pipe'],
   shell: process.platform === 'win32', // Facilita ejecutar scripts npm en Windows
 });
 
@@ -103,9 +107,19 @@ function resetIdleTimer() {
 scheduleHardTimeout();
 resetIdleTimer(); // programa el primer idle timer
 
-// Reiniciamos el idle timer con cada salida
-child.stdout && child.stdout.on('data', resetIdleTimer);
-child.stderr && child.stderr.on('data', resetIdleTimer);
+// Reenviar salida al terminal + reiniciar idle timer
+if (child.stdout) {
+  child.stdout.on('data', (chunk) => {
+    try { process.stdout.write(chunk); } catch {}
+    resetIdleTimer();
+  });
+}
+if (child.stderr) {
+  child.stderr.on('data', (chunk) => {
+    try { process.stderr.write(chunk); } catch {}
+    resetIdleTimer();
+  });
+}
 
 child.on('exit', (code, signal) => {
   clearTimers();

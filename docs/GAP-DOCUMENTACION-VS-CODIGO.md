@@ -15,9 +15,9 @@ Este documento identifica funcionalidades que están **documentadas como impleme
 | Categoría | Documentado | Implementado | Gap |
 |-----------|-------------|--------------|-----|
 | Envío de correos | ✅ | ✅ | 0% |
-| Envíos programados | ✅ | 🟡 Parcial | 40% |
+| Envíos programados | ✅ | ✅ Sí | 0% |
 | Auto-respuestas | ✅ | 🟡 Parcial | 50% |
-| Clasificación IA | ✅ | ❌ No | 100% |
+| Clasificación IA | ✅ | ✅ Sí | 0% |
 | Cloud Functions | ✅ | ❌ No | 100% |
 | Retención trash | ✅ | ❌ No | 100% |
 | Webhooks Mailgun | ✅ | 🟡 Parcial | 30% |
@@ -42,50 +42,39 @@ Responsable: Backend Squad / SRE.
 
 **Estado real del código:**
 ```bash
-❌ NO EXISTE
+✅ IMPLEMENTADO (Actualización: Dic 2025)
 ```
 
-**Búsqueda realizada:**
-```bash
-grep -r "callClassificationAPI" backend/
-# Resultado: No results found
-```
-
-**Impacto:**
-- ❌ Clasificación automática no funciona
-- ❌ Solo hay heurística local básica
-- ❌ No hay API de IA conectada
-- ❌ Métricas de `classificationConfidence` son fake
+**Archivo:**
+- `backend/services/emailClassificationService.js` (líneas 1-351)
 
 **Lo que SÍ existe:**
-- ✅ `POST /api/email-automation/classification` - Guarda clasificación manual
-- ✅ Estructura en Firestore para almacenar clasificaciones
-- ❌ **NO HAY** llamada a OpenAI ni servicio de IA
+- ✅ `callClassificationAPI(emailData, context)` - Función exportada
+- ✅ Integración con OpenAI (gpt-4o-mini por defecto)
+- ✅ Fallback heurístico cuando OpenAI falla o no está configurado
+- ✅ Timeout de 30 segundos
+- ✅ Métricas de clasificación registradas en Firestore
+- ✅ Validación de respuesta y estructura JSON
+- ✅ Categorías: Proveedor, Invitado, Finanzas, Contratos, Facturas, Reuniones, RSVP, General
 
-**Código necesario (NO EXISTE):**
+**Código implementado:**
 ```javascript
-// backend/services/emailClassificationService.js - NO EXISTE
-async function callClassificationAPI(emailData, context) {
-  // Llamar a OpenAI
+// backend/services/emailClassificationService.js
+export async function callClassificationAPI(emailData, context = {}) {
+  // Validar que tenemos API key
+  if (!process.env.OPENAI_API_KEY) {
+    return fallbackClassification(emailData);
+  }
+
+  // Llamar a OpenAI con timeout
   const response = await openai.chat.completions.create({
-    model: "gpt-4",
-    messages: [
-      {
-        role: "system",
-        content: "Clasifica este email en categorías..."
-      },
-      {
-        role: "user",
-        content: JSON.stringify(emailData)
-      }
-    ]
+    model: MODEL, // gpt-4o-mini
+    messages: [...],
+    temperature: 0.3,
+    max_tokens: 500,
+    response_format: { type: 'json_object' }
   });
-  
-  return {
-    classification: response.category,
-    autoReply: response.shouldAutoReply,
-    confidence: response.confidence
-  };
+  // ... validación y retorno
 }
 ```
 
@@ -105,51 +94,49 @@ Responsable: Backend Squad.
 
 **Estado real del código:**
 ```bash
-🟡 PARCIALMENTE IMPLEMENTADO
+✅ IMPLEMENTADO (Actualización: Dic 2025)
 ```
+
+**Archivos:**
+- `backend/services/emailScheduler.js` - Servicio de programación
+- `backend/jobs/emailSchedulerCron.js` - Worker cron
+- `render.yaml` (líneas 45-50) - Configuración cron en Render
 
 **Lo que SÍ existe:**
 - ✅ `backend/services/emailScheduler.js` - Servicio de programación
 - ✅ `POST /api/email-automation/schedule/process` - Endpoint manual
 - ✅ `GET /api/email-automation/scheduled/status` - Estado de cola
+- ✅ **Cron job automático** configurado en Render cada 5 minutos
+- ✅ **Worker independiente** en `backend/jobs/emailSchedulerCron.js`
 
-**Lo que NO existe:**
-- ❌ **Cron job automático** (no se ejecuta solo)
-- ❌ **Worker independiente** que corra cada minuto
-- ❌ **Configuración en Cloud Scheduler** o similar
-
-**Situación actual:**
-```javascript
-// ✅ El código existe en backend/services/emailScheduler.js
-export async function processScheduledEmailQueue({ limit, dryRun }) {
-  // Procesa emails programados
-  // ...
-}
-
-// ✅ El endpoint existe
-router.post('/schedule/process', async (req, res) => {
-  // ...
-});
-
-// ❌ PERO NO HAY CRON que lo llame automáticamente
-// Los emails programados NO se envían solos
-```
-
-**Configuración necesaria (NO EXISTE):**
+**Configuración en render.yaml:**
 ```yaml
-# cloud-scheduler.yaml - NO EXISTE
-jobs:
-  - name: email-scheduler-worker
-    schedule: "*/1 * * * *"  # Cada minuto
-    url: https://maloveapp-backend.onrender.com/api/email-automation/schedule/process
-    headers:
-      x-cron-key: ${EMAIL_AUTOMATION_CRON_KEY}
+- type: cron
+  name: email-scheduler-worker
+  runtime: node
+  schedule: "*/5 * * * *"
+  buildCommand: npm ci --omit=dev
+  startCommand: node backend/jobs/emailSchedulerCron.js
 ```
 
-**Impacto:**
-- ⚠️ Los emails programados se guardan pero **nunca se envían**
-- ⚠️ Usuario programa un email → queda en cola indefinidamente
-- ⚠️ Requiere ejecución manual del endpoint
+**Código implementado:**
+```javascript
+// backend/jobs/emailSchedulerCron.js
+import { processScheduledEmailQueue } from '../services/emailScheduler.js';
+
+async function runEmailScheduler() {
+  const result = await processScheduledEmailQueue({
+    limit: 50,
+    dryRun: false
+  });
+  // ... logging y métricas
+}
+```
+
+**Estado:**
+- ✅ Funcionalidad completamente operativa
+- ✅ Los emails programados se envían automáticamente cada 5 minutos
+- ✅ Monitoring y logging configurado
 
 ---
 

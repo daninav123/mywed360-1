@@ -116,7 +116,7 @@ export default function BankConnect() {
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+              className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
             >
               <option value="ES">
                 {t('finance.bank.countries.es', { defaultValue: 'Espana' })}
@@ -143,7 +143,7 @@ export default function BankConnect() {
             <select
               value={selectedInstitution}
               onChange={(e) => setSelectedInstitution(e.target.value)}
-              className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+              className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
             >
               <option value="">
                 {t('finance.bank.selectBankPlaceholder', { defaultValue: 'Selecciona un banco...' })}
@@ -170,7 +170,7 @@ export default function BankConnect() {
         </div>
 
         {error && (
-          <div className="rounded-lg border border-[color:var(--color-danger)]/40 bg-[color:var(--color-danger)]/10 px-4 py-3 text-sm text-[color:var(--color-danger)]">
+          <div className="rounded-lg border border-[color:var(--color-danger-40)] bg-[color:var(--color-danger-10)] px-4 py-3 text-sm text-[color:var(--color-danger)]">
             {error}
             <div className="mt-3 space-y-2 text-xs text-[color:var(--color-muted)]">
               <p className="font-medium">
@@ -200,7 +200,7 @@ export default function BankConnect() {
         )}
 
         {requisition?.id && (
-          <div className="flex flex-col gap-2 rounded-lg border border-[color:var(--color-border)]/70 bg-[var(--color-surface)] px-4 py-3 text-sm text-[color:var(--color-text)] md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-2 rounded-lg border border-[color:var(--color-border-70)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[color:var(--color-text)] md:flex-row md:items-center md:justify-between">
             <span>
               {t('finance.bank.requisition', { defaultValue: 'Requisition:' })} {requisition.id}
             </span>
@@ -216,7 +216,7 @@ export default function BankConnect() {
           <h2 className="text-lg font-semibold text-[color:var(--color-text)]">
             {t('finance.bank.availableAccounts', { defaultValue: 'Cuentas disponibles' })}
           </h2>
-          <ul className="divide-y divide-[color:var(--color-border)]/50">
+          <ul className="divide-y divide-[color:var(--color-border)]">
             {accounts.map((account) => (
               <li
                 key={account}

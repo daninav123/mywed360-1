@@ -97,12 +97,13 @@ class MockQuery {
   }
 }
 
-const mockDb = {
+const mockDb = vi.hoisted(() => ({
   collection: vi.fn((name) => new MockQuery(name, () => mockData[name] || [])),
   collectionGroup: vi.fn((name) => new MockQuery(name, () => mockData[name] || [])),
-};
+}));
 
 vi.mock('../db.js', () => ({
+  __esModule: true,
   db: mockDb,
 }));
 

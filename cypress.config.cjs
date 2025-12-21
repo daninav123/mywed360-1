@@ -22,7 +22,7 @@ let firebaseInitialized = false;
 function initializeFirebase() {
   if (!firebaseInitialized && !admin.apps.length) {
     try {
-      const serviceAccountPath = path.resolve(__dirname, "backend/serviceAccountKey.json");
+      const serviceAccountPath = path.join(__dirname, 'serviceAccount.json');
       
       if (fs.existsSync(serviceAccountPath)) {
         const serviceAccount = require(serviceAccountPath);
@@ -32,7 +32,7 @@ function initializeFirebase() {
         firebaseInitialized = true;
         console.log("✅ Firebase Admin inicializado para Cypress");
       } else {
-        console.warn("⚠️ serviceAccountKey.json no encontrado, tareas de Firebase no disponibles");
+        console.warn("⚠️ serviceAccount.json no encontrado, tareas de Firebase no disponibles");
       }
     } catch (error) {
       console.error("❌ Error inicializando Firebase Admin:", error.message);

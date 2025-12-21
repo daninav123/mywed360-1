@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { vi } from 'vitest';
 
 import ProveedorBudgets from '../components/proveedores/ProveedorBudgets';
@@ -28,8 +28,12 @@ describe('<ProveedorBudgets />', () => {
     expect(screen.getByText('Fotografía')).toBeInTheDocument();
     expect(screen.getByText('Vídeo')).toBeInTheDocument();
 
-    // Click en Aceptar del primer presupuesto (pendiente)
-    const acceptBtn = screen.getAllByRole('button', { name: /aceptar/i })[0];
+    // Click en aceptar del presupuesto pendiente (puede ser Accept/Aceptar o la key de i18n)
+    const pendingItem = screen.getByText('Fotografía')?.closest('li');
+    expect(pendingItem).toBeTruthy();
+    const acceptBtn = within(pendingItem).getByRole('button', {
+      name: /aceptar|accept|suppliers\.budgets\.buttons\.accept/i,
+    });
     fireEvent.click(acceptBtn);
 
     expect(mockUpdate).toHaveBeenCalledWith('b1', 'accept');

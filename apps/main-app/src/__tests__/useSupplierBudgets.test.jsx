@@ -20,7 +20,16 @@ vi.mock('firebase/firestore', () => {
   };
 });
 
-vi.mock('../firebaseConfig', () => ({ db: {} }));
+vi.mock('../firebaseConfig', () => ({
+  auth: {
+    currentUser: {
+      uid: 'test-uid',
+      getIdToken: vi.fn(async () => 'test-token'),
+    },
+  },
+  db: {},
+  firebaseReady: Promise.resolve(),
+}));
 
 describe('useSupplierBudgets', () => {
   beforeEach(() => {
@@ -38,8 +47,15 @@ describe('useSupplierBudgets', () => {
     });
 
     expect(fetch).toHaveBeenCalledWith(
-      '/api/weddings/wed1/suppliers/sup1/budget',
-      expect.any(Object)
+      expect.stringContaining('/api/weddings/wed1/suppliers/sup1/budget'),
+      expect.objectContaining({
+        method: 'PUT',
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+          Authorization: expect.stringContaining('Bearer '),
+        }),
+        body: JSON.stringify({ action: 'accept', budgetId: 'bud1' }),
+      })
     );
   });
 });

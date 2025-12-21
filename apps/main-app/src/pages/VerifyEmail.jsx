@@ -108,7 +108,7 @@ export default function VerifyEmail() {
           <button
             data-testid="refresh-verification"
             onClick={handleRefresh}
-            className="flex-1 rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary)]/10"
+            className="flex-1 rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-10)]"
           >
             Ya verifique
           </button>

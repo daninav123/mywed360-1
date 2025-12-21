@@ -170,7 +170,7 @@ const AdminRevolut = () => {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
         Cargando Revolut...
       </div>
     );
@@ -180,16 +180,16 @@ const AdminRevolut = () => {
     <div className="space-y-6">
       <header className="flex flex-col gap-2">
         <div className="flex items-center gap-3">
-          <Shield className="h-6 w-6 text-[color:var(--color-primary,#6366f1)]" />
+          <Shield className="h-6 w-6 text-[color:var(--color-primary)]" />
           <div>
             <h1 className="text-xl font-semibold">Revolut Business</h1>
-            <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+            <p className="text-sm text-[color:var(--color-text-soft)]">
               Controla la cuenta de Revolut vinculada al proyecto: saldos, movimientos y acciones críticas.
             </p>
           </div>
         </div>
         {meta?.source && (
-          <span className="text-xs text-[var(--color-text-soft,#6b7280)]">
+          <span className="text-xs text-[color:var(--color-text-soft)]">
             Origen de datos: {meta.source}
           </span>
         )}
@@ -204,7 +204,7 @@ const AdminRevolut = () => {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Estado</p>
+            <p className="text-xs uppercase text-[color:var(--color-text-soft)]">Estado</p>
             {account.connected ? (
               <CheckCircle2 className="h-5 w-5 text-emerald-500" />
             ) : (
@@ -214,28 +214,28 @@ const AdminRevolut = () => {
           <p className="mt-3 text-lg font-semibold">
             {account.connected ? 'Conectada' : 'No conectada'}
           </p>
-          <p className="mt-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+          <p className="mt-1 text-xs text-[color:var(--color-text-soft)]">
             {account.businessName || 'Sin titular registrado'}
           </p>
         </article>
         <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
-          <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Saldo disponible</p>
+          <p className="text-xs uppercase text-[color:var(--color-text-soft)]">Saldo disponible</p>
           <p className="mt-3 text-2xl font-semibold">
             {formatCurrency(account.balance.available, account.balance.currency)}
           </p>
-          <p className="mt-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+          <p className="mt-1 text-xs text-[color:var(--color-text-soft)]">
             Pendiente: {formatCurrency(account.balance.pending, account.balance.currency)}
           </p>
         </article>
         <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
-          <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Ultima sincronizacion</p>
+          <p className="text-xs uppercase text-[color:var(--color-text-soft)]">Ultima sincronizacion</p>
           <p className="mt-3 text-lg font-semibold">{lastSyncLabel}</p>
-          <p className="mt-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+          <p className="mt-1 text-xs text-[color:var(--color-text-soft)]">
             Estado: {account.lastSyncStatus || 'sin datos'}
           </p>
         </article>
         <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
-          <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Webhooks</p>
+          <p className="text-xs uppercase text-[color:var(--color-text-soft)]">Webhooks</p>
           <p className="mt-3 text-lg font-semibold">
             {account.webhookStatus === 'ok'
               ? 'Sin incidencias'
@@ -243,7 +243,7 @@ const AdminRevolut = () => {
                 ? 'Sin verificar'
                 : account.webhookStatus}
           </p>
-          <p className="mt-1 text-xs text-[var(--color-text-soft,#6b7280)] truncate">
+          <p className="mt-1 text-xs text-[color:var(--color-text-soft)] truncate">
             {account.webhookUrl || 'Sin URL registrada'}
           </p>
         </article>
@@ -253,7 +253,7 @@ const AdminRevolut = () => {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold">Acciones rápidas</h2>
-            <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+            <p className="text-xs text-[color:var(--color-text-soft)]">
               Gestiona la sincronización y el acceso desde este panel.
             </p>
           </div>
@@ -262,7 +262,7 @@ const AdminRevolut = () => {
               type="button"
               onClick={handleSync}
               disabled={syncing}
-              className="inline-flex items-center gap-2 rounded-md border border-soft px-3 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)] disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-md border border-soft px-3 py-2 text-sm hover:bg-[var(--color-bg-soft)] disabled:opacity-50"
             >
               <RefreshCcw className="h-4 w-4" />
               {syncing ? 'Sincronizando...' : 'Sincronizar ahora'}
@@ -271,7 +271,7 @@ const AdminRevolut = () => {
               type="button"
               onClick={handleRefreshWebhooks}
               disabled={!account.connected || refreshingWebhooks}
-              className="inline-flex items-center gap-2 rounded-md border border-soft px-3 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)] disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-md border border-soft px-3 py-2 text-sm hover:bg-[var(--color-bg-soft)] disabled:opacity-50"
             >
               <LinkIcon className="h-4 w-4" />
               {refreshingWebhooks ? 'Rearmando...' : 'Rearmar webhooks'}
@@ -291,7 +291,7 @@ const AdminRevolut = () => {
                 type="button"
                 onClick={handleConnect}
                 disabled={connecting}
-                className="inline-flex items-center gap-2 rounded-md bg-[color:var(--color-primary,#6366f1)] px-3 py-2 text-sm font-medium text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-md bg-[color:var(--color-primary)] px-3 py-2 text-sm font-medium text-[color:var(--color-on-primary)] hover:bg-[color:var(--color-primary-dark)] disabled:opacity-50"
               >
                 <ExternalLink className="h-4 w-4" />
                 {connecting ? 'Abriendo Revolut...' : 'Conectar cuenta'}
@@ -302,7 +302,7 @@ const AdminRevolut = () => {
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="rounded-lg border border-soft p-4">
             <h3 className="text-sm font-semibold">Limites</h3>
-            <dl className="mt-3 space-y-2 text-xs text-[var(--color-text-soft,#6b7280)]">
+            <dl className="mt-3 space-y-2 text-xs text-[color:var(--color-text-soft)]">
               <div className="flex justify-between">
                 <dt>Diario</dt>
                 <dd>
@@ -326,7 +326,7 @@ const AdminRevolut = () => {
           <div className="rounded-lg border border-soft p-4">
             <h3 className="text-sm font-semibold">Pendientes</h3>
             {showAttentionBox ? (
-              <ul className="mt-3 space-y-2 text-xs text-[var(--color-text-soft,#6b7280)]">
+              <ul className="mt-3 space-y-2 text-xs text-[color:var(--color-text-soft)]">
                 {account.requiresAction && (
                   <li className="flex items-center gap-2 text-amber-600">
                     <AlertCircle className="h-4 w-4" />
@@ -341,7 +341,7 @@ const AdminRevolut = () => {
                 ))}
               </ul>
             ) : (
-              <p className="mt-3 text-xs text-[var(--color-text-soft,#6b7280)]">Sin tareas pendientes.</p>
+              <p className="mt-3 text-xs text-[color:var(--color-text-soft)]">Sin tareas pendientes.</p>
             )}
           </div>
         </div>
@@ -351,17 +351,17 @@ const AdminRevolut = () => {
         <header className="flex items-center justify-between border-b border-soft px-4 py-3">
           <div>
             <h2 className="text-sm font-semibold">Movimientos recientes</h2>
-            <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+            <p className="text-xs text-[color:var(--color-text-soft)]">
               Últimas transferencias sincronizadas desde Revolut Business.
             </p>
           </div>
-          <span className="text-xs text-[var(--color-text-soft,#6b7280)]">
+          <span className="text-xs text-[color:var(--color-text-soft)]">
             Total: {transfers.length}
           </span>
         </header>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-soft text-sm">
-            <thead className="bg-[var(--color-bg-soft,#f3f4f6)] text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+            <thead className="bg-[var(--color-bg-soft)] text-xs uppercase text-[color:var(--color-text-soft)]">
               <tr>
                 <th className="px-4 py-3 text-left">Fecha</th>
                 <th className="px-4 py-3 text-left">Concepto</th>
@@ -373,7 +373,7 @@ const AdminRevolut = () => {
             <tbody className="divide-y divide-soft">
               {transfers.map((transfer) => (
                 <tr key={transfer.id || `${transfer.createdAt}-${transfer.reference}`}>
-                  <td className="px-4 py-3 text-xs text-[var(--color-text-soft,#6b7280)]">
+                  <td className="px-4 py-3 text-xs text-[color:var(--color-text-soft)]">
                     {formatAbsoluteDate(transfer.createdAt)}
                   </td>
                   <td className="px-4 py-3">
@@ -386,7 +386,7 @@ const AdminRevolut = () => {
                       <span>{transfer.reference || 'Sin referencia'}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-xs text-[var(--color-text-soft,#6b7280)]">
+                  <td className="px-4 py-3 text-xs text-[color:var(--color-text-soft)]">
                     {transfer.counterparty}
                   </td>
                   <td className="px-4 py-3 text-right font-medium">
@@ -395,7 +395,7 @@ const AdminRevolut = () => {
                       transfer.currency || account.balance.currency,
                     )}
                   </td>
-                  <td className="px-4 py-3 text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+                  <td className="px-4 py-3 text-xs uppercase text-[color:var(--color-text-soft)]">
                     {transfer.status}
                   </td>
                 </tr>
@@ -404,7 +404,7 @@ const AdminRevolut = () => {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]"
+                    className="px-4 py-6 text-center text-sm text-[color:var(--color-text-soft)]"
                   >
                     Sin movimientos registrados en la última sincronización.
                   </td>
@@ -419,11 +419,11 @@ const AdminRevolut = () => {
         <header className="flex items-center justify-between border-b border-soft px-4 py-3">
           <div>
             <h2 className="text-sm font-semibold">Extractos</h2>
-            <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+            <p className="text-xs text-[color:var(--color-text-soft)]">
               Descarga de extractos mensuales para conciliación y reporting.
             </p>
           </div>
-          <Download className="h-4 w-4 text-[color:var(--color-primary,#6366f1)]" />
+          <Download className="h-4 w-4 text-[color:var(--color-primary)]" />
         </header>
         <div className="divide-y divide-soft text-sm">
           {statements.map((statement) => (
@@ -432,7 +432,7 @@ const AdminRevolut = () => {
                 <p className="font-medium">
                   {statement.period || statement.id || 'Periodo sin especificar'}
                 </p>
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                <p className="text-xs text-[color:var(--color-text-soft)]">
                   Generado {formatAbsoluteDate(statement.createdAt)} · Estado {statement.status}
                 </p>
               </div>
@@ -441,20 +441,20 @@ const AdminRevolut = () => {
                   href={statement.downloadUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md border border-soft px-3 py-2 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                  className="inline-flex items-center gap-2 rounded-md border border-soft px-3 py-2 text-xs hover:bg-[var(--color-bg-soft)]"
                 >
                   <Download className="h-4 w-4" />
                   Descargar
                 </a>
               ) : (
-                <span className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                <span className="text-xs text-[color:var(--color-text-soft)]">
                   No disponible
                 </span>
               )}
             </article>
           ))}
           {statements.length === 0 && (
-            <div className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]">
+            <div className="px-4 py-6 text-center text-sm text-[color:var(--color-text-soft)]">
               Aún no se han sincronizado extractos desde Revolut.
             </div>
           )}

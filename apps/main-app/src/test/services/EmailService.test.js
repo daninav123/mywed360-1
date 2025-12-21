@@ -1,45 +1,20 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import * as EmailService from '../../services/EmailService';
+import { get as apiGet, post as apiPost, put as apiPut, del as apiDel } from '../../services/apiClient';
+import * as EmailService from '../../services/emailService';
 
 // Mock para fetch global
 global.fetch = vi.fn();
 
-// Mock para localStorage
-const localStorageMock = (() => {
-  let store = {};
-  return {
-    getItem: vi.fn((key) => store[key] || null),
-    setItem: vi.fn((key, value) => {
-      store[key] = value.toString();
-    }),
-    clear: vi.fn(() => {
-      store = {};
-    }),
-    removeItem: vi.fn((key) => {
-      delete store[key];
-    }),
-    getAll: () => store,
-  };
-})();
+// Mock de localStorage ahora manejado por setup.js
+// No es necesario redefinir window.localStorage aquí
 
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-});
-
-// Mock para import.meta.env
-vi.mock('../../services/EmailService', async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    // Variables de entorno simuladas
-    BASE: 'https://api.test.maloveapp.com',
-    MAILGUN_API_KEY: 'key-test123456789',
-    MAILGUN_DOMAIN: 'test.maloveapp.com',
-    USE_MAILGUN: true,
-    USE_BACKEND: false,
-  };
-});
+vi.mock('../../services/apiClient', () => ({
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  del: vi.fn(),
+}));
 
 describe('EmailService', () => {
   const mockProfile = {
@@ -66,12 +41,10 @@ describe('EmailService', () => {
     vi.clearAllMocks();
     localStorage.clear();
 
-    // Configurar respuesta de fetch por defecto
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ success: true, data: {} }),
-    });
+    apiGet.mockResolvedValue({ ok: true, status: 200, json: async () => ({ success: true, data: {} }) });
+    apiPost.mockResolvedValue({ ok: true, status: 200, json: async () => ({ success: true, data: {} }) });
+    apiPut.mockResolvedValue({ ok: true, status: 200, json: async () => ({ success: true, data: {} }) });
+    apiDel.mockResolvedValue({ ok: true, status: 200, json: async () => ({ success: true, data: {} }) });
   });
 
   afterEach(() => {
@@ -81,21 +54,21 @@ describe('EmailService', () => {
   describe('initEmailService', () => {
     it('devuelve una dirección de email válida basada en el perfil', async () => {
       const email = await EmailService.initEmailService(mockProfile);
-      expect(email).toBe('maria.garcia@test.maloveapp.com');
+      expect(email).toBe('maria.garcia@malove.app');
       expect(EmailService.CURRENT_USER).toBe(mockProfile);
-      expect(EmailService.CURRENT_USER_EMAIL).toBe('maria.garcia@test.maloveapp.com');
+      expect(EmailService.CURRENT_USER_EMAIL).toBe('maria.garcia@malove.app');
     });
 
     it('usa el emailAlias si está definido', async () => {
       const profileWithAlias = { ...mockProfile, emailAlias: 'miboda' };
       const email = await EmailService.initEmailService(profileWithAlias);
-      expect(email).toBe('miboda@test.maloveapp.com');
+      expect(email).toBe('miboda@malove.app');
     });
 
     it('usa solo nombre si no hay apellido', async () => {
       const profileNoLastName = { ...mockProfile, brideLastName: '' };
       const email = await EmailService.initEmailService(profileNoLastName);
-      expect(email).toBe('maria@test.maloveapp.com');
+      expect(email).toBe('maria@malove.app');
     });
 
     it('usa userId si no hay nombre', async () => {
@@ -105,7 +78,7 @@ describe('EmailService', () => {
         brideLastName: '',
       };
       const email = await EmailService.initEmailService(profileNoName);
-      expect(email).toBe('useruser123@test.maloveapp.com');
+      expect(email).toBe('user123@malove.app');
     });
   });
 
@@ -117,11 +90,11 @@ describe('EmailService', () => {
 
       // Guardar emails de prueba en localStorage
       const mockEmails = [mockEmail];
-      localStorage.setItem('maloveapp_mails', JSON.stringify(mockEmails));
+      localStorage.setItem('malove_mails', JSON.stringify(mockEmails));
 
       const result = await EmailService.getMails('inbox');
-      expect(result).toEqual(mockEmails);
-      expect(localStorage.getItem).toHaveBeenCalledWith('maloveapp_mails');
+      expect(result).toEqual([{ ...mockEmail, tags: [] }]);
+      expect(localStorage.getItem).toHaveBeenCalledWith('malove_mails');
     });
 
     it('llama a la API del backend cuando está configurado', async () => {
@@ -131,15 +104,12 @@ describe('EmailService', () => {
 
       // Mock respuesta del backend
       const mockResponse = [mockEmail];
-      global.fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, data: mockResponse }),
-      });
+      apiGet.mockResolvedValueOnce({ ok: true, json: async () => ({ success: true, data: mockResponse }) });
 
       const result = await EmailService.getMails('inbox');
 
-      expect(result).toEqual(mockResponse);
-      expect(global.fetch).toHaveBeenCalled();
+      expect(result).toEqual([{ ...mockEmail, tags: [] }]);
+      expect(apiGet).toHaveBeenCalled();
     });
 
     it('maneja errores de API correctamente', async () => {
@@ -148,19 +118,19 @@ describe('EmailService', () => {
       vi.spyOn(EmailService, 'USE_BACKEND', 'get').mockReturnValue(true);
 
       // Mock error de API
-      global.fetch.mockResolvedValueOnce({
+      apiGet.mockResolvedValueOnce({
         ok: false,
         status: 500,
         json: async () => ({ success: false, message: 'Error interno' }),
       });
 
       // Crear datos en localStorage como fallback
-      localStorage.setItem('maloveapp_mails', JSON.stringify([mockEmail]));
+      localStorage.setItem('malove_mails', JSON.stringify([mockEmail]));
 
       const result = await EmailService.getMails('inbox');
 
       // Debe usar el fallback de localStorage ante un error
-      expect(result).toEqual([mockEmail]);
+      expect(result).toEqual([{ ...mockEmail, tags: [] }]);
     });
   });
 
@@ -173,10 +143,7 @@ describe('EmailService', () => {
     it('envía correo utilizando Mailgun cuando está disponible', async () => {
       // Configurar para usar Mailgun
       vi.spyOn(EmailService, 'USE_MAILGUN', 'get').mockReturnValue(true);
-
-      const sendMailgunSpy = vi
-        .spyOn(EmailService, 'sendMailWithMailgun')
-        .mockResolvedValueOnce({ success: true, id: 'msg123' });
+      apiPost.mockResolvedValueOnce({ ok: true, json: async () => ({ success: true, data: { id: 'msg123' } }) });
 
       const mailData = {
         to: 'destinatario@example.com',
@@ -186,18 +153,37 @@ describe('EmailService', () => {
 
       const result = await EmailService.sendMail(mailData);
 
-      expect(sendMailgunSpy).toHaveBeenCalled();
       expect(result.success).toBe(true);
+      expect(apiPost).toHaveBeenCalled();
     });
 
     it('envía correo utilizando backend cuando no hay Mailgun', async () => {
       // Configurar para usar backend
       vi.spyOn(EmailService, 'USE_MAILGUN', 'get').mockReturnValue(false);
       vi.spyOn(EmailService, 'USE_BACKEND', 'get').mockReturnValue(true);
+      apiPost.mockResolvedValueOnce({ ok: true, json: async () => ({ success: true, data: { id: 'msg123' } }) });
 
-      global.fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, data: { id: 'msg123' } }),
+      const mailData = {
+        to: 'destinatario@example.com',
+        subject: 'Asunto de prueba',
+        body: 'Contenido de prueba',
+      };
+
+      const result = await EmailService.sendMail(mailData);
+
+      expect(result.success).toBe(true);
+      expect(apiPost).toHaveBeenCalled();
+    });
+
+    it('almacena correo en localStorage cuando no hay backend ni Mailgun', async () => {
+      // Configurar para usar localStorage
+      vi.spyOn(EmailService, 'USE_MAILGUN', 'get').mockReturnValue(false);
+      vi.spyOn(EmailService, 'USE_BACKEND', 'get').mockReturnValue(false);
+
+      apiPost.mockResolvedValue({
+        ok: false,
+        status: 500,
+        json: async () => ({ success: false, message: 'Error interno' }),
       });
 
       const mailData = {
@@ -208,28 +194,12 @@ describe('EmailService', () => {
 
       const result = await EmailService.sendMail(mailData);
 
-      expect(global.fetch).toHaveBeenCalled();
       expect(result.success).toBe(true);
-    });
-
-    it('almacena correo en localStorage cuando no hay backend ni Mailgun', async () => {
-      // Configurar para usar localStorage
-      vi.spyOn(EmailService, 'USE_MAILGUN', 'get').mockReturnValue(false);
-      vi.spyOn(EmailService, 'USE_BACKEND', 'get').mockReturnValue(false);
-
-      const mailData = {
-        to: 'destinatario@example.com',
-        subject: 'Asunto de prueba',
-        body: 'Contenido de prueba',
-      };
-
-      const result = await EmailService.sendMail(mailData);
-
-      expect(result.success).toBe(true);
+      expect(result.storedLocally).toBe(true);
       expect(localStorage.setItem).toHaveBeenCalled();
 
       // Verificar que el correo se guardó en localStorage
-      const saved = JSON.parse(localStorage.getItem('maloveapp_mails'));
+      const saved = JSON.parse(localStorage.getItem('malove_mails'));
       expect(saved).toHaveLength(1);
       expect(saved[0].subject).toBe('Asunto de prueba');
       expect(saved[0].folder).toBe('sent');
@@ -240,7 +210,7 @@ describe('EmailService', () => {
     beforeEach(() => {
       // Guardar emails de prueba en localStorage
       const mockEmails = [mockEmail];
-      localStorage.setItem('maloveapp_mails', JSON.stringify(mockEmails));
+      localStorage.setItem('malove_mails', JSON.stringify(mockEmails));
     });
 
     it('marca un email como leído correctamente', async () => {
@@ -251,7 +221,7 @@ describe('EmailService', () => {
       await EmailService.markAsRead('email123');
 
       // Verificar que el email fue marcado como leído
-      const saved = JSON.parse(localStorage.getItem('maloveapp_mails'));
+      const saved = JSON.parse(localStorage.getItem('malove_mails'));
       expect(saved[0].read).toBe(true);
     });
 
@@ -263,7 +233,7 @@ describe('EmailService', () => {
       await EmailService.deleteMail('email123');
 
       // Verificar que el email fue eliminado
-      const saved = JSON.parse(localStorage.getItem('maloveapp_mails'));
+      const saved = JSON.parse(localStorage.getItem('malove_mails'));
       expect(saved).toHaveLength(0);
     });
 
@@ -274,8 +244,8 @@ describe('EmailService', () => {
 
       await EmailService.markAsRead('email123');
 
-      expect(global.fetch).toHaveBeenCalled();
-      expect(global.fetch.mock.calls[0][0]).toContain('/api/mail/email123/read');
+      expect(apiPost).toHaveBeenCalled();
+      expect(apiPost.mock.calls[0][0]).toContain('/api/mail/email123/read');
     });
 
     it('llama a la API del backend para eliminar cuando está disponible', async () => {
@@ -285,9 +255,8 @@ describe('EmailService', () => {
 
       await EmailService.deleteMail('email123');
 
-      expect(global.fetch).toHaveBeenCalled();
-      expect(global.fetch.mock.calls[0][0]).toContain('/api/mail/email123');
-      expect(global.fetch.mock.calls[0][1].method).toBe('DELETE');
+      expect(apiDel).toHaveBeenCalled();
+      expect(apiDel.mock.calls[0][0]).toContain('/api/mail/email123');
     });
   });
 

@@ -2,6 +2,7 @@
 import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import { Flag } from 'lucide-react';
 
+import { Card } from '../ui';
 import { addMonths, normalizeAnyDate } from './utils/dateUtils.js';
 import { auth } from '../../firebaseConfig';
 
@@ -28,21 +29,24 @@ const SEGMENT_GAP_DAYS = 10;
 const RISK_STYLES = {
   ok: {
     label: 'En curso',
-    fill: 'rgba(16,185,129,0.12)',
-    border: 'rgba(16,185,129,0.45)',
-    accent: '#10b981',
+    fill: 'var(--color-success-10)',
+    barFill: 'var(--color-success-15)',
+    border: 'var(--color-success-30)',
+    accent: 'var(--color-success)',
   },
   warning: {
     label: 'Atención',
-    fill: 'rgba(245,158,11,0.18)',
-    border: 'rgba(245,158,11,0.6)',
-    accent: '#f59e0b',
+    fill: 'var(--color-warning-10)',
+    barFill: 'var(--color-warning-15)',
+    border: 'var(--color-warning-30)',
+    accent: 'var(--color-warning)',
   },
   critical: {
     label: 'Riesgo',
-    fill: 'rgba(220,38,38,0.18)',
-    border: 'rgba(220,38,38,0.65)',
-    accent: '#dc2626',
+    fill: 'var(--color-danger-10)',
+    barFill: 'var(--color-danger-15)',
+    border: 'var(--color-danger-30)',
+    accent: 'var(--color-danger)',
   },
 };
 
@@ -1147,8 +1151,8 @@ export default function LongTermTasksGantt({
   const contentHeight = HEADER_HEIGHT + bodyHeight;
 
   return (
-    <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 transition-all hover:shadow-lg" data-testid="longterm-gantt-new">
-      <h2 className="text-xl font-semibold mb-4">Tareas a Largo Plazo</h2>
+    <Card className="p-6 transition-shadow hover:shadow-lg" data-testid="longterm-gantt-new">
+      <h2 className="text-xl font-semibold mb-4 text-body">Tareas a Largo Plazo</h2>
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginBottom: 16 }}>
         {riskLegend.map((item) => (
           <span
@@ -1161,7 +1165,7 @@ export default function LongTermTasksGantt({
               borderRadius: 999,
               border: `1px solid ${item.border}`,
               background: item.fill,
-              color: '#0f172a',
+              color: 'var(--color-text)',
               fontSize: 12,
             }}
           >
@@ -1179,23 +1183,25 @@ export default function LongTermTasksGantt({
         ))}
       </div>
       {debugEnabled && (
-        <div data-testid="gantt-debug" style={{ marginBottom: 8, fontSize: 12, color: '#4b5563', display: 'flex', gap: 12, alignItems: 'center' }}>
+        <div data-testid="gantt-debug" style={{ marginBottom: 8, fontSize: 12, color: 'var(--color-muted)', display: 'flex', gap: 12, alignItems: 'center' }}>
           <span>Inicio: {(() => { try { return new Intl.DateTimeFormat('es-ES', { year: 'numeric', month: 'short', day: '2-digit' }).format(timelineStart); } catch { return timelineStart?.toISOString?.().slice(0, 10) || String(timelineStart); } })()}</span>
           <span>Fin: {(() => { try { return new Intl.DateTimeFormat('es-ES', { year: 'numeric', month: 'short', day: '2-digit' }).format(timelineEnd); } catch { return timelineEnd?.toISOString?.().slice(0, 10) || String(timelineEnd); } })()}</span>
         </div>
       )}
 
-      <div className="w-full flex items-stretch gap-3">
-        {/* Columna izquierda fija */}
-        <div
-          className="shrink-0 rounded-lg border border-gray-100 bg-white"
-          style={{ width: leftColumnWidth, height: contentHeight, overflow: 'hidden' }}
-        >
-          <div style={{ height: HEADER_HEIGHT, display: 'flex', alignItems: 'center', padding: '0 10px', borderBottom: '1px solid #eee', fontWeight: 600, color: '#111827' }}>Tarea</div>
-          <div
-            style={{
-              position: 'relative',
-              height: bodyHeight,
+	      <div className="w-full flex items-stretch gap-3">
+	        {/* Columna izquierda fija */}
+	        <div
+	          className="shrink-0 rounded-lg border border-soft bg-surface"
+	          style={{ width: leftColumnWidth, height: contentHeight, overflow: 'hidden' }}
+	        >
+	          <div className="flex items-center px-3 border-b border-soft font-semibold text-body" style={{ height: HEADER_HEIGHT }}>
+	            Tarea
+	          </div>
+	          <div
+	            style={{
+	              position: 'relative',
+	              height: bodyHeight,
               paddingTop: BODY_PADDING_TOP,
               paddingBottom: Math.max(0, BODY_PADDING_BOTTOM - 6),
             }}
@@ -1221,31 +1227,32 @@ export default function LongTermTasksGantt({
               const riskMeta = RISK_STYLES[riskLevel] || RISK_STYLES.ok;
               const riskTitle = t?.risk?.message || riskMeta.label;
               const parentBg = isParent ? riskMeta.fill : 'transparent';
-              const zebraBg = i % 2 === 0 ? 'rgba(148, 163, 184, 0.08)' : 'transparent';
+	              const zebraBg = i % 2 === 0 ? 'var(--color-text-5)' : 'transparent';
               return (
-                <div
-                  key={`left-${row.kind}-${row.id}-${i}`}
-                  id={isParent ? `gantt-row-parent-${row.id}` : undefined}
-                  onClick={onClick}
-                  title={t?.name || t?.title || ''}
-                  style={{
+	                <div
+	                  key={`left-${row.kind}-${row.id}-${i}`}
+	                  id={isParent ? `gantt-row-parent-${row.id}` : undefined}
+	                  onClick={onClick}
+	                  title={t?.name || t?.title || ''}
+	                  style={{
                     position: 'absolute',
                     left: 0,
                     right: 0,
                     top: i * rowHeight,
                     height: rowHeight,
                     display: 'flex',
-                    alignItems: 'center',
-                    padding: '2px 10px',
-                    boxSizing: 'border-box',
-                    cursor: 'pointer',
-                    color: '#111827',
-                    fontSize: 13,
-                    borderBottom: i === rows.length - 1 ? 'none' : '1px dashed #f0f0f0',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    background: isParent ? parentBg : zebraBg,
+	                    alignItems: 'center',
+	                    padding: '2px 10px',
+	                    boxSizing: 'border-box',
+	                    cursor: 'pointer',
+	                    color: 'var(--color-text)',
+	                    fontSize: 13,
+	                    borderBottom:
+	                      i === rows.length - 1 ? 'none' : '1px dashed var(--color-border-60)',
+	                    overflow: 'hidden',
+	                    textOverflow: 'ellipsis',
+	                    whiteSpace: 'nowrap',
+	                    background: isParent ? parentBg : zebraBg,
                     borderLeft: isParent ? `3px solid ${riskMeta.accent}` : undefined,
                   }}
                 >
@@ -1253,32 +1260,32 @@ export default function LongTermTasksGantt({
                     showSubtasks ? (
                       <button
                         type="button"
-                        aria-label={parentExpanded ? 'Ocultar subtareas' : 'Ver subtareas'}
-                        aria-expanded={parentExpanded}
-                        onClick={(e) => { e.stopPropagation(); toggleParent(row.id); }}
-                        style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#374151', background: 'transparent', border: 'none' }}
-                      >
+	                        aria-label={parentExpanded ? 'Ocultar subtareas' : 'Ver subtareas'}
+	                        aria-expanded={parentExpanded}
+	                        onClick={(e) => { e.stopPropagation(); toggleParent(row.id); }}
+	                        style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text)', background: 'transparent', border: 'none' }}
+	                      >
                         {parentExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                       </button>
                     ) : (
                       <button
                         type="button"
-                        aria-label="Ver detalles de la tarea padre"
-                        onClick={(e) => { e.stopPropagation(); emitParentSelect(row.task); }}
-                        style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1d4ed8', background: 'transparent', border: 'none' }}
-                      >
-                        <ChevronRight size={16} />
-                      </button>
+	                        aria-label="Ver detalles de la tarea padre"
+	                        onClick={(e) => { e.stopPropagation(); emitParentSelect(row.task); }}
+	                        style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', background: 'transparent', border: 'none' }}
+	                      >
+	                        <ChevronRight size={16} />
+	                      </button>
                     )
                   ) : isSegment ? (
                     showSubtasks ? (
                       <button
                         type="button"
-                        aria-label={segmentExpanded ? 'Ocultar tareas del segmento' : 'Ver tareas del segmento'}
-                        aria-expanded={segmentExpanded}
-                        onClick={(e) => { e.stopPropagation(); toggleSegment(row.id); }}
-                        style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#374151', background: 'transparent', border: 'none' }}
-                      >
+	                        aria-label={segmentExpanded ? 'Ocultar tareas del segmento' : 'Ver tareas del segmento'}
+	                        aria-expanded={segmentExpanded}
+	                        onClick={(e) => { e.stopPropagation(); toggleSegment(row.id); }}
+	                        style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text)', background: 'transparent', border: 'none' }}
+	                      >
                         {segmentExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                       </button>
                     ) : (
@@ -1287,11 +1294,11 @@ export default function LongTermTasksGantt({
                   ) : (
                     <span style={{ width: 16, display: 'inline-block', opacity: 0.7 }}>•</span>
                   )}
-                  {/* Guía vertical/árbol según nivel */}
-                  {!isParent && showSubtasks && (
-                    <span style={{ position: 'absolute', left: 28 + (isSegment ? 0 : 12), top: 0, bottom: 0, width: 1, background: '#e5e7eb' }} />
-                  )}
-                  <span style={{ marginLeft: leftPad }}>{t?.name || t?.title || (isSegment ? 'Segmento' : 'Tarea')}</span>
+	                  {/* Guía vertical/árbol según nivel */}
+	                  {!isParent && showSubtasks && (
+	                    <span style={{ position: 'absolute', left: 28 + (isSegment ? 0 : 12), top: 0, bottom: 0, width: 1, background: 'var(--color-border)' }} />
+	                  )}
+	                  <span style={{ marginLeft: leftPad }}>{t?.name || t?.title || (isSegment ? 'Segmento' : 'Tarea')}</span>
                   {isParent && riskLevel !== 'ok' && (
                     <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
                       <span
@@ -1315,98 +1322,140 @@ export default function LongTermTasksGantt({
           </div>
         </div>
 
-        {/* Zona scrollable */}
-        <div
-          ref={containerRef || scrollRef}
-          className="grow overflow-y-hidden mb-4 border border-gray-100 rounded-lg shadow-sm"
-          style={{
-            height: contentHeight + 1,
-            overflowX: horizontalOverflow ? 'auto' : 'hidden',
-          }}
-          data-testid="longterm-gantt-scroll"
-        >
+	        {/* Zona scrollable */}
+	        <div
+	          ref={containerRef || scrollRef}
+	          className="grow overflow-y-hidden mb-4 border border-soft rounded-lg shadow-sm bg-surface"
+	          style={{
+	            height: contentHeight + 1,
+	            overflowX: 'auto',
+	          }}
+	          data-testid="longterm-gantt-scroll"
+	        >
           {/* Cabecera: años + meses */}
-          <div style={{ position: 'relative', height: HEADER_HEIGHT, borderBottom: '1px solid #eee', width: contentWidth }}>
-            {yearLabels.map((y) => (
-              <div key={y.key} style={{ position: 'absolute', left: y.left, top: 0, width: y.width, height: 24, boxSizing: 'border-box', borderLeft: '1px solid #f3f4f6', borderRight: '1px solid #f3f4f6', background: 'linear-gradient(180deg, #fafafa, #f7f7f7)', color: '#111827', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{y.year}</div>
-            ))}
-            {monthLabels.map((m) => (
-              <div key={m.key} style={{ position: 'absolute', left: m.left, top: 24, width: effectiveColW, height: 32, borderLeft: '1px solid #f0f0f0', boxSizing: 'border-box', padding: '6px 8px', fontSize: 12, color: '#555', textTransform: 'capitalize', borderTop: '1px solid #f3f4f6' }}>{m.text}</div>
-            ))}
-          </div>
+	          <div style={{ position: 'relative', height: HEADER_HEIGHT, borderBottom: '1px solid var(--color-border)', width: contentWidth }}>
+	            {yearLabels.map((y) => (
+	              <div
+	                key={y.key}
+	                style={{
+	                  position: 'absolute',
+	                  left: y.left,
+	                  top: 0,
+	                  width: y.width,
+	                  height: 24,
+	                  boxSizing: 'border-box',
+	                  borderLeft: '1px solid var(--color-border-50)',
+	                  borderRight: '1px solid var(--color-border-50)',
+	                  background: 'var(--color-text-5)',
+	                  color: 'var(--color-text)',
+	                  fontWeight: 600,
+	                  fontSize: 12,
+	                  display: 'flex',
+	                  alignItems: 'center',
+	                  justifyContent: 'center',
+	                }}
+	              >
+	                {y.year}
+	              </div>
+	            ))}
+	            {monthLabels.map((m) => (
+	              <div
+	                key={m.key}
+	                style={{
+	                  position: 'absolute',
+	                  left: m.left,
+	                  top: 24,
+	                  width: effectiveColW,
+	                  height: 32,
+	                  borderLeft: '1px solid var(--color-border-50)',
+	                  boxSizing: 'border-box',
+	                  padding: '6px 8px',
+	                  fontSize: 12,
+	                  color: 'var(--color-muted)',
+	                  textTransform: 'capitalize',
+	                  borderTop: '1px solid var(--color-border-50)',
+	                  overflow: 'hidden',
+	                  textOverflow: 'ellipsis',
+	                  whiteSpace: 'nowrap',
+	                }}
+	              >
+	                {m.text}
+	              </div>
+	            ))}
+	          </div>
 
           {/* Grid + contenido */}
           <div style={{ position: 'relative', width: contentWidth, height: bodyHeight, paddingTop: BODY_PADDING_TOP, paddingBottom: BODY_PADDING_BOTTOM }}>
-            {monthLabels.map((m) => (
-              <div
-                key={`bg-${m.key}`}
-                style={{
-                  position: 'absolute',
-                  left: m.left,
-                  top: 0,
-                  bottom: 0,
-                  width: effectiveColW,
-                  background: m.key % 2 === 0 ? 'rgba(15, 23, 42, 0.03)' : 'transparent',
-                }}
-              />
-            ))}
-            {rows.map((row, rowIdx) => (
-              <div
-                key={`row-stripe-${row.id}-${rowIdx}`}
-                style={{
+	            {monthLabels.map((m) => (
+	              <div
+	                key={`bg-${m.key}`}
+	                style={{
+	                  position: 'absolute',
+	                  left: m.left,
+	                  top: 0,
+	                  bottom: 0,
+	                  width: effectiveColW,
+	                  background: m.key % 2 === 0 ? 'var(--color-text-5)' : 'transparent',
+	                }}
+	              />
+	            ))}
+	            {rows.map((row, rowIdx) => (
+	              <div
+	                key={`row-stripe-${row.id}-${rowIdx}`}
+	                style={{
                   position: 'absolute',
                   left: 0,
                   right: 0,
-                  top: rowIdx * rowHeight,
-                  height: rowHeight,
-                  background: rowIdx % 2 === 0 ? 'rgba(148, 163, 184, 0.05)' : 'transparent',
-                  pointerEvents: 'none',
-                }}
-              />
-            ))}
-            {monthLabels.map((m) => (
-              <div
-                key={`grid-${m.key}`}
-                style={{
+	                  top: rowIdx * rowHeight,
+	                  height: rowHeight,
+	                  background: rowIdx % 2 === 0 ? 'var(--color-text-5)' : 'transparent',
+	                  pointerEvents: 'none',
+	                }}
+	              />
+	            ))}
+	            {monthLabels.map((m) => (
+	              <div
+	                key={`grid-${m.key}`}
+	                style={{
                   position: 'absolute',
                   left: m.left,
-                  top: 0,
-                  bottom: 0,
-                  width: 1,
-                  background: '#ececec',
-                }}
-              />
-            ))}
-            {monthLabels
-              .filter((m) => m.date?.getMonth?.() % 3 === 0)
-              .map((m) => (
+	                  top: 0,
+	                  bottom: 0,
+	                  width: 1,
+	                  background: 'var(--color-border-50)',
+	                }}
+	              />
+	            ))}
+	            {monthLabels
+	              .filter((m) => m.date?.getMonth?.() % 3 === 0)
+	              .map((m) => (
                 <div
                   key={`quarter-${m.key}`}
                   style={{
                     position: 'absolute',
                     left: m.left,
-                    top: 0,
-                    bottom: 0,
-                    width: 2,
-                    background: 'rgba(15, 23, 42, 0.08)',
-                    pointerEvents: 'none',
-                  }}
-                />
-              ))}
-            {todayMarker && (
-              <div
-                style={{
+	                    top: 0,
+	                    bottom: 0,
+	                    width: 2,
+	                    background: 'var(--color-border-60)',
+	                    pointerEvents: 'none',
+	                  }}
+	                />
+	              ))}
+	            {todayMarker && (
+	              <div
+	                style={{
                   position: 'absolute',
                   left: todayMarker.left,
                   top: 0,
-                  bottom: 0,
-                  width: 1,
-                  background: 'rgba(37, 99, 235, 0.5)',
-                  pointerEvents: 'none',
-                  zIndex: 11,
-                }}
-              />
-            )}
+	                  bottom: 0,
+	                  width: 1,
+	                  background: 'color-mix(in srgb, var(--color-primary) 65%, transparent)',
+	                  pointerEvents: 'none',
+	                  zIndex: 11,
+	                }}
+	              />
+	            )}
             {milestoneMarkers.map((milestone) => (
               <div
                 key={milestone.key}
@@ -1420,51 +1469,51 @@ export default function LongTermTasksGantt({
                   zIndex: 12,
                 }}
               >
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: -BODY_PADDING_TOP + 6,
-                    transform: 'translateX(-50%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    padding: '2px 6px',
-                    borderRadius: 999,
-                    background: 'rgba(255,255,255,0.9)',
-                    color: '#dc2626',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    boxShadow: '0 2px 6px rgba(220,38,38,0.18)',
-                    border: '1px solid rgba(220,38,38,0.35)',
-                  }}
-                  title={formatTooltipDate(milestone.date) || undefined}
-                >
+	                <div
+	                  style={{
+	                    position: 'absolute',
+	                    top: -BODY_PADDING_TOP + 6,
+	                    transform: 'translateX(-50%)',
+	                    display: 'flex',
+	                    alignItems: 'center',
+	                    gap: 4,
+	                    padding: '2px 6px',
+	                    borderRadius: 999,
+	                    background: 'var(--color-surface-80)',
+	                    color: 'var(--color-danger)',
+	                    fontSize: 11,
+	                    fontWeight: 600,
+	                    boxShadow: '0 2px 6px color-mix(in srgb, var(--color-danger) 18%, transparent)',
+	                    border: '1px solid var(--color-danger-30)',
+	                  }}
+	                  title={formatTooltipDate(milestone.date) || undefined}
+	                >
                   <Flag size={14} strokeWidth={2} />
                   <span>{milestone.name}</span>
                 </div>
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: -1,
-                    width: 2,
-                    background: 'linear-gradient(180deg, rgba(220,38,38,0), rgba(220,38,38,0.65))',
-                  }}
-                />
-                <div
-                  style={{
+	                <div
+	                  style={{
+	                    position: 'absolute',
+	                    top: 0,
+	                    bottom: 0,
+	                    left: -1,
+	                    width: 2,
+	                    background: 'var(--color-danger-40)',
+	                  }}
+	                />
+	                <div
+	                  style={{
                     position: 'absolute',
                     bottom: -Math.max(4, BODY_PADDING_BOTTOM * 0.2),
                     left: 0,
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    background: '#dc2626',
-                    transform: 'translate(-50%, 50%)',
-                    boxShadow: '0 0 0 2px rgba(220,38,38,0.2)',
-                  }}
-                />
+	                    width: 10,
+	                    height: 10,
+	                    borderRadius: '50%',
+	                    background: 'var(--color-danger)',
+	                    transform: 'translate(-50%, 50%)',
+	                    boxShadow: '0 0 0 2px var(--color-danger-20)',
+	                  }}
+	                />
               </div>
             ))}
 
@@ -1506,79 +1555,83 @@ export default function LongTermTasksGantt({
                   : Math.max(16, rowHeight * 0.5);
               const verticalOffset = Math.max(0, (rowHeight - barHeight) / 2);
               const barTop = bar.rowIndex * rowHeight + verticalOffset;
-              return (
-              <div
-                key={bar.key}
-                onClick={() => handleBarClick(bar)}
-                title={tooltip || undefined}
-                style={{
+	              return (
+	              <div
+	                key={bar.key}
+	                onClick={() => handleBarClick(bar)}
+	                title={tooltip || undefined}
+	                style={{
                   position: 'absolute',
                   left: bar.left,
                   top: barTop,
                   height: barHeight,
-                  width: bar.width,
-                  background:
-                    bar.type === 'subtask'
-                      ? '#c7d2fe'
-                      : bar.type === 'segment'
-                      ? '#93c5fd'
-                      : bar.type === 'parent-span'
-                      ? 'transparent'
-                      : isParentBar
-                      ? riskMeta.fill
-                      : '#a5b4fc',
-                  borderRadius: 6,
-                  cursor: bar.type === 'parent-span' ? 'default' : 'pointer',
-                  boxShadow:
-                    bar.type === 'parent-span'
-                      ? 'none'
-                      : isParentBar
-                      ? `0 3px 10px ${riskMeta.border}`
-                      : '0 2px 6px rgba(0,0,0,0.12)',
-                  overflow: 'hidden',
-                  border:
-                    bar.type === 'subtask'
-                      ? '1px dashed #818cf8'
-                      : bar.type === 'segment'
-                      ? '1px solid #60a5fa'
-                      : bar.type === 'parent-span'
-                      ? `1px solid ${riskMeta.border}`
-                      : isParentBar
-                      ? `1px solid ${riskMeta.border}`
+	                  width: bar.width,
+	                  background:
+	                    bar.type === 'subtask'
+	                      ? 'var(--color-primary-15)'
+	                      : bar.type === 'segment'
+	                      ? 'var(--color-info-15)'
+	                      : bar.type === 'parent-span'
+	                      ? 'transparent'
+	                      : isParentBar
+	                      ? (riskMeta.barFill || riskMeta.fill)
+	                      : 'var(--color-primary-15)',
+	                  borderRadius: 6,
+	                  cursor: bar.type === 'parent-span' ? 'default' : 'pointer',
+	                  boxShadow:
+	                    bar.type === 'parent-span'
+	                      ? 'none'
+	                      : isParentBar
+	                      ? `0 2px 8px color-mix(in srgb, ${riskMeta.accent} 20%, transparent)`
+	                      : '0 1px 2px rgba(0,0,0,0.10)',
+	                  overflow: 'hidden',
+	                  border:
+	                    bar.type === 'subtask'
+	                      ? '1px dashed var(--color-primary-40)'
+	                      : bar.type === 'segment'
+	                      ? '1px solid var(--color-info-30)'
+	                      : bar.type === 'parent-span'
+	                      ? `1px solid ${riskMeta.border}`
+	                      : isParentBar
+	                      ? `1px solid ${riskMeta.border}`
                       : 'none',
                   pointerEvents: bar.type === 'parent-span' ? 'none' : 'auto',
                 }}
               >
-                {isParentBar && progressPct > 0 && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: `${progressPct}%`,
-                      background: 'linear-gradient(90deg, rgba(15,23,42,0.25), rgba(15,23,42,0.12))',
-                      mixBlendMode: 'multiply',
-                      borderRadius: 'inherit',
-                    }}
-                  />
-                )}
-                {!isParentBar && bar.type !== 'parent-span' && progressPct > 0 && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: `${progressPct}%`,
-                      background:
-                        bar.type === 'subtask'
-                          ? 'linear-gradient(90deg, #93c5fd, #60a5fa)'
-                          : `linear-gradient(90deg, ${riskMeta.accent}, ${riskMeta.accent})`,
-                      borderRadius: 'inherit',
-                    }}
-                  />
-                )}
+	                {isParentBar && progressPct > 0 && (
+	                  <div
+	                    style={{
+	                      position: 'absolute',
+	                      left: 0,
+	                      top: 0,
+	                      bottom: 0,
+	                      width: `${progressPct}%`,
+	                      background: 'color-mix(in srgb, var(--color-text) 12%, transparent)',
+	                      borderRadius: 'inherit',
+	                    }}
+	                  />
+	                )}
+	                {!isParentBar && bar.type !== 'parent-span' && progressPct > 0 && (
+	                  <div
+	                    style={{
+	                      position: 'absolute',
+	                      left: 0,
+	                      top: 0,
+	                      bottom: 0,
+	                      width: `${progressPct}%`,
+	                      background: (() => {
+	                        if (bar.type === 'subtask') {
+	                          return 'color-mix(in srgb, var(--color-primary) 18%, transparent)';
+	                        }
+	                        if (bar.type === 'segment') {
+	                          return 'color-mix(in srgb, var(--color-info) 18%, transparent)';
+	                        }
+	                        return `color-mix(in srgb, ${riskMeta.accent} 18%, transparent)`;
+	                      })(),
+	                      borderRadius: 'inherit',
+	                    }}
+	                  />
+	                )}
                 {bar.type !== 'parent-span' && (
                   <div
                     style={{
@@ -1587,13 +1640,13 @@ export default function LongTermTasksGantt({
                       top: 2,
                       right: 8,
                       bottom: 2,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      color: '#0f172a',
-                      fontSize: 12,
-                    }}
-                  >
+	                      overflow: 'hidden',
+	                      textOverflow: 'ellipsis',
+	                      whiteSpace: 'nowrap',
+	                      color: 'var(--color-text)',
+	                      fontSize: 12,
+	                    }}
+	                  >
                     {bar.task?.name || ''}
                   </div>
                 )}
@@ -1603,6 +1656,6 @@ export default function LongTermTasksGantt({
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

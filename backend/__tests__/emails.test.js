@@ -6,6 +6,7 @@ import request from 'supertest';
 vi.mock('../middleware/authMiddleware.js', () => ({
   __esModule: true,
   default: () => (req, _res, next) => next(),
+  authMiddleware: () => (_req, _res, next) => next(),
   requireAuth: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin' }; next(); },
   requireAdmin: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin' }; next(); },
   requirePlanner: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'planner' }; next(); },

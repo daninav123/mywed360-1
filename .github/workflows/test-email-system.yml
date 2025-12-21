@@ -2,21 +2,21 @@ name: Pruebas del Sistema de Correo
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main, master, windows ]
     paths:
-      - 'src/components/email/**'
-      - 'src/services/EmailService.js'
-      - 'src/services/TagService.js'
-      - 'src/test/components/email/**'
-      - 'src/test/integration/**'
+      - 'apps/main-app/src/components/email/**'
+      - 'apps/main-app/src/services/EmailService.js'
+      - 'apps/main-app/src/services/TagService.js'
+      - 'apps/main-app/src/test/components/email/**'
+      - 'apps/main-app/src/test/integration/**'
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [ main, master, windows ]
     paths:
-      - 'src/components/email/**'
-      - 'src/services/EmailService.js'
-      - 'src/services/TagService.js'
-      - 'src/test/components/email/**'
-      - 'src/test/integration/**'
+      - 'apps/main-app/src/components/email/**'
+      - 'apps/main-app/src/services/EmailService.js'
+      - 'apps/main-app/src/services/TagService.js'
+      - 'apps/main-app/src/test/components/email/**'
+      - 'apps/main-app/src/test/integration/**'
 
 jobs:
   test:

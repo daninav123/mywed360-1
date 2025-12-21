@@ -43,7 +43,7 @@ const GiftListSection = ({ config, editable = false, onChange }) => {
   ];
 
   return (
-    <section className="py-16 px-4 bg-[var(--color-primary)]/10">
+    <section className="py-16 px-4 bg-[var(--color-primary-10)]">
       <div className="max-w-4xl mx-auto">
         {/* Título */}
         {editable ? (

@@ -112,7 +112,10 @@ const EmailFolderList = ({
                 aria-current={selectedFolder === folder.id ? 'true' : undefined}
                 title={!folder.systemFolder ? 'Arrastrar para reordenar' : undefined}
               >
-                <span className="flex items-center space-x-2 truncate">
+                <span
+                  className="flex items-center space-x-2 truncate"
+                  aria-current={selectedFolder === folder.id ? 'true' : undefined}
+                >
                   <Folder size={14} />
                   <span className="truncate">{folder.name}</span>
                 </span>

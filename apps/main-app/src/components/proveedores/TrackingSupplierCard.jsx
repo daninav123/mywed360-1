@@ -46,8 +46,8 @@ export default function TrackingSupplierCard({
 
   return (
     <Card
-      className={`relative border border-dashed border-[var(--color-primary)]/35 bg-white/80  transition-all ${
-        selected ? 'ring-2 ring-[var(--color-primary)]' : ''
+      className={`relative border border-dashed border-[color:var(--color-primary-35)] bg-white/80  transition-all ${
+        selected ? 'ring-2 ring-[color:var(--color-primary)]' : ''
       }`}
     >
       <div className="absolute top-3 left-3">
@@ -55,7 +55,7 @@ export default function TrackingSupplierCard({
           type="checkbox"
           checked={selected}
           onChange={onToggleSelect}
-          className="h-4 w-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+          className="h-4 w-4 rounded border-gray-300 text-[color:var(--color-primary)] focus:ring-[color:var(--color-primary)]"
         />
       </div>
       {hasPending && (
@@ -71,7 +71,7 @@ export default function TrackingSupplierCard({
             {name}
           </h3>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-[var(--color-primary)].5 text-xs font-medium text-[var(--color-primary)]">
+            <span className="inline-flex items-center rounded-full bg-[var(--color-primary-5)] text-xs font-medium text-[color:var(--color-primary)]">
               {service}
             </span>
             <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
@@ -85,7 +85,7 @@ export default function TrackingSupplierCard({
           </div>
         </div>
         {provider?.priceRange && (
-          <div className="text-right text-sm text-[color:var(--color-text)]/70">
+          <div className="text-right text-sm text-[color:var(--color-text-70)]">
             <p className="font-medium">
               {t('suppliers.tracking.card.estimatedBudget')}
             </p>
@@ -94,11 +94,11 @@ export default function TrackingSupplierCard({
         )}
       </header>
 
-      <section className="mt-3 space-y-2 text-sm text-[color:var(--color-text)]/75">
-        <div className="flex flex-col gap-1 border-l-2 border-dashed border-[var(--color-primary)]/40 pl-4">
+      <section className="mt-3 space-y-2 text-sm text-[color:var(--color-text-75)]">
+        <div className="flex flex-col gap-1 border-l-2 border-dashed border-[color:var(--color-primary-40)] pl-4">
           <div className="flex items-center gap-2">
-            <Clock size={14} className="text-[var(--color-primary)]" />
-            <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
+            <Clock size={14} className="text-[color:var(--color-primary)]" />
+            <span className="text-xs uppercase tracking-wide text-[color:var(--color-text-50)]">
               {t('suppliers.tracking.card.labels.lastContact')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
@@ -106,8 +106,8 @@ export default function TrackingSupplierCard({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <ArrowUpRight size={14} className="text-[var(--color-primary)]" />
-            <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
+            <ArrowUpRight size={14} className="text-[color:var(--color-primary)]" />
+            <span className="text-xs uppercase tracking-wide text-[color:var(--color-text-50)]">
               {t('suppliers.tracking.card.labels.nextStep')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
@@ -115,8 +115,8 @@ export default function TrackingSupplierCard({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <User size={14} className="text-[var(--color-primary)]" />
-            <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
+            <User size={14} className="text-[color:var(--color-primary)]" />
+            <span className="text-xs uppercase tracking-wide text-[color:var(--color-text-50)]">
               {t('suppliers.tracking.card.labels.owner')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
@@ -124,8 +124,8 @@ export default function TrackingSupplierCard({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Calendar size={14} className="text-[var(--color-primary)]" />
-            <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
+            <Calendar size={14} className="text-[color:var(--color-primary)]" />
+            <span className="text-xs uppercase tracking-wide text-[color:var(--color-text-50)]">
               {t('suppliers.tracking.card.labels.nextPayment')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
@@ -136,24 +136,24 @@ export default function TrackingSupplierCard({
 
         <div className="flex flex-wrap items-center gap-4 rounded-md bg-white/70 px-3 py-2">
           {provider?.email && (
-            <span className="inline-flex items-center gap-1 text-xs text-[color:var(--color-text)]/60">
+            <span className="inline-flex items-center gap-1 text-xs text-[color:var(--color-text-60)]">
               <Mail size={12} /> {provider.email}
             </span>
           )}
           {provider?.phone && (
-            <span className="inline-flex items-center gap-1 text-xs text-[color:var(--color-text)]/60">
+            <span className="inline-flex items-center gap-1 text-xs text-[color:var(--color-text-60)]">
               <Phone size={12} /> {provider.phone}
             </span>
           )}
           {provider?.location && (
-            <span className="inline-flex items-center gap-1 text-xs text-[color:var(--color-text)]/60">
+            <span className="inline-flex items-center gap-1 text-xs text-[color:var(--color-text-60)]">
               <MapPin size={12} /> {provider.location}
             </span>
           )}
         </div>
       </section>
 
-      <footer className="mt-4 flex flex-wrap gap-2 border-t border-dashed border-[var(--color-primary)]/30 pt-3">
+      <footer className="mt-4 flex flex-wrap gap-2 border-t border-dashed border-[color:var(--color-primary-30)] pt-3">
         <Button
           variant="outline"
           size="sm"

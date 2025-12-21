@@ -51,23 +51,38 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
   // Agrupar proveedores confirmados por servicio
   // PRIORIDAD: servicios asignados desde comparador > proveedores legacy
   const confirmedByService = useMemo(() => {
+    console.log('🔄 [WeddingServicesOverview] Recalculando confirmedByService...');
+    console.log('   - services recibidos:', services?.length || 0);
+    
     const map = {};
 
     // 1. Primero cargar servicios asignados desde el nuevo sistema
     (services || []).forEach((service) => {
-      if (service.assignedSupplier && service.category) {
+      console.log(`   - Procesando servicio: ${service.category}`, {
+        hasAssignedSuppliers: !!service.assignedSuppliers,
+        suppliersCount: service.assignedSuppliers?.length || 0,
+        hasAssignedSupplier: !!service.assignedSupplier
+      });
+      // Soportar assignedSuppliers[] (nuevo) y assignedSupplier (legacy)
+      const suppliers = service.assignedSuppliers || [];
+      const primarySupplier = suppliers.find(s => s.isPrimary) || suppliers[0] || service.assignedSupplier;
+      
+      if (primarySupplier && service.category) {
+        console.log(`   ✅ Proveedor primario encontrado para ${service.category}:`, primarySupplier.name);
         map[service.category] = {
-          name: service.assignedSupplier.name,
-          contact: service.assignedSupplier.email || service.assignedSupplier.contact?.email,
-          email: service.assignedSupplier.email,
-          phone: service.assignedSupplier.contact?.phone,
-          rating: service.assignedSupplier.rating || 0,
-          ratingCount: service.assignedSupplier.ratingCount || 0,
-          price: service.assignedSupplier.price,
-          quote: service.assignedSupplier.quote, // Datos del quote seleccionado
-          confirmedAt: service.assignedSupplier.contractedAt || service.assignedSupplier.assignedAt,
-          status: service.assignedSupplier.status,
+          name: primarySupplier.name,
+          contact: primarySupplier.email || primarySupplier.contact?.email,
+          email: primarySupplier.email,
+          phone: primarySupplier.contact?.phone,
+          rating: primarySupplier.rating || 0,
+          ratingCount: primarySupplier.ratingCount || 0,
+          price: primarySupplier.price,
+          quote: primarySupplier.quote,
+          confirmedAt: primarySupplier.contractedAt || primarySupplier.assignedAt,
+          status: primarySupplier.status,
         };
+      } else {
+        console.log(`   ⚠️ NO hay proveedor primario para ${service.category}`);
       }
     });
 
@@ -201,33 +216,21 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
       {/* Panel de búsqueda (si se proporciona) */}
       {searchPanel && <div className="my-6">{searchPanel}</div>}
 
-      {/* Tarjetas de servicios */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* Listado de servicios */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {activeServices.map((service) => {
-          const serviceKey = service.id.toLowerCase();
-          const confirmed = confirmedByService[serviceKey];
-          const shortlistCount = shortlistCountByService[serviceKey] || 0;
-
-          // Encontrar servicios vinculados
-          const currentServiceData = services.find((s) => s.category === service.id);
-          const linkedServicesList = (currentServiceData?.linkedServices || [])
-            .map((linkedId) => {
-              const linkedService = services.find((s) => s.id === linkedId);
-              return linkedService
-                ? { id: linkedService.category, name: linkedService.name }
-                : null;
-            })
-            .filter(Boolean);
-
+          // Obtener todos los proveedores asignados para este servicio
+          const serviceData = (services || []).find(s => s.category === service.id);
+          const assignedProviders = serviceData?.assignedSuppliers || [];
+          
           return (
             <WeddingServiceCard
               key={service.id}
               serviceId={service.id}
               serviceName={service.name}
-              confirmedProvider={confirmed}
-              shortlistCount={shortlistCount}
-              linkedServices={linkedServicesList}
-              allServices={services}
+              confirmedProvider={confirmedByService[service.id]}
+              confirmedProviders={assignedProviders}
+              shortlistCount={shortlistCountByService[service.id] || 0}
               onSearch={onSearch}
             />
           );

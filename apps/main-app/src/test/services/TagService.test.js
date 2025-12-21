@@ -1,28 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import * as TagService from '../../services/TagService';
+import * as TagService from '../../services/tagService';
 
-// Mock para localStorage
-const localStorageMock = (() => {
-  let store = {};
-  return {
-    getItem: vi.fn((key) => store[key] || null),
-    setItem: vi.fn((key, value) => {
-      store[key] = value.toString();
-    }),
-    clear: vi.fn(() => {
-      store = {};
-    }),
-    removeItem: vi.fn((key) => {
-      delete store[key];
-    }),
-    getAll: () => store,
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-});
+// Mock de localStorage ahora manejado por setup.js
+// No es necesario redefinir window.localStorage aquí
 
 describe('TagService', () => {
   const userId = 'user123';

@@ -532,7 +532,7 @@ export default function CreateWeddingAssistant() {
 
       <div
         ref={messagesRef}
-        className="flex-1 space-y-3 overflow-y-auto rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/60 p-4"
+        className="flex-1 space-y-3 overflow-y-auto rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface-60)] p-4"
       >
         {messages.map((message) => (
           <div
@@ -561,7 +561,7 @@ export default function CreateWeddingAssistant() {
                   key={option.value}
                   type="button"
                   onClick={() => handleOptionClick(option.value)}
-                  className="rounded-full border border-[color:var(--color-primary)]/40 bg-[color:var(--color-surface)] px-3 py-1.5 text-sm text-[color:var(--color-primary)] transition hover:bg-[var(--color-primary)] hover:text-[color:var(--color-surface)]"
+                  className="rounded-full border border-[color:var(--color-primary-40)] bg-[color:var(--color-surface)] px-3 py-1.5 text-sm text-[color:var(--color-primary)] transition hover:bg-[var(--color-primary)] hover:text-[color:var(--color-surface)]"
                 >
                   {option.label}
                 </button>
@@ -575,7 +575,7 @@ export default function CreateWeddingAssistant() {
               onChange={(event) => setInputValue(event.target.value)}
               disabled={creating}
               placeholder="Escribe tu respuesta y pulsa Enter..."
-              className="flex-1 rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+              className="flex-1 rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
             />
             <Button type="submit" disabled={!inputValue.trim() || creating}>
               Enviar

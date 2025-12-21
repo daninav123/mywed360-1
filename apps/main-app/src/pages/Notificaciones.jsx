@@ -19,12 +19,12 @@ import {
 
 const typeColors = {
   success:
-    'bg-[var(--color-success)]/10 border-[color:var(--color-success)]/40 text-[color:var(--color-success)]',
+    'bg-[var(--color-success-10)] border-[color:var(--color-success-40)] text-[color:var(--color-success)]',
   error:
-    'bg-[var(--color-danger)]/10 border-[color:var(--color-danger)]/40 text-[color:var(--color-danger)]',
+    'bg-[var(--color-danger-10)] border-[color:var(--color-danger-40)] text-[color:var(--color-danger)]',
   warning:
-    'bg-[var(--color-warning)]/10 border-[color:var(--color-warning)]/40 text-[color:var(--color-warning)]',
-  info: 'bg-[var(--color-primary)]/10 border-[color:var(--color-primary)]/40 text-[var(--color-primary)]',
+    'bg-[var(--color-warning-10)] border-[color:var(--color-warning-40)] text-[color:var(--color-warning)]',
+  info: 'bg-[var(--color-primary-10)] border-[color:var(--color-primary-40)] text-[color:var(--color-primary)]',
 };
 
 export default function Notificaciones() {
@@ -63,13 +63,13 @@ export default function Notificaciones() {
       <div className="flex space-x-2 mt-2">
         <button
           onClick={() => setFilter('all')}
-          className={`px-3 py-1 rounded ${filter === 'all' ? 'bg-[var(--color-primary)] text-white' : 'bg-[color:var(--color-text)]/10'}`}
+          className={`px-3 py-1 rounded ${filter === 'all' ? 'bg-[var(--color-primary)] text-white' : 'bg-[color:var(--color-text-10)]'}`}
         >
           {t('notifications.filters.all')}
         </button>
         <button
           onClick={() => setFilter('unread')}
-          className={`px-3 py-1 rounded ${filter === 'unread' ? 'bg-[var(--color-primary)] text-white' : 'bg-[color:var(--color-text)]/10'}`}
+          className={`px-3 py-1 rounded ${filter === 'unread' ? 'bg-[var(--color-primary)] text-white' : 'bg-[color:var(--color-text-10)]'}`}
         >
           {t('notifications.filters.unread')}
         </button>
@@ -117,9 +117,9 @@ export default function Notificaciones() {
 
       {/* Preferencias granulares antiguas eliminadas a favor del nuevo panel */}
 
-      <div className="bg-[var(--color-surface)] border border-soft rounded divide-y divide-[color:var(--color-text)]/10">
+      <div className="bg-[var(--color-surface)] border border-soft rounded divide-y divide-[color:var(--color-text-10)]">
         {filtered.length === 0 && (
-          <p className="p-4 text-[color:var(--color-text)]/60">{t('notifications.empty')}</p>
+          <p className="p-4 text-[color:var(--color-text-60)]">{t('notifications.empty')}</p>
         )}
         {filtered.map((n) => (
           <div
@@ -128,7 +128,7 @@ export default function Notificaciones() {
           >
             <div>
               <p className="font-medium">{n.message}</p>
-              <span className="text-xs text-[color:var(--color-text)]/60">
+              <span className="text-xs text-[color:var(--color-text-60)]">
                 {new Date(n.date).toLocaleString('es-ES')}
               </span>
             </div>

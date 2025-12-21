@@ -206,6 +206,16 @@ export const SUPPLIER_CATEGORIES = [
     coverage: 'low',
   },
   {
+    id: 'iglesia',
+    name: 'Iglesia',
+    nameEn: 'Church',
+    icon: 'church',
+    description: 'Iglesias, parroquias y espacios religiosos para ceremonias',
+    googlePlacesType: 'church',
+    keywords: ['iglesia', 'parroquia', 'catedral', 'ermita', 'capilla', 'basilica', 'basílica', 'templo'],
+    coverage: 'low',
+  },
+  {
     id: 'luna-de-miel',
     name: 'Luna de Miel',
     nameEn: 'Honeymoon',
@@ -297,6 +307,7 @@ export const CATEGORY_IDS = {
   FIREWORKS: 'fuegos-artificiales',
   PLANNING: 'organizacion',
   CEREMONY: 'ceremonia',
+  CHURCH: 'iglesia',
   HONEYMOON: 'luna-de-miel',
   OTHER: 'otros',
 };

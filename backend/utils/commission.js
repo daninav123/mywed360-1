@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 const DEFAULT_CURRENCY = 'EUR';
 
 const makeId = () => Math.random().toString(36).slice(2, 12);

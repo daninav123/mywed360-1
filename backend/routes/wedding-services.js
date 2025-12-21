@@ -148,12 +148,12 @@ router.post('/weddings/:weddingId/services/assign', requireAuth, async (req, res
 
 /**
  * POST /api/weddings/:weddingId/services/:serviceId/assign
- * Asignar un proveedor a un servicio existente (legacy)
+ * Asignar un proveedor a un servicio (soporta múltiples proveedores)
  */
 router.post('/weddings/:weddingId/services/:serviceId/assign', requireAuth, async (req, res) => {
   try {
     const { weddingId, serviceId } = req.params;
-    const { supplier, price, currency, notes, status } = req.body;
+    const { supplier, price, currency, notes, status, serviceDescription, deposit } = req.body;
     const userId = req.user.uid;
 
     // Validaciones
@@ -170,9 +170,11 @@ router.post('/weddings/:weddingId/services/:serviceId/assign', requireAuth, asyn
     }
 
     // Preparar datos del proveedor asignado
-    const assignedSupplier = {
+    const newProvider = {
+      id: Date.now().toString(), // ID único para este proveedor dentro del servicio
       supplierId: supplier.id,
       name: supplier.name,
+      serviceDescription: serviceDescription || '', // ej: "Alianzas", "Anillo compromiso"
       contact: {
         email: supplier.contact?.email || supplier.email || null,
         phone: supplier.contact?.phone || supplier.phone || null,
@@ -182,6 +184,10 @@ router.post('/weddings/:weddingId/services/:serviceId/assign', requireAuth, asyn
       price: price || null,
       currency: currency || 'EUR',
       notes: notes || '',
+      
+      // Información de adelantos/depósitos
+      deposit: deposit || null, // { percentage: 30, amount: 360, dueDate: '2025-03-01' }
+      
       assignedAt: new Date().toISOString(),
       contractedAt: null,
       confirmedAt: null,
@@ -189,24 +195,55 @@ router.post('/weddings/:weddingId/services/:serviceId/assign', requireAuth, asyn
       payments: [],
       totalPaid: 0,
       remaining: price || 0,
+      isPrimary: false, // Se marcará como primario si es el primero
     };
 
     // Actualizar servicio
     const serviceRef = weddingRef.collection('services').doc(serviceId);
     const serviceDoc = await serviceRef.get();
 
+    let assignedSuppliers = [];
+    
     if (serviceDoc.exists) {
+      const serviceData = serviceDoc.data();
+      
+      // Migrar de assignedSupplier (singular) a assignedSuppliers (plural)
+      if (serviceData.assignedSupplier && !serviceData.assignedSuppliers) {
+        assignedSuppliers = [{
+          ...serviceData.assignedSupplier,
+          id: Date.now().toString() + '_migrated',
+          isPrimary: true,
+          serviceDescription: serviceData.assignedSupplier.notes || '',
+        }];
+      } else {
+        assignedSuppliers = serviceData.assignedSuppliers || [];
+      }
+      
+      // Marcar como primario si es el primer proveedor
+      if (assignedSuppliers.length === 0) {
+        newProvider.isPrimary = true;
+      }
+      
+      // Añadir nuevo proveedor
+      assignedSuppliers.push(newProvider);
+      
       // Actualizar servicio existente
       await serviceRef.update({
-        assignedSupplier,
+        assignedSuppliers,
+        // Mantener compatibilidad con código antiguo: assignedSupplier apunta al primario
+        assignedSupplier: assignedSuppliers.find(p => p.isPrimary) || assignedSuppliers[0],
         updatedAt: new Date().toISOString(),
       });
     } else {
       // Crear servicio nuevo
+      newProvider.isPrimary = true;
+      assignedSuppliers = [newProvider];
+      
       await serviceRef.set({
         category: serviceId,
         name: serviceId.charAt(0).toUpperCase() + serviceId.slice(1),
-        assignedSupplier,
+        assignedSuppliers,
+        assignedSupplier: newProvider, // Compatibilidad
         candidates: [],
         priority: 'medium',
         createdAt: new Date().toISOString(),
@@ -219,7 +256,7 @@ router.post('/weddings/:weddingId/services/:serviceId/assign', requireAuth, asyn
       message: 'Proveedor asignado correctamente',
       service: {
         id: serviceId,
-        assignedSupplier,
+        assignedSuppliers,
       },
     });
   } catch (error) {
@@ -279,15 +316,15 @@ router.put('/weddings/:weddingId/services/:serviceId/status', requireAuth, async
 });
 
 /**
- * DELETE /api/weddings/:weddingId/services/:serviceId/assigned
- * Quitar proveedor asignado de un servicio
+ * DELETE /api/weddings/:weddingId/services/:serviceId/suppliers/:providerId
+ * Quitar un proveedor específico de un servicio
  */
 router.delete(
-  '/weddings/:weddingId/services/:serviceId/assigned',
+  '/weddings/:weddingId/services/:serviceId/suppliers/:providerId',
   requireAuth,
   async (req, res) => {
     try {
-      const { weddingId, serviceId } = req.params;
+      const { weddingId, serviceId, providerId } = req.params;
       const userId = req.user.uid;
 
       const weddingRef = db.collection('users').doc(userId).collection('weddings').doc(weddingId);
@@ -298,18 +335,80 @@ router.delete(
         return res.status(404).json({ error: 'Servicio no encontrado' });
       }
 
+      const serviceData = serviceDoc.data();
+      let assignedSuppliers = serviceData.assignedSuppliers || [];
+      
+      // Filtrar el proveedor a eliminar
+      const remainingSuppliers = assignedSuppliers.filter(p => p.id !== providerId);
+      
+      // Si eliminamos el primario, hacer primario al siguiente
+      if (remainingSuppliers.length > 0) {
+        const hadPrimary = assignedSuppliers.find(p => p.id === providerId)?.isPrimary;
+        if (hadPrimary && !remainingSuppliers.some(p => p.isPrimary)) {
+          remainingSuppliers[0].isPrimary = true;
+        }
+      }
+
       await serviceRef.update({
-        assignedSupplier: null,
+        assignedSuppliers: remainingSuppliers,
+        assignedSupplier: remainingSuppliers.length > 0 ? remainingSuppliers[0] : null,
         updatedAt: new Date().toISOString(),
       });
 
       res.json({
         success: true,
         message: 'Proveedor eliminado del servicio',
+        remainingCount: remainingSuppliers.length,
       });
     } catch (error) {
       console.error('Error removing assigned supplier:', error);
       res.status(500).json({ error: 'Error al eliminar proveedor' });
+    }
+  }
+);
+
+/**
+ * PATCH /api/weddings/:weddingId/services/:serviceId/suppliers/:providerId/primary
+ * Marcar un proveedor como primario
+ */
+router.patch(
+  '/weddings/:weddingId/services/:serviceId/suppliers/:providerId/primary',
+  requireAuth,
+  async (req, res) => {
+    try {
+      const { weddingId, serviceId, providerId } = req.params;
+      const userId = req.user.uid;
+
+      const weddingRef = db.collection('users').doc(userId).collection('weddings').doc(weddingId);
+      const serviceRef = weddingRef.collection('services').doc(serviceId);
+
+      const serviceDoc = await serviceRef.get();
+      if (!serviceDoc.exists) {
+        return res.status(404).json({ error: 'Servicio no encontrado' });
+      }
+
+      const serviceData = serviceDoc.data();
+      let assignedSuppliers = serviceData.assignedSuppliers || [];
+      
+      // Quitar isPrimary de todos y añadirlo solo al seleccionado
+      assignedSuppliers = assignedSuppliers.map(p => ({
+        ...p,
+        isPrimary: p.id === providerId,
+      }));
+
+      await serviceRef.update({
+        assignedSuppliers,
+        assignedSupplier: assignedSuppliers.find(p => p.isPrimary),
+        updatedAt: new Date().toISOString(),
+      });
+
+      res.json({
+        success: true,
+        message: 'Proveedor marcado como primario',
+      });
+    } catch (error) {
+      console.error('Error setting primary supplier:', error);
+      res.status(500).json({ error: 'Error al marcar proveedor como primario' });
     }
   }
 );

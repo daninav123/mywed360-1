@@ -59,7 +59,7 @@ export default function RoleUpgradeHarness() {
         <h1 className="text-2xl font-semibold" data-testid="role-upgrade-title">
           Harness · Upgrade de roles
         </h1>
-        <p className="text-sm text-[color:var(--color-text)]/70">
+        <p className="text-sm text-[color:var(--color-text-70)]">
           Utilidad de pruebas para simular cambios de rol mediante la API de upgrade.
         </p>
       </header>
@@ -73,7 +73,7 @@ export default function RoleUpgradeHarness() {
             <button
               key={option.id}
               type="button"
-              className="px-4 py-2 rounded border border-soft hover:bg-[var(--color-accent)]/10 transition disabled:opacity-60 disabled:pointer-events-none"
+              className="px-4 py-2 rounded border border-soft hover:bg-[var(--color-accent-10)] transition disabled:opacity-60 disabled:pointer-events-none"
               data-testid={`role-upgrade-${option.id}`}
               onClick={() => handleUpgrade(option)}
               disabled={loading}

@@ -228,7 +228,7 @@ const GlobalSearch = ({ isOpen, onClose }) => {
             {/* Intent badge (si hay búsqueda web) */}
             {searchData?.intent?.needsWeb && query && (
               <div className="px-4 pb-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--color-primary)]ded-full text-xs">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--color-primary-10)] text-primary rounded-full text-xs">
                   <Sparkles className="h-3 w-3" />
                   Búsqueda web con IA activada
                   {searchData.intent.category && (

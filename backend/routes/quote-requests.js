@@ -6,6 +6,7 @@
 
 import express from 'express';
 import { db } from '../db.js';
+import { FieldPath } from 'firebase-admin/firestore';
 import { requireAuth } from '../middleware/authMiddleware.js';
 import { sendQuoteRequestEmail } from '../services/quoteRequestEmailService.js';
 import logger from '../utils/logger.js';
@@ -163,6 +164,7 @@ router.post('/', requireAuth, async (req, res) => {
               customMessage: message || '',
               responseUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/supplier/requests`,
               requestId: docRef.id,
+              userId: req.user.uid,
             });
 
             logger.info(
@@ -191,6 +193,95 @@ router.post('/', requireAuth, async (req, res) => {
       error: 'Error al crear solicitud de presupuesto',
       details: error.message,
     });
+  }
+});
+
+router.post('/cancel-provider', requireAuth, express.json(), async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const { supplierId, supplierEmail } = req.body || {};
+
+    if (!supplierId && !supplierEmail) {
+      return res.status(400).json({ error: 'supplierId o supplierEmail requerido' });
+    }
+
+    const updates = {
+      status: 'cancelled',
+      cancelledAt: new Date().toISOString(),
+      cancelledBy: userId,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const result = {
+      supplierId: supplierId || null,
+      supplierEmail: supplierEmail || null,
+      cancelled: 0,
+      skipped: 0,
+      errors: 0,
+    };
+
+    const updateDocs = async (snapshot) => {
+      for (const doc of snapshot.docs) {
+        try {
+          const data = doc.data() || {};
+          const ownerUid = data.userId || data.createdBy || data.ownerUid;
+          if (ownerUid && ownerUid !== userId) {
+            result.skipped++;
+            continue;
+          }
+          await doc.ref.update(updates);
+          result.cancelled++;
+        } catch (e) {
+          result.errors++;
+        }
+      }
+    };
+
+    if (supplierId) {
+      const snap1 = await db
+        .collection('suppliers')
+        .doc(supplierId)
+        .collection('quote-requests')
+        .get();
+      await updateDocs(snap1);
+
+      const snap2 = await db
+        .collection('suppliers')
+        .doc(supplierId)
+        .collection('requests')
+        .get();
+      await updateDocs(snap2);
+
+      const snap3 = await db
+        .collection('quoteRequests')
+        .where('supplierId', '==', supplierId)
+        .get();
+      await updateDocs(snap3);
+    }
+
+    if (supplierEmail) {
+      const emailLower = String(supplierEmail).toLowerCase();
+
+      const snap4 = await db
+        .collection('quote-requests-internet')
+        .where('userId', '==', userId)
+        .where('supplierEmail', '==', emailLower)
+        .get();
+      await updateDocs(snap4);
+
+      const snap5 = await db
+        .collection('quote-requests-internet')
+        .where('userId', '==', userId)
+        .where('supplierInfo.email', '==', emailLower)
+        .get();
+      await updateDocs(snap5);
+    }
+
+    console.log('✅ [quote-requests] cancel-provider result:', result);
+    return res.json({ success: true, result });
+  } catch (error) {
+    console.error('[quote-requests] Error cancelando proveedor:', error);
+    return res.status(500).json({ error: 'Error al cancelar proveedor', details: error.message });
   }
 });
 
@@ -332,20 +423,173 @@ router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Marcar como cancelada en lugar de eliminar
-    await db.collection('quoteRequests').doc(id).update({
-      status: 'cancelled',
-      cancelledAt: new Date().toISOString(),
-      cancelledBy: req.user.uid,
-      updatedAt: new Date().toISOString(),
+    console.log(`🗑️ [quote-requests] Cancelando solicitud ${id}`);
+
+    // Intentar en quote-requests-internet primero
+    const internetDoc = await db.collection('quote-requests-internet').doc(id).get();
+    
+    if (internetDoc.exists) {
+      const data = internetDoc.data() || {};
+      const ownerUid = data.userId || data.createdBy || data.ownerUid;
+
+      if (ownerUid && ownerUid !== req.user.uid) {
+        return res.status(403).json({
+          error: 'No autorizado para cancelar esta solicitud',
+        });
+      }
+
+      await db.collection('quote-requests-internet').doc(id).update({
+        status: 'cancelled',
+        cancelledAt: new Date().toISOString(),
+        cancelledBy: req.user.uid,
+        updatedAt: new Date().toISOString(),
+      });
+
+      console.log(`✅ [quote-requests] Solicitud ${id} cancelada en quote-requests-internet`);
+
+      return res.json({
+        success: true,
+        message: 'Solicitud cancelada',
+      });
+    }
+
+    // Fallback 1: solicitudes legacy en suppliers/*/quote-requests (de ahí vienen los IDs del quote-stats)
+    const legacyQuoteRequestsSnap = await db
+      .collectionGroup('quote-requests')
+      .where(FieldPath.documentId(), '==', id)
+      .limit(1)
+      .get();
+
+    if (!legacyQuoteRequestsSnap.empty) {
+      const legacyDoc = legacyQuoteRequestsSnap.docs[0];
+      const data = legacyDoc.data() || {};
+      const ownerUid = data.userId || data.createdBy || data.ownerUid;
+
+      if (ownerUid && ownerUid !== req.user.uid) {
+        return res.status(403).json({
+          error: 'No autorizado para cancelar esta solicitud',
+        });
+      }
+
+      await legacyDoc.ref.update({
+        status: 'cancelled',
+        cancelledAt: new Date().toISOString(),
+        cancelledBy: req.user.uid,
+        updatedAt: new Date().toISOString(),
+      });
+
+      console.log(`✅ [quote-requests] Solicitud ${id} cancelada en collectionGroup(quote-requests)`);
+
+      return res.json({
+        success: true,
+        message: 'Solicitud cancelada',
+      });
+    }
+
+    // Fallback 2: solicitudes en suppliers/*/requests
+    const supplierRequestsSnap = await db
+      .collectionGroup('requests')
+      .where(FieldPath.documentId(), '==', id)
+      .limit(1)
+      .get();
+
+    if (!supplierRequestsSnap.empty) {
+      const reqDoc = supplierRequestsSnap.docs[0];
+      const data = reqDoc.data() || {};
+      const ownerUid = data.userId || data.createdBy || data.ownerUid;
+
+      if (ownerUid && ownerUid !== req.user.uid) {
+        return res.status(403).json({
+          error: 'No autorizado para cancelar esta solicitud',
+        });
+      }
+
+      await reqDoc.ref.update({
+        status: 'cancelled',
+        cancelledAt: new Date().toISOString(),
+        cancelledBy: req.user.uid,
+        updatedAt: new Date().toISOString(),
+      });
+
+      console.log(`✅ [quote-requests] Solicitud ${id} cancelada en collectionGroup(requests)`);
+
+      return res.json({
+        success: true,
+        message: 'Solicitud cancelada',
+      });
+    }
+
+    // Si no está en proveedores de internet, intentar en la colección principal quoteRequests
+    const mainDoc = await db.collection('quoteRequests').doc(id).get();
+    if (mainDoc.exists) {
+      const data = mainDoc.data() || {};
+      const ownerUid = data.userId || data.createdBy || data.ownerUid;
+
+      if (ownerUid && ownerUid !== req.user.uid) {
+        return res.status(403).json({
+          error: 'No autorizado para cancelar esta solicitud',
+        });
+      }
+
+      await db.collection('quoteRequests').doc(id).update({
+        status: 'cancelled',
+        cancelledAt: new Date().toISOString(),
+        cancelledBy: req.user.uid,
+        updatedAt: new Date().toISOString(),
+      });
+
+      console.log(`✅ [quote-requests] Solicitud ${id} cancelada en quoteRequests`);
+
+      return res.json({
+        success: true,
+        message: 'Solicitud cancelada',
+      });
+    }
+
+    // Si no está ahí, buscar en suppliers/{supplierId}/requests
+    const suppliersSnapshot = await db.collection('suppliers').get();
+    let found = false;
+
+    for (const supplierDoc of suppliersSnapshot.docs) {
+      const requestDoc = await db
+        .collection('suppliers')
+        .doc(supplierDoc.id)
+        .collection('requests')
+        .doc(id)
+        .get();
+
+      if (requestDoc.exists) {
+        await db
+          .collection('suppliers')
+          .doc(supplierDoc.id)
+          .collection('requests')
+          .doc(id)
+          .update({
+            status: 'cancelled',
+            cancelledAt: new Date().toISOString(),
+            cancelledBy: req.user.uid,
+            updatedAt: new Date().toISOString(),
+          });
+
+        console.log(`✅ [quote-requests] Solicitud ${id} cancelada en suppliers/${supplierDoc.id}/requests`);
+        found = true;
+        break;
+      }
+    }
+
+    if (found) {
+      return res.json({
+        success: true,
+        message: 'Solicitud cancelada',
+      });
+    }
+
+    // Si no se encontró en ningún lado
+    console.warn(`⚠️ [quote-requests] Solicitud ${id} no encontrada`);
+    return res.status(404).json({
+      error: 'Solicitud no encontrada',
     });
 
-    console.log(`❌ [quote-requests] Solicitud ${id} cancelada`);
-
-    res.json({
-      success: true,
-      message: 'Solicitud cancelada',
-    });
   } catch (error) {
     console.error('[quote-requests] Error cancelando solicitud:', error);
     res.status(500).json({

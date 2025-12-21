@@ -1,9 +1,9 @@
-# <N Integraci�n con App Store para Suscripciones iOS
+# Integración con App Store para Suscripciones iOS
 
-## =� �ndice
+## Índice
 
-1. [Descripci�n General](#descripci�n-general)
-2. [Configuraci�n en App Store Connect](#configuraci�n-en-app-store-connect)
+1. [Descripción General](#descripción-general)
+2. [Configuración en App Store Connect](#configuración-en-app-store-connect)
 3. [Variables de Entorno](#variables-de-entorno)
 4. [Endpoints Implementados](#endpoints-implementados)
 5. [Flujo de Trabajo](#flujo-de-trabajo)
@@ -13,49 +13,49 @@
 
 ---
 
-## =� Descripci�n General
+## Descripción General
 
-La integraci�n con App Store permite que el **panel de administraci�n vea autom�ticamente las suscripciones** compradas en la app de iOS.
+La integración con App Store permite que el **panel de administración vea automáticamente las suscripciones** compradas en la app de iOS.
 
-###  Lo que est� implementado:
+### Lo que está implementado:
 
--  Webhook para recibir notificaciones de Apple
--  Validaci�n de receipts con servidores de Apple
--  Almacenamiento de suscripciones en Firestore
--  C�lculo autom�tico de MRR/ARR en el admin
--  Soporte para v2 de App Store Server Notifications
--  Idempotencia (evita duplicados)
--  Logging y auditor�a de eventos
+- Webhook para recibir notificaciones de Apple
+- Validación de receipts con servidores de Apple
+- Almacenamiento de suscripciones en Firestore
+- Cálculo automático de MRR/ARR en el admin
+- Soporte para v2 de App Store Server Notifications
+- Idempotencia (evita duplicados)
+- Logging y auditoría de eventos
 
 ---
 
-## � Configuraci�n en App Store Connect
+## → Configuración en App Store Connect
 
 ### **Paso 1: Crear Productos In-App**
 
 1. Ve a [App Store Connect](https://appstoreconnect.apple.com)
-2. Selecciona tu app � **Features** � **In-App Purchases**
+2. Selecciona tu app → **Features** → **In-App Purchases**
 3. Click en **+** para crear nuevos productos
 
 **Productos recomendados:**
 
-| Product ID | Tipo | Precio | Duraci�n |
+| Product ID | Tipo | Precio | Duración |
 |------------|------|--------|----------|
-| `com.MaLove.App.premium.monthly` | Auto-Renewable Subscription | �9.99 | 1 mes |
-| `com.MaLove.App.premium.yearly` | Auto-Renewable Subscription | �99.99 | 1 a�o |
-| `com.MaLove.App.premium_plus.monthly` | Auto-Renewable Subscription | �19.99 | 1 mes |
-| `com.MaLove.App.premium_plus.yearly` | Auto-Renewable Subscription | �199.99 | 1 a�o |
+| `com.MaLove.App.premium.monthly` | Auto-Renewable Subscription | 9.99 | 1 mes |
+| `com.MaLove.App.premium.yearly` | Auto-Renewable Subscription | 99.99 | 1 año |
+| `com.MaLove.App.premium_plus.monthly` | Auto-Renewable Subscription | 19.99 | 1 mes |
+| `com.MaLove.App.premium_plus.yearly` | Auto-Renewable Subscription | 199.99 | 1 año |
 
 ### **Paso 2: Obtener Shared Secret**
 
-1. En App Store Connect � Tu app � **General** � **App Information**
+1. En App Store Connect → Tu app → **General** → **App Information**
 2. Scroll down hasta **App-Specific Shared Secret**
 3. Click en **Generate** si no existe
-4. Copia el secret (lo necesitar�s para `.env`)
+4. Copia el secret (lo necesitarás para `.env`)
 
 ### **Paso 3: Configurar Server Notifications**
 
-1. En App Store Connect � Tu app � **General** � **App Information**
+1. En App Store Connect → Tu app → **General** → **App Information**
 2. Scroll down hasta **App Store Server Notifications**
 3. Click en **Add Server URL**
 
@@ -69,40 +69,40 @@ https://tudominio.com/api/app-store/webhook
 https://tudominio.com/api/app-store/webhook
 ```
 
-4. Select **Version 2**  (importante)
+4. Select **Version 2**  (importante)
 5. Click en **Save**
 
 ### **Paso 4: Configurar Subscription Groups**
 
-1. En **Features** � **Subscriptions**
+1. En **Features** → **Subscriptions**
 2. Create a **Subscription Group** (ej: "Premium Plans")
 3. Asigna todos tus productos al grupo
-4. Configura los niveles (Basic � Premium � Premium Plus)
+4. Configura los niveles (Basic → Premium → Premium Plus)
 
 ---
 
-## = Variables de Entorno
+## Variables de Entorno
 
-A�ade a tu archivo `.env` del backend:
+Añade a tu archivo `.env` del backend:
 
 ```env
 # App Store Configuration
-APP_STORE_SHARED_SECRET=tu_shared_secret_aqu�
+APP_STORE_SHARED_SECRET=tu_shared_secret_aqui
 
-# Opcional: Configuraci�n adicional
+# Opcional: Configuración adicional
 APP_STORE_BUNDLE_ID=com.maloveapp.app
 NODE_ENV=production
 ```
 
-� **IMPORTANTE:** Nunca subas el `.env` a Git. A��delo a `.gitignore`.
+ **IMPORTANTE:** Nunca subas el `.env` a Git. Añádelo a `.gitignore`.
 
 ---
 
-## =� Endpoints Implementados
+## Endpoints Implementados
 
 ### **1. POST `/api/app-store/webhook`**
 
-**Prop�sito:** Recibe notificaciones autom�ticas de Apple
+**Propósito:** Recibe notificaciones automáticas de Apple
 
 **Headers:**
 ```
@@ -122,19 +122,19 @@ Content-Type: application/json
 ```
 
 **Tipos de notificaciones soportadas:**
--  `SUBSCRIBED` - Nueva suscripci�n
--  `DID_RENEW` - Renovaci�n exitosa
--  `EXPIRED` - Suscripci�n expir�
--  `DID_FAIL_TO_RENEW` - Fallo en renovaci�n
--  `REFUND` - Reembolso procesado
--  `REVOKE` - Suscripci�n revocada
--  `DID_CHANGE_RENEWAL_STATUS` - Usuario cambi� renovaci�n autom�tica
+- `SUBSCRIBED` - Nueva suscripción
+- `DID_RENEW` - Renovación exitosa
+- `EXPIRED` - Suscripción expir
+- `DID_FAIL_TO_RENEW` - Fallo en renovación
+- `REFUND` - Reembolso procesado
+- `REVOKE` - Suscripción revocada
+- `DID_CHANGE_RENEWAL_STATUS` - Usuario cambi renovación automática
 
 ---
 
 ### **2. POST `/api/app-store/verify-receipt`**
 
-**Prop�sito:** Permite al cliente iOS validar un receipt manualmente
+**Propósito:** Permite al cliente iOS validar un receipt manualmente
 
 **Body:**
 ```json
@@ -168,7 +168,7 @@ let base64Receipt = receiptData.base64EncodedString()
 
 ### **3. GET `/api/app-store/subscription/:userId`**
 
-**Prop�sito:** Obtiene la suscripci�n activa de un usuario
+**Propósito:** Obtiene la suscripción activa de un usuario
 
 **Response:**
 ```json
@@ -189,7 +189,7 @@ let base64Receipt = receiptData.base64EncodedString()
 
 ---
 
-## =� Colecciones de Firestore
+## Colecciones de Firestore
 
 ### **Collection: `subscriptions`**
 
@@ -230,7 +230,7 @@ let base64Receipt = receiptData.base64EncodedString()
 
 ### **Collection: `appStoreEvents`**
 
-Auditor�a de todos los eventos recibidos:
+Auditora de todos los eventos recibidos:
 
 ```javascript
 {
@@ -240,9 +240,9 @@ Auditor�a de todos los eventos recibidos:
 }
 ```
 
-### **Actualizaci�n en `users/{uid}`**
+### **Actualización en `users/{uid}`**
 
-Cuando se detecta una suscripci�n, tambi�n se actualiza:
+Cuando se detecta una suscripción, también se actualiza:
 
 ```javascript
 {
@@ -255,53 +255,53 @@ Cuando se detecta una suscripci�n, tambi�n se actualiza:
 
 ---
 
-## = Flujo de Trabajo
+## Flujo de Trabajo
 
 ### **Flujo Completo:**
 
 ```
 1. Usuario compra en App Store
-   �
+   
 2. Apple valida el pago
-   �
-3. Apple env�a webhook a tu backend
+   
+3. Apple envía webhook a tu backend
    POST /api/app-store/webhook
-   �
+   
 4. Backend valida la firma (opcional)
-   �
-5. Backend parsea la transacci�n
-   �
+   
+5. Backend parsea la transacción
+   
 6. Backend guarda en Firestore:
    - Collection 'subscriptions'
    - Collection 'appStoreEvents'
    - Update 'users/{uid}'
-   �
-7. Admin ve la suscripci�n en dashboard
-   �
-8. Se calcula MRR/ARR autom�ticamente
+   
+7. Admin ve la suscripción en dashboard
+   
+8. Se calcula MRR/ARR automáticamente
 ```
 
-### **Renovaciones Autom�ticas:**
+### **Renovaciones Automáticas:**
 
 ```
-Apple renueva la suscripci�n
-   �
+Apple renueva la suscripción
+   
 Webhook DID_RENEW
-   �
+   
 Backend actualiza expiresDate
-   �
-Admin ve la renovaci�n
+   
+Admin ve la renovación
 ```
 
 ---
 
-## >� Testing
+## Testing
 
 ### **Sandbox Environment**
 
 1. **Crear usuarios de prueba:**
-   - App Store Connect � Users and Access � Sandbox Testers
-   - Crea un usuario de prueba con email �nico
+   - App Store Connect → Users and Access → Sandbox Testers
+   - Crea un usuario de prueba con email único
 
 2. **Configurar en iOS:**
    ```swift
@@ -320,14 +320,14 @@ Admin ve la renovaci�n
 
 App Store Connect puede enviar notificaciones de prueba:
 
-1. Ve a tu app � App Information
+1. Ve a tu app → App Information
 2. Scroll a Server Notifications
 3. Click en **Send Test Notification**
 4. Verifica en tus logs:
 
 ```bash
 # Logs del backend
-[app-store] Procesando notificaci�n type=TEST
+[app-store] Procesando notificación type=TEST
 [app-store] Test notification recibida
 ```
 
@@ -345,22 +345,22 @@ curl -X POST https://tubackend.com/api/app-store/webhook \
 
 ---
 
-## =' Troubleshooting
+## ' Troubleshooting
 
 ### **Problema: Webhook no recibe notificaciones**
 
- **Soluciones:**
+ **Soluciones:**
 1. Verifica que la URL sea accesible desde internet (no localhost)
-2. Verifica que sea HTTPS en producci�n
+2. Verifica que sea HTTPS en producción
 3. Revisa que la URL termine en `/webhook`
 4. Comprueba logs del backend: `grep "app-store" logs/*.log`
 
-### **Problema: Receipt inv�lido**
+### **Problema: Receipt invlido**
 
- **Soluciones:**
-1. Verifica que `APP_STORE_SHARED_SECRET` est� en `.env`
+ **Soluciones:**
+1. Verifica que `APP_STORE_SHARED_SECRET` está en `.env`
 2. Usa sandbox URL para testing
-3. Verifica que el receipt no est� expirado
+3. Verifica que el receipt no está expirado
 4. Log del error:
 ```javascript
 logger.error('[app-store] Error verificando receipt', { 
@@ -372,15 +372,15 @@ logger.error('[app-store] Error verificando receipt', {
 
 El webhook puede no incluir el `userId`. Soluciones:
 
- **Opci�n 1: App Account Token**
-En tu app iOS, al crear la transacci�n:
+ **Opción 1: App Account Token**
+En tu app iOS, al crear la transacción:
 ```swift
 let transaction = Transaction()
 transaction.appAccountToken = UUID(uuidString: firebaseUID)
 ```
 
- **Opci�n 2: Verificaci�n manual**
-El usuario valida el receipt despu�s de comprar:
+ **Opción 2: Verificación manual**
+El usuario valida el receipt después de comprar:
 ```javascript
 POST /api/app-store/verify-receipt
 {
@@ -389,7 +389,7 @@ POST /api/app-store/verify-receipt
 }
 ```
 
- **Opci�n 3: Linking posterior**
+ **Opción 3: Linking posterior**
 Admin puede asociar manualmente en el dashboard.
 
 ### **Problema: Suscripciones duplicadas**
@@ -397,27 +397,27 @@ Admin puede asociar manualmente en el dashboard.
 El sistema usa **idempotencia** con `notificationUUID`:
 
 ```javascript
-// Evita procesar la misma notificaci�n dos veces
+// Evita procesar la misma notificación dos veces
 await seenOrMark(`appstore:${notificationUUID}`, 24 * 60 * 60);
 ```
 
-Si a�n hay duplicados, verifica:
+Si aún hay duplicados, verifica:
 1. Que `originalTransactionId` se use como Document ID
-2. Que `merge: true` est� en las escrituras de Firestore
+2. Que `merge: true` está en las escrituras de Firestore
 
 ---
 
-## =� Ver en el Admin Dashboard
+## Ver en el Admin Dashboard
 
-Una vez configurado, el admin ver� autom�ticamente:
+Una vez configurado, el admin verá automáticamente:
 
-### **1. KPI "Facturaci�n 30 d�as"**
+### **1. KPI "Facturación 30 días"**
 Incluye pagos de iOS
 
-### **2. M�tricas Econ�micas**
+### **2. Métricas Econúmicas**
 ```
-MRR: �X,XXX
-ARR: �XX,XXX
+MRR: X,XXX
+ARR: XX,XXX
 Suscripciones activas: XX
 ```
 
@@ -431,7 +431,7 @@ Suscripciones activas: XX
 
 ---
 
-## <� Mapeo de Productos
+## Mapeo de Productos
 
 Configura tus product IDs en `app-store-webhook.js`:
 
@@ -447,13 +447,13 @@ const PRODUCT_ID_TO_PLAN = {
     interval: 'year', 
     amount: 99.99 
   },
-  // ... a�ade tus productos aqu�
+  // ... añade tus productos aquí
 };
 ```
 
 ---
 
-## =� Referencias
+## Referencias
 
 - [App Store Server Notifications v2](https://developer.apple.com/documentation/appstoreservernotifications)
 - [Validating Receipts](https://developer.apple.com/documentation/appstorereceipts/verifyreceipt)
@@ -462,26 +462,26 @@ const PRODUCT_ID_TO_PLAN = {
 
 ---
 
-##  Checklist de Implementaci�n
+## Checklist de Implementación
 
 - [ ] Crear productos in-app en App Store Connect
 - [ ] Obtener App Store Shared Secret
-- [ ] A�adir `APP_STORE_SHARED_SECRET` a `.env`
+- [ ] Añadir `APP_STORE_SHARED_SECRET` a `.env`
 - [ ] Configurar Server Notification URL (v2)
 - [ ] Desplegar backend con HTTPS
 - [ ] Crear usuario sandbox para testing
 - [ ] Probar compra de prueba en sandbox
 - [ ] Verificar que llegue webhook al backend
 - [ ] Verificar que se guarde en Firestore
-- [ ] Verificar que admin vea la suscripci�n
-- [ ] Probar renovaci�n autom�tica
+- [ ] Verificar que admin vea la suscripción
+- [ ] Probar renovación automática
 - [ ] Probar refund
-- [ ] Documentar product IDs en el c�digo
-- [ ] Configurar monitoreo de webhooks en producci�n
+- [ ] Documentar product IDs en el código
+- [ ] Configurar monitoreo de webhooks en producción
 
 ---
 
-**�La integraci�n est� completa y lista para usar!** <�
+**La integración está completa y lista para usar!** <
 
 Para cualquier duda, revisa los logs:
 ```bash

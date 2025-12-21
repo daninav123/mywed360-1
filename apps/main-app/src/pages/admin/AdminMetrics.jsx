@@ -95,7 +95,7 @@ const AdminMetrics = () => {
       </header>
 
       {loading ? (
-        <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+        <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
           Cargando métricas...
         </div>
       ) : (
@@ -142,7 +142,7 @@ const AdminMetrics = () => {
           <section className="grid gap-4 md:grid-cols-2">
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
               <h2 className="text-sm font-semibold">Usuarios activos (últimos 30 días)</h2>
-              <p className="mt-2 text-xs text-[var(--color-text-soft,#6b7280)]">
+              <p className="mt-2 text-xs text-[color:var(--color-text-soft)]">
                 Distribución diaria de usuarios activos
               </p>
               <div className="mt-4 h-64">
@@ -158,7 +158,7 @@ const AdminMetrics = () => {
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-full items-center justify-center rounded-md border border-dashed border-soft text-xs text-[var(--color-text-soft,#6b7280)]">
+                  <div className="flex h-full items-center justify-center rounded-md border border-dashed border-soft text-xs text-[color:var(--color-text-soft)]">
                     Sin datos suficientes
                   </div>
                 )}
@@ -166,7 +166,7 @@ const AdminMetrics = () => {
             </article>
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
               <h2 className="text-sm font-semibold">Ingresos diarios (últimos 30 días)</h2>
-              <p className="mt-2 text-xs text-[var(--color-text-soft,#6b7280)]">
+              <p className="mt-2 text-xs text-[color:var(--color-text-soft)]">
                 Evolución de ingresos en {iaCosts[0]?.currency || 'EUR'}
               </p>
               <div className="mt-4 h-64">
@@ -182,7 +182,7 @@ const AdminMetrics = () => {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-full items-center justify-center rounded-md border border-dashed border-soft text-xs text-[var(--color-text-soft,#6b7280)]">
+                  <div className="flex h-full items-center justify-center rounded-md border border-dashed border-soft text-xs text-[color:var(--color-text-soft)]">
                     Sin datos suficientes
                   </div>
                 )}
@@ -198,7 +198,7 @@ const AdminMetrics = () => {
                   <div key={step.label || index} className="rounded-lg border border-soft px-3 py-4 text-sm">
                     <p className="font-medium">{step.label}</p>
                     <p className="text-2xl font-semibold">{step.value}</p>
-                    <p className="text-xs text-[var(--color-text-soft,#6b7280)]">{step.percentage}</p>
+                    <p className="text-xs text-[color:var(--color-text-soft)]">{step.percentage}</p>
                   </div>
                 ))
               ) : (

@@ -165,7 +165,7 @@ const BlogAuthor = () => {
         <div className="mb-6">
           <Link
             to="/blog"
-            className="text-sm text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]"
+            className="text-sm text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)]"
           >
             ← {t('blog.author.backToBlog', { defaultValue: 'Volver al blog' })}
           </Link>
@@ -194,7 +194,7 @@ const BlogAuthor = () => {
               </div>
               <div className="flex-1 space-y-2">
                 <div>
-                  <p className="text-sm uppercase tracking-widest text-[var(--color-primary,#6366f1)]">
+                  <p className="text-sm uppercase tracking-widest text-[color:var(--color-primary)]">
                     {t('blog.author.badge', { defaultValue: 'Equipo editorial Lovenda' })}
                   </p>
                   <h1 className="text-2xl font-semibold text-gray-900">{author.name}</h1>
@@ -207,14 +207,14 @@ const BlogAuthor = () => {
                 ) : null}
                 {author.bio ? <p className="text-base text-gray-700">{author.bio}</p> : null}
                 {author.social && Object.keys(author.social).length ? (
-                  <div className="flex flex-wrap gap-3 text-sm text-[var(--color-primary,#6366f1)]">
+                  <div className="flex flex-wrap gap-3 text-sm text-[color:var(--color-primary)]">
                     {Object.entries(author.social).map(([network, url]) => (
                       <a
                         key={network}
                         href={url}
                         target="_blank"
                         rel="noreferrer"
-                        className="hover:text-[var(--color-primary-dark,#4f46e5)]"
+                        className="hover:text-[color:var(--color-primary-dark)]"
                       >
                         {t(`common.blog.author.social.${network}`, { defaultValue: network })}
                       </a>
@@ -269,7 +269,7 @@ const BlogAuthor = () => {
                     <Link
                       key={profile.id}
                       to={`/blog/autor/${profile.slug}`}
-                      className="rounded-lg border border-soft bg-surface px-4 py-3 text-sm hover:border-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary,#6366f1)] transition"
+                      className="rounded-lg border border-soft bg-surface px-4 py-3 text-sm hover:border-[color:var(--color-primary)] hover:text-[color:var(--color-primary)] transition"
                     >
                       <p className="font-semibold text-body">{profile.name}</p>
                       {profile.title ? <p className="text-xs text-muted">{profile.title}</p> : null}

@@ -41,7 +41,7 @@ const ManageFoldersModal = ({ isOpen, onClose, folders = [], onDeleteFolder }) =
         <div className="flex items-center justify-between px-4 py-2 border-b">
           <h2 className="text-lg font-semibold">Gestor de carpetas</h2>
           <button
-            className="text-[var(--color-primary)] p-1 rounded"
+            className="text-[color:var(--color-primary)] p-1 rounded"
             aria-label="Cerrar"
             data-testid="close-modal-button"
             onClick={onClose}

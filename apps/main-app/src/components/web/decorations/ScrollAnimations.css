@@ -159,8 +159,8 @@
 .gradient-text {
   background: linear-gradient(
     135deg,
-    var(--color-primary, #9333ea) 0%,
-    var(--color-secondary, #ec4899) 100%
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -198,7 +198,7 @@
   top: 50%;
   width: 40%;
   height: 1px;
-  background: linear-gradient(to right, transparent, var(--color-primary, #9333ea), transparent);
+  background: linear-gradient(to right, transparent, var(--color-primary), transparent);
 }
 
 .decorative-divider::before {

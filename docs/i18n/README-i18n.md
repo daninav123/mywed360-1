@@ -4,6 +4,9 @@
 **Estado:** ✅ SISTEMA 100% FUNCIONAL  
 **Versión:** 2.0.0 FINAL
 
+> Nota (monorepo): cuando este directorio menciona `src/...`, en el repo actual corresponde a `apps/main-app/src/...`.
+> `docs/i18n/REPORTE-MIGRACION-AUTO.json` es un snapshot automático: úsalo para inventario, no como guía de estilo/código.
+
 ---
 
 ## 📋 ÍNDICE

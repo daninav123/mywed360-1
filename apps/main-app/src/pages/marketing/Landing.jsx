@@ -454,21 +454,21 @@ const Landing = () => {
 
   return (
     <MarketingLayout>
-      <section className="layout-container grid gap-12 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 lg:grid-cols-[1.15fr,0.85fr] lg:items-center">
+      <section className="layout-container grid gap-12 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg lg:grid-cols-[1.15fr,0.85fr] lg:items-center">
         <div>
           <div className="flex items-center gap-3">
             <img
               src={logoApp}
               alt={hero.logoAlt || hero.brandLabel || 'MaLove.App'}
-              className="h-12 w-12 rounded-2xl bg-white object-contain shadow-sm ring-1 ring-[var(--color-primary)]/25"
+              className="h-12 w-12 rounded-2xl bg-white object-contain shadow-sm ring-1 ring-[color:var(--color-primary-25)]"
             />
             <span className="text-sm font-semibold uppercase tracking-widest text-muted">
               {hero.brandLabel || 'MaLove.App'}
             </span>
           </div>
           {hero.badge ? (
-            <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted">
-              <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+            <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-primary-40)] bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted">
+              <Sparkles className="h-3.5 w-3.5 text-[color:var(--color-primary)]" />
               {hero.badge}
             </span>
           ) : null}
@@ -487,13 +487,13 @@ const Landing = () => {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
               to="/signup"
-              className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
             >
               {heroPrimaryActionLabel}
             </Link>
             <Link
               to="/app"
-              className="inline-flex items-center justify-center rounded-md border border-[var(--color-primary)]/45 px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[var(--color-primary)] hover:text-body focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-md border border-[color:var(--color-primary-45)] px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[color:var(--color-primary)] hover:text-body focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
             >
               {heroSecondaryActionLabel}
             </Link>
@@ -502,7 +502,7 @@ const Landing = () => {
             {heroHighlights.map((highlight) => (
               <li
                 key={`${highlight.value}-${highlight.label}`}
-                className="rounded-2xl border border-soft bg-white/95 p-4 shadow-sm shadow-[var(--color-primary)]/10"
+                className="rounded-2xl border border-soft bg-white/95 p-4 shadow-sm"
               >
                 <span className="text-xl font-semibold text-body">{highlight.value}</span>
                 <p className="mt-1 text-sm text-muted">{highlight.label}</p>
@@ -512,7 +512,7 @@ const Landing = () => {
         </div>
         <div className="relative">
           {heroWidget.summaryLabel ? (
-            <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg shadow-[var(--color-primary)]/12">
+            <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-widest text-muted">
@@ -523,7 +523,7 @@ const Landing = () => {
                   </h3>
                 </div>
                 {heroWidget.growth ? (
-                  <span className="rounded-full bg-[var(--color-primary)]3 py-1 text-xs font-semibold text-[var(--color-primary)]">
+                  <span className="rounded-full bg-[var(--color-primary-30)] py-1 text-xs font-semibold text-[color:var(--color-primary)]">
                     {heroWidget.growth}
                   </span>
                 ) : null}
@@ -546,7 +546,7 @@ const Landing = () => {
                     <p className="mt-2 text-2xl font-semibold text-body">{heroWidgetBudget.value}</p>
                     {heroWidgetBudget.pendingInvoices ? (
                       <div className="mt-3 flex items-center gap-2 text-xs text-muted">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+                        <CheckCircle2 className="h-3.5 w-3.5 text-[color:var(--color-primary)]" />
                         {heroWidgetBudget.pendingInvoices}
                       </div>
                     ) : null}
@@ -559,9 +559,9 @@ const Landing = () => {
                       {heroWidgetTasksItems.map((task) => (
                         <li
                           key={`${task.day}-${task.text}`}
-                          className="flex items-center gap-3 rounded-lg bg-primary-soft/30 px-3 py-2 text-body"
+                          className="flex items-center gap-3 rounded-lg bg-primary-soft px-3 py-2 text-body"
                         >
-                          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-semibold text-[var(--color-primary)]">
+                          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-semibold text-[color:var(--color-primary)]">
                             {task.day}
                           </span>
                           {task.text}
@@ -574,7 +574,7 @@ const Landing = () => {
             </div>
           ) : null}
           {heroWidgetAssistant.label ? (
-            <div className="ml-auto mt-6 w-5/6 rounded-[1.5rem] border border-soft bg-white/90 p-5 shadow-lg shadow-[var(--color-primary)]/10 ">
+            <div className="ml-auto mt-6 w-5/6 rounded-[1.5rem] border border-soft bg-white/90 p-5 shadow-lg ">
               <p className="text-xs font-medium uppercase tracking-wider text-muted">
                 {heroWidgetAssistant.label}
               </p>
@@ -584,7 +584,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+      <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-semibold text-body">
             {modules.title || 'Todo lo que necesitas en un solo lugar'}
@@ -597,7 +597,7 @@ const Landing = () => {
           {modulesItems.map((feature) => (
             <article
               key={feature.title}
-              className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+              className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm"
             >
               <h3 className="text-lg font-semibold text-body">{feature.title}</h3>
               <p className="mt-3 text-sm text-muted">{feature.description}</p>
@@ -606,11 +606,11 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 p-8 shadow-lg shadow-[var(--color-primary)]/15">
+      <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 p-8 shadow-lg">
         <div className="grid gap-8 lg:grid-cols-[1.2fr,0.8fr] lg:items-center">
           <div>
             {planner.badge ? (
-              <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+              <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
                 {planner.badge}
               </span>
             ) : null}
@@ -624,9 +624,9 @@ const Landing = () => {
               {plannerHighlights.map(({ key, title, description, Icon }) => (
                 <article
                   key={key || title}
-                  className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white p-4 shadow-sm shadow-[var(--color-primary)]/10"
+                  className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white p-4 shadow-sm"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-soft text-[color:var(--color-primary)]">
                     <Icon className="h-5 w-5" />
                   </span>
                   <h3 className="text-sm font-semibold text-body">{title}</h3>
@@ -635,7 +635,7 @@ const Landing = () => {
               ))}
             </div>
           </div>
-          <div className="rounded-2xl border border-soft bg-primary-soft/40 p-6">
+          <div className="rounded-2xl border border-soft bg-primary-soft p-6">
             {plannerDashboard.title ? (
               <p className="text-xs font-semibold uppercase tracking-widest text-muted">
                 {plannerDashboard.title}
@@ -651,7 +651,7 @@ const Landing = () => {
                     {plannerDashboard.portfolioValue}
                   </p>
                   {plannerDashboard.portfolioBadge ? (
-                    <span className="rounded-full bg-[var(--color-primary)]2 py-1 text-xs text-[var(--color-primary)]">
+                    <span className="rounded-full bg-[var(--color-primary-20)] py-1 text-xs text-[color:var(--color-primary)]">
                       {plannerDashboard.portfolioBadge}
                     </span>
                   ) : null}
@@ -681,10 +681,10 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+      <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
         <div className="mx-auto max-w-4xl text-center">
           {benefits.badge ? (
-            <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               {benefits.badge}
             </span>
           ) : null}
@@ -701,9 +701,9 @@ const Landing = () => {
           {benefitItems.map(({ key, title, description, Icon }) => (
             <article
               key={key}
-              className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white/95 p-6 text-center shadow-sm shadow-[var(--color-primary)]/10"
+              className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white/95 p-6 text-center shadow-sm"
             >
-              <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
+              <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-[color:var(--color-primary)]">
                 <Icon className="h-5 w-5" />
               </span>
               <h3 className="text-lg font-semibold text-body">{title}</h3>
@@ -713,10 +713,10 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 space-y-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 lg:grid-cols-[1fr,1fr]">
+      <section className="layout-container mt-24 space-y-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg lg:grid-cols-[1fr,1fr]">
         <div>
           {stories.badge ? (
-            <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               {stories.badge}
             </span>
           ) : null}
@@ -730,9 +730,9 @@ const Landing = () => {
             {testimonials.map((testimonial) => (
               <article
                 key={testimonial.name}
-                className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+                className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white/95 p-6 shadow-sm"
               >
-                <Quote className="h-5 w-5 text-[var(--color-primary)]" />
+                <Quote className="h-5 w-5 text-[color:var(--color-primary)]" />
                 <p className="text-sm text-body">{testimonial.quote}</p>
                 <div>
                   <p className="text-sm font-semibold text-body">{testimonial.name}</p>
@@ -742,7 +742,7 @@ const Landing = () => {
             ))}
           </div>
         </div>
-        <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg shadow-[var(--color-primary)]/15">
+        <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg">
           {trust.title ? (
             <p className="text-xs font-semibold uppercase tracking-widest text-muted">
               {trust.title}
@@ -752,7 +752,7 @@ const Landing = () => {
             {trustBrands.map((brand) => (
               <div
                 key={brand}
-                className="rounded-xl border border-soft bg-primary-soft/40 py-4 text-muted"
+                className="rounded-xl border border-soft bg-primary-soft py-4 text-muted"
               >
                 {brand}
               </div>
@@ -764,10 +764,10 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 grid gap-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 lg:grid-cols-[1fr,1fr]">
+      <section className="layout-container mt-24 grid gap-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg lg:grid-cols-[1fr,1fr]">
         <div>
           {faq.badge ? (
-            <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               {faq.badge}
             </span>
           ) : null}
@@ -778,11 +778,11 @@ const Landing = () => {
             {faqItems.map((faqItem) => (
               <details
                 key={faqItem.question}
-                className="group rounded-2xl border border-soft bg-white/95 p-5 shadow-sm shadow-[var(--color-primary)]/10 open:ring-1 open:ring-[var(--color-primary)]/20"
+                className="group rounded-2xl border border-soft bg-white/95 p-5 shadow-sm open:ring-1 open:ring-[color:var(--color-primary-20)]"
               >
                 <summary className="flex cursor-pointer items-center justify-between text-base font-semibold text-body">
                   {faqItem.question}
-                  <span className="text-sm font-normal text-[var(--color-primary)] transition group-open:rotate-45">
+                  <span className="text-sm font-normal text-[color:var(--color-primary)] transition group-open:rotate-45">
                     +
                   </span>
                 </summary>
@@ -791,7 +791,7 @@ const Landing = () => {
             ))}
           </div>
         </div>
-        <div className="rounded-3xl border border-soft bg-white/95 p-8 shadow-lg shadow-[var(--color-primary)]/15">
+        <div className="rounded-3xl border border-soft bg-white/95 p-8 shadow-lg">
           <h3 className="text-2xl font-semibold text-body">
             {faqForm.title || 'Solicita una demo personalizada'}
           </h3>
@@ -809,7 +809,7 @@ const Landing = () => {
                 value={demoName}
                 onChange={(event) => setDemoName(event.target.value)}
                 placeholder={faqFormFields.name.placeholder || 'Tu nombre'}
-                className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
               />
             </div>
             <div>
@@ -822,7 +822,7 @@ const Landing = () => {
                 value={demoEmail}
                 onChange={(event) => setDemoEmail(event.target.value)}
                 placeholder={faqFormFields.email.placeholder || 'hola@tuagencia.com'}
-                className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
               />
             </div>
             <button
@@ -833,17 +833,17 @@ const Landing = () => {
               <Send className="h-4 w-4" />
               {isSubmitting ? faqSubmittingLabel : faqSubmitLabel}
             </button>
-            {demoMessage ? <p className="text-sm text-[var(--color-primary)]">{demoMessage}</p> : null}
+            {demoMessage ? <p className="text-sm text-[color:var(--color-primary)]">{demoMessage}</p> : null}
           </form>
           {faqForm.consent ? (
-            <div className="mt-6 rounded-2xl border border-soft bg-primary-soft/40 p-4 text-xs text-muted">
+            <div className="mt-6 rounded-2xl border border-soft bg-primary-soft p-4 text-xs text-muted">
               {faqForm.consent}
             </div>
           ) : null}
         </div>
       </section>
 
-      <section className="layout-container mt-24 rounded-3xl border border-[var(--color-primary)]/45 bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/30 md:px-12">
+      <section className="layout-container mt-24 rounded-3xl border border-[color:var(--color-primary-45)] bg-[var(--color-primary)] text-white shadow-lg md:px-12">
         <div className="grid gap-10 md:grid-cols-[2fr,1fr] md:items-center">
           <div>
             <h2 className="text-3xl font-semibold">{cta.title || 'Lista para usar en minutos.'}</h2>
@@ -854,13 +854,13 @@ const Landing = () => {
           <div className="flex flex-col gap-3">
             <Link
               to="/signup"
-              className="inline-flex items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-[var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
+              className="inline-flex items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-[color:var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[color:var(--color-primary)]"
             >
               {cta.primary || 'Crear cuenta gratuita'}
             </Link>
             <Link
               to="/precios"
-              className="inline-flex items-center justify-center rounded-md border border-white/70 px-4 py-3 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
+              className="inline-flex items-center justify-center rounded-md border border-white/70 px-4 py-3 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[color:var(--color-primary)]"
             >
               {cta.secondary || 'Comparar planes'}
             </Link>

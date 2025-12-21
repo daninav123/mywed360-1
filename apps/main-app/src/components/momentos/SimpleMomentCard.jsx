@@ -9,11 +9,14 @@ import {
   X,
   Plus,
   Star,
+  AlertTriangle,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from '../ui';
 import MusicPlayerWithAuth from './MusicPlayerWithAuth';
+import SongTimingSlider from './SongTimingSlider';
+import { findDuplicateSongs, getDuplicateWarning } from '../../utils/songDuplicateDetector';
 
 /**
  * SimpleMomentCard - Tarjeta minimalista para configurar un momento
@@ -31,12 +34,24 @@ const SimpleMomentCard = ({
   selectedSong = null,
   allCandidates = [],
   showAdvanced = false,
+  allMoments = {},
+  currentBlockId = '',
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [showTimingSettings, setShowTimingSettings] = useState(false);
   const [showAllCandidates, setShowAllCandidates] = useState(false);
   const [showMoreCandidates, setShowMoreCandidates] = useState(false);
   const [playlistUrl, setPlaylistUrl] = useState(moment.playlistUrl || '');
+
+  // Detectar duplicados de la canción seleccionada
+  const duplicates = useMemo(() => {
+    if (!selectedSong || !allMoments) return [];
+    return findDuplicateSongs(selectedSong, allMoments, currentBlockId, moment.id);
+  }, [selectedSong, allMoments, currentBlockId, moment.id]);
+
+  const duplicateWarning = useMemo(() => {
+    return getDuplicateWarning(duplicates);
+  }, [duplicates]);
 
   // Limitar opciones visibles a 3 por defecto
   const MAX_VISIBLE_CANDIDATES = 3;
@@ -218,6 +233,45 @@ const SimpleMomentCard = ({
 
               {selectedSong ? (
                 <div className="space-y-3">
+                  {/* Advertencia de duplicados */}
+                  {duplicateWarning && (
+                    <div
+                      className={`rounded-lg p-3 border ${
+                        duplicateWarning.severity === 'error'
+                          ? 'bg-red-50 border-red-300'
+                          : duplicateWarning.severity === 'warning'
+                            ? 'bg-yellow-50 border-yellow-300'
+                            : 'bg-blue-50 border-blue-300'
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle
+                          size={16}
+                          className={`flex-shrink-0 mt-0.5 ${
+                            duplicateWarning.severity === 'error'
+                              ? 'text-red-600'
+                              : duplicateWarning.severity === 'warning'
+                                ? 'text-yellow-600'
+                                : 'text-blue-600'
+                          }`}
+                        />
+                        <div className="flex-1 text-sm">
+                          <p
+                            className={`font-medium ${
+                              duplicateWarning.severity === 'error'
+                                ? 'text-red-900'
+                                : duplicateWarning.severity === 'warning'
+                                  ? 'text-yellow-900'
+                                  : 'text-blue-900'
+                            }`}
+                          >
+                            {duplicateWarning.message}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Info de la canción DESPUÉS del player */}
                   <div className="border border-gray-200 rounded-lg p-3 bg-gradient-to-br from-blue-50 to-white">
                     <div className="flex items-center gap-2 mb-2">
@@ -365,7 +419,7 @@ const SimpleMomentCard = ({
                   {/* Controles de timing - Solo si está expandido */}
                   {expanded && (
                     <div className="space-y-2">
-                      {/* Controles de timing de la canción */}
+                      {/* Controles de timing de la canción con slider visual */}
                       {spotifyTrackId && (
                         <div className="border border-gray-200 rounded-lg p-3 bg-gray-50">
                           <button
@@ -374,59 +428,17 @@ const SimpleMomentCard = ({
                             className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors w-full"
                           >
                             <Settings size={16} />
-                            {showTimingSettings ? 'Ocultar' : 'Mostrar'} tiempos de reproducción
+                            {showTimingSettings ? 'Ocultar' : 'Configurar'} tiempos de reproducción
                           </button>
 
                           {showTimingSettings && (
-                            <div className="mt-3 space-y-3">
-                              <div>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">
-                                  Inicio (minutos:segundos)
-                                </label>
-                                <input
-                                  type="text"
-                                  placeholder="0:00"
-                                  value={moment.songStartTime || '0:00'}
-                                  onChange={(e) =>
-                                    onSongTimingChange?.({
-                                      startTime: e.target.value,
-                                      endTime: moment.songEndTime,
-                                    })
-                                  }
-                                  className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Ej: 0:30 para empezar a los 30 segundos
-                                </p>
-                              </div>
-
-                              <div>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">
-                                  Final (minutos:segundos)
-                                </label>
-                                <input
-                                  type="text"
-                                  placeholder="Dejar vacío para final completo"
-                                  value={moment.songEndTime || ''}
-                                  onChange={(e) =>
-                                    onSongTimingChange?.({
-                                      startTime: moment.songStartTime,
-                                      endTime: e.target.value,
-                                    })
-                                  }
-                                  className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Ej: 3:45 para terminar a los 3:45 minutos
-                                </p>
-                              </div>
-
-                              <div className="bg-blue-50 border border-blue-200 rounded p-2">
-                                <p className="text-xs text-blue-700">
-                                  💡 <strong>Tip:</strong> Usa estos tiempos para reproducir solo la
-                                  parte que necesitas de la canción
-                                </p>
-                              </div>
+                            <div className="mt-3">
+                              <SongTimingSlider
+                                startTime={moment.songStartTime || '0:00'}
+                                endTime={moment.songEndTime || ''}
+                                maxDuration={300}
+                                onChange={onSongTimingChange}
+                              />
                             </div>
                           )}
                         </div>
@@ -529,6 +541,8 @@ SimpleMomentCard.propTypes = {
   selectedSong: PropTypes.object,
   allCandidates: PropTypes.array,
   showAdvanced: PropTypes.bool,
+  allMoments: PropTypes.object,
+  currentBlockId: PropTypes.string,
 };
 
 export default SimpleMomentCard;

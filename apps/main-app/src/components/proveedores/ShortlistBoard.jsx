@@ -13,7 +13,7 @@ export default function ShortlistBoard({
 }) {
   if (!Array.isArray(groups) || groups.length === 0) {
     return (
-      <Card className="border border-dashed border-[color:var(--color-text)]/15 bg-white/70 text-sm text-[color:var(--color-text)]/70">
+      <Card className="border border-dashed border-[color:var(--color-text-15)] bg-white/70 text-sm text-[color:var(--color-text-70)]">
         Aún no guardas candidatos. Usa la búsqueda con IA o añade enlaces manuales para construir tu shortlist inicial.
       </Card>
     );
@@ -22,13 +22,13 @@ export default function ShortlistBoard({
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
       {groups.map(({ service, items, total }) => (
-        <Card key={service} className="border border-[color:var(--color-text)]/12 bg-white/85 shadow-sm">
+        <Card key={service} className="border border-[color:var(--color-text-12)] bg-white/85 shadow-sm">
           <header className="flex items-start justify-between gap-2">
             <div>
               <h3 className="text-sm font-semibold text-[color:var(--color-text)]">
                 {service}
               </h3>
-              <p className="text-xs text-[color:var(--color-text)]/60">
+              <p className="text-xs text-[color:var(--color-text-60)]">
                 {total} candidato{total === 1 ? '' : 's'} guardado{total === 1 ? '' : 's'}
               </p>
             </div>
@@ -45,14 +45,14 @@ export default function ShortlistBoard({
             {items.map((item) => (
               <article
                 key={item.id}
-                className="rounded-xl border border-dashed border-[var(--color-primary)]/30 bg-white/60 px-3 py-2 text-sm text-[color:var(--color-text)]/80"
+                className="rounded-xl border border-dashed border-[color:var(--color-primary-30)] bg-white/60 px-3 py-2 text-sm text-[color:var(--color-text-80)]"
               >
                 <header className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-medium text-[color:var(--color-text)]">
                       {item.name || 'Proveedor sugerido'}
                     </p>
-                    <p className="text-xs text-[color:var(--color-text)]/55">
+                    <p className="text-xs text-[color:var(--color-text-55)]">
                       {item.location || 'Sin ubicación'} · Guardado: {formatDateLocal(item.createdAt)}
                     </p>
                   </div>
@@ -64,7 +64,7 @@ export default function ShortlistBoard({
                 </header>
 
                 {item.notes && (
-                  <p className="mt-2 text-sm text-[color:var(--color-text)]/75 line-clamp-3">
+                  <p className="mt-2 text-sm text-[color:var(--color-text-75)] line-clamp-3">
                     {item.notes}
                   </p>
                 )}

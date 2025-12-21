@@ -303,7 +303,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Tipo de transacción */}
       <div>
-        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-2">
+        <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-2">
           {t('finance.form.type', { defaultValue: 'Tipo de transacción' })}
         </label>
         <div className="flex space-x-4">
@@ -315,7 +315,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
               onChange={(e) => handleChange('type', e.target.value)}
               className="mr-2"
             />
-            <span className="text-sm text-[color:var(--color-text)]/80">
+            <span className="text-sm text-[color:var(--color-text-80)]">
               {t('finance.transactions.expense', { defaultValue: 'Gasto' })}
             </span>
           </label>
@@ -327,7 +327,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
               onChange={(e) => handleChange('type', e.target.value)}
               className="mr-2"
             />
-            <span className="text-sm text-[color:var(--color-text)]/80">
+            <span className="text-sm text-[color:var(--color-text-80)]">
               {t('finance.transactions.income', { defaultValue: 'Ingreso' })}
             </span>
           </label>
@@ -336,7 +336,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
       {/* Concepto */}
       <div>
-        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+        <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
           {t('finance.form.concept', { defaultValue: 'Concepto' })} *
         </label>
         <input
@@ -349,7 +349,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
           className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] ${
             errors.concept
               ? 'border-[color:var(--color-danger)]'
-              : 'border-[color:var(--color-text)]/20'
+              : 'border-[color:var(--color-text-20)]'
           }`}
         />
         {errors.concept && (
@@ -359,7 +359,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
       {/* Proveedor / Fuente */}
       <div>
-        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+        <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
           {t('finance.form.provider', { defaultValue: 'Proveedor / Fuente' })}
         </label>
         <input
@@ -369,9 +369,9 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
           placeholder={t('finance.form.providerPlaceholder', {
             defaultValue: 'Ej: Catering Gourmet, Banco BBVA...',
           })}
-          className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+          className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent border-[color:var(--color-text-20)] bg-[var(--color-surface)] text-[color:var(--color-text)]"
         />
-        <p className="mt-1 text-sm text-[color:var(--color-text)]/70">
+        <p className="mt-1 text-sm text-[color:var(--color-text-70)]">
           {t('finance.form.providerHint', {
             defaultValue: 'Identifica con quin se contrata o de dnde proviene el dinero.',
           })}
@@ -380,13 +380,13 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
       {/* Método de pago */}
       <div>
-        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+        <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
           {t('finance.form.paymentMethod', { defaultValue: 'Método de pago' })}
         </label>
         <select
           value={formData.paymentMethod}
           onChange={(e) => handleChange('paymentMethod', e.target.value)}
-          className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] border-[color:var(--color-text)]/20"
+          className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] border-[color:var(--color-text-20)]"
         >
           <option value="">
             {t('finance.form.paymentMethodPlaceholder', { defaultValue: 'Selecciona un método' })}
@@ -401,7 +401,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
       {/* Monto */}
       <div>
-        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+        <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
           {t('finance.form.amount', { defaultValue: 'Monto (€)' })} *
         </label>
         <input
@@ -414,14 +414,14 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
           className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] ${
             errors.amount
               ? 'border-[color:var(--color-danger)]'
-              : 'border-[color:var(--color-text)]/20'
+              : 'border-[color:var(--color-text-20)]'
           }`}
         />
         {errors.amount && (
           <p className="mt-1 text-sm text-[color:var(--color-danger)]">{errors.amount}</p>
         )}
         {formData.amount && !isNaN(formData.amount) && (
-          <p className="mt-1 text-sm text-[color:var(--color-text)]/70">
+          <p className="mt-1 text-sm text-[color:var(--color-text-70)]">
             {t('finance.form.amountLabel', { defaultValue: 'Monto:' })}{' '}
             {formatCurrency(Number(formData.amount))}
           </p>
@@ -430,7 +430,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
       {/* Fecha */}
       <div>
-        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+        <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
           {t('finance.form.date', { defaultValue: 'Fecha' })} *
         </label>
         <input
@@ -440,7 +440,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
           className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] ${
             errors.date
               ? 'border-[color:var(--color-danger)]'
-              : 'border-[color:var(--color-text)]/20'
+              : 'border-[color:var(--color-text-20)]'
           }`}
         />
         {errors.date && (
@@ -450,7 +450,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
       {/* Categoria */}
       <div>
-        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1" data-testid="finance-category-label">
+        <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1" data-testid="finance-category-label">
           {categoryLabel} *
         </label>
         <select
@@ -459,7 +459,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
           className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] ${
             errors.category
               ? 'border-[color:var(--color-danger)]'
-              : 'border-[color:var(--color-text)]/20'
+              : 'border-[color:var(--color-text-20)]'
           }`}
         >
           <option value="">
@@ -478,19 +478,19 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
       {/* Seguimiento de pago */}
       <div>
-        <h3 className="text-sm font-medium text-[color:var(--color-text)]/80 mb-2">
+        <h3 className="text-sm font-medium text-[color:var(--color-text-80)] mb-2">
           {t('finance.form.paymentTracking', { defaultValue: 'Seguimiento de pago' })}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+            <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
               {t('finance.form.dueDate', { defaultValue: 'Fecha limite' })}
             </label>
             <input
               type="date"
               value={formData.dueDate}
               onChange={(e) => handleChange('dueDate', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent border-[color:var(--color-text-20)] bg-[var(--color-surface)] text-[color:var(--color-text)]"
             />
             {isOverdue && (
               <p className="mt-1 text-sm text-[color:var(--color-danger)]">
@@ -501,13 +501,13 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+            <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
               {t('finance.form.status', { defaultValue: 'Estado' })}
             </label>
             <select
               value={formData.status}
               onChange={(e) => handleChange('status', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent border-[color:var(--color-text-20)] bg-[var(--color-surface)] text-[color:var(--color-text)]"
             >
               {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -517,7 +517,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+            <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
               {t('finance.form.paidAmount', { defaultValue: 'Monto abonado' })}
             </label>
             <input
@@ -527,13 +527,13 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
               value={formData.paidAmount}
               onChange={(e) => handleChange('paidAmount', e.target.value)}
               placeholder="0.00"
-              className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] ${errors.paidAmount ? 'border-[color:var(--color-danger)]' : 'border-[color:var(--color-text)]/20'}`}
+              className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] ${errors.paidAmount ? 'border-[color:var(--color-danger)]' : 'border-[color:var(--color-text-20)]'}`}
             />
             {errors.paidAmount && (
               <p className="mt-1 text-sm text-[color:var(--color-danger)]">{errors.paidAmount}</p>
             )}
             {numericAmount > 0 && (
-              <p className="mt-1 text-sm text-[color:var(--color-text)]/70">
+              <p className="mt-1 text-sm text-[color:var(--color-text-70)]">
                 {t(
                   formData.type === 'expense'
                     ? 'finance.form.remainingToPay'
@@ -554,10 +554,10 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
       {/* Comprobantes */}
       <div>
-        <h3 className="text-sm font-medium text-[color:var(--color-text)]/80 mb-2">
+        <h3 className="text-sm font-medium text-[color:var(--color-text-80)] mb-2">
           {t('finance.form.attachments.title', { defaultValue: 'Comprobantes' })}
         </h3>
-        <p className="text-xs text-[color:var(--color-text)]/60 mb-3">
+        <p className="text-xs text-[color:var(--color-text-60)] mb-3">
           {t('finance.form.attachments.help', {
             defaultValue: 'Adjunta facturas, contratos o recibos para tenerlos a mano.',
           })}
@@ -567,7 +567,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             existingAttachments.map((attachment, index) => (
               <div
                 key={attachment.url || attachment.filename || index}
-                className="flex items-center justify-between rounded border border-[color:var(--color-text)]/15 px-3 py-2"
+                className="flex items-center justify-between rounded border border-[color:var(--color-text-15)] px-3 py-2"
               >
                 <div className="flex flex-col">
                   {attachment.url ? (
@@ -587,7 +587,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
                     </span>
                   )}
                   {typeof attachment.size === 'number' && attachment.size > 0 && (
-                    <span className="text-xs text-[color:var(--color-text)]/60">
+                    <span className="text-xs text-[color:var(--color-text-60)]">
                       {(attachment.size / 1024).toFixed(1)} KB
                     </span>
                   )}
@@ -606,11 +606,11 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             newAttachments.map((file, index) => (
               <div
                 key={`${file.name}-${index}`}
-                className="flex items-center justify-between rounded border border-dashed border-[color:var(--color-text)]/15 px-3 py-2 bg-[var(--color-surface)]/60"
+                className="flex items-center justify-between rounded border border-dashed border-[color:var(--color-text-15)] px-3 py-2 bg-[var(--color-surface-60)]"
               >
-                <div className="flex flex-col text-sm text-[color:var(--color-text)]/80">
+                <div className="flex flex-col text-sm text-[color:var(--color-text-80)]">
                   <span>{file.name}</span>
-                  <span className="text-xs text-[color:var(--color-text)]/60">
+                  <span className="text-xs text-[color:var(--color-text-60)]">
                     {(file.size / 1024).toFixed(1)} KB
                   </span>
                 </div>
@@ -643,7 +643,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             {t('finance.form.attachments.add', { defaultValue: 'Adjuntar comprobante' })}
           </Button>
           {existingAttachments.length + newAttachments.length > 0 && (
-            <span className="text-xs text-[color:var(--color-text)]/60 self-center">
+            <span className="text-xs text-[color:var(--color-text-60)] self-center">
               {t('finance.form.attachments.count', { defaultValue: 'Total adjuntos:' })}{' '}
               {existingAttachments.length + newAttachments.length}
             </span>
@@ -653,7 +653,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
       {/* Descripción adicional (opcional) */}
       <div>
-        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+        <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
           {t('finance.form.description', { defaultValue: 'Descripción adicional' })}
         </label>
         <textarea
@@ -663,7 +663,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             defaultValue: 'Detalles adicionales sobre la transacción...',
           })}
           rows={3}
-          className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
+          className="w-full px-3 py-2 border border-[color:var(--color-text-20)] rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
         />
       </div>
 

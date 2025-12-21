@@ -35,11 +35,12 @@ Sugerencia de archivos:
 Nota: si trabajas en un entorno compartido evita levantar servidores en puertos ya ocupados.
 
 - Backend (Express):
-  - `npm start` (ejecuta `node backend/index.js`)
+  - `npm run backend` (ejecuta `node backend/index.js`)
   - Comprobar salud: `GET http://localhost:4004/health` (o puerto definido por `PORT`)
 
 - Frontend (Vite):
-  - `npm run dev` (levanta en `http://localhost:5173` con `--strictPort`)
+  - `npm run dev:main` (levanta en `http://localhost:5173` con `--strictPort`)
+  - Alternativamente: `cd apps/main-app && npm run dev`
   - Si necesitas previsualización de build: `npm run preview`
 
 ## 4) Datos de prueba y scripts útiles
@@ -82,4 +83,4 @@ También disponible: `npm run ci:check` (agrega varias comprobaciones en cadena)
 - CI/CD: `docs/DEPLOYMENT_CI.md`
 - API (OpenAPI): `docs/api/openapi.yaml`
 - Monitorización: `docs/monitoring/README.md`
-- Roadmap: `docs/roadmap-2025-v2.md`
+- Roadmap: `docs/ROADMAP.md` (versión actual), `docs/archive/roadmap-2025-v2.md` (snapshot histórico)

@@ -1478,7 +1478,7 @@ const SeatingPlanRefactored = () => {
     ) : null;
 
   const renderGuestPanel = (wrapperClassName = 'h-full') =>
-    showGuestSidebar ? (
+    guestSidebarOpen ? (
       <div className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}>
         <SeatingGuestSidebar
           guests={safeGuests}
@@ -1952,7 +1952,7 @@ const SeatingPlanRefactored = () => {
                   className="px-2 py-1 border rounded hover:bg-gray-50 text-xs"
                   onClick={() => setGuestSidebarOpen((prev) => !prev)}
                 >
-                  {showGuestSidebar ? 'Ocultar Guest Sidebar' : 'Mostrar Guest Sidebar'}
+                  {guestSidebarOpen ? 'Ocultar Guest Sidebar' : 'Mostrar Guest Sidebar'}
                 </button>
               )}
             </div>

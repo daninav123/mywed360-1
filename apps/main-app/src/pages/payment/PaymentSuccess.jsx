@@ -49,7 +49,7 @@ const PaymentSuccess = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 text-[var(--color-primary)] animate-spin mx-auto" />
+          <Loader2 className="h-12 w-12 text-[color:var(--color-primary)] animate-spin mx-auto" />
           <p className="mt-4 text-gray-600">
             {t('public.payment.success.loadingMessage')}
           </p>
@@ -74,13 +74,13 @@ const PaymentSuccess = () => {
           <div className="mt-8 space-y-3">
             <Link
               to="/pricing"
-              className="block w-full rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+              className="block w-full rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
             >
               {t('public.payment.success.buttons.backPricing')}
             </Link>
             <Link
               to="/contact"
-              className="block w-full rounded-md border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+              className="block w-full rounded-md border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
             >
               {t('public.payment.success.buttons.contactSupport')}
             </Link>
@@ -134,7 +134,7 @@ const PaymentSuccess = () => {
         <div className="mt-8 space-y-3">
           <Link
             to="/dashboard"
-            className="block w-full rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+            className="block w-full rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
           >
             {t('public.payment.success.buttons.goDashboard')}
           </Link>

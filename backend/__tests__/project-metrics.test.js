@@ -113,14 +113,22 @@ describe('Project Metrics API', () => {
   });
 
   test('GET /api/project-metrics - 200 y puntos diarios cuando usuario pertenece a la boda', async () => {
-    stubFirestoreForGet({ points: [ { date: '2025-10-08', totals: { events: 3, alerts: 1 } } ] });
+    const d = new Date();
+    d.setUTCHours(0, 0, 0, 0);
+    d.setUTCDate(d.getUTCDate() - 1);
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const dateId = `${y}-${m}-${day}`;
+
+    stubFirestoreForGet({ points: [ { date: dateId, totals: { events: 3, alerts: 1 } } ] });
     const app = makeApp(true);
     const res = await request(app)
       .get('/api/project-metrics')
       .query({ weddingId: 'w123', module: 'finance', range: '7d', groupBy: 'daily' })
       .expect(200);
     expect(Array.isArray(res.body.points)).toBe(true);
-    expect(res.body.points[0].date).toBe('2025-10-08');
+    expect(res.body.points[0].date).toBe(dateId);
     expect(res.body.points[0].events).toBe(3);
     expect(res.body.points[0].alerts).toBe(1);
   });

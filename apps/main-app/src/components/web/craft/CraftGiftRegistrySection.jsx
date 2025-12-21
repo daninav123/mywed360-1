@@ -59,8 +59,8 @@ export const CraftGiftRegistrySection = ({
       ref={(ref) => connect(drag(ref))}
       className="py-16 px-4"
       style={{
-        backgroundColor: 'var(--color-fondo, #F9FAFB)',
-        color: 'var(--color-texto, #1F2937)',
+        backgroundColor: 'var(--color-fondo)',
+        color: 'var(--color-texto)',
       }}
     >
       <div className="max-w-6xl mx-auto">
@@ -69,7 +69,7 @@ export const CraftGiftRegistrySection = ({
           <h2
             className="text-4xl md:text-5xl font-bold mb-4"
             style={{
-              color: 'var(--color-primario, #9333EA)',
+              color: 'var(--color-primario)',
               fontFamily: 'var(--fuente-titulo, inherit)',
             }}
           >
@@ -115,7 +115,7 @@ export const CraftGiftRegistrySection = ({
               <div className="text-5xl mb-4">💰</div>
               <h3
                 className="text-2xl font-bold mb-3"
-                style={{ color: 'var(--color-secundario, #1F2937)' }}
+                style={{ color: 'var(--color-secundario)' }}
               >
                 Regalo en Efectivo
               </h3>

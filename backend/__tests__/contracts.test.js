@@ -10,6 +10,7 @@ vi.mock('firebase-admin', () => {
   const mkDoc = (col, id) => ({
     async get(){ const d = store[col][id]; return { exists: !!d, id, data: () => (d ? { ...d } : undefined) }; },
     async set(data, opts){ store[col][id] = opts?.merge ? { ...(store[col][id]||{}), ...data } : { ...data }; },
+    collection(name){ return mkCol(`${col}/${id}/${name}`); },
   });
   const mkCol = (name) => ({
     async add(data){ const id = 'id_' + Math.random().toString(36).slice(2,9); store[name] = store[name] || {}; store[name][id] = { ...data }; return { id }; },
@@ -18,6 +19,7 @@ vi.mock('firebase-admin', () => {
     async get(){ return { docs: Object.entries(store[name] || {}).map(([id, data]) => ({ id, data: () => ({ ...data }) })) }; },
   });
   const firestore = () => ({ FieldValue, collection: mkCol });
+  firestore.FieldValue = FieldValue;
   return { __esModule: true, default: { apps, initializeApp: () => { apps.push({}); }, credential: { applicationDefault: () => ({}) }, firestore } };
 });
 
@@ -25,6 +27,7 @@ vi.mock('firebase-admin', () => {
 vi.mock('../middleware/authMiddleware.js', () => ({
   __esModule: true,
   default: () => (req, _res, next) => next(),
+  authMiddleware: () => (_req, _res, next) => next(),
   requireAuth: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin' }; next(); },
   requireMailAccess: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin', email: 'user@example.com' }; next(); },
   requirePlanner: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'planner' }; next(); },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Download, Eye, Calendar, Users } from 'lucide-react';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
@@ -83,7 +83,7 @@ const AdminPortfolio = () => {
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-xl font-semibold">Portfolio de bodas</h1>
-          <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+          <p className="text-sm text-[color:var(--color-text-soft)]">
             Filtra por estado o por rango de fechas para revisar la cartera.
           </p>
         </div>
@@ -126,7 +126,7 @@ const AdminPortfolio = () => {
             type="button"
             data-testid="portfolio-filter-apply"
             onClick={handleApplyFilters}
-            className="rounded-md border border-soft px-3 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+            className="rounded-md border border-soft px-3 py-2 text-sm hover:bg-[var(--color-bg-soft)]"
           >
             {loading ? 'Aplicando…' : 'Aplicar'}
           </button>
@@ -134,20 +134,20 @@ const AdminPortfolio = () => {
       </header>
 
       {meta && (
-        <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+        <p className="text-xs text-[color:var(--color-text-soft)]">
           Mostrando {portfolio.length} de {meta.count ?? portfolio.length} bodas · Orden: {meta.order ?? 'desc'} ·
           Estado: {meta.status ?? 'all'}
         </p>
       )}
 
       {loading ? (
-        <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+        <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
           Cargando cartera...
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-soft bg-surface shadow-sm">
           <table data-testid="portfolio-table" className="min-w-full divide-y divide-soft text-sm">
-            <thead className="bg-[var(--color-bg-soft,#f3f4f6)] text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+            <thead className="bg-[var(--color-bg-soft)] text-xs uppercase text-[color:var(--color-text-soft)]">
               <tr>
                 <th className="px-4 py-3 text-left">Pareja</th>
                 <th className="px-4 py-3 text-left">Owner</th>
@@ -176,7 +176,7 @@ const AdminPortfolio = () => {
                         type="button"
                         data-testid="portfolio-view-detail"
                         onClick={() => setSelectedWedding(wedding)}
-                        className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                        className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft)]"
                       >
                         Ver detalle
                       </button>
@@ -186,7 +186,7 @@ const AdminPortfolio = () => {
               ))}
               {portfolio.length === 0 && (
                 <tr>
-                  <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={7}>
+                  <td className="px-4 py-6 text-center text-sm text-[color:var(--color-text-soft)]" colSpan={7}>
                     No se encontraron bodas con los filtros seleccionados.
                   </td>
                 </tr>
@@ -202,18 +202,18 @@ const AdminPortfolio = () => {
             <header className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold">{selectedWedding.couple}</h2>
-                <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+                <p className="text-sm text-[color:var(--color-text-soft)]">
                   Evento el {selectedWedding.eventDate}
                 </p>
               </div>
-              <button type="button" className="text-sm text-[var(--color-text-soft,#6b7280)]" onClick={() => setSelectedWedding(null)}>
+              <button type="button" className="text-sm text-[color:var(--color-text-soft)]" onClick={() => setSelectedWedding(null)}>
                 Cerrar
               </button>
             </header>
             <div className="grid gap-3 md:grid-cols-2 text-sm">
               <div className="rounded-lg border border-soft px-3 py-3">
                 <h3 className="font-medium">Resumen</h3>
-                <ul className="mt-2 space-y-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+                <ul className="mt-2 space-y-1 text-xs text-[color:var(--color-text-soft)]">
                   <li>Owner: {selectedWedding.owner}</li>
                   <li>Estado: {statusLabels[selectedWedding.status] || selectedWedding.status}</li>
                   <li>Confirmados: {selectedWedding.confirmedGuests}</li>
@@ -222,7 +222,7 @@ const AdminPortfolio = () => {
               </div>
               <div className="rounded-lg border border-soft px-3 py-3">
                 <h3 className="font-medium">Notas</h3>
-                <p className="mt-2 text-xs text-[var(--color-text-soft,#6b7280)]">
+                <p className="mt-2 text-xs text-[color:var(--color-text-soft)]">
                   Información ficticia para la vista previa del panel administrativo.
                 </p>
               </div>
@@ -233,7 +233,7 @@ const AdminPortfolio = () => {
                 data-testid="portfolio-export-pdf"
                 onClick={handleExportPDF}
                 disabled={exporting}
-                className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {exporting ? 'Exportando...' : '📄 Exportar Portfolio (JSON)'}
               </button>

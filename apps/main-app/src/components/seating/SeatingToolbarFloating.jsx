@@ -74,7 +74,7 @@ const ToolbarButton = ({
         <div className="flex items-center gap-2">
           <span>{label}</span>
           {shortcut && (
-            <kbd className="px-2 py-0.5 bg-[var(--color-primary)]xs font-mono">{shortcut}</kbd>
+            <kbd className="px-2 py-0.5 bg-white/10 rounded font-mono">{shortcut}</kbd>
           )}
         </div>
         {/* Arrow */}

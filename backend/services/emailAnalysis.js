@@ -1,20 +1,32 @@
-import dotenv from 'dotenv';
-import path from 'path';
 import logger from '../utils/logger.js';
 
-dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
-
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
-const OPENAI_PROJECT_ID = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
-
 let openai = null;
+let openAIConfig = { apiKeyPrefix: null, projectId: null };
+
+function getOpenAIConfig() {
+  const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+  const projectId = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
+  return { apiKey, projectId };
+}
+
 async function ensureOpenAI() {
-  if (openai || !OPENAI_API_KEY) return;
+  const { apiKey, projectId } = getOpenAIConfig();
+  const apiKeyPrefix = apiKey ? apiKey.slice(0, 8) : null;
+
+  if (!apiKey) return;
+  if (openai && openAIConfig.apiKeyPrefix === apiKeyPrefix && openAIConfig.projectId === (projectId || null)) return;
+
   try {
     const { default: OpenAI } = await import('openai');
-    openai = new OpenAI({ apiKey: OPENAI_API_KEY, project: OPENAI_PROJECT_ID || undefined });
+    openai = new OpenAI({
+      apiKey,
+      project: projectId || undefined,
+      timeout: 15000,
+      maxRetries: 2,
+    });
+    openAIConfig = { apiKeyPrefix, projectId: projectId || null };
     console.log('✅ Cliente OpenAI inicializado en emailAnalysis', {
-      projectId: OPENAI_PROJECT_ID || null,
+      projectId: projectId || null,
     });
   } catch (err) {
     console.error('❌ Error inicializando OpenAI en emailAnalysis:', err);

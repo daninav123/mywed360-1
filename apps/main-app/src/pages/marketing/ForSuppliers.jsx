@@ -403,20 +403,20 @@ const ForSuppliers = () => {
       </Helmet>
 
       <MarketingLayout>
-        <section className="layout-container grid gap-12 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 lg:grid-cols-[1.15fr,0.85fr] lg:items-center">
+        <section className="layout-container grid gap-12 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg lg:grid-cols-[1.15fr,0.85fr] lg:items-center">
           <div>
             <div className="flex items-center gap-3">
               <img
                 src={logoApp}
                 alt={content.hero?.logoAlt ?? fallbackContent.hero.logoAlt}
-                className="h-12 w-12 rounded-2xl bg-white object-contain shadow-sm ring-1 ring-[var(--color-primary)]/25"
+                className="h-12 w-12 rounded-2xl bg-white object-contain shadow-sm ring-1 ring-[color:var(--color-primary-25)]"
               />
               <span className="text-sm font-semibold uppercase tracking-widest text-muted">
                 {content.hero?.brand ?? fallbackContent.hero.brand}
               </span>
             </div>
-            <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted">
-              <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+            <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-primary-40)] bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted">
+              <Sparkles className="h-3.5 w-3.5 text-[color:var(--color-primary)]" />
               {content.hero?.badge ?? fallbackContent.hero.badge}
             </span>
             <h1 className="mt-6 text-4xl font-semibold leading-tight text-body md:text-5xl">
@@ -432,13 +432,13 @@ const ForSuppliers = () => {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
                 to="/supplier/registro"
-                className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
               >
                 {content.hero?.primaryCta ?? fallbackContent.hero.primaryCta}
               </Link>
               <a
                 href="#como-funciona"
-                className="inline-flex items-center justify-center rounded-md border border-[var(--color-primary)]/45 px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[var(--color-primary)] hover:text-body focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-md border border-[color:var(--color-primary-45)] px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[color:var(--color-primary)] hover:text-body focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
               >
                 {content.hero?.secondaryCta ?? fallbackContent.hero.secondaryCta}
               </a>
@@ -446,7 +446,7 @@ const ForSuppliers = () => {
           </div>
 
           <div className="relative">
-            <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg shadow-[var(--color-primary)]/12">
+            <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-widest text-muted">
@@ -456,7 +456,7 @@ const ForSuppliers = () => {
                     {content.hero?.stats?.title ?? fallbackContent.hero.stats.title}
                   </h3>
                 </div>
-                <span className="rounded-full bg-[var(--color-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
+                <span className="rounded-full bg-[var(--color-primary-10)] px-3 py-1 text-xs font-semibold text-[color:var(--color-primary)]">
                   {content.hero?.stats?.growthBadge ?? fallbackContent.hero.stats.growthBadge}
                 </span>
               </div>
@@ -467,7 +467,7 @@ const ForSuppliers = () => {
                     className="rounded-2xl border border-soft bg-white/95 p-4 shadow-sm"
                   >
                     <div className="flex items-center gap-2">
-                      <metric.Icon className="h-4 w-4 text-[var(--color-primary)]" />
+                      <metric.Icon className="h-4 w-4 text-[color:var(--color-primary)]" />
                       <p className="text-sm text-muted">{metric.label}</p>
                     </div>
                     <p className="mt-2 text-2xl font-semibold text-body">{metric.value}</p>
@@ -476,7 +476,7 @@ const ForSuppliers = () => {
                 ))}
                 <div className="rounded-2xl border border-soft bg-white/95 p-4 shadow-sm md:col-span-2">
                   <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-[var(--color-primary)]" />
+                    <Star className="h-4 w-4 text-[color:var(--color-primary)]" />
                     <p className="text-sm text-muted">
                       {heroMetrics[2]?.label ?? fallbackContent.hero.stats.metrics[2].label}
                     </p>
@@ -489,7 +489,7 @@ const ForSuppliers = () => {
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={`rating-${i}`}
-                          className="h-4 w-4 fill-[var(--color-primary)] text-[var(--color-primary)]"
+                          className="h-4 w-4 fill-[var(--color-primary)] text-[color:var(--color-primary)]"
                         />
                       ))}
                     </div>
@@ -503,7 +503,7 @@ const ForSuppliers = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-3xl font-semibold text-body">
               {content.benefits?.title ?? fallbackContent.benefits.title}
@@ -516,9 +516,9 @@ const ForSuppliers = () => {
             {benefits.map((benefit) => (
               <article
                 key={benefit.title}
-                className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+                className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-[color:var(--color-primary)]">
                   <benefit.Icon className="h-5 w-5" />
                 </span>
                 <h3 className="mt-4 text-lg font-semibold text-body">{benefit.title}</h3>
@@ -530,10 +530,10 @@ const ForSuppliers = () => {
 
         <section
           id="como-funciona"
-          className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15"
+          className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg"
         >
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               <CheckCircle2 className="h-3.5 w-3.5" />
               {content.howItWorks?.badge ?? fallbackContent.howItWorks.badge}
             </span>
@@ -547,7 +547,7 @@ const ForSuppliers = () => {
           <div className="mt-12 grid gap-8 md:grid-cols-5">
             {howSteps.map((item, index) => (
               <article key={`${item.title}-${index}`} className="relative text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-primary)] text-2xl font-bold text-white shadow-lg shadow-[var(--color-primary)]/30">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-primary)] text-2xl font-bold text-white shadow-lg">
                   {index + 1}
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-body">{item.title}</h3>
@@ -556,9 +556,9 @@ const ForSuppliers = () => {
             ))}
           </div>
         </section>
-        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               <Wallet className="h-3.5 w-3.5" />
               {content.tokens?.badge ?? fallbackContent.tokens.badge}
             </span>
@@ -570,20 +570,20 @@ const ForSuppliers = () => {
             </p>
           </div>
           <div className="mt-12 grid gap-8 md:grid-cols-2">
-            <div className="rounded-2xl border border-soft bg-white/95 p-8 shadow-sm shadow-[var(--color-primary)]/10">
+            <div className="rounded-2xl border border-soft bg-white/95 p-8 shadow-sm">
               <h3 className="text-xl font-semibold text-body">
                 {content.tokens?.howTitle ?? fallbackContent.tokens.howTitle}
               </h3>
               <ul className="mt-6 space-y-4 text-sm text-muted">
                 {tokenHowList.map((item, index) => (
                   <li key={`token-how-${index}`} className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 text-[var(--color-primary)]" />
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 text-[color:var(--color-primary)]" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl border border-soft bg-white/95 p-8 shadow-sm shadow-[var(--color-primary)]/10">
+            <div className="rounded-2xl border border-soft bg-white/95 p-8 shadow-sm">
               <h3 className="text-xl font-semibold text-body">
                 {content.tokens?.includedTitle ?? fallbackContent.tokens.includedTitle}
               </h3>
@@ -595,7 +595,7 @@ const ForSuppliers = () => {
                   </li>
                 ))}
               </ul>
-              <div className="mt-8 rounded-xl bg-primary-soft/40 p-4">
+              <div className="mt-8 rounded-xl bg-primary-soft p-4">
                 <p className="text-sm font-medium text-body">
                   {content.tokens?.notice ?? fallbackContent.tokens.notice}
                 </p>
@@ -604,9 +604,9 @@ const ForSuppliers = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 space-y-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="layout-container mt-24 space-y-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               <Star className="h-3.5 w-3.5" />
               {content.testimonials?.badge ?? fallbackContent.testimonials.badge}
             </span>
@@ -618,13 +618,13 @@ const ForSuppliers = () => {
             {testimonials.map((testimonial, index) => (
               <article
                 key={`${testimonial.name}-${index}`}
-                className="flex h-full flex-col gap-4 rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+                className="flex h-full flex-col gap-4 rounded-2xl border border-soft bg-white/95 p-6 shadow-sm"
               >
                 <div className="flex gap-1">
                   {[...Array(testimonial.rating)].map((_, starIndex) => (
                     <Star
                       key={`testimonial-${index}-${starIndex}`}
-                      className="h-4 w-4 fill-[var(--color-primary)] text-[var(--color-primary)]"
+                      className="h-4 w-4 fill-[var(--color-primary)] text-[color:var(--color-primary)]"
                     />
                   ))}
                 </div>
@@ -638,9 +638,9 @@ const ForSuppliers = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 grid gap-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 lg:grid-cols-2">
+        <section className="layout-container mt-24 grid gap-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg lg:grid-cols-2">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               <Crown className="h-3.5 w-3.5" />
               {content.categoriesSection?.badge ?? fallbackContent.categoriesSection.badge}
             </span>
@@ -657,14 +657,14 @@ const ForSuppliers = () => {
                   key={category}
                   className="flex items-center gap-2 rounded-lg border border-soft bg-white px-3 py-2 text-sm text-muted"
                 >
-                  <CheckCircle2 className="h-4 w-4 text-[var(--color-primary)]" />
+                  <CheckCircle2 className="h-4 w-4 text-[color:var(--color-primary)]" />
                   {category}
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-soft bg-white/95 p-8 shadow-lg shadow-[var(--color-primary)]/15">
+          <div className="rounded-3xl border border-soft bg-white/95 p-8 shadow-lg">
             <h3 className="text-2xl font-semibold text-body">
               {content.categoriesSection?.formTitle ?? fallbackContent.categoriesSection.formTitle}
             </h3>
@@ -686,7 +686,7 @@ const ForSuppliers = () => {
                     content.form?.fields?.name?.placeholder ??
                     fallbackContent.form.fields.name.placeholder
                   }
-                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                   required
                 />
               </div>
@@ -703,7 +703,7 @@ const ForSuppliers = () => {
                     content.form?.fields?.email?.placeholder ??
                     fallbackContent.form.fields.email.placeholder
                   }
-                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                   required
                 />
               </div>
@@ -721,7 +721,7 @@ const ForSuppliers = () => {
                     content.form?.fields?.business?.placeholder ??
                     fallbackContent.form.fields.business.placeholder
                   }
-                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                   required
                 />
               </div>
@@ -734,7 +734,7 @@ const ForSuppliers = () => {
                   id="demo-category"
                   value={demoCategory}
                   onChange={(event) => setDemoCategory(event.target.value)}
-                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                 >
                   <option value="">
                     {content.form?.fields?.category?.placeholder ??
@@ -765,13 +765,13 @@ const ForSuppliers = () => {
                 </p>
               )}
             </form>
-            <div className="mt-6 rounded-2xl border border-soft bg-primary-soft/40 p-4 text-xs text-muted">
+            <div className="mt-6 rounded-2xl border border-soft bg-primary-soft p-4 text-xs text-muted">
               {content.form?.consent ?? fallbackContent.form.consent}
             </div>
           </div>
         </section>
 
-        <section className="layout-container mt-24 rounded-3xl border border-[var(--color-primary)]/45 bg-[var(--color-primary)] px-8 py-10 text-white shadow-lg shadow-[var(--color-primary)]/30 md:px-12">
+        <section className="layout-container mt-24 rounded-3xl border border-[color:var(--color-primary-45)] bg-[var(--color-primary)] px-8 py-10 text-white shadow-lg md:px-12">
           <div className="grid gap-10 md:grid-cols-[2fr,1fr] md:items-center">
             <div>
               <h2 className="text-3xl font-semibold">
@@ -784,13 +784,13 @@ const ForSuppliers = () => {
             <div className="flex flex-col gap-3">
               <Link
                 to="/supplier/registro"
-                className="inline-flex items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-[var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
+                className="inline-flex items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-[color:var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[color:var(--color-primary)]"
               >
                 {content.finalCta?.primary ?? fallbackContent.finalCta.primary}
               </Link>
               <a
                 href="#como-funciona"
-                className="inline-flex items-center justify-center rounded-md border border-white/70 px-4 py-3 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
+                className="inline-flex items-center justify-center rounded-md border border-white/70 px-4 py-3 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[color:var(--color-primary)]"
               >
                 {content.finalCta?.secondary ?? fallbackContent.finalCta.secondary}
               </a>

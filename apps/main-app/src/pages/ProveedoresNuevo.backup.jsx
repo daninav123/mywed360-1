@@ -96,7 +96,7 @@ const ShortlistList = ({ items, loading, error, t }) => {
 
   if (!items || items.length === 0) {
     return (
-      <Card className="border border-dashed border-soft bg-surface/80">
+      <Card className="border border-dashed border-soft bg-[var(--color-surface-80)]">
         <p className="text-sm text-muted">{t('suppliers.overview.shortlist.empty')}</p>
       </Card>
     );
@@ -117,7 +117,7 @@ const ShortlistList = ({ items, loading, error, t }) => {
                   value: formatShortDate(item.createdAt),
                 })}
               </p>
-              {item.notes && <p className="text-sm text-body/75">{item.notes}</p>}
+              {item.notes && <p className="text-sm text-[color:var(--color-text-75)]">{item.notes}</p>}
             </div>
             {item.match != null && (
               <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">
@@ -163,7 +163,7 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
                     : t('suppliers.overview.status.pending')}{' '}
                   · {prov.service || card.label}
                 </p>
-                {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
+                {prov.notes && <p className="mt-2 text-sm text-[color:var(--color-text-75)]">{prov.notes}</p>}
               </Card>
             ))}
           </section>
@@ -183,11 +183,11 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
                     : t('suppliers.overview.status.pending')}{' '}
                   · {prov.service || card.label}
                 </p>
-                {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
+                {prov.notes && <p className="mt-2 text-sm text-[color:var(--color-text-75)]">{prov.notes}</p>}
               </Card>
             ))
           ) : (
-            <Card className="border border-dashed border-soft bg-surface/80">
+            <Card className="border border-dashed border-soft bg-[var(--color-surface-80)]">
               <p className="text-sm text-muted">
                 {t('suppliers.overview.modals.options.contactEmpty')}
               </p>
@@ -210,11 +210,11 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
                     value: formatShortDate(item.createdAt),
                   })}
                 </p>
-                {item.notes && <p className="mt-2 text-sm text-body/75">{item.notes}</p>}
+                {item.notes && <p className="mt-2 text-sm text-[color:var(--color-text-75)]">{item.notes}</p>}
               </Card>
             ))
           ) : (
-            <Card className="border border-dashed border-soft bg-surface/80">
+            <Card className="border border-dashed border-soft bg-[var(--color-surface-80)]">
               <p className="text-sm text-muted">
                 {t('suppliers.overview.modals.options.shortlistEmpty')}
               </p>
@@ -862,11 +862,11 @@ const Proveedores = () => {
                   !searchPanelCollapsed ? (
                     <Card
                       data-search-panel
-                      className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg"
+                      className="p-6 bg-[var(--color-surface-80)] backdrop-blur-md border-soft shadow-lg"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
-                          <div className="p-3 rounded-xl bg-[var(--color-primary)]/15">
+                          <div className="p-3 rounded-xl bg-[var(--color-primary-15)]">
                             <Search className="w-6 h-6 text-[color:var(--color-primary)]" />
                           </div>
                           <div>
@@ -883,7 +883,7 @@ const Proveedores = () => {
                           size="sm"
                           aria-label={t('suppliers.overview.exploration.collapseAria')}
                           onClick={() => setSearchPanelCollapsed(true)}
-                          className="h-8 w-8 justify-center hover:bg-[var(--color-primary)]/10"
+                          className="h-8 w-8 justify-center hover:bg-[var(--color-primary-10)]"
                         >
                           <ChevronUp className="h-4 w-4" />
                         </Button>
@@ -1012,7 +1012,7 @@ const Proveedores = () => {
                                   setSearchInput(query);
                                   setSearchTerm(query);
                                 }}
-                                className="px-3 py-1.5 rounded-full border border-soft bg-surface hover:border-primary hover:text-primary hover:bg-[var(--color-primary)]/5 transition-all duration-200"
+                                className="px-3 py-1.5 rounded-full border border-soft bg-surface hover:border-primary hover:text-primary hover:bg-[var(--color-primary-5)] transition-all duration-200"
                               >
                                 {query}
                               </button>
@@ -1091,7 +1091,7 @@ const Proveedores = () => {
                     {aiError?.message || t('suppliers.overview.toasts.error')}
                   </Card>
                 ) : aiResults.length === 0 ? (
-                  <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
+                  <Card className="border border-dashed border-soft bg-[var(--color-surface-80)] text-sm text-muted">
                     {t('suppliers.overview.results.empty')}
                   </Card>
                 ) : (
@@ -1244,10 +1244,10 @@ const Proveedores = () => {
                       </p>
                     )}
                     {searchDrawerResult.aiSummary && (
-                      <p className="text-sm text-body/75">{searchDrawerResult.aiSummary}</p>
+                      <p className="text-sm text-[color:var(--color-text-75)]">{searchDrawerResult.aiSummary}</p>
                     )}
                     {searchDrawerResult.snippet && (
-                      <p className="text-sm text-body/75">{searchDrawerResult.snippet}</p>
+                      <p className="text-sm text-[color:var(--color-text-75)]">{searchDrawerResult.snippet}</p>
                     )}
                     <div className="flex flex-wrap gap-2 pt-1">
                       {Array.isArray(searchDrawerResult.tags) &&

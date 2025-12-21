@@ -368,7 +368,7 @@ router.post('/search', async (req, res) => {
 
       // Traer todos los proveedores (sin filtro de categoría ni ubicación)
       // Filtraremos por nombre y ubicación en memoria con lógica de ámbito geográfico
-      let firestoreQuery = db.collection('suppliers').limit(100);
+      let firestoreQuery = db.collection('suppliers').limit(200);
 
       const snapshot = await firestoreQuery.get();
 
@@ -642,7 +642,7 @@ router.post('/search', async (req, res) => {
           return scoreB - scoreA; // Descendente
         })
         // Limitar resultados después de ordenar
-        .slice(0, 20);
+        .slice(0, 50);
 
       // Filtro por presupuesto
       if (budget) {
@@ -895,8 +895,8 @@ router.post('/search', async (req, res) => {
         // ✅ PRIORIZAR: Bodas.net → Alto score → Resto
         const prioritizedResults = [...bodasNetResults, ...highScoreResults, ...otherResults].slice(
           0,
-          10
-        ); // ✅ Aumentado de 8 a 10
+          30
+        ); // ✅ Aumentado para obtener más resultados de internet
 
         console.log(
           `   📊 Resultados priorizados: ${bodasNetResults.length} bodas.net, ${highScoreResults.length} alto score, ${otherResults.length} otros`

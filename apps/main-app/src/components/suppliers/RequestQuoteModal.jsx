@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, Send, Calendar, Users, MapPin, CheckCircle } from 'lucide-react';
+import { X, Send, Calendar, Users, MapPin, CheckCircle, Clock, DollarSign } from 'lucide-react';
 import Modal from '../Modal';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 import { useAuth } from '../../hooks/useAuth';
 import { useWeddingBasicInfo, formatWeddingBasicInfo } from '../../hooks/useWeddingBasicInfo';
+import useFinance from '../../hooks/useFinance';
+import { normalizeBudgetCategoryKey } from '../../utils/budgetCategories';
 import {
   getQuoteFormTemplate,
   getVisibleFields,
@@ -37,9 +39,12 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
   const { t } = useTranslations();
   const { user } = useAuth();
   const basicInfo = useWeddingBasicInfo();
+  const { budget } = useFinance();
   const [loading, setLoading] = useState(false);
   const [serviceData, setServiceData] = useState({});
   const [customMessage, setCustomMessage] = useState('');
+  const [includeBudget, setIncludeBudget] = useState(false);
+  const [assignedBudget, setAssignedBudget] = useState('');
 
   // Obtener template según categoría del proveedor
   const template = useMemo(() => {
@@ -109,9 +114,11 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
         // Info automática
         weddingInfo: {
           fecha: basicInfo.fecha,
+          hora: basicInfo.hora,
+          lugar: basicInfo.lugar,
           ciudad: basicInfo.ciudad,
           numeroInvitados: basicInfo.numeroInvitados,
-          presupuestoTotal: basicInfo.presupuestoTotal,
+          presupuestoAsignado: includeBudget && assignedBudget ? parseFloat(assignedBudget) : null,
         },
         // Info de contacto
         contacto: {
@@ -173,6 +180,67 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
+
+  // Calcular presupuesto automáticamente basado en servicios del proveedor
+  const calculatedBudget = useMemo(() => {
+    if (!budget?.categories || !supplier) return null;
+
+    // Obtener todas las categorías que ofrece este proveedor
+    const supplierCategories = [];
+    
+    // 1. Categoría principal
+    if (supplier.category) {
+      supplierCategories.push({
+        original: supplier.category,
+        normalized: normalizeBudgetCategoryKey(supplier.category),
+        name: supplier.categoryName || supplier.category
+      });
+    }
+    
+    // 2. Categorías alternativas (si el proveedor ofrece múltiples servicios)
+    if (supplier.alternativeCategories && Array.isArray(supplier.alternativeCategories)) {
+      supplier.alternativeCategories.forEach(alt => {
+        if (alt.category && alt.confidence > 20) { // Umbral reducido para incluir más servicios
+          supplierCategories.push({
+            original: alt.category,
+            normalized: normalizeBudgetCategoryKey(alt.category),
+            name: alt.categoryName || alt.category
+          });
+        }
+      });
+    }
+
+    // 3. Buscar presupuestos asignados para esas categorías
+    const matchedBudgets = [];
+    let totalBudget = 0;
+
+    supplierCategories.forEach(supplierCat => {
+      const budgetCategory = budget.categories.find(budgetCat => 
+        normalizeBudgetCategoryKey(budgetCat.name) === supplierCat.normalized
+      );
+
+      if (budgetCategory && budgetCategory.amount > 0) {
+        matchedBudgets.push({
+          category: supplierCat.name,
+          amount: budgetCategory.amount
+        });
+        totalBudget += budgetCategory.amount;
+      }
+    });
+
+    return matchedBudgets.length > 0 ? {
+      total: totalBudget,
+      breakdown: matchedBudgets
+    } : null;
+  }, [budget, supplier]);
+
+  // Inicializar presupuesto automáticamente si se detecta
+  useEffect(() => {
+    if (open && calculatedBudget && calculatedBudget.total > 0) {
+      setAssignedBudget(calculatedBudget.total.toString());
+      setIncludeBudget(true);
+    }
+  }, [open, calculatedBudget]);
 
   // Formatear info básica para display
   const formattedInfo = useMemo(() => {
@@ -240,6 +308,20 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
                     <span className="font-medium text-gray-900">{formattedInfo.fecha}</span>
                   </div>
                 )}
+                {formattedInfo.hora && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-600">Hora:</span>
+                    <span className="font-medium text-gray-900">{formattedInfo.hora}</span>
+                  </div>
+                )}
+                {formattedInfo.lugar && (
+                  <div className="flex items-center gap-2 md:col-span-2">
+                    <MapPin className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-600">Lugar:</span>
+                    <span className="font-medium text-gray-900">{formattedInfo.lugar}</span>
+                  </div>
+                )}
                 {formattedInfo.ciudad && (
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-gray-500" />
@@ -253,14 +335,6 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
                     <span className="text-gray-600">Invitados:</span>
                     <span className="font-medium text-gray-900">
                       {formattedInfo.numeroInvitados}
-                    </span>
-                  </div>
-                )}
-                {formattedInfo.presupuestoTotal && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-600">Presupuesto:</span>
-                    <span className="font-medium text-gray-900">
-                      {formattedInfo.presupuestoTotal}
                     </span>
                   </div>
                 )}
@@ -296,7 +370,80 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
             </div>
           </Card>
 
-          {/* 💬 Sección 3: Mensaje Personalizado (Opcional) */}
+          {/* 💰 Sección 3: Presupuesto Asignado (Opcional) */}
+          <Card className="border-indigo-200">
+            <div className="flex items-start gap-3 mb-4">
+              <DollarSign className="h-5 w-5 text-indigo-600 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  💰 Presupuesto para este servicio
+                </h3>
+                
+                {calculatedBudget ? (
+                  <div className="mb-3">
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-sm text-green-800 mb-2">
+                        ✨ Hemos detectado automáticamente tu presupuesto:
+                      </p>
+                      {calculatedBudget.breakdown.length > 1 ? (
+                        <div className="space-y-1 mb-2">
+                          {calculatedBudget.breakdown.map((item, idx) => (
+                            <div key={idx} className="flex justify-between text-xs text-green-700">
+                              <span>• {item.category}</span>
+                              <span className="font-semibold">{item.amount.toLocaleString('es-ES')}€</span>
+                            </div>
+                          ))}
+                          <div className="border-t border-green-300 pt-1 mt-1 flex justify-between text-sm font-bold text-green-800">
+                            <span>Total:</span>
+                            <span>{calculatedBudget.total.toLocaleString('es-ES')}€</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm font-semibold text-green-800">
+                          {calculatedBudget.breakdown[0].category}: {calculatedBudget.total.toLocaleString('es-ES')}€
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600 mb-3">
+                    Opcionalmente, puedes compartir cuánto tienes asignado para este servicio
+                  </p>
+                )}
+                
+                <label className="flex items-center gap-3 cursor-pointer mb-3">
+                  <input
+                    type="checkbox"
+                    checked={includeBudget}
+                    onChange={(e) => setIncludeBudget(e.target.checked)}
+                    className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Incluir presupuesto asignado en la solicitud
+                  </span>
+                </label>
+
+                {includeBudget && (
+                  <div className="ml-7">
+                    <input
+                      type="number"
+                      value={assignedBudget}
+                      onChange={(e) => setAssignedBudget(e.target.value)}
+                      placeholder="Ej: 5000"
+                      min="0"
+                      step="100"
+                      className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      💡 Esto ayuda al proveedor a ajustar su oferta a tu presupuesto
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+
+          {/* 💬 Sección 4: Mensaje Personalizado (Opcional) */}
           <Card>
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Send className="h-5 w-5 text-indigo-600" />

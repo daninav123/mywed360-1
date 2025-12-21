@@ -127,7 +127,7 @@ export default function SupplierReviews({ supplierId }) {
 
         <button
           onClick={() => setShowAddReview(!showAddReview)}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-[var(--color-primary-90)] transition-colors"
         >
           {showAddReview ? 'Cancelar' : 'Escribir Reseña'}
         </button>
@@ -174,7 +174,7 @@ export default function SupplierReviews({ supplierId }) {
 
           <button
             type="submit"
-            className="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            className="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-[var(--color-primary-90)] transition-colors"
           >
             Publicar Reseña
           </button>
@@ -220,7 +220,7 @@ export default function SupplierReviews({ supplierId }) {
 
               {/* Respuesta del Proveedor */}
               {review.supplierResponse && (
-                <div className="mt-4 pl-4 border-l-2 border-primary bg-primary/5 p-4 rounded-r-lg">
+                <div className="mt-4 pl-4 border-l-2 border-primary bg-[var(--color-primary-5)] p-4 rounded-r-lg">
                   <p className="text-sm font-semibold text-foreground mb-2">
                     Respuesta del proveedor:
                   </p>

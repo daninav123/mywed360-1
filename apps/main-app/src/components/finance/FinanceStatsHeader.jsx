@@ -21,7 +21,7 @@ export default function FinanceStatsHeader({
         <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
           {t('finance.transactions.title', { defaultValue: 'Transacciones' })}
         </h2>
-        <p className="text-sm text-[color:var(--color-text)]/70">
+        <p className="text-sm text-[color:var(--color-text-70)]">
           {stats.count} {t('finance.transactions.items', { defaultValue: 'transacciones' })}
           {' - '} {t('finance.transactions.balanceLabel', { defaultValue: 'Balance:' })}{' '}
           {formatCurrency(stats.balance)}

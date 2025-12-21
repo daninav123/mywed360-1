@@ -28,7 +28,7 @@ const KPICard = ({ title, value, subtitle, color = 'gray', description = '' }) =
   return (
     <div className="relative group">
       <div
-        className={`rounded-lg border p-4 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)]/40 ${bgClass}`}
+        className={`rounded-lg border p-4 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary-40)] ${bgClass}`}
         aria-label={hasTooltip ? description : title}
         aria-describedby={hasTooltip ? tooltipId : undefined}
         tabIndex={hasTooltip ? 0 : undefined}

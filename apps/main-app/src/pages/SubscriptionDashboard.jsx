@@ -123,7 +123,7 @@ const SubscriptionDashboard = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 text-[var(--color-primary)] animate-spin mx-auto" />
+          <Loader2 className="h-12 w-12 text-[color:var(--color-primary)] animate-spin mx-auto" />
           <p className="mt-4 text-gray-600">Cargando suscripción...</p>
         </div>
       </div>
@@ -300,7 +300,7 @@ const SubscriptionDashboard = () => {
               <button
                 onClick={handleManageSubscription}
                 disabled={managingSubscription}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
               >
                 {managingSubscription ? (
                   <>
@@ -317,7 +317,7 @@ const SubscriptionDashboard = () => {
               
               <Link
                 to="/pricing"
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
               >
                 <ExternalLink className="h-4 w-4" />
                 Cambiar Plan
@@ -351,7 +351,7 @@ const SubscriptionDashboard = () => {
           <button
             onClick={handleManageSubscription}
             disabled={managingSubscription}
-            className="inline-flex items-center gap-2 text-[var(--color-primary)] hover:underline font-semibold"
+            className="inline-flex items-center gap-2 text-[color:var(--color-primary)] hover:underline font-semibold"
           >
             Abrir Portal del Cliente
             <ExternalLink className="h-4 w-4" />

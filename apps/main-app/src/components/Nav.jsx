@@ -27,7 +27,6 @@ function getNavItems(role, t) {
       return [
         { path: '/home', label: t('navigation.home') },
         { path: '/tasks', label: t('navigation.tasks') },
-        { path: '/timeline', label: 'Timeline' },
         { path: '/finance', label: t('navigation.finance') },
         { path: '/more', label: t('navigation.more') },
       ];
@@ -72,7 +71,7 @@ function Nav() {
   }, []);
 
   return (
-    <nav className="fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center p-3 z-30">
+    <nav className="fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center px-3 py-4 z-30">
       {/* Navegación principal */}
       <div className="flex justify-around flex-1">
         {navItems.map(({ path, label }, idx) => {

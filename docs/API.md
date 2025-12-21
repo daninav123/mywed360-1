@@ -1,4 +1,4 @@
-﻿# API — Contratos y Endpoints
+# API — Contratos y Endpoints
 
 Este documento lista los endpoints REST usados por el frontend y los contratos esperados (ajustar según el backend real).
 

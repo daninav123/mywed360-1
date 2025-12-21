@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock de los hooks y servicios (deben declararse ANTES de importar los módulos a testear)
 vi.mock('../../hooks/useAuth', () => ({ useAuth: vi.fn() }));
-vi.mock('../../services/EmailService', () => ({
+vi.mock('../../services/emailService', () => ({
   initEmailService: vi.fn().mockReturnValue('usuario@maloveapp.com'),
   getEmailTemplates: vi.fn().mockResolvedValue([
     {
@@ -176,7 +176,7 @@ describe('EmailComposer', () => {
 
   it('envía el correo correctamente con todos los datos', async () => {
     // Importar el servicio para espiar la función
-    const EmailService = await import('../../services/EmailService');
+    const EmailService = await import('../../services/emailService');
 
     const user = userEvent.setup();
     render(<EmailComposer {...defaultProps} />);
@@ -208,7 +208,7 @@ describe('EmailComposer', () => {
 
   it('muestra mensaje de error cuando falla el envío', async () => {
     // Configurar el mock para fallar
-    const EmailService = await import('../../services/EmailService');
+    const EmailService = await import('../../services/emailService');
     EmailService.sendEmail.mockRejectedValueOnce(new Error('Error de prueba'));
 
     const user = userEvent.setup();

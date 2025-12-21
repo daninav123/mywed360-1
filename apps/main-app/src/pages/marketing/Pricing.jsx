@@ -28,17 +28,17 @@ const Pricing = () => {
   const featureHighlights = useMemo(
     () => [
       {
-        icon: <Sparkles className="h-5 w-5 text-[var(--color-primary)]" />,
+        icon: <Sparkles className="h-5 w-5 text-[color:var(--color-primary)]" />,
         title: t('pricing.hero.highlights.payPerEvent.title'),
         description: t('pricing.hero.highlights.payPerEvent.description'),
       },
       {
-        icon: <Users className="h-5 w-5 text-[var(--color-primary)]" />,
+        icon: <Users className="h-5 w-5 text-[color:var(--color-primary)]" />,
         title: t('pricing.hero.highlights.collaboration.title'),
         description: t('pricing.hero.highlights.collaboration.description'),
       },
       {
-        icon: <CheckCircle2 className="h-5 w-5 text-[var(--color-primary)]" />,
+        icon: <CheckCircle2 className="h-5 w-5 text-[color:var(--color-primary)]" />,
         title: t('pricing.hero.highlights.syncStatus.title'),
         description: t('pricing.hero.highlights.syncStatus.description'),
       },
@@ -262,10 +262,10 @@ const Pricing = () => {
               </div>
             </div>
           )}
-          <section className="rounded-3xl border border-soft bg-surface px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 md:px-12 md:py-14">
+          <section className="rounded-3xl border border-soft bg-surface px-6 py-10 shadow-lg md:px-12 md:py-14">
             <div className="grid gap-10 md:grid-cols-[1.35fr,0.65fr] md:items-center">
               <div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)]/12 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+                <span className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary-12)] px-4 py-2 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
                   <Sparkles className="h-4 w-4" />
                   {heroBadge}
                 </span>
@@ -275,9 +275,9 @@ const Pricing = () => {
                   {featureHighlights.map((item) => (
                     <div
                       key={item.title}
-                      className="flex flex-col gap-2 rounded-2xl border border-soft bg-white p-4 shadow-sm shadow-[var(--color-primary)]/10"
+                      className="flex flex-col gap-2 rounded-2xl border border-soft bg-white p-4 shadow-sm"
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)]/12">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary-12)]">
                         {item.icon}
                       </div>
                       <p className="text-sm font-semibold text-body">{item.title}</p>
@@ -287,22 +287,22 @@ const Pricing = () => {
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-[var(--color-primary)]/35 bg-surface p-6 shadow-lg shadow-[var(--color-primary)]/15">
-                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+              <div className="rounded-3xl border border-[color:var(--color-primary-35)] bg-surface p-6 shadow-lg">
+                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
                   <HeartHandshake className="h-4 w-4" />
                   {heroBenefitsTitle}
                 </div>
                 <ul className="mt-4 space-y-3 text-sm text-muted">
                   {heroBenefits.map((benefit) => (
                     <li key={benefit} className="flex items-start gap-3">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 text-[var(--color-primary)]" />
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 text-[color:var(--color-primary)]" />
                       {benefit}
                     </li>
                   ))}
                 </ul>
                 <Link
                   to="/signup"
-                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
                 >
                   {heroCta}
                 </Link>
@@ -312,7 +312,7 @@ const Pricing = () => {
 
           <section>
             <div className="flex flex-wrap items-center gap-3">
-              <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+              <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
                 {couplesLabel}
               </span>
               <h2 className="text-xl font-semibold text-body md:text-2xl">{couplesTitle}</h2>
@@ -322,14 +322,14 @@ const Pricing = () => {
             <div className="mt-6 grid gap-8 md:grid-cols-3">
               {couplePlans.map((plan) => {
                 const cardClasses = [
-                  'flex h-full flex-col rounded-3xl border bg-surface p-8 shadow-sm shadow-[var(--color-primary)]/12 transition-transform hover:-translate-y-1 hover:shadow-lg hover:shadow-[var(--color-primary)]/20',
-                  plan.highlight ? 'border-[var(--color-primary)]/55' : 'border-soft',
+                  'flex h-full flex-col rounded-3xl border bg-surface p-8 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg',
+                  plan.highlight ? 'border-[color:var(--color-primary-55)]' : 'border-soft',
                 ].join(' ');
                 const buttonClasses = [
-                  'mt-8 inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2',
+                  'mt-8 inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2',
                   plan.highlight
                     ? 'bg-[var(--color-primary)] text-white hover:brightness-95'
-                    : 'border border-[var(--color-primary)]/45 text-body hover:border-[var(--color-primary)]',
+                    : 'border border-[color:var(--color-primary-45)] text-body hover:border-[color:var(--color-primary)]',
                 ].join(' ');
 
                 return (
@@ -402,7 +402,7 @@ const Pricing = () => {
 
           <section>
             <div className="flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary)]/12 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary-12)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
                 <Crown className="h-3.5 w-3.5" />
                 {plannersLabel}
               </span>
@@ -414,7 +414,7 @@ const Pricing = () => {
               {plannerPlans.map((plan) => (
                 <article
                   key={plan.key}
-                  className="flex h-full flex-col rounded-3xl border border-soft bg-surface p-8 shadow-sm shadow-[var(--color-primary)]/12 transition-transform hover:-translate-y-1 hover:shadow-lg hover:shadow-[var(--color-primary)]/20"
+                  className="flex h-full flex-col rounded-3xl border border-soft bg-surface p-8 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg"
                 >
                   <div>
                     <span className="text-xs font-semibold uppercase tracking-widest text-muted">
@@ -443,7 +443,7 @@ const Pricing = () => {
                         handlePurchase(PRODUCT_IDS[`${plan.key}Monthly`], `${plan.key}_monthly`)
                       }
                       disabled={loadingPlan === `${plan.key}_monthly`}
-                      className="w-full inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] text-white px-5 py-3 text-sm font-semibold transition-colors hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                      className="w-full inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] text-white px-5 py-3 text-sm font-semibold transition-colors hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
                     >
                       {loadingPlan === `${plan.key}_monthly` ? (
                         <span className="flex items-center gap-2">
@@ -459,7 +459,7 @@ const Pricing = () => {
                         handlePurchase(PRODUCT_IDS[`${plan.key}Annual`], `${plan.key}_annual`)
                       }
                       disabled={loadingPlan === `${plan.key}_annual`}
-                      className="w-full inline-flex items-center justify-center rounded-md border border-[var(--color-primary)]/45 px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                      className="w-full inline-flex items-center justify-center rounded-md border border-[color:var(--color-primary-45)] px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[color:var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
                     >
                       {loadingPlan === `${plan.key}_annual` ? (
                         <span className="flex items-center gap-2">
@@ -476,7 +476,7 @@ const Pricing = () => {
             </div>
           </section>
 
-          <section className="rounded-3xl border border-soft bg-surface p-10 shadow-lg shadow-[var(--color-primary)]/12">
+          <section className="rounded-3xl border border-soft bg-surface p-10 shadow-lg">
             <div className="grid gap-8 md:grid-cols-[1.5fr,0.5fr] md:items-center">
               <div>
                 <h2 className="text-2xl font-semibold text-body md:text-3xl">
@@ -486,14 +486,14 @@ const Pricing = () => {
               </div>
               <Link
                 to="/signup"
-                className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
               >
                 {needHelpSection.cta}
               </Link>
             </div>
           </section>
 
-          <section className="rounded-3xl border border-[var(--color-primary)]/45 bg-[var(--color-primary)] px-8 py-10 text-white shadow-lg shadow-[var(--color-primary)]/30 md:px-12">
+          <section className="rounded-3xl border border-[color:var(--color-primary-45)] bg-[var(--color-primary)] px-8 py-10 text-white shadow-lg md:px-12">
             <div className="grid gap-10 md:grid-cols-[2fr,1fr] md:items-center">
               <div>
                 <h2 className="text-3xl font-semibold">{quickStartSection.title}</h2>
@@ -502,13 +502,13 @@ const Pricing = () => {
               <div className="flex flex-col gap-3">
                 <Link
                   to="/signup"
-                  className="inline-flex items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-[var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
+                  className="inline-flex items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-[color:var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[color:var(--color-primary)]"
                 >
                   {quickStartSection.primaryCta}
                 </Link>
                 <Link
                   to="/acceso"
-                  className="inline-flex items-center justify-center rounded-md border border-white/70 px-4 py-3 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
+                  className="inline-flex items-center justify-center rounded-md border border-white/70 px-4 py-3 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[color:var(--color-primary)]"
                 >
                   {quickStartSection.secondaryCta}
                 </Link>

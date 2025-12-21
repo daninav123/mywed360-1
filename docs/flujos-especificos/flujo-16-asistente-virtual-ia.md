@@ -1,4 +1,4 @@
-﻿# 16. Asistente Virtual y Automatizaciones IA (estado 2025-10-07)
+# 16. Asistente Virtual y Automatizaciones IA (estado 2025-10-07)
 
 > Implementado hoy: `ChatWidget.jsx`, utilidades locales (memoria, notas importantes) y llamadas opcionales a `/api/ai/parse-dialog` (con fallback local contextual).  
 > En desarrollo: orquestador multicanal (email/chat/WhatsApp), reglas configurables y workers backend.
@@ -47,7 +47,7 @@ oGoItems; si el usuario insiste, solicita confirmación adicional y registra la 
 ## 6. Estados especiales y errores
 - `loading`: spinner mientras se espera respuesta (tanto local como remota).
 - Error API → toast “No se pudo conectar, prueba de nuevo” y se mantiene el mensaje en la lista.
-- Respuesta offline contextual: menciona el tipo de evento vigente y sugiere rutas manuales cuando la IA no responde.\n- Si el backend devuelve style_balance_alert o ecommendation_conflict, muestra banner con CTA (abrir presupuesto/checklist) y limita nuevas sugerencias contrastantes hasta resolver.
+- Respuesta offline contextual: menciona el tipo de evento vigente y sugiere rutas manuales cuando la IA no responde.\n- Si el backend devuelve style_balance_alert o ecommendation_conflict, muestra banner con CTA (abrir presupuesto/checklist) y limita nuevas sugerencias contrastantes hasta resolver.
 - Si el usuario borra `localStorage`, se reinicia la conversación (no existe recuperación).
 
 ## 7. Integración con otros flujos (hoy)

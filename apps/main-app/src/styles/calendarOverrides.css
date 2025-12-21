@@ -26,16 +26,16 @@
 
 /* Grilla mensual */
 .rbc-month-row + .rbc-month-row {
-  border-top: 1px solid #e5e7eb; /* gray-200 */
+  border-top: 1px solid var(--color-border);
 }
 
 .rbc-off-range {
-  color: #9ca3af; /* gray-400 */
+  color: var(--color-text-50);
 }
 
 /* Día actual */
 .rbc-today {
-  background-color: rgba(138, 203, 255, 0.25); /* light primary */
+  background-color: var(--color-primary-25);
 }
 
 /* Eventos */

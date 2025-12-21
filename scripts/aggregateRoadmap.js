@@ -10,14 +10,50 @@
  *  node scripts/aggregateRoadmap.js           # genera archivos de salida
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const ROOT = process.cwd();
 const FLOWS_DIR = path.join(ROOT, 'docs', 'flujos-especificos');
 const OUTPUT_JSON = path.join(ROOT, 'roadmap_aggregated.json');
 const OUTPUT_MD = path.join(ROOT, 'docs', 'ROADMAP.md');
 const OUTPUT_E2E_MD = path.join(ROOT, 'docs', 'testing', 'e2e-coverage.md');
+
+const SKIP_DIR_NAMES = new Set([
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  'coverage',
+  '.next',
+  '.turbo',
+  '.cache',
+]);
+
+function getDefaultSearchRoots() {
+  const roots = ['src', 'backend', 'functions', 'scripts', 'docs'];
+
+  const appsDir = path.join(ROOT, 'apps');
+  if (fs.existsSync(appsDir)) {
+    const entries = fs.readdirSync(appsDir, { withFileTypes: true });
+    for (const e of entries) {
+      if (!e.isDirectory()) continue;
+      const srcDir = path.join(appsDir, e.name, 'src');
+      try {
+        if (fs.existsSync(srcDir) && fs.statSync(srcDir).isDirectory()) {
+          roots.push(path.relative(ROOT, srcDir));
+        }
+      } catch (_) {
+        // Ignorar apps con permisos/links raros
+      }
+    }
+  }
+
+  return Array.from(new Set(roots));
+}
+
+const DEFAULT_SEARCH_ROOTS = getDefaultSearchRoots();
 
 function readFileSafe(p) {
   try { return fs.readFileSync(p, 'utf8'); } catch (_) { return null; }
@@ -94,16 +130,15 @@ function fileExists(relOrAbs) {
   return fs.existsSync(p);
 }
 
-function findByBasenameInRoots(basename, roots = ['src', 'backend', 'functions', 'scripts', 'docs']) {
-  const found = [];
-  const targetName = path.parse(basename).name;
-  const extensions = ['', '.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs'];
-  const candidateNames = new Set(
-    extensions.flatMap((ext) => [
-      targetName + ext,
-      basename.endsWith(ext) ? basename : null,
-    ]).filter(Boolean).map((n) => n.toLowerCase())
-  );
+const fileIndexCache = new Map();
+
+function buildFileIndex(roots) {
+  const index = new Map();
+  const add = (key, value) => {
+    const list = index.get(key);
+    if (list) list.push(value);
+    else index.set(key, [value]);
+  };
 
   for (const r of roots) {
     const baseDir = path.join(ROOT, r);
@@ -120,19 +155,47 @@ function findByBasenameInRoots(basename, roots = ['src', 'backend', 'functions',
       for (const e of entries) {
         const full = path.join(d, e.name);
         if (e.isDirectory()) {
+          if (SKIP_DIR_NAMES.has(e.name)) continue;
           stack.push(full);
           continue;
         }
         if (!e.isFile()) continue;
         const nameLc = e.name.toLowerCase();
         const stemLc = path.parse(e.name).name.toLowerCase();
-        if (candidateNames.has(nameLc) || candidateNames.has(stemLc)) {
-          found.push(full);
-        }
+        add(nameLc, full);
+        add(stemLc, full);
       }
     }
   }
-  return found;
+
+  return index;
+}
+
+function findByBasenameInRoots(basename, roots = DEFAULT_SEARCH_ROOTS) {
+  const targetName = path.parse(basename).name;
+  const extensions = ['', '.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs'];
+  const candidateNames = new Set(
+    extensions
+      .flatMap((ext) => [targetName + ext, basename.endsWith(ext) ? basename : null])
+      .filter(Boolean)
+      .map((n) => n.toLowerCase())
+  );
+
+  const key = roots.join('|');
+  let index = fileIndexCache.get(key);
+  if (!index) {
+    index = buildFileIndex(roots);
+    fileIndexCache.set(key, index);
+  }
+
+  const found = new Set();
+  for (const candidate of candidateNames) {
+    const hits = index.get(candidate);
+    if (!hits) continue;
+    for (const full of hits) found.add(full);
+  }
+
+  return Array.from(found);
 }
 
 function parseFlowDoc(filePath) {
@@ -188,11 +251,11 @@ function parseFlowDoc(filePath) {
 
 function generateMarkdown(modules) {
   const lines = [];
-  lines.push('# Roadmap - Lovenda/MaLoveApp');
+  lines.push('# Roadmap - MaLove.App');
   lines.push('');
-  lines.push('> Documento canonico que integra backlog, plan de sprints y estado por flujo. Actualiza esta fuente unica cuando haya cambios para evitar divergencias.');
+  lines.push('> Documento canónico que integra backlog, plan de sprints y estado por flujo. Actualiza esta fuente única cuando haya cambios para evitar divergencias.');
   lines.push('>');
-  lines.push('> Snapshot historico: `docs/roadmap-2025-v2.md` (09/10/2025). Mantén este archivo como referencia principal.');
+  lines.push('> Snapshot histórico: `docs/archive/roadmap-2025-v2.md` (09/10/2025). Úsalo solo como referencia histórica.');
   lines.push('');
   lines.push('## Resumen ejecutivo');
   lines.push('### Objetivos trimestrales');
@@ -314,6 +377,11 @@ function main() {
   console.log(`[aggregateRoadmap] Generado ${path.relative(ROOT, OUTPUT_JSON)}, ${path.relative(ROOT, OUTPUT_MD)} y ${path.relative(ROOT, OUTPUT_E2E_MD)}`);
 }
 
-if (require.main === module) {
-  try { main(); } catch (e) { console.error(e); process.exit(1); }
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  try {
+    main();
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
 }

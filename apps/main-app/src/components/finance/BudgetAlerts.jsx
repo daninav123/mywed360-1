@@ -72,7 +72,7 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
   }, [categoryTotals, transactions, budgetLimits]);
 
   return (
-    <Card className="p-4 h-full bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+    <Card className="p-4 h-full">
       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <AlertCircle className="text-[color:var(--color-primary)]" />
         Alertas de Presupuesto
@@ -84,10 +84,10 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
             key={index}
             className={`p-3 rounded-lg border ${
               alert.type === 'error'
-                ? 'border-[color:var(--color-danger)]/30'
+                ? 'border-[color:var(--color-danger-30)]'
                 : alert.type === 'warning'
-                  ? 'border-[color:var(--color-warning)]/30'
-                  : 'border-[color:var(--color-success)]/30'
+                  ? 'border-[color:var(--color-warning-30)]'
+                  : 'border-[color:var(--color-success-30)]'
             }`}
           >
             <div className="flex items-start gap-2">
@@ -101,7 +101,7 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
                     {alert.items.map((item, i) => (
                       <div
                         key={i}
-                        className="text-xs text-[color:var(--color-text)]/70 flex justify-between"
+                        className="text-xs text-[color:var(--color-text-70)] flex justify-between"
                       >
                         <span>{item.name}</span>
                         <span className="font-medium">€{item.amount.toFixed(2)}</span>

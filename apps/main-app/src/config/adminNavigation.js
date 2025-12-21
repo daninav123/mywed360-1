@@ -94,6 +94,12 @@ const ADMIN_NAVIGATION = [
     title: 'Configuración',
     items: [
       {
+        id: 'specs',
+        label: 'Especificaciones',
+        path: '/admin/specs',
+        description: 'Gestión dinámica de campos de especificaciones de proveedores.',
+      },
+      {
         id: 'task-templates',
         label: 'Plantillas tareas',
         path: '/admin/task-templates',

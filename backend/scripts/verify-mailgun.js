@@ -5,14 +5,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Cargar .env desde la ra�z del proyecto
 const rootDir = path.resolve(__dirname, '..', '..');
 const envPath = path.join(rootDir, '.env');
 
-console.log('=� Cargando variables desde:', envPath);
+console.log('==> Cargando variables desde:', envPath);
 dotenv.config({ path: envPath });
 
-console.log('\n= Verificaci�n de Configuraci�n Mailgun\n');
+console.log('\n=== Verificacion de Configuracion Mailgun\n');
 console.log('='.repeat(60));
 
 const checks = {
@@ -30,70 +29,42 @@ const checks = {
 let hasErrors = false;
 let hasWarnings = false;
 
-console.log('\n=� Estado de Variables:\n');
+console.log('\n=== DIAGNOSTICO:\n');
 
-for (const [key, value] of Object.entries(checks)) {
-  const status = value ? '' : 'L';
-  let displayValue = 'NO DEFINIDA';
-  
-  if (value) {
-    if (key.includes('API_KEY') || key.includes('SIGNING_KEY')) {
-      displayValue = value.substring(0, 8) + '***' + value.substring(value.length - 8);
-    } else if (key.includes('REGION')) {
-      displayValue = value;
-    } else {
-      displayValue = value;
-    }
-  }
-  
-  console.log(`${status} ${key.padEnd(30)} ${displayValue}`);
-  
-  if (!value && key.startsWith('MAILGUN_') && key !== 'MAILGUN_SIGNING_KEY') {
-    hasErrors = true;
-  }
-}
-
-console.log('\n' + '='.repeat(60));
-console.log('\n=� DIAGN�STICO:\n');
-
-// Verificar configuraci�n cr�tica
 if (!checks.MAILGUN_API_KEY) {
-  console.log('L CR�TICO: MAILGUN_API_KEY no est� definida');
+  console.log('X CRITICO: MAILGUN_API_KEY no esta definida');
   hasErrors = true;
 } else {
-  console.log(' MAILGUN_API_KEY configurada');
+  console.log('+ MAILGUN_API_KEY configurada');
 }
 
 if (!checks.MAILGUN_DOMAIN) {
-  console.log('L CR�TICO: MAILGUN_DOMAIN no est� definida');
+  console.log('X CRITICO: MAILGUN_DOMAIN no esta definida');
   hasErrors = true;
 } else {
-  console.log(' MAILGUN_DOMAIN configurada:', checks.MAILGUN_DOMAIN);
+  console.log('+ MAILGUN_DOMAIN configurada');
 }
 
-if (checks.MAILGUN_EU_REGION === 'true') {
-  console.log(' Regi�n EU configurada (api.eu.mailgun.net)');
-} else {
-  console.log('9  Regi�n US (api.mailgun.net)');
+for (const [key, value] of Object.entries(checks)) {
+  const status = value ? 'OK' : 'NO';
+  console.log(`  ${key}: ${status}`);
 }
 
-// Verificar fallbacks
-console.log('\n= Verificaci�n de Fallbacks:\n');
+console.log('\n=== Verificacion de Fallbacks:\n');
 
 if (checks.VITE_MAILGUN_API_KEY && !checks.MAILGUN_API_KEY) {
-  console.log('� AVISO: Solo existe VITE_MAILGUN_API_KEY');
+  console.log('! AVISO: Solo existe VITE_MAILGUN_API_KEY');
   console.log('   Backend necesita MAILGUN_API_KEY (sin prefijo VITE_)');
   hasWarnings = true;
 }
 
 if (checks.VITE_MAILGUN_DOMAIN && !checks.MAILGUN_DOMAIN) {
-  console.log('� AVISO: Solo existe VITE_MAILGUN_DOMAIN');
+  console.log('! AVISO: Solo existe VITE_MAILGUN_DOMAIN');
   console.log('   Backend necesita MAILGUN_DOMAIN (sin prefijo VITE_)');
   hasWarnings = true;
 }
 
-// Test de creaci�n de cliente
-console.log('\n=' Test de Cliente Mailgun:\n');
+console.log('\n=== Test de Cliente Mailgun:\n');
 
 try {
   const mailgunJs = (await import('mailgun-js')).default;
@@ -103,7 +74,7 @@ try {
   const euRegion = (checks.MAILGUN_EU_REGION || checks.VITE_MAILGUN_EU_REGION) === 'true';
   
   if (!apiKey || !domain) {
-    console.log('L No se puede crear cliente: faltan credenciales');
+    console.log('X No se puede crear cliente: faltan credenciales');
     hasErrors = true;
   } else {
     const options = {
@@ -116,59 +87,43 @@ try {
     }
     
     const mg = mailgunJs(options);
-    console.log(' Cliente Mailgun creado correctamente');
-    console.log('   - API Key:', apiKey.substring(0, 8) + '***');
-    console.log('   - Dominio:', domain);
-    console.log('   - Host:', options.host || 'api.mailgun.net (US)');
+    console.log('+ Cliente Mailgun creado correctamente');
+    console.log(`  Region: ${euRegion ? 'EU' : 'US'}`);
+    console.log(`  Domain: ${domain}`);
     
-    // Intentar validar el dominio
-    console.log('\n< Validando dominio...');
-    
-    try {
-      await new Promise((resolve, reject) => {
-        mg.get(`/domains/${domain}`, (err, body) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(body);
-          }
-        });
-      });
-      
-      console.log(' Dominio v�lido y accesible en Mailgun');
-    } catch (validateError) {
-      console.log('� No se pudo validar el dominio:', validateError.message);
-      console.log('   Esto puede ser normal si el dominio no est� completamente configurado');
+    if (typeof mg.messages === 'function') {
+      console.log('+ API de mensajes disponible');
+    } else {
+      console.log('! AVISO: API de mensajes no detectada');
       hasWarnings = true;
     }
   }
 } catch (error) {
-  console.log('L Error creando cliente:', error.message);
+  console.log('X Error creando cliente:', error.message);
   hasErrors = true;
 }
 
-// Resumen final
 console.log('\n' + '='.repeat(60));
-console.log('\n<� RESUMEN FINAL:\n');
+console.log('\n=== RESUMEN FINAL:\n');
 
 if (!hasErrors && !hasWarnings) {
-  console.log(' �Configuraci�n PERFECTA! El sistema de emails est� listo.');
-  console.log('\n=� Puedes probar el env�o con:');
+  console.log('+ Configuracion PERFECTA! El sistema de emails esta listo.');
+  console.log('\n=== Puedes probar el envio con:');
   console.log('   curl -X POST http://localhost:4004/api/mailgun/send-test \\');
   console.log('     -H "Content-Type: application/json" \\');
   console.log('     -d \'{"toEmail":"tu-email@ejemplo.com","subject":"Test"}\'');
   process.exit(0);
 } else if (hasErrors) {
-  console.log('L Configuraci�n INCORRECTA - los emails NO funcionar�n');
-  console.log('\n=' Acciones requeridas:');
-  console.log('   1. Revisar el archivo .env en la ra�z del proyecto');
+  console.log('X Configuracion INCORRECTA - los emails NO funcionaran');
+  console.log('\n=== Acciones requeridas:');
+  console.log('   1. Revisar el archivo .env en la raiz del proyecto');
   console.log('   2. Asegurar que existen MAILGUN_API_KEY y MAILGUN_DOMAIN');
   console.log('   3. Reiniciar el servidor backend');
   process.exit(1);
 } else if (hasWarnings) {
-  console.log('� Configuraci�n con ADVERTENCIAS - puede funcionar pero hay mejoras');
-  console.log('\n=� Recomendaciones:');
+  console.log('! Configuracion con ADVERTENCIAS - puede funcionar pero hay mejoras');
+  console.log('\n=== Recomendaciones:');
   console.log('   - Verificar el dominio en el panel de Mailgun');
-  console.log('   - Asegurar que los registros DNS est�n configurados');
+  console.log('   - Asegurar que los registros DNS estan configurados');
   process.exit(0);
 }

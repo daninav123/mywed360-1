@@ -29,31 +29,37 @@ export default function Invitaciones() {
     setLoading(true);
     setToast(null);
     try {
-      const allowDirect =
-        import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
-      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuración');
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-          'OpenAI-Project': import.meta.env.VITE_OPENAI_PROJECT_ID,
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a helpful assistant specialized in generating invitation texts.',
-            },
-            { role: 'user', content: aiPrompt },
-          ],
-        }),
-      });
-      const data = await response.json();
-      const text = data.choices?.[0]?.message?.content || '';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+      try {
+        const response = await apiPost(
+          '/api/proxy/openai',
+          {
+            model: 'gpt-4o-mini',
+            messages: [
+              {
+                role: 'system',
+                content: 'Eres un asistente especializado en generar textos de invitación.',
+              },
+              { role: 'user', content: aiPrompt },
+            ],
+            maxTokens: 700,
+          },
+          { auth: true, signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Proxy OpenAI error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const text = String(data?.response || '');
       setGeneratedText(text);
       setToast({ message: 'Invitación generada', type: 'success' });
+      } finally {
+        clearTimeout(timeoutId);
+      }
     } catch (err) {
       // console.error(err);
       setToast({ message: 'Error generando invitación', type: 'error' });

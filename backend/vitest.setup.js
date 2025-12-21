@@ -1,4 +1,4 @@
-import { vi, afterEach, expect } from 'vitest';
+import { vi, afterEach, afterAll, expect } from 'vitest';
 // Registrar matchers de Testing Library (jest-dom) para Vitest
 import '@testing-library/jest-dom/vitest';
 import * as matchers from '@testing-library/jest-dom/matchers';
@@ -24,12 +24,27 @@ vi.mock('./db.js', () => ({
 // Mock del middleware de auth para que index.js y rutas no fallen por requireAdmin
 vi.mock('./middleware/authMiddleware.js', () => ({
   __esModule: true,
-  requireAuth: () => (_req, _res, next) => next(),
-  requireMailAccess: () => (_req, _res, next) => next(),
-  requirePlanner: () => (_req, _res, next) => next(),
-  optionalAuth: () => (_req, _res, next) => next(),
-  requireAdmin: () => (_req, _res, next) => next(),
+  authMiddleware: () => (_req, _res, next) => next(),
+  requireAuth: (_req, _res, next) => next(),
+  requireMailAccess: (_req, _res, next) => next(),
+  requirePlanner: (_req, _res, next) => next(),
+  optionalAuth: (_req, _res, next) => next(),
+  requireAdmin: (_req, _res, next) => next(),
 }));
+
+// Mock de multer para evitar dependencias nativas y asegurar memoryStorage() (supplier-dashboard)
+vi.mock('multer', () => {
+  const middleware = (_req, _res, next) => next();
+  const instance = {
+    any: () => middleware,
+    single: () => middleware,
+    array: () => middleware,
+    fields: () => middleware,
+  };
+  const fn = () => instance;
+  fn.memoryStorage = () => ({});
+  return { __esModule: true, default: fn };
+});
 
 // Mock del SDK cliente de Firestore solo en entorno jsdom (evitar interferir con pruebas de reglas en entorno node)
 if (typeof window !== 'undefined') {
@@ -69,21 +84,48 @@ if (typeof window !== 'undefined') {
 
 // Mock de firebase-admin por seguridad (soporta initializeApp, apps, credential, firestore y FieldValue)
 vi.mock('firebase-admin', () => {
+  const makeQuery = () => ({
+    get: vi.fn(async () => ({ empty: true, docs: [] })),
+    limit: vi.fn(() => makeQuery()),
+    orderBy: vi.fn(() => makeQuery()),
+    where: vi.fn(() => makeQuery()),
+    select: vi.fn(() => ({ get: vi.fn(async () => ({ forEach: () => {} })) })),
+  });
+
+  const makeDocRef = () => {
+    const ref = {
+      set: vi.fn(async () => {}),
+      get: vi.fn(async () => ({ exists: false, data: () => ({}) })),
+      update: vi.fn(async () => {}),
+    };
+    ref.collection = vi.fn(() => makeCollectionRef());
+    return ref;
+  };
+
+  const makeCollectionRef = () => ({
+    doc: vi.fn(() => makeDocRef()),
+    where: vi.fn(() => makeQuery()),
+    select: vi.fn(() => ({ get: vi.fn(async () => ({ forEach: () => {} })) })),
+    get: vi.fn(async () => ({ empty: true, docs: [], forEach: () => {} })),
+    limit: vi.fn(() => makeQuery()),
+    orderBy: vi.fn(() => makeCollectionRef()),
+  });
+
   const firestoreFn = vi.fn(() => ({
-    collection: vi.fn(() => ({
-      doc: vi.fn(() => ({
-        set: vi.fn(async () => {}),
-        get: vi.fn(async () => ({ exists: false, data: () => ({}) })),
-        update: vi.fn(async () => {}),
-      })),
-      where: vi.fn(() => ({ get: vi.fn(async () => ({ empty: true, docs: [] })) })),
-      select: vi.fn(() => ({ get: vi.fn(async () => ({ forEach: () => {} })) })),
-      get: vi.fn(async () => ({ forEach: () => {} })),
+    collection: vi.fn(() => makeCollectionRef()),
+    doc: vi.fn(() => makeDocRef()),
+    batch: vi.fn(() => ({
+      set: vi.fn(() => {}),
+      update: vi.fn(() => {}),
+      delete: vi.fn(() => {}),
+      commit: vi.fn(async () => {}),
     })),
-    doc: vi.fn(() => ({ set: vi.fn(async () => {}), update: vi.fn(async () => {}) })),
   }));
-  // Emular FieldValue en namespace firestore (admin.firestore.FieldValue.serverTimestamp())
-  firestoreFn.FieldValue = { serverTimestamp: () => new Date() };
+  firestoreFn.FieldValue = {
+    serverTimestamp: () => new Date(),
+    increment: (n = 1) => n,
+    arrayUnion: (...vals) => ({ __op: 'arrayUnion', vals }),
+  };
   return {
     __esModule: true,
     default: {
@@ -201,6 +243,56 @@ globalThis.useAuth = authMock.useAuth;
 // Asegurar entorno de tests antes de que index.js se cargue
 process.env.NODE_ENV = 'test';
 
+try {
+  const keysToClear = [
+    'OPENAI_API_KEY',
+    'VITE_OPENAI_API_KEY',
+    'OPENAI_PROJECT_ID',
+    'VITE_OPENAI_PROJECT_ID',
+    'OPENAI_MODEL',
+    'OPENAI_MODEL_WEBSITE',
+    'GOOGLE_PLACES_API_KEY',
+    'VITE_GOOGLE_PLACES_API_KEY',
+    'GOOGLE_SEARCH_API_KEY',
+    'GOOGLE_SEARCH_CX',
+    'TAVILY_API_KEY',
+    'MAILGUN_API_KEY',
+    'MAILGUN_DOMAIN',
+    'MAILGUN_SENDING_DOMAIN',
+    'VITE_MAILGUN_API_KEY',
+    'VITE_MAILGUN_DOMAIN',
+    'VITE_MAILGUN_SENDING_DOMAIN',
+  ];
+  for (const k of keysToClear) {
+    try {
+      delete process.env[k];
+    } catch {}
+  }
+} catch {}
+
+vi.mock('openai', () => {
+  class OpenAI {
+    constructor() {
+      this.chat = {
+        completions: {
+          create: async () => ({ choices: [{ message: { content: '{}' } }] }),
+        },
+      };
+    }
+  }
+  return { __esModule: true, default: OpenAI };
+});
+
+vi.mock('node-fetch', () => {
+  const fetch = async () => ({
+    ok: true,
+    status: 200,
+    json: async () => ({}),
+    text: async () => '',
+  });
+  return { __esModule: true, default: fetch };
+});
+
 // Limpiar el DOM después de cada prueba para evitar colisiones
 // Parche para jest-axe: eliminar tag runOnly desconocido "wcag2aa" que no existe en axe-core v4
 import axeCore from 'axe-core';
@@ -218,9 +310,44 @@ axeCore.run = (node, options = {}, callback) => {
 };
 
 // Evitar que rechazos no manejados (simulados) rompan toda la suite; se loguean para diagnóstico
-process.on('unhandledRejection', (reason) => {
-  // eslint-disable-next-line no-console
-  console.error('Unhandled Rejection (test env):', reason);
+if (!process.__malove_vitest_unhandled_rejection_handler) {
+  process.__malove_vitest_unhandled_rejection_handler = true;
+  process.on('unhandledRejection', (reason) => {
+    // eslint-disable-next-line no-console
+    console.error('Unhandled Rejection (test env):', reason);
+  });
+}
+
+afterAll(() => {
+  try {
+    if (process.env && process.env.VITEST_DEBUG_HANDLES === '1') {
+      const handles = typeof process._getActiveHandles === 'function' ? process._getActiveHandles() : [];
+      const counts = new Map();
+      if (Array.isArray(handles)) {
+        for (const h of handles) {
+          const name = h && h.constructor && h.constructor.name ? h.constructor.name : typeof h;
+          counts.set(name, (counts.get(name) || 0) + 1);
+        }
+      }
+      const summary = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+      // eslint-disable-next-line no-console
+      console.error('[VITEST_DEBUG_HANDLES][backend] active handles:', summary);
+    }
+  } catch {}
+});
+
+afterEach(async () => {
+  try {
+    if (typeof process === 'undefined' || typeof process._getActiveHandles !== 'function') return;
+    const handles = process._getActiveHandles() || [];
+    if (!Array.isArray(handles)) return;
+    const servers = handles.filter((h) => h && h.constructor && h.constructor.name === 'Server' && typeof h.close === 'function');
+    for (const s of servers) {
+      try {
+        await new Promise((resolve) => s.close(() => resolve()));
+      } catch {}
+    }
+  } catch {}
 });
 
 afterEach(() => {

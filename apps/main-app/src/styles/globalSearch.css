@@ -43,7 +43,7 @@ kbd {
 
 /* Highlight de búsqueda */
 .search-highlight {
-  background-color: #fef08a;
+  background-color: var(--color-warning-20);
   padding: 0 2px;
   border-radius: 2px;
 }
@@ -58,15 +58,15 @@ kbd {
 }
 
 .search-results::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--color-text-5);
   border-radius: 4px;
 }
 
 .search-results::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-text-20);
   border-radius: 4px;
 }
 
 .search-results::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-text-30);
 }

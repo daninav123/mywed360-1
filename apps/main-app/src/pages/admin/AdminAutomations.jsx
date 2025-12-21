@@ -422,7 +422,7 @@ export default function AdminAutomations() {
                 <Typography variant="caption" color="textSecondary">
                   Placeholders disponibles:
                 </Typography>
-                <ul className="mt-1 space-y-1 text-sm text-[var(--color-text-soft,#6b7280)]">
+                <ul className="mt-1 space-y-1 text-sm text-[color:var(--color-text-soft)]">
                   {ANNIVERSARY_PLACEHOLDERS.map((item) => (
                     <li key={item.token}>
                       <code>{item.token}</code> — {item.description}
@@ -482,7 +482,7 @@ export default function AdminAutomations() {
             {anniversarySummary.notes.length > 0 && (
               <Box>
                 <Typography variant="subtitle2">Notas</Typography>
-                <ul className="list-disc pl-5 text-sm text-[var(--color-text,#111827)]">
+                <ul className="list-disc pl-5 text-sm text-[color:var(--color-text)]">
                   {anniversarySummary.notes.map((note, idx) => (
                     <li key={`anniv-note-${idx}`}>{note}</li>
                   ))}
@@ -639,7 +639,7 @@ export default function AdminAutomations() {
                 <Typography variant="caption" color="textSecondary">
                   Placeholders disponibles:
                 </Typography>
-                <ul className="mt-1 space-y-1 text-sm text-[var(--color-text-soft,#6b7280)]">
+                <ul className="mt-1 space-y-1 text-sm text-[color:var(--color-text-soft)]">
                   {PARTNER_PLACEHOLDERS.map((item) => (
                     <li key={item.token}>
                       <code>{item.token}</code> — {item.description}
@@ -699,7 +699,7 @@ export default function AdminAutomations() {
             {partnerSummary.notes.length > 0 && (
               <Box mb={2}>
                 <Typography variant="subtitle2">Notas</Typography>
-                <ul className="list-disc pl-5 text-sm text-[var(--color-text,#111827)]">
+                <ul className="list-disc pl-5 text-sm text-[color:var(--color-text)]">
                   {partnerSummary.notes.map((note, idx) => (
                     <li key={`partner-note-${idx}`}>{note}</li>
                   ))}
@@ -711,7 +711,7 @@ export default function AdminAutomations() {
                 <Typography variant="subtitle2" gutterBottom>
                   Previsualizaciones (primeros 5)
                 </Typography>
-                <ul className="space-y-1 text-sm text-[var(--color-text,#111827)]">
+                <ul className="space-y-1 text-sm text-[color:var(--color-text)]">
                   {partnerSummary.previews.map((preview, idx) => (
                     <li key={`partner-preview-${idx}`} className="rounded border border-soft px-3 py-2">
                       <strong>{preview.partnerName || preview.partnerId}</strong> —

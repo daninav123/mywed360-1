@@ -316,6 +316,7 @@ router.get('/categories', async (req, res) => {
     { value: 'musica', label: 'Música y DJ' },
     { value: 'flores', label: 'Flores y Decoración' },
     { value: 'lugar', label: 'Lugar de Celebración' },
+    { value: 'iglesia', label: 'Iglesia' },
     { value: 'pasteleria', label: 'Pastelería / Tarta' },
     { value: 'invitaciones', label: 'Invitaciones' },
     { value: 'maquillaje', label: 'Maquillaje y Peluquería' },

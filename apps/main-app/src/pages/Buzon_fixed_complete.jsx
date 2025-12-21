@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Send, Trash2, Archive, Mail } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -23,7 +23,7 @@ import {
   deleteMail,
   createEmailAlias,
   markAsRead,
-} from '../services/EmailService';
+} from '../services/emailService';
 
 import { loadData, saveData } from '../services/StorageService';
 

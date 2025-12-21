@@ -4,7 +4,7 @@
  * contra los que aparecen en roadmap.json.
  */
 
-const fs = require('fs');
+import fs from 'node:fs';
 
 const norm = (p) => p.replace(/\\/g, '/');
 

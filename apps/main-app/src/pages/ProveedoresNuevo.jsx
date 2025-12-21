@@ -15,6 +15,8 @@ import {
   Filter,
   Grid,
   List,
+  Send,
+  Zap,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -45,6 +47,12 @@ import MyServicesSection from '../components/suppliers/MyServicesSection';
 import AdvancedFiltersModal from '../components/suppliers/AdvancedFiltersModal';
 import SearchTabContent from '../components/suppliers/SearchTabContent';
 import ServicesProgressBar from '../components/suppliers/ServicesProgressBar';
+import BudgetDistribution from '../components/proveedores/BudgetDistribution';
+import useFinance from '../hooks/useFinance';
+import { normalizeBudgetCategoryKey } from '../utils/budgetCategories';
+import { syncPaymentScheduleWithTransactions } from '../services/paymentScheduleService';
+import { useFavorites } from '../contexts/FavoritesContext';
+import { createQuoteRequest } from '../services/quoteRequestsService';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
@@ -99,7 +107,7 @@ const ShortlistList = ({ items, loading, error, t }) => {
 
   if (!items || items.length === 0) {
     return (
-      <Card className="border border-dashed border-soft bg-surface/80">
+      <Card className="border border-dashed border-soft bg-[var(--color-surface-80)]">
         <p className="text-sm text-muted">{t('suppliers.overview.shortlist.empty')}</p>
       </Card>
     );
@@ -120,7 +128,7 @@ const ShortlistList = ({ items, loading, error, t }) => {
                   value: formatShortDate(item.createdAt),
                 })}
               </p>
-              {item.notes && <p className="text-sm text-body/75">{item.notes}</p>}
+              {item.notes && <p className="text-sm text-[color:var(--color-text-75)]">{item.notes}</p>}
             </div>
             {item.match != null && (
               <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">
@@ -166,7 +174,7 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
                     : t('suppliers.overview.status.pending')}{' '}
                   · {prov.service || card.label}
                 </p>
-                {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
+                {prov.notes && <p className="mt-2 text-sm text-[color:var(--color-text-75)]">{prov.notes}</p>}
               </Card>
             ))}
           </section>
@@ -186,11 +194,11 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
                     : t('suppliers.overview.status.pending')}{' '}
                   · {prov.service || card.label}
                 </p>
-                {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
+                {prov.notes && <p className="mt-2 text-sm text-[color:var(--color-text-75)]">{prov.notes}</p>}
               </Card>
             ))
           ) : (
-            <Card className="border border-dashed border-soft bg-surface/80">
+            <Card className="border border-dashed border-soft bg-[var(--color-surface-80)]">
               <p className="text-sm text-muted">
                 {t('suppliers.overview.modals.options.contactEmpty')}
               </p>
@@ -213,11 +221,11 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
                     value: formatShortDate(item.createdAt),
                   })}
                 </p>
-                {item.notes && <p className="mt-2 text-sm text-body/75">{item.notes}</p>}
+                {item.notes && <p className="mt-2 text-sm text-[color:var(--color-text-75)]">{item.notes}</p>}
               </Card>
             ))
           ) : (
-            <Card className="border border-dashed border-soft bg-surface/80">
+            <Card className="border border-dashed border-soft bg-[var(--color-surface-80)]">
               <p className="text-sm text-muted">
                 {t('suppliers.overview.modals.options.shortlistEmpty')}
               </p>
@@ -256,6 +264,17 @@ const Proveedores = () => {
   } = useSupplierShortlist();
   const { activeWedding } = useWedding();
   const { info: weddingProfile } = useActiveWeddingInfo();
+  const { 
+    budget, 
+    addBudgetCategory,
+    transactions,
+    addTransaction,
+    updateTransaction,
+    deleteTransaction
+  } = useFinance();
+  const { favorites, addFavorite, refreshFavorites, isFavorite } = useFavorites();
+  const [isAutoFindingAll, setIsAutoFindingAll] = useState(false);
+  const [isRequestingAllQuotes, setIsRequestingAllQuotes] = useState(false);
   // Sistema de búsqueda híbrido (prioriza BD propia)
   const [aiResults, setAiResults] = useState([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -272,6 +291,7 @@ const Proveedores = () => {
   const [showNewProviderForm, setShowNewProviderForm] = useState(false);
   const [newProviderInitial, setNewProviderInitial] = useState(null);
   const [servicePanelView, setServicePanelView] = useState(null);
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [wantedServices, setWantedServices] = useState([]);
   const [searchPanelCollapsed, setSearchPanelCollapsed] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
@@ -282,7 +302,7 @@ const Proveedores = () => {
   const [searchResultsQuery, setSearchResultsQuery] = useState('');
   const [searchResultsPage, setSearchResultsPage] = useState(1);
   const [searchCompleted, setSearchCompleted] = useState(false);
-  const [activeTab, setActiveTab] = useState('search'); // 'search' | 'services'
+  const [activeTab, setActiveTab] = useState('search'); // 'search' | 'services' | 'budget'
 
   // Estado para filtros avanzados
   const [showFiltersModal, setShowFiltersModal] = useState(false);
@@ -373,10 +393,23 @@ const Proveedores = () => {
   );
 
   const normalizedWanted = useMemo(() => {
+    // Usar budget.categories como fuente de verdad para los servicios
+    // Esto garantiza que solo se muestren servicios que tienen presupuesto asignado
+    if (budget?.categories && Array.isArray(budget.categories) && budget.categories.length > 0) {
+      return budget.categories
+        .map((cat) => ({
+          id: normalizeBudgetCategoryKey(cat.name),
+          name: cat.name,
+          amount: cat.amount,
+        }))
+        .filter((s) => s && s.name);
+    }
+    
+    // Fallback: usar wantedServices solo si no hay categorías de presupuesto
     return (wantedServices || [])
       .map((s) => (typeof s === 'string' ? { id: s, name: s } : s))
       .filter((s) => s && (s.name || s.id));
-  }, [wantedServices]);
+  }, [budget?.categories, wantedServices]);
 
   const providersSource = useMemo(() => {
     if (searchTerm && filteredProviders) return filteredProviders;
@@ -402,19 +435,33 @@ const Proveedores = () => {
       });
     }
 
+    // Solo añadir proveedores a servicios que existen en el presupuesto
     providersSource.forEach((prov) => {
-      const label = prov.service || t('suppliers.overview.defaults.otherService');
-      const card = ensureCard(label);
-      card.providers.push(prov);
-      if (!card.confirmed && isConfirmedStatus(prov.status)) {
-        card.confirmed = prov;
+      const label = prov.service || '';
+      if (!label) return; // Ignorar proveedores sin servicio definido
+      
+      const key = normalizeServiceKey(label);
+      // Solo procesar si la tarjeta ya existe (está en budget.categories)
+      if (map.has(key)) {
+        const card = map.get(key);
+        card.providers.push(prov);
+        if (!card.confirmed && isConfirmedStatus(prov.status)) {
+          card.confirmed = prov;
+        }
       }
     });
 
+    // Solo añadir shortlist a servicios que existen en el presupuesto
     (shortlist || []).forEach((item) => {
-      const label = item.service || t('suppliers.overview.defaults.otherService');
-      const card = ensureCard(label);
-      card.shortlist.push(item);
+      const label = item.service || '';
+      if (!label) return; // Ignorar items sin servicio definido
+      
+      const key = normalizeServiceKey(label);
+      // Solo procesar si la tarjeta ya existe (está en budget.categories)
+      if (map.has(key)) {
+        const card = map.get(key);
+        card.shortlist.push(item);
+      }
     });
 
     return Array.from(map.values()).sort((a, b) =>
@@ -732,8 +779,27 @@ const Proveedores = () => {
   const handleSubmitProvider = useCallback(
     async (providerData) => {
       try {
-        await addProvider(providerData);
-        toast.success(t('suppliers.overview.toasts.providerSaved'));
+        const newProvider = await addProvider(providerData);
+        
+        // Sincronizar plan de pagos con transacciones si existe
+        if (newProvider && providerData.paymentSchedule && Array.isArray(providerData.paymentSchedule) && providerData.paymentSchedule.length > 0) {
+          console.log('[handleSubmitProvider] Sincronizando plan de pagos...');
+          try {
+            const syncResult = await syncPaymentScheduleWithTransactions(
+              newProvider,
+              transactions || [],
+              { addTransaction, updateTransaction, deleteTransaction }
+            );
+            console.log('[handleSubmitProvider] Sincronización completada:', syncResult);
+            toast.success(`✅ ${t('suppliers.overview.toasts.providerSaved')} - ${syncResult.created} pagos programados`);
+          } catch (syncError) {
+            console.error('[handleSubmitProvider] Error sincronizando:', syncError);
+            toast.warning('⚠️ Proveedor guardado pero error al sincronizar pagos');
+          }
+        } else {
+          toast.success(t('suppliers.overview.toasts.providerSaved'));
+        }
+        
         setShowNewProviderForm(false);
         setNewProviderInitial(null);
         loadProviders();
@@ -741,10 +807,247 @@ const Proveedores = () => {
         toast.error(t('suppliers.overview.toasts.providerError'));
       }
     },
-    [addProvider, loadProviders, t]
+    [addProvider, loadProviders, t, transactions, addTransaction, updateTransaction, deleteTransaction]
   );
 
-  const headerActions = null; // Botón movido a cada servicio individual
+  // Handler: Buscar automáticamente 3 proveedores por cada servicio activo
+  const handleAutoFindAllServices = async () => {
+    const activeServices = normalizedWanted || [];
+    
+    if (activeServices.length === 0) {
+      toast.warning('No hay servicios activos en tu presupuesto');
+      return;
+    }
+
+    // Obtener ubicación del perfil de boda
+    const profile = (weddingProfile && (weddingProfile.weddingInfo || weddingProfile)) || {};
+    const location =
+      profile.celebrationPlace ||
+      profile.location ||
+      profile.city ||
+      profile.ceremonyLocation ||
+      profile.receptionVenue ||
+      profile.destinationCity ||
+      profile.country ||
+      '';
+
+    if (!location) {
+      toast.warning('Configura la ubicación de tu boda en el perfil para usar esta función');
+      return;
+    }
+
+    if (!confirm(`¿Buscar automáticamente hasta 10 proveedores nuevos para cada uno de los ${activeServices.length} servicios activos?\n\nEsto añadirá proveedores que aún no estén en favoritos.`)) {
+      return;
+    }
+
+    setIsAutoFindingAll(true);
+    let totalAdded = 0;
+    let alreadyExists = 0;
+
+    // Mapeo de categorías relacionadas para búsqueda
+    const categoryAliases = {
+      'musica': ['musica', 'dj'], // Música incluye DJs
+      'dj': ['dj', 'musica'],
+    };
+
+    try {
+      for (const service of activeServices) {
+        const categoryName = service.name || service.id;
+        
+        try {
+          console.log(`🔍 [AutoFind] Buscando proveedores de ${categoryName} (ID: ${service.id})...`);
+          // Llamar con parámetros posicionales: service, location, query
+          const searchResponse = await searchSuppliersHybrid(
+            categoryName, // service
+            location,     // location
+            '',          // query (vacío para búsqueda general)
+            { limit: 50 } // filters - aumentado para obtener más resultados
+          );
+
+          // searchSuppliersHybrid retorna objeto { success, suppliers: [...], count }
+          let searchResults = searchResponse?.suppliers || [];
+          console.log(`📦 [AutoFind] ${categoryName}: ${searchResults.length} resultados sin filtrar`);
+          
+          // Importar utilidad de normalización
+          const { normalizeBudgetCategoryKey } = await import('../utils/budgetCategories');
+          const normalizedServiceId = normalizeBudgetCategoryKey(service.id);
+          
+          // Obtener categorías aceptadas (incluye aliases)
+          const acceptedCategories = categoryAliases[normalizedServiceId] || [normalizedServiceId];
+          
+          // Filtrar por categoría coincidente (incluyendo aliases y categorías alternativas)
+          searchResults = searchResults.filter(supplier => {
+            const supplierCategory = normalizeBudgetCategoryKey(supplier.category || supplier.categoryName || '');
+            
+            // 1. Verificar categoría principal
+            let matches = acceptedCategories.includes(supplierCategory);
+            
+            // 2. Si no coincide, verificar categorías alternativas
+            if (!matches && supplier.alternativeCategories && Array.isArray(supplier.alternativeCategories)) {
+              matches = supplier.alternativeCategories.some(alt => {
+                const altCat = normalizeBudgetCategoryKey(alt.category || alt.categoryName || '');
+                return acceptedCategories.includes(altCat);
+              });
+              if (matches) {
+                console.log(`  ✨ ${supplier.name}: Coincidencia por categoría alternativa!`);
+              }
+            }
+
+            console.log(`  🔍 ${supplier.name}: ${supplier.category} → normalizado: ${supplierCategory} vs [${acceptedCategories.join(', ')}] = ${matches ? '✅' : '❌'}`);
+            return matches;
+          });
+          
+          console.log(`✅ [AutoFind] ${categoryName}: ${searchResults.length} resultados filtrados por categoría`);
+
+          if (searchResults.length > 0) {
+            // Filtrar proveedores que NO están ya en favoritos
+            let newSuppliers = searchResults.filter(supplier => {
+              const isAlreadyFavorite = isFavorite(supplier.id || supplier.slug);
+              if (isAlreadyFavorite) {
+                console.log(`  ⏭️ ${supplier.name}: Ya está en favoritos, omitiendo`);
+                alreadyExists++;
+              }
+              return !isAlreadyFavorite;
+            });
+            
+            // Aleatorizar para obtener variedad en cada búsqueda
+            if (newSuppliers.length > 10) {
+              newSuppliers = newSuppliers
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 10);
+              console.log(`  🎲 Aleatorizados ${newSuppliers.length} de ${searchResults.length} resultados`);
+            } else {
+              newSuppliers = newSuppliers.slice(0, 10);
+            }
+            
+            if (newSuppliers.length > 0) {
+              console.log(`📝 [AutoFind] Añadiendo ${newSuppliers.length} proveedores nuevos a favoritos...`);
+              
+              for (const supplier of newSuppliers) {
+                try {
+                  console.log(`➕ [AutoFind] Intentando añadir: ${supplier.name}`);
+                  await addFavorite(supplier, `Auto-búsqueda: ${categoryName}`);
+                  console.log(`✅ [AutoFind] ${supplier.name} añadido a favoritos`);
+                  totalAdded++;
+                } catch (error) {
+                  // Silenciar errores de duplicados
+                  if (error.message?.includes('Already Exists') || error.message?.includes('existe')) {
+                    console.log(`  ⏭️ ${supplier.name}: Ya existe (detectado en catch)`);
+                    alreadyExists++;
+                  } else {
+                    console.error(`❌ [AutoFind] Error añadiendo ${supplier.name}:`, error);
+                  }
+                }
+              }
+            } else {
+              console.log(`  ℹ️ Todos los proveedores de ${categoryName} ya están en favoritos`);
+            }
+          } else {
+            console.log(`⚠️ [AutoFind] No se encontraron proveedores de ${categoryName} después de filtrar`);
+          }
+        } catch (error) {
+          console.error(`❌ [AutoFind] Error buscando proveedores de ${categoryName}:`, error);
+        }
+      }
+
+      console.log(`📊 [AutoFind] Resumen:`);
+      console.log(`  ✅ Añadidos: ${totalAdded}`);
+      console.log(`  ⏭️ Ya existían: ${alreadyExists}`);
+
+      if (totalAdded > 0) {
+        toast.success(`✅ ${totalAdded} proveedores añadidos a favoritos`);
+        await refreshFavorites(true);
+      } else if (alreadyExists > 0) {
+        toast.info(`ℹ️ ${alreadyExists} proveedores ya estaban en favoritos`);
+      } else {
+        toast.info('No se encontraron nuevos proveedores');
+      }
+    } catch (error) {
+      console.error('[AutoFindAll] Error:', error);
+      toast.error(`Error en búsqueda automática: ${error.message}`);
+    } finally {
+      setIsAutoFindingAll(false);
+    }
+  };
+
+  // Handler: Solicitar presupuestos a TODOS los favoritos
+  const handleRequestQuotesToAllFavorites = async () => {
+    if (!favorites || favorites.length === 0) {
+      toast.warning('No tienes proveedores en favoritos');
+      return;
+    }
+
+    if (!confirm(`¿Enviar solicitud de presupuesto a TODOS los ${favorites.length} proveedores favoritos?\n\nSe creará una solicitud individual para cada proveedor.`)) {
+      return;
+    }
+
+    setIsRequestingAllQuotes(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      for (const fav of favorites) {
+        const supplier = fav.supplier || {};
+        
+        try {
+          await createQuoteRequest({
+            supplierId: supplier.id || supplier.slug,
+            supplierName: supplier.name,
+            supplierEmail: supplier.contact?.email,
+            category: supplier.category || supplier.service,
+            service: supplier.category || supplier.service,
+            message: `Solicitud de presupuesto`,
+            urgent: false,
+          });
+          successCount++;
+        } catch (error) {
+          console.error(`Error enviando a ${supplier.name}:`, error);
+          errorCount++;
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(`✅ ${successCount} solicitudes enviadas correctamente`);
+      }
+      
+      if (errorCount > 0) {
+        toast.warning(`⚠️ ${errorCount} solicitudes fallaron`);
+      }
+    } catch (error) {
+      console.error('[RequestAllQuotes] Error:', error);
+      toast.error(`Error al enviar solicitudes: ${error.message}`);
+    } finally {
+      setIsRequestingAllQuotes(false);
+    }
+  };
+
+  const headerActions = (
+    <div className="flex gap-2">
+      <Button
+        onClick={handleAutoFindAllServices}
+        variant="outline"
+        disabled={isAutoFindingAll}
+        leftIcon={isAutoFindingAll ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent" /> : <Sparkles className="h-4 w-4" />}
+      >
+        {isAutoFindingAll ? 'Buscando...' : '✨ Auto-buscar'}
+      </Button>
+      <Button
+        onClick={handleRequestQuotesToAllFavorites}
+        variant="outline"
+        disabled={isRequestingAllQuotes || !favorites || favorites.length === 0}
+        leftIcon={isRequestingAllQuotes ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent" /> : <Send className="h-4 w-4" />}
+      >
+        {isRequestingAllQuotes ? `Enviando...` : `📨 Solicitar a ${favorites?.length || 0}`}
+      </Button>
+      <Button
+        onClick={() => setShowBudgetModal(true)}
+        variant="outline"
+        leftIcon={<DollarSign className="h-4 w-4" />}
+      >
+        {t('suppliers.overview.budget.viewSummary', { defaultValue: 'Presupuesto' })}
+      </Button>
+    </div>
+  );
 
   // Stats calculations
   const confirmedCount = useMemo(() => {
@@ -843,10 +1146,10 @@ const Proveedores = () => {
             </button>
             <button
               onClick={() => setActiveTab('services')}
-              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors ${
+              className={`flex-1 py-3 px-4 text-sm font-medium transition-colors rounded-md ${
                 activeTab === 'services'
-                  ? 'bg-primary text-white'
-                  : 'bg-transparent text-muted hover:bg-surface'
+                  ? 'bg-[color:var(--color-primary)] text-white'
+                  : 'text-body hover:bg-[var(--color-text-5)]'
               }`}
             >
               <div className="flex items-center justify-center gap-2">
@@ -865,6 +1168,7 @@ const Proveedores = () => {
             onAddManualProvider={handleAddManualProvider}
             onViewFavorites={() => setActiveTab('search')}
             loading={loading}
+            wedding={weddingProfile}
           />
         ) : (
           <SearchTabContent
@@ -927,9 +1231,48 @@ const Proveedores = () => {
           <ProveedorForm
             initialData={newProviderInitial}
             onSubmit={async (data) => {
-              await addProvider(data);
-              setShowNewProviderForm(false);
-              setNewProviderInitial(null);
+              try {
+                // Verificar si la categoría existe en el presupuesto
+                if (data.service && budget?.categories) {
+                  const serviceKey = normalizeBudgetCategoryKey(data.service);
+                  const categoryExists = budget.categories.some(
+                    (cat) => normalizeBudgetCategoryKey(cat.name) === serviceKey
+                  );
+                  
+                  // Si no existe, crear la categoría automáticamente
+                  if (!categoryExists) {
+                    const result = addBudgetCategory(data.service, 0);
+                    if (result?.success) {
+                      toast.info(`✨ Categoría "${data.service}" añadida automáticamente al presupuesto`);
+                    }
+                  }
+                }
+                
+                const newProvider = await addProvider(data);
+                
+                // Sincronizar plan de pagos con transacciones si existe
+                if (newProvider && data.paymentSchedule && Array.isArray(data.paymentSchedule) && data.paymentSchedule.length > 0) {
+                  console.log('[Proveedores] Sincronizando plan de pagos con transacciones...');
+                  try {
+                    const syncResult = await syncPaymentScheduleWithTransactions(
+                      newProvider,
+                      transactions || [],
+                      { addTransaction, updateTransaction, deleteTransaction }
+                    );
+                    console.log('[Proveedores] Sincronización completada:', syncResult);
+                    toast.success(`✅ Plan de pagos sincronizado: ${syncResult.created} transacciones creadas`);
+                  } catch (syncError) {
+                    console.error('[Proveedores] Error sincronizando plan de pagos:', syncError);
+                    toast.warning('⚠️ Proveedor creado pero hubo un problema al sincronizar el plan de pagos');
+                  }
+                }
+                
+                toast.success(`✅ Proveedor "${data.name}" añadido correctamente`);
+                setShowNewProviderForm(false);
+                setNewProviderInitial(null);
+              } catch (error) {
+                toast.error('Error al añadir proveedor');
+              }
             }}
             onCancel={() => {
               setShowNewProviderForm(false);
@@ -945,6 +1288,31 @@ const Proveedores = () => {
         value={wantedServices}
         onSave={handleSaveWantedServices}
       />
+
+      {/* Modal de Resumen de Presupuesto */}
+      {showBudgetModal && (
+        <Modal
+          open={showBudgetModal}
+          onClose={() => setShowBudgetModal(false)}
+          size="xl"
+        >
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-body mb-4">
+              {t('suppliers.overview.budget.modalTitle', { defaultValue: 'Resumen de Presupuesto' })}
+            </h2>
+            <BudgetDistribution
+              providers={providers}
+              totalBudget={budget?.total || 0}
+              budgetCategories={budget?.categories || []}
+              onCategoryClick={(category) => {
+                setShowBudgetModal(false);
+                setSearchInput(category);
+                setActiveTab('search');
+              }}
+            />
+          </div>
+        </Modal>
+      )}
 
       {/* Barra flotante de comparación */}
       <CompareBar />

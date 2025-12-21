@@ -4,10 +4,14 @@ import axios from 'axios';
 import { z } from 'zod';
 
 let openaiClient = null;
+let openAIConfig = { apiKeyPrefix: null, projectId: null };
 
-const OPENAI_API_KEY =
-  process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || process.env.OPENAI_TOKEN || '';
-const OPENAI_PROJECT_ID = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
+function getOpenAIConfig() {
+  const apiKey =
+    process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || process.env.OPENAI_TOKEN || '';
+  const projectId = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
+  return { apiKey, projectId };
+}
 const FALLBACK_COVER_PROMPT =
   'Editorial wedding photography, elegant pastel palette, minimal styling, soft natural light';
 const DEFAULT_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
@@ -19,14 +23,27 @@ const SUPPORTED_TRANSLATION_LANGUAGES = (process.env.BLOG_SUPPORTED_LANGUAGES ||
   .filter(Boolean);
 
 async function ensureOpenAI() {
-  if (openaiClient || !OPENAI_API_KEY) return openaiClient;
+  const { apiKey, projectId } = getOpenAIConfig();
+  const apiKeyPrefix = apiKey ? apiKey.slice(0, 8) : null;
+
+  if (!apiKey) return null;
+  if (openaiClient && openAIConfig.apiKeyPrefix === apiKeyPrefix && openAIConfig.projectId === (projectId || null)) {
+    return openaiClient;
+  }
   const { default: OpenAI } = await import('openai');
-  openaiClient = new OpenAI({ apiKey: OPENAI_API_KEY, project: OPENAI_PROJECT_ID || undefined });
+  openaiClient = new OpenAI({
+    apiKey,
+    project: projectId || undefined,
+    timeout: 15000,
+    maxRetries: 2,
+  });
+  openAIConfig = { apiKeyPrefix, projectId: projectId || null };
   return openaiClient;
 }
 
 export async function getOpenAiClient() {
-  if (!OPENAI_API_KEY) {
+  const { apiKey } = getOpenAIConfig();
+  if (!apiKey) {
     throw new Error('openai-missing-api-key');
   }
   const client = await ensureOpenAI();
@@ -282,7 +299,8 @@ function fallbackArticle(input) {
 export async function generateBlogArticle(options) {
   const input = GenerationInputSchema.parse(options || {});
 
-  if (!OPENAI_API_KEY) {
+  const { apiKey } = getOpenAIConfig();
+  if (!apiKey) {
     return { ...fallbackArticle(input), source: 'fallback' };
   }
 
@@ -448,7 +466,8 @@ export async function translateBlogArticleToLanguages({
     return {};
   }
 
-  if (!OPENAI_API_KEY) {
+  const { apiKey } = getOpenAIConfig();
+  if (!apiKey) {
     return {};
   }
 
@@ -611,7 +630,8 @@ export async function generateCoverImageFromPrompt(prompt, options = {}) {
     throw new Error('cover-image-missing-prompt');
   }
 
-  if (!OPENAI_API_KEY) {
+  const { apiKey } = getOpenAIConfig();
+  if (!apiKey) {
     return {
       status: 'skipped',
       reason: 'missing-openai-key',

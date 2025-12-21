@@ -8,10 +8,14 @@
  * Usage: node scripts/syncLocales.js            # sync all locales
  *        node scripts/syncLocales.js es es-MX   # sync only selected locales
  */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const LOCALES_DIR = path.resolve(process.cwd(), 'src/i18n/locales');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const LOCALES_DIR = path.resolve(process.cwd(), 'apps/main-app/src/i18n/locales');
 const BASE_LOCALE = 'en';
 const DEFAULT_TARGETS = ['es', 'es-MX', 'es-AR'];
 const TARGET_LOCALES =

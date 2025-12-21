@@ -101,8 +101,8 @@ export default function MainLayout() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)] mx-auto mb-4"></div>
-          <p className="text-[color:var(--color-text)]/70">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[color:var(--color-primary)] mx-auto mb-4"></div>
+          <p className="text-[color:var(--color-text-70)]">
             {t('app.loading', { defaultValue: 'Cargando...' })}
           </p>
         </div>
@@ -144,8 +144,8 @@ export default function MainLayout() {
             onClick={() => setOpenMenu(!openMenu)}
             className={`w-12 h-12 rounded-full cursor-pointer transition-all duration-200 hover:ring-2 ${
               openMenu
-                ? 'ring-2 bg-[var(--color-accent)]/20'
-                : 'bg-[var(--color-surface)] hover:bg-[var(--color-accent)]/20'
+                ? 'ring-2 bg-[var(--color-accent-20)]'
+                : 'bg-[var(--color-surface)] hover:bg-[var(--color-accent-20)]'
             } flex items-center justify-center`}
             title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })}
             style={{
@@ -161,7 +161,7 @@ export default function MainLayout() {
             />
           </div>
           {openMenu && (
-            <div className="absolute right-0 mt-2 bg-[var(--color-surface)] border border-[color:var(--color-text)]/15 rounded-lg shadow-lg p-1 space-y-1 min-w-[220px] z-50">
+            <div className="absolute right-0 mt-2 bg-[var(--color-surface)] border border-[color:var(--color-text-15)] rounded-lg shadow-lg p-1 space-y-1 min-w-[220px] z-50">
               <div className="px-2 py-1">
                 <NotificationCenter />
               </div>
@@ -169,7 +169,7 @@ export default function MainLayout() {
               <Link
                 to="/perfil"
                 onClick={() => setOpenMenu(false)}
-                className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
+                className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent-20)] rounded-md transition-colors"
               >
                 <User className="w-4 h-4 mr-2" />{' '}
                 {t('navigation.profile', { defaultValue: 'Perfil' })}
@@ -181,7 +181,7 @@ export default function MainLayout() {
                   onMouseEnter={prefetchNotificaciones}
                   onFocus={prefetchNotificaciones}
                   onTouchStart={prefetchNotificaciones}
-                  className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
+                  className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent-20)] rounded-md transition-colors"
                 >
                   Notificaciones
                 </Link>
@@ -193,13 +193,13 @@ export default function MainLayout() {
                 onMouseEnter={prefetchEmail}
                 onFocus={prefetchEmail}
                 onTouchStart={prefetchEmail}
-                className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
+                className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent-20)] rounded-md transition-colors"
               >
                 <Mail className="w-4 h-4 mr-2" />{' '}
                 {t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
               </Link>
 
-              <div className="px-3 py-2 hover:bg-[var(--color-accent)]/20 rounded-md transition-colors">
+              <div className="px-3 py-2 hover:bg-[var(--color-accent-20)] rounded-md transition-colors">
                 <div className="flex items-center justify-between">
                   <span className="text-sm flex items-center">
                     <Moon className="w-4 h-4 mr-2" />{' '}
@@ -209,13 +209,13 @@ export default function MainLayout() {
                 </div>
               </div>
 
-              <div className="border-t border-[color:var(--color-text)]/15 my-1"></div>
+              <div className="border-t border-[color:var(--color-text-15)] my-1"></div>
               <button
                 onClick={() => {
                   logoutUnified();
                   setOpenMenu(false);
                 }}
-                className="w-full text-left px-3 py-2 text-sm text-[color:var(--color-danger)] hover:bg-[var(--color-danger)]/10 rounded-md transition-colors flex items-center"
+                className="w-full text-left px-3 py-2 text-sm text-[color:var(--color-danger)] hover:bg-[var(--color-danger-10)] rounded-md transition-colors flex items-center"
               >
                 <LogOut className="w-4 h-4 mr-2" />{' '}
                 {t('navigation.logout', { defaultValue: 'Cerrar sesión' })}

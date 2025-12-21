@@ -221,7 +221,7 @@ export default function BodaDetalle() {
     >
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center text-[var(--color-accent)] hover:underline"
+        className="flex items-center text-[color:var(--color-accent)] hover:underline"
       >
         <ArrowLeft size={18} className="mr-1" /> Volver
       </button>
@@ -323,11 +323,11 @@ export default function BodaDetalle() {
                 className="flex items-center bg-[var(--color-surface)] rounded-md p-3 shadow-sm"
               >
                 {done ? (
-                  <CheckCircle className="text-[var(--color-success)] w-5 h-5 mr-2" />
+                  <CheckCircle className="text-[color:var(--color-success)] w-5 h-5 mr-2" />
                 ) : (
-                  <Circle className="text-[color:var(--color-text)]/40 w-5 h-5 mr-2" />
+                  <Circle className="text-[color:var(--color-text-40)] w-5 h-5 mr-2" />
                 )}
-                <span className={done ? 'text-[var(--color-success)] font-medium' : 'text-body'}>
+                <span className={done ? 'text-[color:var(--color-success)] font-medium' : 'text-body'}>
                   {item.label}
                 </span>
               </li>

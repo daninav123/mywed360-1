@@ -70,7 +70,7 @@ const AdminSettings = () => {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
         Cargando configuración...
       </div>
     );
@@ -87,7 +87,7 @@ const AdminSettings = () => {
             <li key={flag.id} className="flex items-center justify-between px-4 py-3 text-sm">
               <div>
                 <p className="font-medium">{flag.name}</p>
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">{flag.description}</p>
+                <p className="text-xs text-[color:var(--color-text-soft)]">{flag.description}</p>
               </div>
               <button
                 type="button"
@@ -96,7 +96,7 @@ const AdminSettings = () => {
                 className={
                   flag.enabled
                     ? 'rounded-full bg-green-100 px-4 py-2 text-xs font-medium text-green-700'
-                    : 'rounded-full bg-[var(--color-bg-soft,#f3f4f6)] px-4 py-2 text-xs font-medium text-[var(--color-text-soft,#6b7280)]'
+                    : 'rounded-full bg-[var(--color-bg-soft)] px-4 py-2 text-xs font-medium text-[color:var(--color-text-soft)]'
                 }
               >
                 {flag.enabled ? 'Activo' : 'Inactivo'}
@@ -104,7 +104,7 @@ const AdminSettings = () => {
             </li>
           ))}
           {flags.length === 0 && (
-            <li className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]">
+            <li className="px-4 py-6 text-center text-sm text-[color:var(--color-text-soft)]">
               No hay banderas configuradas.
             </li>
           )}
@@ -120,20 +120,20 @@ const AdminSettings = () => {
             <li key={secret.id} className="flex items-center justify-between px-4 py-3">
               <div>
                 <p className="font-medium">{secret.name}</p>
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">Última rotación: {secret.lastRotatedAt}</p>
+                <p className="text-xs text-[color:var(--color-text-soft)]">Última rotación: {secret.lastRotatedAt}</p>
               </div>
               <button
                 type="button"
                 data-testid="secret-rotate-button"
                 onClick={() => { setRotateStep(0); setShowSecretModal(secret.id); }}
-                className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft)]"
               >
                 Rotar
               </button>
             </li>
           ))}
           {secrets.length === 0 && (
-            <li className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]">
+            <li className="px-4 py-6 text-center text-sm text-[color:var(--color-text-soft)]">
               No hay secretos configurados.
             </li>
           )}
@@ -143,7 +143,7 @@ const AdminSettings = () => {
       <section className="rounded-xl border border-soft bg-surface shadow-sm p-4 space-y-4">
         <div>
           <h2 className="text-sm font-semibold">Plantillas globales</h2>
-          <p className="text-xs text-[var(--color-text-soft,#6b7280)]">Actualiza contenidos reutilizables.</p>
+          <p className="text-xs text-[color:var(--color-text-soft)]">Actualiza contenidos reutilizables.</p>
         </div>
         <div className="grid gap-4 md:grid-cols-[240px_1fr]">
           <select
@@ -166,14 +166,14 @@ const AdminSettings = () => {
             className="w-full rounded-md border border-soft px-3 py-2 text-sm"
           />
         </div>
-        <div className="rounded-lg border border-dashed border-soft p-4 text-xs text-[var(--color-text-soft,#6b7280)]" data-testid="template-editor-preview">
+        <div className="rounded-lg border border-dashed border-soft p-4 text-xs text-[color:var(--color-text-soft)]" data-testid="template-editor-preview">
           {templateContent}
         </div>
         <button
           type="button"
           data-testid="template-editor-save"
           onClick={handleSaveTemplate}
-          className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
+          className="rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary)] hover:bg-[color:var(--color-primary-dark)]"
         >
           Guardar cambios
         </button>
@@ -186,14 +186,14 @@ const AdminSettings = () => {
               ¿Deseas {showFlagConfirm.enabled ? 'desactivar' : 'activar'} la bandera <strong>{showFlagConfirm.name}</strong>?
             </p>
             <div className="flex justify-end gap-3 text-sm">
-              <button type="button" onClick={() => setShowFlagConfirm(null)} className="px-3 py-2 text-[var(--color-text-soft,#6b7280)]">
+              <button type="button" onClick={() => setShowFlagConfirm(null)} className="px-3 py-2 text-[color:var(--color-text-soft)]">
                 Cancelar
               </button>
               <button
                 type="button"
                 data-testid="feature-flag-confirm"
                 onClick={confirmToggleFlag}
-                className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-3 py-2 text-[color:var(--color-on-primary,#ffffff)]"
+                className="rounded-md bg-[color:var(--color-primary)] px-3 py-2 text-[color:var(--color-on-primary)]"
               >
                 Confirmar
               </button>
@@ -205,7 +205,7 @@ const AdminSettings = () => {
       {showSecretModal && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4" data-testid="secret-rotate-modal">
           <div className="w-full max-w-sm rounded-xl bg-surface p-6 shadow-xl space-y-4">
-            <p className="text-sm text-[var(--color-text-soft,#6b7280)]">Proceso simulado de rotación en 3 pasos.</p>
+            <p className="text-sm text-[color:var(--color-text-soft)]">Proceso simulado de rotación en 3 pasos.</p>
             <div className="flex flex-col gap-2 text-sm">
               {rotateStep < 2 && (
                 <button
@@ -230,7 +230,7 @@ const AdminSettings = () => {
                     setRotateStep(0);
                   }
                 }}
-                className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-3 py-2 text-[color:var(--color-on-primary,#ffffff)]"
+                className="rounded-md bg-[color:var(--color-primary)] px-3 py-2 text-[color:var(--color-on-primary)]"
               >
                 Confirmar rotación
               </button>

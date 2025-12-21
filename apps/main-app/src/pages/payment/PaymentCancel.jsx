@@ -39,14 +39,14 @@ const PaymentCancel = () => {
         <div className="mt-8 space-y-3">
           <Link
             to="/pricing"
-            className="flex items-center justify-center gap-2 w-full rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+            className="flex items-center justify-center gap-2 w-full rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
           >
             <ArrowLeft className="h-4 w-4" />
             {t('public.payment.cancel.buttons.backPricing')}
           </Link>
           <Link
             to="/contact"
-            className="block w-full rounded-md border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+            className="block w-full rounded-md border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
           >
             {t('public.payment.cancel.buttons.contactSupport')}
           </Link>
@@ -64,7 +64,7 @@ const PaymentCancel = () => {
               <p className="font-semibold text-gray-900">
                 {t('public.payment.cancel.faq.title')}
               </p>
-              <Link to="/faq" className="text-[var(--color-primary)] hover:underline">
+              <Link to="/faq" className="text-[color:var(--color-primary)] hover:underline">
                 {t('public.payment.cancel.faq.link')}
               </Link>
             </div>
@@ -74,7 +74,7 @@ const PaymentCancel = () => {
               </p>
               <a
                 href="mailto:support@maloveapp.com"
-                className="text-[var(--color-primary)] hover:underline"
+                className="text-[color:var(--color-primary)] hover:underline"
               >
                 {t('public.payment.cancel.support.emailLink')}
               </a>

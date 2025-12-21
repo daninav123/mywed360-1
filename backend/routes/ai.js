@@ -1,11 +1,6 @@
 ﻿// routes/ai.js
 // Handles AI-powered endpoints: parse-dialog via OpenAI GPT and image generation via Stability SDK
 // Note: requires environment variables OPENAI_API_KEY and STABILITY_API_KEY
-
-import dotenv from 'dotenv';
-import path from 'path';
-// Cargar variables de entorno desde el .env raíz
-dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 import express from 'express';
 import logger from '../utils/logger.js';
 import axios from 'axios';
@@ -19,37 +14,45 @@ import {
 } from '../utils/apiResponse.js';
 import { requireAdmin } from '../middleware/authMiddleware.js';
 
-// Definir la API key directamente como respaldo si no se encuentra en las variables de entorno
-// Soportar variables de entorno tanto OPENAI_API_KEY como VITE_OPENAI_API_KEY
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
-const OPENAI_PROJECT_ID = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
-
 const router = express.Router();
 
 // ---------- OpenAI Client (opcional) ----------
 let openai = null;
 
+function getOpenAIConfig() {
+  const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+  const projectId = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
+  return { apiKey, projectId };
+}
+
+let openAIConfig = { apiKey: '', projectId: '' };
+
 async function ensureOpenAI() {
-  // Si ya está inicializado o no hay API key, salir temprano
-  if (openai || !OPENAI_API_KEY) {
-    if (!OPENAI_API_KEY) {
-      console.warn('⚠️  OPENAI_API_KEY no definido. Se usará modo simulación.');
-    }
+  const { apiKey, projectId } = getOpenAIConfig();
+
+  if (!apiKey) {
+    console.warn('⚠️  OPENAI_API_KEY no definido. Se usará modo simulación.');
     return;
   }
+
+  if (openai && openAIConfig.apiKey === apiKey && openAIConfig.projectId === projectId) return;
+
   try {
     const { default: OpenAI } = await import('openai');
-    openai = new OpenAI({ apiKey: OPENAI_API_KEY, project: OPENAI_PROJECT_ID || undefined });
+    openai = new OpenAI({
+      apiKey,
+      project: projectId || undefined,
+      timeout: 15000,
+      maxRetries: 2,
+    });
+    openAIConfig = { apiKey, projectId };
     console.log('✅ Cliente OpenAI inicializado correctamente.', {
-      projectId: OPENAI_PROJECT_ID || null,
+      projectId: projectId || null,
     });
   } catch (err) {
     console.error('Error al inicializar OpenAI SDK:', err.message);
   }
 }
-
-// Al arrancar intentamos inicializar, pero si las variables aún no están cargadas no fallamos
-ensureOpenAI().catch((err) => console.error('❌ Error al inicializar OpenAI:', err.message));
 
 // ---------- Firestore (optional) ----------
 let db = null;
@@ -96,6 +99,7 @@ function buildContextSummary(context) {
 router.get('/debug-env', requireAdmin, (req, res) => {
   const envVars = {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'SET' : 'NOT_SET',
+    OPENAI_PROJECT_ID: process.env.OPENAI_PROJECT_ID ? 'SET' : 'NOT_SET',
     NODE_ENV: process.env.NODE_ENV || 'NOT_SET',
     ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN ? 'SET' : 'NOT_SET',
     MAILGUN_API_KEY: process.env.MAILGUN_API_KEY ? 'SET' : 'NOT_SET',

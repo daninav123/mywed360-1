@@ -62,8 +62,8 @@ const formatSourceLabel = (value) => {
 };
 
 const AdminDashboard = () => {
+  const { currentUser, getIdToken } = useAuth();
   const { t } = useTranslations();
-  const { currentUser } = useAuth();
   const [overview, setOverview] = useState(null);
   const [services, setServices] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -114,9 +114,17 @@ const AdminDashboard = () => {
     const loadOverview = async () => {
       setLoadingOverview(true);
       try {
+        const token = await getIdToken();
         const res = await apiGet(
           '/api/admin/dashboard/overview',
-          getAdminFetchOptions({ auth: false, silent: true })
+          {
+            ...getAdminFetchOptions({ auth: false, silent: true }),
+            headers: {
+              ...getAdminFetchOptions({ auth: false, silent: true }).headers,
+              'Authorization': `Bearer ${token}`,
+              'X-Admin-Token': token
+            }
+          }
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
@@ -156,9 +164,17 @@ const AdminDashboard = () => {
     const loadMetrics = async () => {
       setLoadingMetrics(true);
       try {
+        const token = await getIdToken();
         const res = await apiGet(
           '/api/admin/dashboard/metrics',
-          getAdminFetchOptions({ auth: false, silent: true })
+          {
+            ...getAdminFetchOptions({ auth: false, silent: true }),
+            headers: {
+              ...getAdminFetchOptions({ auth: false, silent: true }).headers,
+              'Authorization': `Bearer ${token}`,
+              'X-Admin-Token': token
+            }
+          }
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
@@ -180,7 +196,7 @@ const AdminDashboard = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [getIdToken]);
 
   const kpiCards = useMemo(() => {
     if (!overview?.kpis?.length) {

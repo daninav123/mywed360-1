@@ -32,8 +32,8 @@ export const CraftLocationMapSection = ({
       ref={(ref) => connect(drag(ref))}
       className="py-16 px-4"
       style={{
-        backgroundColor: 'var(--color-fondo, #F9FAFB)',
-        color: 'var(--color-texto, #1F2937)',
+        backgroundColor: 'var(--color-fondo)',
+        color: 'var(--color-texto)',
       }}
     >
       <div className="max-w-6xl mx-auto">
@@ -41,7 +41,7 @@ export const CraftLocationMapSection = ({
         <div className="text-center mb-12">
           <h2
             className="text-4xl font-bold mb-4"
-            style={{ color: 'var(--color-primario, #9333EA)' }}
+            style={{ color: 'var(--color-primario)' }}
           >
             {titulo}
           </h2>

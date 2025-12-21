@@ -153,12 +153,12 @@ export default function TaskList({
 
   return (
     <div
-      className="flex-1 rounded-xl shadow-md overflow-hidden h-full flex flex-col bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-text)]/10"
+      className="flex-1 rounded-xl shadow-md overflow-hidden h-full flex flex-col bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-text-10)]"
       style={containerStyle}
     >
-      <div className="px-4 py-3 border-b border-[color:var(--color-text)]/10">
+      <div className="px-4 py-3 border-b border-[color:var(--color-text-10)]">
         <h2 className="text-lg font-semibold">{t('tasks.page.list.sectionTitle')}</h2>
-        <div className="flex flex-wrap gap-2 mt-1 text-[10px] text-[color:var(--color-text)]/60">
+        <div className="flex flex-wrap gap-2 mt-1 text-[10px] text-[color:var(--color-text-60)]">
           {Object.entries(categories).map(([key, cat]) => (
             <div key={key} className="flex items-center">
               <div className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: cat.color }} />
@@ -174,7 +174,7 @@ export default function TaskList({
           return (
             <div key={`group-${pid}`} className="space-y-2">
               <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold text-[color:var(--color-text)]/80">
+                <div className="text-sm font-semibold text-[color:var(--color-text-80)]">
                   {parentName}
                 </div>
                 <button
@@ -256,14 +256,14 @@ export default function TaskList({
                         {event.desc && (
                           <div
                             className={`text-[13px] mt-1 line-clamp-2 ${
-                              overdue ? 'text-red-700/90' : 'text-[color:var(--color-text)]/70'
+                              overdue ? 'text-red-700/90' : 'text-[color:var(--color-text-70)]'
                             }`}
                           >
                             {event.desc}
                           </div>
                         )}
                         {event.assignee && (
-                          <div className="text-[11px] text-[color:var(--color-text)]/60 mt-1">
+                          <div className="text-[11px] text-[color:var(--color-text-60)] mt-1">
                             {t('tasks.page.list.labels.assigned', { name: event.assignee })}
                           </div>
                         )}
@@ -326,20 +326,20 @@ export default function TaskList({
                       {t('tasks.page.list.badges.overdue')}
                     </span>
                   )}
-                  <div className="text-[11px] text-[color:var(--color-text)]/60">
+                  <div className="text-[11px] text-[color:var(--color-text-60)]">
                     {event.start ? format.datetime(event.start) : ''}
                   </div>
                   {event.desc && (
                     <div
                       className={`text-[13px] mt-1 line-clamp-2 ${
-                        overdue ? 'text-red-700/90' : 'text-[color:var(--color-text)]/70'
+                        overdue ? 'text-red-700/90' : 'text-[color:var(--color-text-70)]'
                       }`}
                     >
                       {event.desc}
                     </div>
                   )}
                   {event.assignee && (
-                    <div className="text-[11px] text-[color:var(--color-text)]/60 mt-1">
+                    <div className="text-[11px] text-[color:var(--color-text-60)] mt-1">
                       {t('tasks.page.list.labels.assigned', { name: event.assignee })}
                     </div>
                   )}
@@ -350,15 +350,15 @@ export default function TaskList({
         })}
 
         {pagedTasks.length === 0 && (
-          <div className="text-center py-6 text-[color:var(--color-text)]/60 text-sm">
+          <div className="text-center py-6 text-[color:var(--color-text-60)] text-sm">
             {t('tasks.page.list.empty.upcoming')}
           </div>
         )}
       </div>
 
       {totalPages > 1 && (
-        <div className="px-4 py-3 border-t border-[color:var(--color-text)]/10 flex items-center justify-between text-sm bg-[var(--color-surface)]">
-          <span className="text-[color:var(--color-text)]/60">
+        <div className="px-4 py-3 border-t border-[color:var(--color-text-10)] flex items-center justify-between text-sm bg-[var(--color-surface)]">
+          <span className="text-[color:var(--color-text-60)]">
             {t('tasks.page.list.pagination.page', {
               current: Math.min(page, totalPages - 1) + 1,
               total: totalPages,
@@ -367,7 +367,7 @@ export default function TaskList({
           <div className="flex gap-2">
             <button
               type="button"
-              className="px-2 py-1 rounded border border-[color:var(--color-text)]/20 text-xs hover:bg-[color:var(--color-text)]/10 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2 py-1 rounded border border-[color:var(--color-text-20)] text-xs hover:bg-[color:var(--color-text-10)] disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={() => setPage((prev) => Math.max(0, prev - 1))}
               disabled={page <= 0}
             >
@@ -375,7 +375,7 @@ export default function TaskList({
             </button>
             <button
               type="button"
-              className="px-2 py-1 rounded border border-[color:var(--color-text)]/20 text-xs hover:bg-[color:var(--color-text)]/10 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2 py-1 rounded border border-[color:var(--color-text-20)] text-xs hover:bg-[color:var(--color-text-10)] disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={() => setPage((prev) => Math.min(totalPages - 1, prev + 1))}
               disabled={page >= totalPages - 1}
             >

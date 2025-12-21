@@ -15,15 +15,15 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
     received: t('finance.transactions.status.received', { defaultValue: 'Recibido' }),
   };
   const statusStyles = {
-    pending: 'bg-[var(--color-warning)]/15 text-[color:var(--color-warning)]',
-    partial: 'bg-[var(--color-primary)]/15 text-[color:var(--color-primary)]',
-    paid: 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]',
-    expected: 'bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]/70',
-    received: 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]',
+    pending: 'bg-[var(--color-warning-15)] text-[color:var(--color-warning)]',
+    partial: 'bg-[var(--color-primary-15)] text-[color:var(--color-primary)]',
+    paid: 'bg-[var(--color-success-15)] text-[color:var(--color-success)]',
+    expected: 'bg-[color:var(--color-text-10)] text-[color:var(--color-text-70)]',
+    received: 'bg-[var(--color-success-15)] text-[color:var(--color-success)]',
   };
   return (
     <div className="w-full">
-      <div className="grid grid-cols-7 gap-2 px-6 py-3 bg-[var(--color-surface)] text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
+      <div className="grid grid-cols-7 gap-2 px-6 py-3 bg-[var(--color-surface)] text-xs font-medium text-[color:var(--color-text-60)] uppercase tracking-wider">
         <div>{t('finance.transactions.headers.date', { defaultValue: 'Fecha' })}</div>
         <div className="col-span-2">
           {t('finance.transactions.headers.concept', { defaultValue: 'Concepto' })}
@@ -56,7 +56,7 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
             <div
               style={style}
               key={tx.id}
-              className="grid grid-cols-8 gap-2 px-6 items-center border-b border-[color:var(--color-text)]/10 hover:bg-[var(--color-primary)]/5 transition-colors duration-150"
+              className="grid grid-cols-8 gap-2 px-6 items-center border-b border-[color:var(--color-text-10)] hover:bg-[var(--color-primary-5)] transition-colors duration-150"
             >
               <div className="text-sm text-[color:var(--color-text)]">{formatDate(tx.date)}</div>
               <div className="col-span-2 text-sm text-[color:var(--color-text)]">
@@ -66,7 +66,7 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
                     t('finance.transactions.noConcept', { defaultValue: 'Sin concepto' })}
                 </div>
                 {(tx.provider || tx.dueDate) && (
-                  <div className="mt-0.5 text-xs text-[color:var(--color-text)]/60 space-y-0.5">
+                  <div className="mt-0.5 text-xs text-[color:var(--color-text-60)] space-y-0.5">
                     {tx.provider && <div>{tx.provider}</div>}
                     {tx.dueDate && (
                       <div className={isOverdue ? 'text-[color:var(--color-danger)]' : ''}>
@@ -77,15 +77,15 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
                   </div>
                 )}
               </div>
-              <div className="text-xs text-[color:var(--color-text)]/60">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]">
+              <div className="text-xs text-[color:var(--color-text-60)]">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[color:var(--color-text-10)] text-[color:var(--color-text)]">
                   {tx.category ||
                     t('finance.transactions.noCategory', { defaultValue: 'Sin categoría' })}
                 </span>
               </div>
               <div>
                 <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tx.type === 'income' ? 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]' : 'bg-[var(--color-danger)]/15 text-[color:var(--color-danger)]'}`}
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tx.type === 'income' ? 'bg-[var(--color-success-15)] text-[color:var(--color-success)]' : 'bg-[var(--color-danger-15)] text-[color:var(--color-danger)]'}`}
                 >
                   {tx.type === 'income'
                     ? t('finance.transactions.income', { defaultValue: 'Ingreso' })
@@ -94,7 +94,7 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
               </div>
               <div>
                 <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status] || 'bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]/70'}`}
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status] || 'bg-[color:var(--color-text-10)] text-[color:var(--color-text-70)]'}`}
                 >
                   {statusLabels[status] || status}
                 </span>
@@ -105,7 +105,7 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
                 {tx.type === 'income' ? '+' : '-'}
                 {formatCurrency(Math.abs(displayAmount))}
                 {outstanding > 0 && (
-                  <p className="text-xs text-[color:var(--color-text)]/60 mt-0.5">
+                  <p className="text-xs text-[color:var(--color-text-60)] mt-0.5">
                     {t(
                       tx.type === 'expense'
                         ? 'finance.transactions.outstandingExpense'
@@ -121,14 +121,14 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
                   <button
                     aria-label={t('app.edit', { defaultValue: 'Editar' })}
                     onClick={() => onEdit?.(tx)}
-                    className="p-2 rounded-md text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors duration-150"
+                    className="p-2 rounded-md text-[color:var(--color-primary)] hover:bg-[var(--color-primary-10)] transition-colors duration-150"
                   >
                     <Edit3 size={16} />
                   </button>
                   <button
                     aria-label={t('app.delete', { defaultValue: 'Eliminar' })}
                     onClick={() => onDelete?.(tx)}
-                    className="p-2 rounded-md text-[color:var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors duration-150"
+                    className="p-2 rounded-md text-[color:var(--color-danger)] hover:bg-[var(--color-danger-10)] transition-colors duration-150"
                   >
                     <Trash2 size={16} />
                   </button>

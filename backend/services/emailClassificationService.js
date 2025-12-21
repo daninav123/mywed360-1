@@ -8,13 +8,43 @@
 import OpenAI from 'openai';
 import { db } from '../db.js';
 
-// Inicializar cliente OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  project: process.env.OPENAI_PROJECT_ID,
-});
+let openai = null;
+let openAIConfig = { apiKeyPrefix: null, projectId: null };
 
-const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini'; // Más rápido y económico
+function getOpenAIConfig() {
+  const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+  const projectId = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
+  return { apiKey, projectId };
+}
+
+function getModel() {
+  return process.env.OPENAI_MODEL || 'gpt-4o-mini';
+}
+
+function ensureOpenAIClient() {
+  const { apiKey, projectId } = getOpenAIConfig();
+  const apiKeyPrefix = apiKey ? apiKey.slice(0, 8) : null;
+
+  if (!apiKey) {
+    openai = null;
+    openAIConfig = { apiKeyPrefix: null, projectId: null };
+    return null;
+  }
+
+  if (openai && openAIConfig.apiKeyPrefix === apiKeyPrefix && openAIConfig.projectId === (projectId || null)) {
+    return openai;
+  }
+
+  openai = new OpenAI({
+    apiKey,
+    project: projectId || undefined,
+    timeout: 15000,
+    maxRetries: 2,
+  });
+  openAIConfig = { apiKeyPrefix, projectId: projectId || null };
+  return openai;
+}
+
 const MAX_RETRIES = 2;
 const TIMEOUT_MS = 30000; // 30 segundos
 
@@ -54,7 +84,8 @@ export async function callClassificationAPI(emailData, context = {}) {
     });
 
     // Validar que tenemos API key
-    if (!process.env.OPENAI_API_KEY) {
+    const client = ensureOpenAIClient();
+    if (!client) {
       console.warn('[emailClassificationService] OPENAI_API_KEY no configurada, usando heurística');
       return fallbackClassification(emailData);
     }
@@ -64,8 +95,8 @@ export async function callClassificationAPI(emailData, context = {}) {
     
     // Llamar a OpenAI con timeout
     const response = await Promise.race([
-      openai.chat.completions.create({
-        model: MODEL,
+      client.chat.completions.create({
+        model: getModel(),
         messages: [
           {
             role: 'system',
@@ -115,7 +146,7 @@ Responde SOLO con JSON válido, sin texto adicional.`,
     await recordClassificationMetric({
       success: true,
       durationMs: duration,
-      model: MODEL,
+      model: getModel(),
       category: validated.category,
       confidence: validated.confidence,
     });
@@ -123,7 +154,7 @@ Responde SOLO con JSON válido, sin texto adicional.`,
     return {
       ...validated,
       source: 'openai',
-      model: MODEL,
+      model: getModel(),
       durationMs: duration,
     };
   } catch (error) {

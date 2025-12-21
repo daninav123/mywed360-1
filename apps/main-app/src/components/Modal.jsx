@@ -46,7 +46,7 @@ export default function Modal({
           <button
             onClick={onClose}
             aria-label="Cerrar"
-            className="p-2 rounded hover:bg-[var(--color-accent)]/20 focus:outline-none focus:ring-2 ring-primary"
+            className="p-2 rounded hover:bg-[var(--color-accent-20)] focus:outline-none focus:ring-2 ring-primary"
           >
             <span aria-hidden>×</span>
           </button>

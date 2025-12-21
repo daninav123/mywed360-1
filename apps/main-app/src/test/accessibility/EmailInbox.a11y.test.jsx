@@ -7,7 +7,7 @@ import EmailInbox from '../../components/email/EmailInbox';
 import { axe, formatViolations } from '../helpers/axeSetup';
 
 // Mock de servicios
-vi.mock('../../services/EmailService', () => ({
+vi.mock('../../services/emailService', () => ({
   getMails: vi.fn().mockResolvedValue([
     {
       id: 'email1',
@@ -35,12 +35,12 @@ vi.mock('../../services/EmailService', () => ({
   getUnreadCount: vi.fn().mockResolvedValue(1),
 }));
 
-vi.mock('../../services/TagService', () => ({
+vi.mock('../../services/tagService', () => ({
   getUserTags: vi.fn().mockReturnValue([{ id: 'important', name: 'Importante', color: '#e53e3e' }]),
   getEmailTagsDetails: vi.fn().mockReturnValue([]),
 }));
 
-vi.mock('../../services/FolderService', () => ({
+vi.mock('../../services/folderService', () => ({
   getUserFolders: vi.fn().mockReturnValue([
     { id: 'inbox', name: 'Bandeja de entrada', system: true },
     { id: 'sent', name: 'Enviados', system: true },
@@ -127,7 +127,7 @@ describe('Pruebas de accesibilidad para EmailInbox', () => {
 
   it('proporciona feedback adecuado para estados de carga y errores', async () => {
     // Simular estado de carga
-    vi.mock('../../services/EmailService', () => ({
+    vi.mock('../../services/emailService', () => ({
       getMails: vi
         .fn()
         .mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 1000))),
@@ -141,7 +141,7 @@ describe('Pruebas de accesibilidad para EmailInbox', () => {
     expect(getByText('Cargando...')).toHaveAttribute('aria-live', 'polite');
 
     // Simular error
-    vi.mock('../../services/EmailService', () => ({
+    vi.mock('../../services/emailService', () => ({
       getMails: vi.fn().mockRejectedValue(new Error('Error de prueba')),
       getUnreadCount: vi.fn().mockResolvedValue(0),
     }));

@@ -48,7 +48,7 @@ export default function CsvImportModal({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {fields.map(({ key, label }) => (
             <div key={key}>
-              <label className="block text-sm text-[color:var(--color-text)]/70 mb-1">
+              <label className="block text-sm text-[color:var(--color-text-70)] mb-1">
                 {label}
               </label>
               <select
@@ -109,7 +109,7 @@ export default function CsvImportModal({
                     <tr
                       key={idx}
                       className={
-                        idx % 2 ? 'bg-[var(--color-accent)]/10' : 'bg-[var(--color-surface)]'
+                        idx % 2 ? 'bg-[var(--color-accent-10)]' : 'bg-[var(--color-surface)]'
                       }
                     >
                       <td className="px-2 py-1">

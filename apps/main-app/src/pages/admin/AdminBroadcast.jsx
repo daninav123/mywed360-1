@@ -27,7 +27,7 @@ const AdminBroadcast = () => {
     <div className="space-y-6">
       <header>
         <h1 className="text-xl font-semibold">Broadcast global</h1>
-        <p className="text-sm text-[var(--color-text-soft,#6b7280)]">Envía comunicaciones a segmentos específicos o a todos los usuarios.</p>
+        <p className="text-sm text-[color:var(--color-text-soft)]">Envía comunicaciones a segmentos específicos o a todos los usuarios.</p>
       </header>
 
       <div className="rounded-xl border border-soft bg-surface shadow-sm">
@@ -36,14 +36,14 @@ const AdminBroadcast = () => {
             type="button"
             data-testid="broadcast-tab-email"
             onClick={() => setTab('email')}
-            className={tab === 'email' ? 'flex-1 px-4 py-3 bg-[var(--color-bg-soft,#f3f4f6)] font-medium' : 'flex-1 px-4 py-3'}
+            className={tab === 'email' ? 'flex-1 px-4 py-3 bg-[var(--color-bg-soft)] font-medium' : 'flex-1 px-4 py-3'}
           >
             Email
           </button>
           <button
             type="button"
             onClick={() => setTab('push')}
-            className={tab === 'push' ? 'flex-1 px-4 py-3 bg-[var(--color-bg-soft,#f3f4f6)] font-medium' : 'flex-1 px-4 py-3'}
+            className={tab === 'push' ? 'flex-1 px-4 py-3 bg-[var(--color-bg-soft)] font-medium' : 'flex-1 px-4 py-3'}
           >
             Push
           </button>
@@ -146,7 +146,7 @@ const AdminBroadcast = () => {
                   // console.warn('[AdminBroadcast] create broadcast failed:', e);
                 }
               }}
-              className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
+              className="rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary)] hover:bg-[color:var(--color-primary-dark)]"
             >
               Confirmar envío
             </button>
@@ -159,10 +159,10 @@ const AdminBroadcast = () => {
           <h2 className="text-sm font-semibold">Histórico</h2>
         </header>
         {loading ? (
-          <div className="px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">Cargando histórico...</div>
+          <div className="px-4 py-6 text-sm text-[color:var(--color-text-soft)]">Cargando histórico...</div>
         ) : (
           <table className="min-w-full divide-y divide-soft text-sm">
-            <thead className="bg-[var(--color-bg-soft,#f3f4f6)] text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+            <thead className="bg-[var(--color-bg-soft)] text-xs uppercase text-[color:var(--color-text-soft)]">
               <tr>
                 <th className="px-4 py-3 text-left">Asunto</th>
                 <th className="px-4 py-3 text-left">Segmento</th>
@@ -181,7 +181,7 @@ const AdminBroadcast = () => {
               ))}
               {history.length === 0 && (
                 <tr>
-                  <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={4}>
+                  <td className="px-4 py-6 text-center text-sm text-[color:var(--color-text-soft)]" colSpan={4}>
                     No hay envíos registrados.
                   </td>
                 </tr>

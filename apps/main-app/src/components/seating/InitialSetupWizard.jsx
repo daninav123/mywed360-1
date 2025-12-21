@@ -134,10 +134,10 @@ export default function InitialSetupWizard({
                 <Icon className="w-8 h-8 text-white" />
               </motion.div>
 
-              <h2 className="text-2xl font-semibold text-[var(--color-text)] mb-2">
+              <h2 className="text-2xl font-semibold text-[color:var(--color-text)] mb-2">
                 {step.title}
               </h2>
-              <p className="text-[var(--color-muted)]">
+              <p className="text-[color:var(--color-muted)]">
                 {step.description}
               </p>
             </div>
@@ -173,7 +173,7 @@ export default function InitialSetupWizard({
                             onOpenHallConfig?.();
                           }}
                           type="button"
-                          className="text-sm text-[var(--color-primary)] hover:opacity-80 font-medium flex items-center gap-1 cursor-pointer hover:underline"
+                          className="text-sm text-[color:var(--color-primary)] hover:opacity-80 font-medium flex items-center gap-1 cursor-pointer hover:underline"
                         >
                           {t('initialWizard.sections.dimensions.change', { ns: 'seating' })}
                         </button>
@@ -200,9 +200,9 @@ export default function InitialSetupWizard({
                 )}
 
                 {currentStep === 1 && (
-                  <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border-2 border-[var(--color-primary)]">
-                    <h3 className="font-semibold text-[var(--color-text)] mb-3 flex items-center gap-2">
-                      <LayoutGrid className="w-5 h-5 text-[var(--color-primary)]" />
+                  <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border-2 border-[color:var(--color-primary)]">
+                    <h3 className="font-semibold text-[color:var(--color-text)] mb-3 flex items-center gap-2">
+                      <LayoutGrid className="w-5 h-5 text-[color:var(--color-primary)]" />
                       {t('initialWizard.sections.template.title', { ns: 'seating' })}
                     </h3>
                     {selectedTemplate ? (
@@ -228,7 +228,7 @@ export default function InitialSetupWizard({
                         </button>
                       </div>
                     ) : (
-                      <p className="text-[var(--color-muted)] text-sm">
+                      <p className="text-[color:var(--color-muted)] text-sm">
                         {t('initialWizard.sections.template.prompt', { ns: 'seating' })}
                       </p>
                     )}
@@ -236,17 +236,17 @@ export default function InitialSetupWizard({
                 )}
 
                 {currentStep === 2 && (
-                  <div className="bg-[var(--color-surface)] rounded-lg p-5 border border-[var(--color-border)] shadow-sm">
+                  <div className="bg-[var(--color-surface)] rounded-lg p-5 border border-[color:var(--color-border)] shadow-sm">
                     <div className="flex items-start gap-4">
-                      <Sparkles className="w-6 h-6 text-[var(--color-success)] flex-shrink-0" />
+                      <Sparkles className="w-6 h-6 text-[color:var(--color-success)] flex-shrink-0" />
                       <div>
-                        <h3 className="font-semibold text-[var(--color-text)] mb-2">
+                        <h3 className="font-semibold text-[color:var(--color-text)] mb-2">
                           {t('initialWizard.sections.complete.title', { ns: 'seating' })}
                         </h3>
-                        <p className="text-[var(--color-text)] text-sm mb-4">
+                        <p className="text-[color:var(--color-text)] text-sm mb-4">
                           {t('initialWizard.sections.complete.description', { ns: 'seating' })}
                         </p>
-                        <ul className="space-y-2 text-sm text-[var(--color-muted)]">
+                        <ul className="space-y-2 text-sm text-[color:var(--color-muted)]">
                           {summaryPoints.map((point) => (
                             <li key={point} className="flex items-center gap-2">
                               <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]" />

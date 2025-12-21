@@ -49,7 +49,9 @@ const ensureOpenAIClient = () => {
 };
 
 // Intento de inicialización al cargar el módulo
-ensureOpenAIClient();
+if (process.env.NODE_ENV !== 'test') {
+  ensureOpenAIClient();
+}
 
 router.post('/', async (req, res) => {
   const hasClient = ensureOpenAIClient();

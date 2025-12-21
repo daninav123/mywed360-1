@@ -61,7 +61,7 @@ Auditoría completa de cumplimiento de requisitos según reglas de usuario (defi
 |-----------|--------|---------------|
 | Stack: Prometheus + Grafana + Alertmanager | ✅ | `docs/monitoring/README.md` |
 | Métricas: Disponibilidad, Rendimiento, Recursos | ✅ | `docs/monitoring/README.md` § Métricas expuestas |
-| Endpoint `/health` frontend (puerto 3000) | ✅ | `docs/monitoring/README.md` § Endpoints de salud |
+| Endpoint `/health` frontend (puerto 5173) | ✅ | `docs/monitoring/README.md` § Endpoints de salud |
 | Endpoint `/health` backend (puerto 4004*) | ✅ | `docs/monitoring/README.md` § Endpoints de salud |
 | Alertas Prometheus Alertmanager | ✅ | `docs/monitoring/alerting_rules.yml` |
 | Frecuencia: Checks cada 5 minutos | ✅ | `docs/AUTOMATIZACION-TAREAS.md` § 3.4 |
@@ -79,15 +79,15 @@ Auditoría completa de cumplimiento de requisitos según reglas de usuario (defi
 | Requisito | Estado | Documentación |
 |-----------|--------|---------------|
 | Archivo `.env` en raíz del repositorio | ✅ | `.env.example` + `docs/ENVIRONMENT.md` |
-| Variables: `FRONTEND_PORT`, `BACKEND_PORT` | ✅ | `docs/ENVIRONMENT.md` § Frontend/Backend |
+| Variables: `FRONTEND_PORT`, `PORT` (backend) | ✅ | `docs/ENVIRONMENT.md` § Frontend/Backend |
 | Carga con `dotenv` | ✅ | Implementado en código |
 | `OPENAI_API_KEY` desde entorno | ✅ | `docs/ENVIRONMENT.md` |
 | Documentación de puertos especiales | ✅ | `docs/ENVIRONMENT.md` (nota sobre 4004 vs 3001) |
 
 **Configuración documentada:**
 ```
-FRONTEND_PORT=3000
-BACKEND_PORT=4004  # (default, ajustable)
+FRONTEND_PORT=5173  # (fijo, strictPort en Vite)
+PORT=4004  # (backend, ajustable)
 OPENAI_API_KEY=${OPENAI_API_KEY}
 NODE_ENV=production
 ```

@@ -11,17 +11,14 @@
 ## Reglas
 
 - El frontend debe estar SIEMPRE en 5173. Los scripts, Cypress y la documentación se ajustan a este puerto.
-- Cypress usa por defecto `http://localhost:5173` como `baseUrl` (configurado en `cypress.config.js`).
+- Cypress usa por defecto `http://localhost:5173` como `baseUrl` (configurado en `cypress.config.cjs`).
   - Si excepcionalmente se necesita otro puerto, se puede sobreescribir con la variable de entorno `CYPRESS_BASE_URL`.
 
 ## Referencias en código
 
-- `package.json`:
-  - `dev`: `vite --host --port 5173`
-  - `e2e` / `e2e:open`: verificación en `http://localhost:5173`.
-- `cypress.config.js`: `baseUrl` por defecto `http://localhost:5173`.
+- **Frontend (Vite):** `apps/main-app/package.json` → script `dev` ejecuta `vite` con puerto 5173 fijado (`apps/main-app/vite.config.js`). Desde raíz: `npm run dev:main`.
+- **Cypress:** `cypress.config.cjs` → `baseUrl: 'http://localhost:5173'` (configurable con `CYPRESS_BASE_URL`).
 - `.env.example`: `FRONTEND_PORT=5173` documentado (informativo).
-
 
 ---
 

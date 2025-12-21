@@ -786,7 +786,7 @@ export default function Checklist() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={translate('common.protocol.checklist.labels.search', 'Buscar en el checklist')}
-                className="w-64 rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none"
+                className="w-64 rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-[color:var(--color-primary)] focus:outline-none"
               />
             </div>
           </div>

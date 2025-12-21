@@ -1,4 +1,4 @@
-﻿# Guía de diseño y prototipado (Figma)
+# Guía de diseño y prototipado (Figma)
 
 ## Objetivo
 Adoptar Figma como herramienta estándar para prototipar el flujo de Plan de Asientos y futuras funcionalidades.

@@ -4,6 +4,40 @@ import express from 'express';
 import cors from 'cors';
 import taskTemplatesRouter from '../routes/task-templates.js';
 
+import { vi } from 'vitest';
+
+vi.mock('../db.js', () => ({
+  __esModule: true,
+  db: {
+    collection: () => ({
+      where: () => ({
+        orderBy: () => ({
+          limit: () => ({
+            get: async () => ({ empty: true, docs: [], size: 0 }),
+          }),
+        }),
+        limit: () => ({
+          get: async () => ({ empty: true, docs: [], size: 0 }),
+        }),
+        get: async () => ({ empty: true, docs: [], size: 0 }),
+      }),
+      limit: () => ({
+        get: async () => ({ empty: true, docs: [], size: 0 }),
+      }),
+      orderBy: () => ({
+        limit: () => ({
+          get: async () => ({ empty: true, docs: [], size: 0 }),
+        }),
+      }),
+      doc: () => ({
+        get: async () => ({ exists: false, data: () => undefined }),
+        set: async () => {},
+        update: async () => {},
+      }),
+    }),
+  },
+}));
+
 // Mock de db (en tests reales, usar Firebase Testing o mocks)
 const app = express();
 app.use(cors());

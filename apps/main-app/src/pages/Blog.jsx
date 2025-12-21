@@ -22,7 +22,7 @@ const ArticleCard = React.forwardRef(({ post, onOpen, onOpenAuthor, ctaLabel }, 
   return (
     <article
       ref={ref}
-      className="border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-[var(--color-primary,#6366f1)] cursor-pointer flex flex-col"
+      className="border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] cursor-pointer flex flex-col"
       data-testid="blog-card"
       onClick={() => onOpen?.(post)}
       role="link"
@@ -52,7 +52,7 @@ const ArticleCard = React.forwardRef(({ post, onOpen, onOpenAuthor, ctaLabel }, 
             <button
               type="button"
               onClick={handleAuthorClick}
-              className="text-xs font-medium text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)] focus:outline-none"
+              className="text-xs font-medium text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)] focus:outline-none"
             >
               Por {post.byline.name}
               {post.byline.title ? ` · ${post.byline.title}` : ''}
@@ -72,7 +72,7 @@ const ArticleCard = React.forwardRef(({ post, onOpen, onOpenAuthor, ctaLabel }, 
             ))}
           </div>
         </div>
-        <span className="inline-flex text-sm text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]">
+        <span className="inline-flex text-sm text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)]">
           {ctaLabel}
         </span>
       </div>
@@ -230,7 +230,7 @@ function Blog() {
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
           placeholder={t('blog.search.placeholder')}
-          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary,#6366f1)]"
+          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
         />
         {isFiltering ? (
           <p className="mt-2 text-xs text-gray-500">

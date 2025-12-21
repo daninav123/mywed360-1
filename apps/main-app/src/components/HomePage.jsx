@@ -930,9 +930,9 @@ export default function HomePage() {
 
         {/* Progress Section */}
         <section className="z-10 w-full p-6">
-          <Card className="bg-[var(--color-surface)]/70  p-4 w-full flex flex-col gap-4">
+          <Card className="bg-[var(--color-surface-70)]  p-4 w-full flex flex-col gap-4">
             <div>
-              <p className="text-sm text-[color:var(--color-text)]/70 mb-2">{progressTasksLabel}</p>
+              <p className="text-sm text-[color:var(--color-text-70)] mb-2">{progressTasksLabel}</p>
               <Progress
                 className="h-4 rounded-full w-full"
                 value={progressPercent}
@@ -947,14 +947,14 @@ export default function HomePage() {
                 {progressCompletionLabel}
               </p>
               <p
-                className="text-xs text-[color:var(--color-text)]/60"
+                className="text-xs text-[color:var(--color-text-60)]"
                 data-testid="home-progress-status"
               >
                 {progressStatusText}
                 {expectedProgressLabel}
               </p>
               {progressLoading && (
-                <p className="text-xs text-[color:var(--color-text)]/40">{progressLoadingLabel}</p>
+                <p className="text-xs text-[color:var(--color-text-40)]">{progressLoadingLabel}</p>
               )}
               {progressError && !progressLoading && (
                 <p className="text-xs text-[color:var(--color-danger)]">{progressErrorLabel}</p>
@@ -972,13 +972,13 @@ export default function HomePage() {
                 key={idx}
                 role="button"
                 onClick={() => setActiveModal(action.key)}
-                className="flex items-center justify-between p-4 bg-[var(--color-surface)]/80  hover:shadow-lg transition transform hover:scale-105 cursor-pointer"
+                className="flex items-center justify-between p-4 bg-[var(--color-surface-80)]  hover:shadow-lg transition transform hover:scale-105 cursor-pointer"
               >
                 <div className="flex items-center space-x-3">
-                  <Icon className="text-[var(--color-primary)]" />
+                  <Icon className="text-[color:var(--color-primary)]" />
                   <span className="text-[color:var(--color-text)] font-medium">{action.label}</span>
                 </div>
-                <ChevronRight className="text-[color:var(--color-text)]/50" />
+                <ChevronRight className="text-[color:var(--color-text-50)]" />
               </Card>
             );
           })}
@@ -991,13 +991,13 @@ export default function HomePage() {
             return (
               <Card
                 key={idx}
-                className="p-4 bg-[var(--color-surface)]/80  hover:shadow-lg transition transform hover:scale-105"
+                className="p-4 bg-[var(--color-surface-80)]  hover:shadow-lg transition transform hover:scale-105"
               >
                 <div className="flex items-center space-x-2">
-                  <Icon className="text-[var(--color-primary)]" />
+                  <Icon className="text-[color:var(--color-primary)]" />
                   <p className="text-sm text-[color:var(--color-text)]">{stat.label}</p>
                 </div>
-                <p className="text-2xl font-extrabold text-[var(--color-primary)] mt-2">
+                <p className="text-2xl font-extrabold text-[color:var(--color-primary)] mt-2">
                   {stat.value}
                 </p>
               </Card>
@@ -1009,22 +1009,22 @@ export default function HomePage() {
         <section className="z-10 p-6 pb-12 relative">
           <div className="flex justify-between items-center mb-4">
             <Link to="/inspiracion">
-              <button className="text-xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)]">
+              <button className="text-xl font-bold text-[color:var(--color-text)] hover:text-[color:var(--color-primary)]">
                 Inspiración para tu boda
               </button>
             </Link>
             <div className="flex space-x-2">
               <button
                 onClick={scrollPrev}
-                className="p-2 rounded-full bg-[var(--color-surface)]/80 "
+                className="p-2 rounded-full bg-[var(--color-surface-80)] "
               >
-                <ChevronLeft className="text-[var(--color-primary)]" />
+                <ChevronLeft className="text-[color:var(--color-primary)]" />
               </button>
               <button
                 onClick={scrollNext}
-                className="p-2 rounded-full bg-[var(--color-surface)]/80 "
+                className="p-2 rounded-full bg-[var(--color-surface-80)] "
               >
-                <ChevronRight className="text-[var(--color-primary)]" />
+                <ChevronRight className="text-[color:var(--color-primary)]" />
               </button>
             </div>
           </div>
@@ -1056,7 +1056,7 @@ export default function HomePage() {
         <section className="z-10 p-6 pb-2">
           <div className="flex justify-between items-center mb-4">
             <Link to="/blog">
-              <button className="text-xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)]">
+              <button className="text-xl font-bold text-[color:var(--color-text)] hover:text-[color:var(--color-primary)]">
                 {t('home.blog.title')}
               </button>
             </Link>
@@ -1082,7 +1082,7 @@ export default function HomePage() {
                   <Card
                     key={post.id}
                     onClick={() => navigate(post.slug ? `/blog/${post.slug}` : '/blog')}
-                    className="cursor-pointer p-0 overflow-hidden bg-[var(--color-surface)]/80  hover:shadow-lg transition"
+                    className="cursor-pointer p-0 overflow-hidden bg-[var(--color-surface-80)]  hover:shadow-lg transition"
                   >
                     {post.coverUrl && (
                       <ExternalImage
@@ -1098,10 +1098,10 @@ export default function HomePage() {
                       <h3 className="font-semibold text-[color:var(--color-text)] line-clamp-2">
                         {post.title}
                       </h3>
-                      <p className="text-sm text-[var(--color-text)]/70 line-clamp-2">
+                      <p className="text-sm text-[color:var(--color-text-70)] line-clamp-2">
                         {post.excerpt || ''}
                       </p>
-                      <div className="pt-2 text-xs text-[var(--color-text)]/60 border-t border-[var(--color-text)]/10 flex items-center justify-between">
+                      <div className="pt-2 text-xs text-[color:var(--color-text-60)] border-t border-[color:var(--color-text-10)] flex items-center justify-between">
                         <span>{t('home.blog.source')} Lovenda</span>
                         <span>{publishedLabel}</span>
                       </div>
@@ -1164,13 +1164,13 @@ export default function HomePage() {
             <div className="flex justify-end space-x-2 mt-6">
               <button
                 onClick={() => setActiveModal(null)}
-                className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
+                className="px-4 py-2 text-[color:var(--color-text)] border border-[color:var(--color-text-20)] rounded"
               >
                 {t('home.modals.shared.cancel')}
               </button>
               <button
                 onClick={() => handleNavigateFromModal('/invitados')}
-                className="px-4 py-2 text-[var(--color-primary)] border border-[var(--color-primary)]/40 rounded bg-[var(--color-primary)]/10"
+                className="px-4 py-2 text-[color:var(--color-primary)] border border-[color:var(--color-primary-40)] rounded bg-[var(--color-primary-10)]"
               >
                 {t('home.modals.shared.goToGuests')}
               </button>
@@ -1292,13 +1292,13 @@ export default function HomePage() {
             <div className="flex justify-end space-x-2 mt-6">
               <button
                 onClick={() => setActiveModal(null)}
-                className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
+                className="px-4 py-2 text-[color:var(--color-text)] border border-[color:var(--color-text-20)] rounded"
               >
                 {t('home.modals.shared.cancel')}
               </button>
               <button
                 onClick={() => handleNavigateFromModal('/finance')}
-                className="px-4 py-2 text-[var(--color-primary)] border border-[var(--color-primary)]/40 rounded bg-[var(--color-primary)]/10"
+                className="px-4 py-2 text-[color:var(--color-primary)] border border-[color:var(--color-primary-40)] rounded bg-[var(--color-primary-10)]"
               >
                 {t('home.modals.shared.goToFinance')}
               </button>
@@ -1335,13 +1335,13 @@ export default function HomePage() {
             <div className="flex justify-end space-x-2 mt-6">
               <button
                 onClick={() => setActiveModal(null)}
-                className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
+                className="px-4 py-2 text-[color:var(--color-text)] border border-[color:var(--color-text-20)] rounded"
               >
                 {t('home.modals.shared.cancel')}
               </button>
               <button
                 onClick={() => handleNavigateFromModal('/ideas')}
-                className="px-4 py-2 text-[var(--color-primary)] border border-[var(--color-primary)]/40 rounded bg-[var(--color-primary)]/10"
+                className="px-4 py-2 text-[color:var(--color-primary)] border border-[color:var(--color-primary-40)] rounded bg-[var(--color-primary-10)]"
               >
                 {t('home.modals.shared.goToIdeas')}
               </button>

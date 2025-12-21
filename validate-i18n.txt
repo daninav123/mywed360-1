@@ -1,0 +1,5 @@
+
+> malove-app@0.1.0 validate:i18n
+> node scripts/validateI18n.js
+
+No locales directory found, skipping.

@@ -21,9 +21,13 @@ router.get('/:id/attachments/:attId', requireMailAccess, async (req, res) => {
       const role = String(profile.role || '').toLowerCase();
       const isPrivileged = role === 'admin' || role === 'planner';
       const myAlias = String(profile.myWed360Email || '').toLowerCase();
+      const myMaLoveEmail = String(profile.maLoveEmail || '').toLowerCase();
       const myLogin = String(profile.email || '').toLowerCase();
+      const authUid = req.user?.uid || null;
       const ownerTarget = String(data.folder === 'sent' ? data.from || '' : data.to || '').toLowerCase();
-      if (!isPrivileged && ownerTarget && !(ownerTarget === myAlias || ownerTarget === myLogin)) {
+      const ownerUid = typeof data.ownerUid === 'string' ? data.ownerUid.trim() : '';
+      const uidOk = authUid && ownerUid && ownerUid === authUid;
+      if (!isPrivileged && !uidOk && ownerTarget && !(ownerTarget === myAlias || ownerTarget === myMaLoveEmail || ownerTarget === myLogin)) {
         return res.status(403).json({ error: 'forbidden' });
       }
     } catch {}
@@ -77,9 +81,13 @@ router.get('/:id/attachments/:attId/url', requireMailAccess, async (req, res) =>
       const role = String(profile.role || '').toLowerCase();
       const isPrivileged = role === 'admin' || role === 'planner';
       const myAlias = String(profile.myWed360Email || '').toLowerCase();
+      const myMaLoveEmail = String(profile.maLoveEmail || '').toLowerCase();
       const myLogin = String(profile.email || '').toLowerCase();
+      const authUid = req.user?.uid || null;
       const ownerTarget = String(data.folder === 'sent' ? data.from || '' : data.to || '').toLowerCase();
-      if (!isPrivileged && ownerTarget && !(ownerTarget === myAlias || ownerTarget === myLogin)) {
+      const ownerUid = typeof data.ownerUid === 'string' ? data.ownerUid.trim() : '';
+      const uidOk = authUid && ownerUid && ownerUid === authUid;
+      if (!isPrivileged && !uidOk && ownerTarget && !(ownerTarget === myAlias || ownerTarget === myMaLoveEmail || ownerTarget === myLogin)) {
         return res.status(403).json({ error: 'forbidden' });
       }
     } catch {}

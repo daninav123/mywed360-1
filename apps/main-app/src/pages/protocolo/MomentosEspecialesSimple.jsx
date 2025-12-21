@@ -76,6 +76,7 @@ const MomentosEspecialesSimple = () => {
       isOpen: true,
       momentId: moment.id,
       momentTitle: moment.title || 'Momento',
+      momentType: moment.type || 'otro',
     });
   }, []);
 
@@ -84,6 +85,7 @@ const MomentosEspecialesSimple = () => {
       isOpen: false,
       momentId: null,
       momentTitle: '',
+      momentType: '',
     });
   }, []);
 
@@ -291,6 +293,8 @@ const MomentosEspecialesSimple = () => {
                       updateMoment(activeBlockId, moment.id, updatedMoment)
                     }
                     showAdvanced={false}
+                    allMoments={moments}
+                    currentBlockId={activeBlockId}
                   />
                 ))
               )}
@@ -305,6 +309,7 @@ const MomentosEspecialesSimple = () => {
         onClose={closeSongPicker}
         onSelect={handleSongSelect}
         momentTitle={songPickerState.momentTitle}
+        momentType={songPickerState.momentType}
       />
     </PageWrapper>
   );

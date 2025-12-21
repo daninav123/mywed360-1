@@ -1,4 +1,4 @@
-# 🎨 Guía de Estilo Visual - MaLoveApp
+# 🎨 Guía de Estilo Visual - MaLove.App
 
 **Versión:** 1.0  
 **Última actualización:** Diciembre 2025
@@ -50,6 +50,10 @@ Esta guía define el estilo visual oficial del proyecto basado en las páginas *
 --color-muted: rgba(31, 41, 55, 0.72)
 ```
 
+### Opacidades (importante)
+Para fondos/bordes/textos con “alpha”, **no uses** `bg-[var(--color-primary)]/10` (no funciona bien con variables hex).  
+Usa los tokens derivados: `--color-primary-10`, `--color-text-60`, `--color-surface-80`, etc (definidos en `apps/*/src/index.css`).
+
 ### Layout
 ```css
 --layout-max-width: 1120px
@@ -63,7 +67,7 @@ Esta guía define el estilo visual oficial del proyecto basado en las páginas *
 
 ### 1. **Card Blanco Estándar**
 ```jsx
-<div className="bg-[var(--color-surface)] rounded-xl shadow-md border border-[color:var(--color-text)]/10 p-6">
+<div className="bg-surface rounded-xl shadow-md border border-soft p-6 text-body">
   {/* Contenido */}
 </div>
 ```
@@ -75,12 +79,12 @@ Esta guía define el estilo visual oficial del proyecto basado en las páginas *
 ### 2. **Layout de Página**
 ```jsx
 // Patrón estándar (como Dashboard y Tasks)
-<div className="p-4 md:p-6 max-w-7xl mx-auto">
+<div className="layout-container-wide space-y-6 pt-4 md:pt-6">
   {/* Header */}
   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
     <div>
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Título</h1>
-      <p className="text-gray-500 mt-1">Subtítulo descriptivo</p>
+      <h1 className="page-title">Título</h1>
+      <p className="text-muted mt-1">Subtítulo descriptivo</p>
     </div>
   </div>
   
@@ -92,25 +96,21 @@ Esta guía define el estilo visual oficial del proyecto basado en las páginas *
 ```
 
 **Características:**
-- ✅ `p-4 md:p-6` - Padding responsivo
-- ✅ `max-w-7xl mx-auto` - Ancho máximo centrado
+- ✅ `layout-container` / `layout-container-wide` - Ancho centrado
+- ✅ `pt-4 md:pt-6` - Padding vertical responsivo
 - ✅ `space-y-6` - Espaciado vertical entre elementos
 
 ---
 
 ### 3. **Título de Página**
 ```jsx
-<h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-  Título de la Página
-</h1>
-<p className="text-gray-500 mt-1">
-  Descripción breve
-</p>
+<h1 className="page-title">Título de la Página</h1>
+<p className="text-muted mt-1">Descripción breve</p>
 ```
 
 **Tipografía:**
-- Título: `text-2xl md:text-3xl font-bold text-gray-800`
-- Subtítulo: `text-gray-500 mt-1`
+- Título: `page-title`
+- Subtítulo: `text-muted mt-1`
 
 ---
 
@@ -119,7 +119,7 @@ Solo para indicadores, NO para cards principales:
 
 ```jsx
 {/* Correcto - Fondo sutil al 10% */}
-<div className="p-4 rounded-xl bg-[var(--color-success)]/10 border border-[color:var(--color-success)]/30">
+<div className="p-4 rounded-xl bg-[var(--color-success-10)] border border-[color:var(--color-success-30)]">
   <p className="text-[color:var(--color-success)]">Estado OK</p>
 </div>
 
@@ -134,12 +134,12 @@ Solo para indicadores, NO para cards principales:
 ### 5. **Botones Estándar**
 ```jsx
 {/* Botón primario */}
-<button className="bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-600 transition-colors">
+<button className="bg-[var(--color-primary)] text-white px-4 py-2 rounded-md hover:bg-[var(--color-primary-90)] transition-colors">
   Acción Principal
 </button>
 
 {/* Botón secundario */}
-<button className="border border-pink-500 text-pink-600 px-4 py-2 rounded-md hover:bg-pink-50 transition-colors">
+<button className="border border-soft bg-surface text-body px-4 py-2 rounded-md hover:bg-[var(--color-accent-10)] transition-colors">
   Acción Secundaria
 </button>
 ```
@@ -170,7 +170,7 @@ Solo para indicadores, NO para cards principales:
 </div>
 
 // USAR
-<div className="bg-[var(--color-surface)] text-[color:var(--color-text)] border-[color:var(--color-text)]/10">
+<div className="bg-surface text-body border border-soft">
   ✅ Correcto
 </div>
 ```
@@ -194,27 +194,26 @@ Solo para indicadores, NO para cards principales:
 
 Antes de crear o modificar un componente, verifica:
 
-- [ ] ¿Usa `bg-[var(--color-surface)]` para fondos blancos?
+- [ ] ¿Usa `bg-surface` para fondos blancos?
 - [ ] ¿Usa `shadow-md` en lugar de `shadow-2xl`?
 - [ ] ¿Usa `rounded-xl` consistentemente?
 - [ ] ¿Los colores usan variables CSS o clases utility?
 - [ ] ¿El padding es `p-6` o `p-4 md:p-6`?
 - [ ] ¿Evita degradados (`bg-gradient-*`)?
 - [ ] ¿Evita efectos blur (`blur-*`)?
-- [ ] ¿Los títulos usan `text-2xl md:text-3xl font-bold text-gray-800`?
+- [ ] ¿Los títulos usan `page-title`?
 - [ ] ¿El espaciado vertical usa `space-y-6`?
-- [ ] ¿Los bordes usan `border border-[color:var(--color-text)]/10`?
+- [ ] ¿Los bordes usan `border border-soft`?
 
 ---
 
 ## 🎯 Páginas de Referencia
 
 ### ✅ ESTILO CORRECTO
-- **Dashboard (Home)** - `apps/main-app/src/pages/Dashboard.jsx`
+- **Dashboard (Home)** - `apps/main-app/src/pages/HomeUser.jsx` + `apps/main-app/src/components/HomePage.jsx`
 - **Tasks** - `apps/main-app/src/pages/Tasks.jsx`
 
 ### 🔧 Necesitan Actualización
-- Finance (tiene degradados y blur)
 - Proveedores (verificar consistencia)
 - Invitados (verificar consistencia)
 - Otras páginas secundarias
@@ -243,11 +242,11 @@ Antes de crear o modificar un componente, verifica:
 
 2. **Aplicar plantilla estándar**
    ```jsx
-   <div className="p-4 md:p-6 max-w-7xl mx-auto">
+   <div className="layout-container-wide space-y-6 pt-4 md:pt-6">
      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
        <div>
-         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{title}</h1>
-         <p className="text-gray-500 mt-1">{subtitle}</p>
+         <h1 className="page-title">{title}</h1>
+         <p className="text-muted mt-1">{subtitle}</p>
        </div>
      </div>
      <div className="space-y-6">
@@ -259,7 +258,7 @@ Antes de crear o modificar un componente, verifica:
 3. **Convertir cards**
    - Eliminar `bg-gradient-*`
    - Eliminar efectos `blur-*`
-   - Aplicar `bg-[var(--color-surface)] rounded-xl shadow-md border border-[color:var(--color-text)]/10`
+   - Aplicar `bg-surface rounded-xl shadow-md border border-soft text-body`
 
 4. **Revisar colores**
    - Reemplazar hardcoded por variables
@@ -279,8 +278,8 @@ Antes de crear o modificar un componente, verifica:
 
 ### Después ✅
 ```jsx
-<Card className="bg-[var(--color-surface)] rounded-xl shadow-md border border-[color:var(--color-text)]/10 p-6">
-  <h2 className="text-xl font-bold text-gray-800">Título</h2>
+<Card className="bg-surface rounded-xl shadow-md border border-soft p-6">
+  <h2 className="text-xl font-bold text-body">Título</h2>
 </Card>
 ```
 

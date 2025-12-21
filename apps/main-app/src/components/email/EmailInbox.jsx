@@ -10,7 +10,7 @@ import {
   deleteMail,
   initEmailService,
   sendMail as sendMailService,
-} from '../../services/EmailService';
+} from '../../services/emailService';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
 
 // En entorno de pruebas, algunos tests referencian un mock global `EmailService` en `globalThis`.

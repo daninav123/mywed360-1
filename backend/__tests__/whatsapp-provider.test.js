@@ -5,6 +5,46 @@ import request from 'supertest';
 // Mock mínimo de firebase-admin para no tocar servicios reales
 vi.mock('firebase-admin', () => {
   const apps = [];
+
+  const makeQuery = () => ({
+    get: async () => ({ empty: true, docs: [], size: 0, forEach: () => {} }),
+    limit: () => makeQuery(),
+    orderBy: () => makeQuery(),
+    where: () => makeQuery(),
+  });
+
+  const makeDocRef = () => {
+    const ref = {
+      get: async () => ({ exists: false, data: () => ({}) }),
+      set: async () => {},
+      update: async () => {},
+    };
+    ref.collection = () => makeCollectionRef();
+    return ref;
+  };
+
+  const makeCollectionRef = () => ({
+    doc: () => makeDocRef(),
+    where: () => makeQuery(),
+    orderBy: () => makeQuery(),
+    limit: () => makeQuery(),
+    get: async () => ({ empty: true, docs: [], size: 0, forEach: () => {} }),
+    add: async () => ({ id: 'id1' }),
+  });
+
+  const FieldValue = {
+    increment: () => 0,
+    serverTimestamp: () => new Date('2025-01-01T00:00:00Z'),
+    arrayUnion: (...vals) => ({ __op: 'arrayUnion', vals }),
+  };
+
+  const firestore = () => ({
+    collection: () => makeCollectionRef(),
+    doc: () => makeDocRef(),
+    batch: () => ({ set: () => {}, update: () => {}, delete: () => {}, commit: async () => {} }),
+  });
+  firestore.FieldValue = FieldValue;
+
   return {
     __esModule: true,
     default: {
@@ -16,11 +56,7 @@ vi.mock('firebase-admin', () => {
         applicationDefault: () => ({}),
         cert: () => ({}),
       },
-      firestore: () => ({
-        collection: () => ({
-          limit: () => ({ get: async () => ({ size: 0, docs: [] }) }),
-        }),
-      }),
+      firestore,
     },
   };
 });

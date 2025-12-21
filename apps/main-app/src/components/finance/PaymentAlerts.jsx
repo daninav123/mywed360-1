@@ -6,7 +6,7 @@ import { Card } from '../ui';
 export default function PaymentAlerts({ overdueCount = 0, upcomingCount = 0, tr = (k) => k }) {
   if (!overdueCount && !upcomingCount) return null;
   return (
-    <Card className="p-4 border border-[color:var(--color-warning)]/40 bg-[color:var(--color-warning)]/10">
+    <Card className="p-4 border border-[color:var(--color-warning-40)] bg-[color:var(--color-warning-10)]">
       <div className="flex items-start gap-3">
         <AlertTriangle className="w-5 h-5 text-[color:var(--color-warning)] mt-0.5" />
         <div className="space-y-1">

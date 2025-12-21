@@ -149,16 +149,16 @@ const [canvasState, setCanvasState] = useState({
 
 ```javascript
 const AREA_TYPE_META = {
-  boundary: { label: 'Per�metro', color: '#2563eb', order: 1 },
+  boundary: { label: 'Permetro', color: '#2563eb', order: 1 },
   //                     ⬆️ Debería ser "Perímetro"
 
-  obstacle: { label: 'Obst�culos', color: '#f97316', order: 4 },
+  obstacle: { label: 'Obstéculos', color: '#f97316', order: 4 },
   //                     ⬆️ Debería ser "Obstáculos"
 
-  kids: { label: '�rea infantil', color: '#f59e0b', order: 7 },
+  kids: { label: 'rea infantil', color: '#f59e0b', order: 7 },
   //             ⬆️ Debería ser "Área infantil"
 
-  free: { label: '�rea libre', color: '#4b5563', order: 8 },
+  free: { label: 'rea libre', color: '#4b5563', order: 8 },
   //             ⬆️ Debería ser "Área libre"
 };
 ```
@@ -426,7 +426,7 @@ import AIAssistantChat from './AIAssistantChat.jsx'; // 325 líneas
 
 ```javascript
 // Antes
-boundary: { label: 'Per�metro', ... }
+boundary: { label: 'Permetro', ... }
 // Después
 boundary: { label: 'Perímetro', ... }
 ```

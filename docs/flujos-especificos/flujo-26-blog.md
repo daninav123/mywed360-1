@@ -1,4 +1,4 @@
-# 26. Blog IA Lovenda (estado 2025-10-29)
+# 26. Blog IA MaLove.App (estado 2025-10-29)
 
 > Implementado (octubre 2025)
 >
@@ -19,7 +19,7 @@
 
 ## 1. Objetivo y alcance
 
-- Centralizar la gestión editorial dentro de Lovenda, desde la investigación hasta la publicación y el seguimiento del plan anual.
+- Centralizar la gestión editorial dentro de MaLove.App, desde la investigación hasta la publicación y el seguimiento del plan anual.
 - Garantizar coherencia visual con el estilo global (`layout-container`, `bg-surface`, `border-soft`, tipografía tokens) en todo el circuito: panel admin y blog público.
 - Permitir que los artículos se generen solos cada día, con posibilidad de edición manual y programación flexible.
 - Servir el contenido vía API (`/api/blog`) al front público, manteniendo paginación y multilenguaje.

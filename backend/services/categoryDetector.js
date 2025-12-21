@@ -19,6 +19,10 @@ const GOOGLE_TYPES_MAPPING = {
   event_venue: 'lugares',
   wedding_venue: 'lugares',
 
+  // Iglesia / lugares de culto
+  church: 'iglesia',
+  place_of_worship: 'iglesia',
+
   // Restaurantes y Catering
   restaurant: 'restaurantes',
   meal_takeaway: 'catering',
@@ -63,6 +67,10 @@ const KEYWORD_PATTERNS = {
     /\b(masía|masia|cortijo|finca|hacienda|palacio|castillo|pazo|parador)\b/i,
     /\b(salon|salón|espacio|venue|lugar)\b/i,
     /\b(bodas?\s+(rural|campestre))\b/i,
+  ],
+  iglesia: [
+    /\b(iglesia|parroquia|catedral|ermita|capilla|basilica|basílica|templo)\b/i,
+    /\b(ceremonia\s+religiosa|boda\s+religiosa|misa)\b/i,
   ],
   catering: [/\b(catering|banquete|gastronom[ií]a)\b/i, /\b(comida|men[uú]|culin[aá]ri[oa])\b/i],
   restaurantes: [/\b(restaurante|comedor|mesón|venta)\b/i, /\b(bar.*restaurante)\b/i],

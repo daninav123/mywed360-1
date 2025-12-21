@@ -1,6 +1,18 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import { awardPoints, getStats, getAchievements } from '../services/GamificationService';
+vi.mock('../firebaseConfig', () => ({
+  auth: {
+    currentUser: {
+      getIdToken: vi.fn(async () => 'test-token'),
+    },
+  },
+  db: null,
+  storage: null,
+  analytics: null,
+  firebaseReady: Promise.resolve(),
+  getFirebaseAuth: () => null,
+  isOnline: true,
+}));
 
 const okJson = (data) => Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
 
@@ -8,6 +20,10 @@ describe('GamificationService', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     globalThis.fetch = vi.fn();
+    try {
+      window?.sessionStorage?.removeItem('maloveapp_gamification_disabled');
+    } catch {}
+    vi.resetModules();
     Object.defineProperty(window, 'location', {
       value: { origin: 'http://localhost:5173', hostname: 'localhost' },
       writable: true,
@@ -19,12 +35,14 @@ describe('GamificationService', () => {
   });
 
   it('awardPoints llama a /api/gamification/award', async () => {
+    const { awardPoints } = await import('../services/GamificationService');
     fetch.mockImplementation((url, opts) => {
       expect(String(url)).toContain('/api/gamification/award');
       expect(opts?.method).toBe('POST');
       const body = JSON.parse(opts.body);
       expect(body.weddingId).toBe('w1');
       expect(body.eventType).toBe('create_timeline');
+      expect(String(opts?.headers?.Authorization || '')).toContain('Bearer ');
       return okJson({ success: true, result: { totalPoints: 100, level: 2 } });
     });
     const res = await awardPoints('w1', 'create_timeline', { source: 'test' });
@@ -32,6 +50,7 @@ describe('GamificationService', () => {
   });
 
   it('getStats consulta /api/gamification/stats con query', async () => {
+    const { getStats } = await import('../services/GamificationService');
     fetch.mockImplementation((url) => {
       const u = new URL(String(url));
       expect(u.pathname).toContain('/api/gamification/stats');
@@ -44,6 +63,7 @@ describe('GamificationService', () => {
   });
 
   it('getAchievements consulta /api/gamification/achievements', async () => {
+    const { getAchievements } = await import('../services/GamificationService');
     fetch.mockImplementation((url) => {
       const u = new URL(String(url));
       expect(u.pathname).toContain('/api/gamification/achievements');

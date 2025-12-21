@@ -16,6 +16,7 @@ import { WeddingProvider } from './context/WeddingContext';
 import { FavoritesProvider } from './contexts/FavoritesContext';
 import { UserPreferencesProvider } from './contexts/UserContext';
 import { useAuth, AuthProvider } from './hooks/useAuth';
+import useSupplierSpecs from './hooks/useSupplierSpecs';
 import AcceptInvitation from './pages/AcceptInvitation';
 import BankConnect from './pages/BankConnect.jsx';
 import BodaDetalle from './pages/BodaDetalle.jsx';
@@ -32,6 +33,7 @@ import InfoBoda from './pages/InfoBoda';
 import GestionProveedores from './pages/GestionProveedores.jsx';
 import SavedSuppliers from './pages/SavedSuppliers.jsx';
 import SupplierCompare from './pages/SupplierCompare.jsx';
+import QuoteResponsesPage from './pages/QuoteResponsesPage.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import PublicWedding from './pages/PublicWedding';
 import PublicQuoteResponse from './pages/PublicQuoteResponse';
@@ -56,7 +58,7 @@ import SupplierPayments from './pages/suppliers/SupplierPayments';
 import SupplierDebug from './pages/suppliers/SupplierDebug';
 import SupplierPublicPage from './pages/SupplierPublicPage';
 import Tasks from './pages/Tasks';
-import TimelinePage from './pages/TimelinePage';
+import Checklist from './pages/Checklist';
 import PhotoShotListPage from './pages/PhotoShotListPage';
 import PruebasEnsayos from './pages/PruebasEnsayos';
 import DesignWizard from './pages/DesignWizard';
@@ -77,6 +79,7 @@ import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminMetrics from './pages/admin/AdminMetricsComplete.jsx';
 import AdminPortfolio from './pages/admin/AdminPortfolio.jsx';
 import AdminUsers from './pages/admin/AdminUsers.jsx';
+import AdminSpecsManager from './pages/admin/AdminSpecsManager.jsx';
 import AdminIntegrations from './pages/admin/AdminIntegrations.jsx';
 import AdminSettings from './pages/admin/AdminSettings.jsx';
 import AdminAlerts from './pages/admin/AdminAlerts.jsx';
@@ -283,6 +286,9 @@ function RootLandingRoute() {
 }
 
 function App() {
+  // Cargar especificaciones dinámicas de proveedores al iniciar
+  useSupplierSpecs();
+
   return (
     <HelmetProvider>
       <AuthProvider>
@@ -352,6 +358,7 @@ function App() {
                               <Route path="debug/payments" element={<AdminDebugPayments />} />
                               <Route path="finance/payouts" element={<AdminPayouts />} />
                               <Route path="finance/revolut" element={<AdminRevolut />} />
+                              <Route path="specs" element={<AdminSpecsManager />} />
                             </Route>
                           </Route>
                           <Route path="/" element={<RootLandingRoute />} />
@@ -390,6 +397,8 @@ function App() {
                               <Route path="debug/payments" element={<AdminDebugPayments />} />
                               <Route path="finance/payouts" element={<AdminPayouts />} />
                               <Route path="finance/revolut" element={<AdminRevolut />} />
+                              <Route path="specs" element={<AdminSpecsManager />} />
+                              <Route path="specs" element={<AdminSpecsManager />} />
                             </Route>
                           </Route>
 
@@ -475,7 +484,7 @@ function App() {
                             <Route element={<MainLayout />}>
                               <Route path="home" element={<HomeUser />} />
                               <Route path="tasks" element={<Tasks />} />
-                              <Route path="timeline" element={<TimelinePage />} />
+                              <Route path="checklist" element={<Checklist />} />
                               <Route path="shot-list" element={<PhotoShotListPage />} />
                               <Route path="pruebas-ensayos" element={<PruebasEnsayos />} />
                               <Route path="design-wizard" element={<DesignWizard />} />
@@ -503,6 +512,7 @@ function App() {
                               <Route path="proveedores/favoritos" element={<SavedSuppliers />} />
                               <Route path="proveedores/comparar" element={<SupplierCompare />} />
                               <Route path="proveedores/contratos" element={<Contratos />} />
+                              <Route path="proveedores/presupuestos" element={<QuoteResponsesPage />} />
                               {/* Redirect /servicios to /proveedores (unified page) */}
                               <Route
                                 path="servicios"

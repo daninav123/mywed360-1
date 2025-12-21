@@ -103,7 +103,7 @@ const NotificationSettings = () => {
       </h2>
 
       {/* Canales */}
-      <div className="border rounded p-3 bg-[var(--color-surface)]/50">
+      <div className="border rounded p-3 bg-[var(--color-surface-50)]">
         <h3 className="font-medium mb-2">Canales</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
           <Toggle
@@ -142,7 +142,7 @@ const NotificationSettings = () => {
       </div>
 
       {/* Horas de silencio */}
-      <div className="border rounded p-3 bg-[var(--color-surface)]/50">
+      <div className="border rounded p-3 bg-[var(--color-surface-50)]">
         <div className="flex items-center justify-between">
           <h3 className="font-medium">Horas de silencio</h3>
           <span className="text-xs text-gray-500">
@@ -199,7 +199,7 @@ const NotificationSettings = () => {
       </div>
 
       {/* Categorías */}
-      <div className="border rounded p-3 bg-[var(--color-surface)]/50">
+      <div className="border rounded p-3 bg-[var(--color-surface-50)]">
         <h3 className="font-medium mb-2">Categorías</h3>
         <div className="space-y-3 text-sm">
           {rows.map((row) => (

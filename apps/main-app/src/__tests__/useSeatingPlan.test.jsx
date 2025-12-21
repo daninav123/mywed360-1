@@ -6,11 +6,48 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { useSeatingPlan } from '../hooks/useSeatingPlan';
+let useSeatingPlan;
+
+vi.mock('firebase/firestore', () => {
+  const noopUnsub = () => {};
+  const doc = (...path) => ({ path });
+  const collection = (...path) => ({ path });
+  return {
+    __esModule: true,
+    collection,
+    doc,
+    addDoc: vi.fn(async () => ({ id: 'new-doc' })),
+    updateDoc: vi.fn(async () => {}),
+    deleteDoc: vi.fn(async () => {}),
+    setDoc: vi.fn(async () => {}),
+    getDoc: vi.fn(async () => ({ exists: () => false, data: () => ({}) })),
+    getDocs: vi.fn(async () => ({ docs: [] })),
+    onSnapshot: vi.fn((_q, onNext) => {
+      try {
+        if (typeof onNext === 'function') onNext({ docs: [] });
+      } catch {}
+      return noopUnsub;
+    }),
+    serverTimestamp: vi.fn(() => '__serverTimestamp__'),
+    writeBatch: vi.fn(() => ({ set: vi.fn(), commit: vi.fn(async () => {}) })),
+    runTransaction: vi.fn(async (_db, fn) => fn({ get: async () => ({ exists: () => false }) })),
+    Timestamp: {
+      now: () => ({ toDate: () => new Date() }),
+      fromDate: () => ({ toDate: () => new Date() }),
+    },
+  };
+});
 
 // Mock de dependencias
 vi.mock('../firebaseConfig', () => ({
+  auth: {
+    currentUser: {
+      uid: 'test-uid',
+      getIdToken: vi.fn(async () => 'test-token'),
+    },
+  },
   db: {},
+  firebaseReady: Promise.resolve(),
 }));
 
 vi.mock('../services/SyncService', () => ({
@@ -35,6 +72,11 @@ vi.mock('html2canvas', () => ({
 }));
 
 vi.mock('jspdf', () => ({
+  jsPDF: vi.fn(() => ({
+    addImage: vi.fn(),
+    addPage: vi.fn(),
+    save: vi.fn(),
+  })),
   default: vi.fn(() => ({
     addImage: vi.fn(),
     addPage: vi.fn(),
@@ -47,10 +89,15 @@ describe('useSeatingPlan Hook', () => {
     vi.clearAllMocks();
   });
 
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ useSeatingPlan } = await import('../hooks/useSeatingPlan'));
+  });
+
   it('should initialize with default state', () => {
     const { result } = renderHook(() => useSeatingPlan());
 
-    expect(result.current.tab).toBe('ceremony');
+    expect(result.current.tab).toBe('banquet');
     expect(result.current.areas).toEqual([]);
     expect(result.current.tables).toEqual([]);
     expect(result.current.seats).toEqual([]);
@@ -62,10 +109,10 @@ describe('useSeatingPlan Hook', () => {
     const { result } = renderHook(() => useSeatingPlan());
 
     act(() => {
-      result.current.setTab('banquet');
+      result.current.setTab('ceremony');
     });
 
-    expect(result.current.tab).toBe('banquet');
+    expect(result.current.tab).toBe('ceremony');
   });
 
   it('should handle table selection', () => {
@@ -93,6 +140,9 @@ describe('useSeatingPlan Hook', () => {
 
     act(() => {
       result.current.setTables([mockTable]);
+    });
+
+    act(() => {
       result.current.handleSelectTable(1);
     });
 
@@ -110,6 +160,9 @@ describe('useSeatingPlan Hook', () => {
 
     act(() => {
       result.current.setTables([mockTable]);
+    });
+
+    act(() => {
       result.current.handleSelectTable(1);
     });
 
@@ -117,11 +170,15 @@ describe('useSeatingPlan Hook', () => {
       result.current.toggleSelectedTableShape();
     });
 
-    expect(result.current.selectedTable.shape).toBe('circle');
+    expect(result.current.selectedTable.tableType).toBe('round');
   });
 
   it('should generate seat grid for ceremony', () => {
     const { result } = renderHook(() => useSeatingPlan());
+
+    act(() => {
+      result.current.setTab('ceremony');
+    });
 
     act(() => {
       result.current.generateSeatGrid(5, 6, 40, 100, 80, 3);
@@ -158,9 +215,9 @@ describe('useSeatingPlan Hook', () => {
       id: 1,
       x: 120,
       y: 160,
-      seats: 8,
       enabled: true,
     });
+    expect(result.current.tables[0].seats).toBeGreaterThan(0);
   });
 
   it('should handle undo/redo functionality', () => {

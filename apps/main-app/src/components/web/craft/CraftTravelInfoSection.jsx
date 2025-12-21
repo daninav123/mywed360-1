@@ -102,8 +102,8 @@ export const CraftTravelInfoSection = ({
       ref={(ref) => connect(drag(ref))}
       className="py-16 px-4"
       style={{
-        backgroundColor: 'var(--color-fondo, #F9FAFB)',
-        color: 'var(--color-texto, #1F2937)',
+        backgroundColor: 'var(--color-fondo)',
+        color: 'var(--color-texto)',
       }}
     >
       <div className="max-w-6xl mx-auto">
@@ -112,7 +112,7 @@ export const CraftTravelInfoSection = ({
           <h2
             className="text-4xl md:text-5xl font-bold mb-4"
             style={{
-              color: 'var(--color-primario, #9333EA)',
+              color: 'var(--color-primario)',
               fontFamily: 'var(--fuente-titulo, inherit)',
             }}
           >
@@ -126,7 +126,7 @@ export const CraftTravelInfoSection = ({
           <div className="mb-12 bg-white rounded-xl shadow-md p-8">
             <h3
               className="text-2xl font-bold mb-4 text-center"
-              style={{ color: 'var(--color-secundario, #1F2937)' }}
+              style={{ color: 'var(--color-secundario)' }}
             >
               🏨 Hoteles Recomendados
             </h3>
@@ -139,7 +139,7 @@ export const CraftTravelInfoSection = ({
           <div className="mb-12 bg-white rounded-xl shadow-md p-8">
             <h3
               className="text-2xl font-bold mb-4 text-center"
-              style={{ color: 'var(--color-secundario, #1F2937)' }}
+              style={{ color: 'var(--color-secundario)' }}
             >
               🚌 Información de Autobuses
             </h3>
@@ -154,7 +154,7 @@ export const CraftTravelInfoSection = ({
           <div className="mb-12">
             <h3
               className="text-2xl font-bold mb-6 text-center"
-              style={{ color: 'var(--color-secundario, #1F2937)' }}
+              style={{ color: 'var(--color-secundario)' }}
             >
               🏨 Hoteles Recomendados
             </h3>
@@ -198,7 +198,7 @@ export const CraftTravelInfoSection = ({
                     href={hotel.web}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-4 block w-full text-center px-4 py-2 bg-[var(--color-primary)]/100 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
+                    className="mt-4 block w-full text-center px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:shadow-lg transition-all font-semibold"
                   >
                     Reservar
                   </a>
@@ -213,7 +213,7 @@ export const CraftTravelInfoSection = ({
           <div className="mb-12">
             <h3
               className="text-2xl font-bold mb-6 text-center"
-              style={{ color: 'var(--color-secundario, #1F2937)' }}
+              style={{ color: 'var(--color-secundario)' }}
             >
               ✈️ Aeropuertos Cercanos
             </h3>
@@ -250,7 +250,7 @@ export const CraftTravelInfoSection = ({
           <div className="mb-12">
             <h3
               className="text-2xl font-bold mb-6 text-center"
-              style={{ color: 'var(--color-secundario, #1F2937)' }}
+              style={{ color: 'var(--color-secundario)' }}
             >
               🚗 Opciones de Transporte
             </h3>
@@ -302,7 +302,7 @@ export const CraftTravelInfoSection = ({
           </p>
           <a
             href="mailto:contacto@ejemplo.com"
-            className="inline-block mt-4 px-6 py-3 bg-[var(--color-primary)]/100 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
+            className="inline-block mt-4 px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:shadow-lg transition-all font-semibold"
           >
             📧 Contáctanos
           </a>

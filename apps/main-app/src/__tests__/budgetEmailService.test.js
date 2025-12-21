@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Capturaremos la función send mockeada en el scope exterior
 let sendMock;
 
@@ -14,7 +14,8 @@ vi.mock('mailgun-js', () => {
   };
 });
 
-import { sendBudgetStatusEmail } from '../../backend/services/budgetEmailService.js';
+import { sendBudgetStatusEmail } from '../../../../backend/services/budgetEmailService.js';
+
 
 const baseParams = {
   supplierEmail: 'proveedor@example.com',
@@ -25,9 +26,22 @@ const baseParams = {
 };
 
 describe('sendBudgetStatusEmail', () => {
+  const originalMailgunApiKey = process.env.MAILGUN_API_KEY;
+  const originalMailgunDomain = process.env.MAILGUN_DOMAIN;
+
   beforeEach(() => {
+    process.env.MAILGUN_API_KEY = 'test-mailgun-key';
+    process.env.MAILGUN_DOMAIN = 'test.mailgun.org';
     // Limpiar mocks entre tests
     if (sendMock) sendMock.mockClear();
+  });
+
+  afterEach(() => {
+    if (originalMailgunApiKey === undefined) delete process.env.MAILGUN_API_KEY;
+    else process.env.MAILGUN_API_KEY = originalMailgunApiKey;
+
+    if (originalMailgunDomain === undefined) delete process.env.MAILGUN_DOMAIN;
+    else process.env.MAILGUN_DOMAIN = originalMailgunDomain;
   });
 
   it('envía email cuando status es accepted', async () => {

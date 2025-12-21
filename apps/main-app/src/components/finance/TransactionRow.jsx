@@ -28,7 +28,7 @@ export default function TransactionRow({
   );
 
   return (
-    <tr className="hover:bg-[var(--color-accent)]/10">
+    <tr className="hover:bg-[var(--color-accent-10)]">
       <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]">
         {formatDate(tx.date)}
       </td>
@@ -39,7 +39,7 @@ export default function TransactionRow({
             tr('finance.transactions.noConcept', { defaultValue: 'Sin concepto' })}
         </div>
         {(tx.provider || tx.dueDate) && (
-          <div className="mt-1 text-xs text-[color:var(--color-text)]/60 space-y-0.5">
+          <div className="mt-1 text-xs text-[color:var(--color-text-60)] space-y-0.5">
             {tx.provider && <div>{tx.provider}</div>}
             {tx.dueDate && (
               <div className={isOverdue ? 'text-[color:var(--color-danger)]' : ''}>
@@ -50,7 +50,7 @@ export default function TransactionRow({
           </div>
         )}
         {Array.isArray(tx.attachments) && tx.attachments.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--color-text)]/70">
+          <div className="mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--color-text-70)]">
             {tx.attachments.map((att, index) => {
               const label =
                 att?.filename ||
@@ -76,14 +76,14 @@ export default function TransactionRow({
           </div>
         )}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]/60">
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text-60)]">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[color:var(--color-text-10)] text-[color:var(--color-text)]">
           {tx.category || tr('finance.transactions.noCategory', { defaultValue: 'No category' })}
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm">
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tx.type === 'income' ? 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]' : 'bg-[var(--color-danger)]/15 text-[color:var(--color-danger)]'}`}
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tx.type === 'income' ? 'bg-[var(--color-success-15)] text-[color:var(--color-success)]' : 'bg-[var(--color-danger-15)] text-[color:var(--color-danger)]'}`}
         >
           {tx.type === 'income'
             ? tr('finance.transactions.income', { defaultValue: 'Ingreso' })
@@ -92,7 +92,7 @@ export default function TransactionRow({
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm">
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status] || 'bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]/70'}`}
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status] || 'bg-[color:var(--color-text-10)] text-[color:var(--color-text-70)]'}`}
         >
           {statusLabels[status] || status}
         </span>
@@ -103,7 +103,7 @@ export default function TransactionRow({
         {tx.type === 'income' ? '+' : '-'}
         {formatCurrency(Math.abs(displayAmount))}
         {outstanding > 0 && (
-          <p className="text-xs text-[color:var(--color-text)]/60 mt-1">
+          <p className="text-xs text-[color:var(--color-text-60)] mt-1">
             {tr(
               tx.type === 'expense'
                 ? 'finance.transactions.outstandingExpense'
@@ -118,14 +118,14 @@ export default function TransactionRow({
         <div className="flex justify-end space-x-2">
           <button
             aria-label="Editar transacción"
-            className="inline-flex items-center gap-1 rounded-md border border-[color:var(--color-text)]/20 px-2 py-1 text-[color:var(--color-text)] hover:bg-[var(--color-accent)]/10"
+            className="inline-flex items-center gap-1 rounded-md border border-[color:var(--color-text-20)] px-2 py-1 text-[color:var(--color-text)] hover:bg-[var(--color-accent-10)]"
             onClick={() => onEdit && onEdit(tx)}
           >
             <span className="sr-only">Editar</span>
           </button>
           <button
             aria-label="Borrar transacción"
-            className="inline-flex items-center gap-1 rounded-md border border-[color:var(--color-text)]/20 px-2 py-1 text-[color:var(--color-danger)] hover:bg-[var(--color-danger)]/10"
+            className="inline-flex items-center gap-1 rounded-md border border-[color:var(--color-text-20)] px-2 py-1 text-[color:var(--color-danger)] hover:bg-[var(--color-danger-10)]"
             onClick={() => onDelete && onDelete(tx)}
           >
             <span className="sr-only">Borrar</span>

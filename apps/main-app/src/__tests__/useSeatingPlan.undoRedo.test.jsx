@@ -6,10 +6,49 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { useSeatingPlan } from '../hooks/useSeatingPlan';
+let useSeatingPlan;
+
+vi.mock('firebase/firestore', () => {
+  const noopUnsub = () => {};
+  const doc = (...path) => ({ path });
+  const collection = (...path) => ({ path });
+  return {
+    __esModule: true,
+    collection,
+    doc,
+    addDoc: vi.fn(async () => ({ id: 'new-doc' })),
+    updateDoc: vi.fn(async () => {}),
+    deleteDoc: vi.fn(async () => {}),
+    setDoc: vi.fn(async () => {}),
+    getDoc: vi.fn(async () => ({ exists: () => false, data: () => ({}) })),
+    getDocs: vi.fn(async () => ({ docs: [] })),
+    onSnapshot: vi.fn((_q, onNext) => {
+      try {
+        if (typeof onNext === 'function') onNext({ docs: [] });
+      } catch {}
+      return noopUnsub;
+    }),
+    serverTimestamp: vi.fn(() => '__serverTimestamp__'),
+    writeBatch: vi.fn(() => ({ set: vi.fn(), commit: vi.fn(async () => {}) })),
+    runTransaction: vi.fn(async (_db, fn) => fn({ get: async () => ({ exists: () => false }) })),
+    Timestamp: {
+      now: () => ({ toDate: () => new Date() }),
+      fromDate: () => ({ toDate: () => new Date() }),
+    },
+  };
+});
 
 // Mocks compartidos (los mismos que en useSeatingPlan.test.jsx)
-vi.mock('../firebaseConfig', () => ({ db: {} }));
+vi.mock('../firebaseConfig', () => ({
+  auth: {
+    currentUser: {
+      uid: 'test-uid',
+      getIdToken: vi.fn(async () => 'test-token'),
+    },
+  },
+  db: {},
+  firebaseReady: Promise.resolve(),
+}));
 vi.mock('../services/SyncService', () => ({
   saveData: vi.fn(),
   loadData: vi.fn(),
@@ -29,7 +68,10 @@ vi.mock('html2canvas', () => ({
 }));
 
 const mockPdfInstance = { addImage: vi.fn(), addPage: vi.fn(), save: vi.fn() };
-vi.mock('jspdf', () => ({ default: vi.fn(() => mockPdfInstance) }));
+vi.mock('jspdf', () => ({
+  jsPDF: vi.fn(() => mockPdfInstance),
+  default: vi.fn(() => mockPdfInstance),
+}));
 
 // Helper para simular un <a> click sin manipular el DOM real
 const originalCreateElement = document.createElement;
@@ -46,12 +88,19 @@ describe('useSeatingPlan Hook – undo/redo & export', () => {
     vi.clearAllMocks();
   });
 
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ useSeatingPlan } = await import('../hooks/useSeatingPlan'));
+  });
+
   it('permite deshacer y rehacer cambios en el historial', () => {
     const { result } = renderHook(() => useSeatingPlan());
 
     // Añadimos dos snapshots diferentes
     act(() => {
       result.current.pushHistory({ type: 'snapshot-1', foo: 1 });
+    });
+    act(() => {
       result.current.pushHistory({ type: 'snapshot-2', foo: 2 });
     });
 

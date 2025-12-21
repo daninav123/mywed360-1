@@ -1,6 +1,9 @@
 # 💒 Workflow General del Usuario - Organización de Boda
 
-> **Documento Maestro:** Este workflow define la experiencia completa del usuario en MaLove.App y guía el desarrollo de todas las features.
+> **Documento de visión:** Este workflow define la experiencia completa ideal del usuario en MaLove.App.
+>
+> **Fuente de verdad de estado/prioridades:** `docs/FLUJOS-INDICE.md` (estado por flujo) y `docs/ROADMAP.md` (prioridades/entregables).  
+> Este documento puede contener estados desactualizados por ser una vista “de producto”.
 
 **Última actualización:** Diciembre 2024  
 **Estado:** En desarrollo continuo
@@ -819,20 +822,20 @@ MaLove.App guía a las parejas paso a paso en la organización de su boda, desde
 - 🔄 Búsqueda de vuelos/hoteles
 - 🔄 Planificador de actividades
 - 🔄 Lista de deseos de luna de miel
-- � Crowdfunding para viaje
+- → Crowdfunding para viaje
 
 **Estado actual:** No implementado  
 **Prioridad:** 🟢 Baja
 
 ---
 
-## � Estado de Implementación por Fase (Actualizado)
+## → Estado de Implementación por Fase (Actualizado)
 
 | Fase | % Completado | Nuevas Subfases | Prioridad | Estado |
 |------|--------------|-----------------|-----------|--------|
 | 0. Pre-Planificación | 0% | ✨ 2 nuevas | 🔴 Alta | ⏳ No iniciado |
 | 1. Planificación Inicial | 70% | Mejorar diseño | ⭐⭐⭐ | 🟢 En producción |
-| 2. Búsqueda y Contratación | 75% | ✨ Pruebas/Ensayos | � Alta | � En producción |
+| 2. Búsqueda y Contratación | 75% | ✨ Pruebas/Ensayos | → Alta | → En producción |
 | 3. Diseño de Experiencia | 60% | ✨ Team + Shot List | 🔴 Alta | 🟡 En desarrollo |
 | 4. Trámites Legales | 0% | - | 🟡 Media | 🔴 Pendiente |
 | 5. Confirmaciones Finales | 70% | ✨ Regalos + Accesibilidad | 🔴 Alta | 🟢 En producción |

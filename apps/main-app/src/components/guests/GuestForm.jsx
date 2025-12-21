@@ -322,72 +322,37 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
         </div>
       </div>
       {/* Acompañantes y mesa */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex flex-col">
           <label className="block text-sm font-medium text-body mb-1">{t('guests.plusOne')}</label>
-          <Input
-            type="number"
-            min="0"
-            max="10"
-            value={formData.companion}
-            onChange={(e) => handleChange('companion', e.target.value)}
-            placeholder="0"
-            className={errors.companion ? 'border-red-500' : ''}
-            disabled={isLoading}
-          />
+          <div className="flex-1">
+            <Input
+              type="number"
+              min="0"
+              max="10"
+              value={formData.companion}
+              onChange={(e) => handleChange('companion', e.target.value)}
+              placeholder="0"
+              className={errors.companion ? 'border-red-500' : ''}
+              disabled={isLoading}
+            />
+          </div>
           {errors.companion && <p className="text-red-500 text-xs mt-1">{errors.companion}</p>}
         </div>
 
-        {/* Grupo de acompañantes */}
-        <div>
-          <label className="block text-sm font-medium text-body mb-1">Grupo de acompañantes</label>
-          <div className="flex space-x-2">
-            <Input
-              value={formData.companionGroupId}
-              onChange={(e) => handleChange('companionGroupId', e.target.value)}
-              placeholder="group-12345"
-              disabled={isLoading}
-            />
-            <Button
-              type="button"
-              variant="secondary"
-              disabled={isLoading}
-              onClick={() => handleChange('companionGroupId', `group-${Date.now()}`)}
-            >
-              Generar
-            </Button>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-body mb-1">Tipo de acompañante</label>
-          <select
-            value={formData.companionType}
-            onChange={(e) => handleChange('companionType', e.target.value)}
-            className={`w-full border border-soft rounded-md px-3 py-2 focus:outline-none focus:ring-2 ring-primary ${errors.companionType ? 'border-red-500' : ''}`}
-            disabled={isLoading}
-          >
-            <option value="none">Sin acompañante</option>
-            <option value="partner">Pareja</option>
-            <option value="child">Hijo/a(s)</option>
-            <option value="plus_one">+1</option>
-          </select>
-          {errors.companionType && (
-            <p className="text-red-500 text-xs mt-1">{errors.companionType}</p>
-          )}
-        </div>
-
-        <div>
+        <div className="flex flex-col">
           <label className="block text-sm font-medium text-body mb-1">
             {t('guests.guestTable')}
           </label>
-          <Input
-            type="text"
-            value={formData.table}
-            onChange={(e) => handleChange('table', e.target.value)}
-            placeholder="Número o nombre de mesa"
-            disabled={isLoading}
-          />
+          <div className="flex-1">
+            <Input
+              type="text"
+              value={formData.table}
+              onChange={(e) => handleChange('table', e.target.value)}
+              placeholder="Número o nombre de mesa"
+              disabled={isLoading}
+            />
+          </div>
         </div>
       </div>
 

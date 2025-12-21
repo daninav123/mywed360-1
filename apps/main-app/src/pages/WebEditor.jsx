@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import useTranslations from '../hooks/useTranslations';
 import { db } from '../firebaseConfig';
+import { post as apiPost } from '../services/apiClient';
 
 /*
   Editor interno para la página web de la boda.
@@ -94,43 +95,42 @@ export default function WebEditor() {
   // --- AI helpers ---
   const suggestStory = async () => {
     if (aiLoading) return;
-    const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
-    if (!allowDirect) {
-      toast.warning(t('errors.openaiDisabled'));
-      return;
-    }
-    if (!import.meta.env.VITE_OPENAI_API_KEY) {
-      toast.error(t('errors.missingOpenAIKey'));
-      return;
-    }
     setAiLoading(true);
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-          'OpenAI-Project': import.meta.env.VITE_OPENAI_PROJECT_ID,
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content:
-                'Eres un asistente que redacta textos románticos para webs de boda en español.',
-            },
-            {
-              role: 'user',
-              content: `Genera una breve historia de amor (máx 150 palabras) para la pareja ${info.coupleName}.`,
-            },
-          ],
-          temperature: 0.8,
-        }),
-      });
-      const data = await response.json();
-      const text = data.choices?.[0]?.message?.content?.trim();
-      if (text) setInfo((prev) => ({ ...prev, story: text }));
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+      try {
+        const response = await apiPost(
+          '/api/proxy/openai',
+          {
+            model: 'gpt-4o-mini',
+            messages: [
+              {
+                role: 'system',
+                content:
+                  'Eres un asistente que redacta textos románticos para webs de boda en español.',
+              },
+              {
+                role: 'user',
+                content: `Genera una breve historia de amor (máx 150 palabras) para la pareja ${info.coupleName}.`,
+              },
+            ],
+            maxTokens: 450,
+          },
+          { auth: true, signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Proxy OpenAI error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const text = String(data?.response || '').trim();
+        if (text) setInfo((prev) => ({ ...prev, story: text }));
+      } finally {
+        clearTimeout(timeoutId);
+      }
     } catch (err) {
       // console.error(err);
       toast.error(t('errors.openaiError'));
@@ -140,48 +140,46 @@ export default function WebEditor() {
 
   const suggestSchedule = async () => {
     if (aiLoading) return;
-    const allowDirect2 =
-      import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
-    if (!allowDirect2) {
-      toast.warning(t('errors.openaiDisabled'));
-      return;
-    }
-    if (!import.meta.env.VITE_OPENAI_API_KEY) {
-      toast.error(t('errors.missingOpenAIKey'));
-      return;
-    }
     setAiLoading(true);
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-          'OpenAI-Project': import.meta.env.VITE_OPENAI_PROJECT_ID,
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content:
-                'Eres un asistente que devuelve un JSON con el programa típico de una boda en España. Ejemplo: [{"time":"12:00","title":"Ceremonia"}]',
-            },
-            {
-              role: 'user',
-              content:
-                'Genera un programa para nuestra boda con 6-8 eventos clave. Usa formato JSON.',
-            },
-          ],
-          temperature: 0.7,
-        }),
-      });
-      const data = await response.json();
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+      try {
+        const response = await apiPost(
+          '/api/proxy/openai',
+          {
+            model: 'gpt-4o-mini',
+            messages: [
+              {
+                role: 'system',
+                content:
+                  'Eres un asistente que devuelve un JSON con el programa típico de una boda en España. Ejemplo: [{"time":"12:00","title":"Ceremonia"}]',
+              },
+              {
+                role: 'user',
+                content:
+                  'Genera un programa para nuestra boda con 6-8 eventos clave. Usa formato JSON.',
+              },
+            ],
+            maxTokens: 650,
+          },
+          { auth: true, signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Proxy OpenAI error: ${response.status}`);
+        }
+
+        const data = await response.json();
       let arr = [];
       try {
-        arr = JSON.parse(data.choices?.[0]?.message?.content);
+        arr = JSON.parse(data?.response);
       } catch {}
       if (Array.isArray(arr)) setSchedule(arr.map((item, i) => ({ ...item, temp: i })));
+      } finally {
+        clearTimeout(timeoutId);
+      }
     } catch (err) {
       // console.error(err);
       toast.error(t('errors.openaiError'));

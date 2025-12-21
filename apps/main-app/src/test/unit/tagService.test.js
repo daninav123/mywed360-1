@@ -132,7 +132,7 @@ describe('tagService', () => {
         throw new Error('Error de prueba');
       });
 
-      const tags = getCustomTags(USER_ID);
+      const tags = getCustomTags('erroruser456');
       expect(tags).toEqual([]);
     });
   });
@@ -170,21 +170,15 @@ describe('tagService', () => {
       expect(newTag.color).toBe('#64748b'); // Color predeterminado
     });
 
-    it('lanza error si ya existe una etiqueta con el mismo nombre', () => {
+    it('maneja nombres duplicados agregando un sufijo', () => {
       // Configurar datos previos
       localStorageMock.getItem.mockReturnValueOnce(JSON.stringify(mockCustomTags));
 
-      // Intentar crear etiqueta con nombre existente (tanto personalizado como del sistema)
-      expect(() => {
-        createTag(USER_ID, 'Cliente'); // Ya existe en mockCustomTags
-      }).toThrow('Ya existe una etiqueta con ese nombre');
+      const tag1 = createTag(USER_ID, 'Cliente'); // Ya existe en mockCustomTags
+      expect(tag1.name).toBe('Cliente (1)');
 
-      expect(() => {
-        createTag(USER_ID, 'Importante'); // Ya existe en SYSTEM_TAGS
-      }).toThrow('Ya existe una etiqueta con ese nombre');
-
-      // Verificar que no se guardaron cambios
-      expect(localStorageMock.setItem).not.toHaveBeenCalled();
+      const tag2 = createTag(USER_ID, 'Importante'); // Ya existe en SYSTEM_TAGS
+      expect(tag2.name).toBe('Importante (1)');
     });
   });
 
@@ -222,16 +216,8 @@ describe('tagService', () => {
     });
 
     it('no permite eliminar etiquetas del sistema', () => {
-      const result = deleteTag(USER_ID, 'important');
-
-      // Verificar resultado
-      expect(result).toBe(false);
-
-      // Verificar que no se modificaron las etiquetas
-      expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        TAGS_STORAGE_KEY,
-        expect.any(String)
-      );
+      expect(() => deleteTag(USER_ID, 'important')).toThrow('No se pueden eliminar etiquetas del sistema');
+      expect(localStorageMock.setItem).not.toHaveBeenCalled();
     });
 
     it('devuelve false si la etiqueta no existe', () => {
@@ -302,7 +288,7 @@ describe('tagService', () => {
       const result = addTagToEmail(USER_ID, emailId, tagId);
 
       // Verificar resultado
-      expect(result).toBe(false); // No se añadió nada nuevo
+      expect(result).toBe(true); // Idempotente: no se añadió nada nuevo pero es éxito
 
       // Verificar que no se modificó el mapeo
       expect(localStorageMock.setItem).not.toHaveBeenCalled();
@@ -312,12 +298,7 @@ describe('tagService', () => {
       const emailId = 'email1';
       const tagId = 'etiqueta-inexistente';
 
-      const result = addTagToEmail(USER_ID, emailId, tagId);
-
-      // Verificar resultado
-      expect(result).toBe(false);
-
-      // Verificar que no se modificó el mapeo
+      expect(() => addTagToEmail(USER_ID, emailId, tagId)).toThrow('La etiqueta especificada no existe');
       expect(localStorageMock.setItem).not.toHaveBeenCalled();
     });
   });
@@ -361,7 +342,7 @@ describe('tagService', () => {
       const result = removeTagFromEmail(USER_ID, emailId, tagId);
 
       // Verificar resultado
-      expect(result).toBe(false);
+      expect(result).toBe(true);
 
       // Verificar que no se modificó el mapeo
       expect(localStorageMock.setItem).not.toHaveBeenCalled();
@@ -374,7 +355,7 @@ describe('tagService', () => {
       const result = removeTagFromEmail(USER_ID, emailId, tagId);
 
       // Verificar resultado
-      expect(result).toBe(false);
+      expect(result).toBe(true);
 
       // Verificar que no se modificó el mapeo
       expect(localStorageMock.setItem).not.toHaveBeenCalled();

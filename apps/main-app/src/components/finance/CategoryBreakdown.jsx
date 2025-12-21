@@ -50,11 +50,11 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
 
   if (categoryData.length === 0) {
     return (
-      <Card className="p-4 h-full bg-[var(--color-surface)]/80 border-soft">
+      <Card className="p-4 h-full">
         <h3 className="text-lg font-semibold mb-4">
           {type === 'expense' ? 'Gastos por Categoría' : 'Ingresos por Categoría'}
         </h3>
-        <p className="text-[color:var(--color-text)]/70 text-center my-8">
+        <p className="text-[color:var(--color-text-70)] text-center my-8">
           No hay datos disponibles
         </p>
       </Card>
@@ -64,7 +64,7 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
   const outerR = Math.max(60, Math.min(size.width, size.height) / 2 - 20);
 
   return (
-    <Card className="p-4 h-full bg-[var(--color-surface)]/80 border-soft">
+    <Card className="p-4 h-full">
       <h3 className="text-lg font-semibold mb-4">
         {type === 'expense' ? 'Gastos por Categoría' : 'Ingresos por Categoría'}
       </h3>

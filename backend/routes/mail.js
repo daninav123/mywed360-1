@@ -9,6 +9,12 @@ import templates from './mail/templates.js';
 
 const router = express.Router();
 
+// Debug middleware para ver si las peticiones llegan
+router.use((req, res, next) => {
+  console.error(`🔥 [MAIL-ROUTER] ${req.method} ${req.path} query=${JSON.stringify(req.query)}`);
+  next();
+});
+
 // Orden de montaje: rutas fijas -> dinámicas
 router.use('/', templates);
 router.use('/', getRoutes);

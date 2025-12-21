@@ -157,7 +157,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
   const financeSection = t('navigation.finance');
 
   const containerClassName =
-    `bg-[var(--color-primary)]accent/5 border-primary/20 ${className}`.trim();
+    `bg-[var(--color-primary-5)] border-[color:var(--color-primary-20)] ${className}`.trim();
 
   return (
     <Card className={containerClassName}>
@@ -203,7 +203,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {hasValue(filters.budget) && (
-                <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
+                <div className="flex items-center gap-2 bg-[var(--color-surface-50)] rounded-lg p-3 border border-soft">
                   <DollarSign className="h-4 w-4 text-primary flex-shrink-0" />
                   {editing.budget ? (
                     <div className="flex-1 flex items-center gap-2">
@@ -249,7 +249,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
               )}
 
               {hasValue(filters.guests) && (
-                <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
+                <div className="flex items-center gap-2 bg-[var(--color-surface-50)] rounded-lg p-3 border border-soft">
                   <Users className="h-4 w-4 text-primary flex-shrink-0" />
                   {editing.guests ? (
                     <div className="flex-1 flex items-center gap-2">
@@ -295,7 +295,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
               )}
 
               {hasValue(filters.style) && (
-                <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
+                <div className="flex items-center gap-2 bg-[var(--color-surface-50)] rounded-lg p-3 border border-soft">
                   <Palette className="h-4 w-4 text-primary flex-shrink-0" />
                   {editing.style ? (
                     <div className="flex-1 flex items-center gap-2">
@@ -341,7 +341,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
               )}
 
               {hasValue(filters.location) && (
-                <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
+                <div className="flex items-center gap-2 bg-[var(--color-surface-50)] rounded-lg p-3 border border-soft">
                   <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
                   {editing.location ? (
                     <div className="flex-1 flex items-center gap-2">

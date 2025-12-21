@@ -170,7 +170,7 @@ const AdminUsers = () => {
   const renderUsersTable = () => {
     if (loading) {
       return (
-        <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+        <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
           Cargando usuarios...
         </div>
       );
@@ -179,7 +179,7 @@ const AdminUsers = () => {
     return (
       <div className="overflow-x-auto rounded-xl border border-soft bg-surface shadow-sm" data-testid="admin-users-table">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-[var(--color-bg-soft,#f3f4f6)] text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+          <thead className="bg-[var(--color-bg-soft)] text-xs uppercase text-[color:var(--color-text-soft)]">
             <tr>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Rol</th>
@@ -214,7 +214,7 @@ const AdminUsers = () => {
                       type="button"
                       data-testid="admin-user-suspend"
                       onClick={() => openSuspendModal(user)}
-                      className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                      className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft)]"
                     >
                       Suspender
                     </button>
@@ -237,11 +237,11 @@ const AdminUsers = () => {
         data-testid="admin-users-role-summary"
       >
         {loadingRoleSummary ? (
-          <div className="text-sm text-[var(--color-text-soft,#6b7280)]">Cargando resumen de roles...</div>
+          <div className="text-sm text-[color:var(--color-text-soft)]">Cargando resumen de roles...</div>
         ) : (
           <>
             {roleSummaryError ? (
-              <div className="rounded-md border border-soft bg-[var(--color-bg-soft,#fff7ed)] px-3 py-2 text-xs text-[color:var(--color-text,#b45309)]">
+              <div className="rounded-md border border-soft bg-[var(--color-bg-soft)] px-3 py-2 text-xs text-[color:var(--color-text)]">
                 {roleSummaryError}
               </div>
             ) : null}
@@ -261,17 +261,17 @@ const AdminUsers = () => {
               return (
                 <div
                   key={key}
-                  className="rounded-lg border border-soft bg-[var(--color-bg-soft,#f3f4f6)] p-4"
+                  className="rounded-lg border border-soft bg-[var(--color-bg-soft)] p-4"
                   data-testid={`admin-users-role-card-${key}`}
                 >
-                  <h2 className="text-sm font-medium text-[var(--color-text-soft,#6b7280)]">
+                  <h2 className="text-sm font-medium text-[color:var(--color-text-soft)]">
                     {bucket.label || label}
                   </h2>
-                  <p className="mt-2 text-3xl font-semibold text-[var(--color-text,#111827)]">
+                  <p className="mt-2 text-3xl font-semibold text-[color:var(--color-text)]">
                     {bucket.real}
                   </p>
-                  <p className="text-xs text-[var(--color-text-soft,#6b7280)]">Usuarios reales</p>
-                  <dl className="mt-3 space-y-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+                  <p className="text-xs text-[color:var(--color-text-soft)]">Usuarios reales</p>
+                  <dl className="mt-3 space-y-1 text-xs text-[color:var(--color-text-soft)]">
                     <div className="flex justify-between">
                       <dt>Total cuentas</dt>
                       <dd>{bucket.total}</dd>
@@ -297,7 +297,7 @@ const AdminUsers = () => {
               );
             })}
           </div>
-          <div className="flex flex-col gap-2 text-xs text-[var(--color-text-soft,#6b7280)] md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-2 text-xs text-[color:var(--color-text-soft)] md:flex-row md:items-center md:justify-between">
             <div>
               Estados permitidos:{' '}
               {summaryData.filters?.allowedStatuses?.length
@@ -309,7 +309,7 @@ const AdminUsers = () => {
                 </span>
               ) : null}
             </div>
-            <div className="flex flex-col items-start gap-1 text-xs text-[var(--color-text-soft,#6b7280)] md:flex-row md:items-center md:gap-3">
+            <div className="flex flex-col items-start gap-1 text-xs text-[color:var(--color-text-soft)] md:flex-row md:items-center md:gap-3">
               <span>
                 Fuente:{' '}
                 {summaryData.source === 'firestore'
@@ -328,7 +328,7 @@ const AdminUsers = () => {
               <button
                 type="button"
                 onClick={fetchRoleSummary}
-                className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft)]"
                 data-testid="admin-users-role-refresh"
               >
                 Actualizar
@@ -346,7 +346,7 @@ const AdminUsers = () => {
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-xl font-semibold">Usuarios</h1>
-          <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+          <p className="text-sm text-[color:var(--color-text-soft)]">
             Estados y acceso de cuentas críticas.
           </p>
         </div>
@@ -359,8 +359,8 @@ const AdminUsers = () => {
           onClick={() => setActiveTab('list')}
           className={
             activeTab === 'list'
-              ? 'border-b-2 border-[color:var(--color-primary,#6366f1)] px-3 py-2 text-sm font-medium text-[color:var(--color-primary,#6366f1)]'
-              : 'px-3 py-2 text-sm text-[var(--color-text-soft,#6b7280)] hover:text-[var(--color-text,#111827)]'
+              ? 'border-b-2 border-[color:var(--color-primary)] px-3 py-2 text-sm font-medium text-[color:var(--color-primary)]'
+              : 'px-3 py-2 text-sm text-[color:var(--color-text-soft)] hover:text-[color:var(--color-text)]'
           }
         >
           Listado
@@ -371,8 +371,8 @@ const AdminUsers = () => {
           onClick={() => setActiveTab('roles')}
           className={
             activeTab === 'roles'
-              ? 'border-b-2 border-[color:var(--color-primary,#6366f1)] px-3 py-2 text-sm font-medium text-[color:var(--color-primary,#6366f1)]'
-              : 'px-3 py-2 text-sm text-[var(--color-text-soft,#6b7280)] hover:text-[var(--color-text,#111827)]'
+              ? 'border-b-2 border-[color:var(--color-primary)] px-3 py-2 text-sm font-medium text-[color:var(--color-primary)]'
+              : 'px-3 py-2 text-sm text-[color:var(--color-text-soft)] hover:text-[color:var(--color-text)]'
           }
         >
           Roles reales
@@ -389,7 +389,7 @@ const AdminUsers = () => {
           <div className="w-full max-w-md rounded-xl bg-surface p-6 shadow-xl space-y-4">
             <div>
               <h2 className="text-lg font-semibold">Suspender cuenta</h2>
-              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+              <p className="text-sm text-[color:var(--color-text-soft)]">
                 Estás suspendiendo la cuenta {selectedUser.email}. Introduce el motivo.
               </p>
             </div>
@@ -405,7 +405,7 @@ const AdminUsers = () => {
               <button
                 type="button"
                 onClick={() => setShowSuspendModal(false)}
-                className="px-3 py-2 text-[var(--color-text-soft,#6b7280)]"
+                className="px-3 py-2 text-[color:var(--color-text-soft)]"
               >
                 Cancelar
               </button>
@@ -414,7 +414,7 @@ const AdminUsers = () => {
                 data-testid="admin-user-suspend-confirm"
                 onClick={confirmSuspend}
                 disabled={!suspendReason.trim() || isSuspending}
-                className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-3 py-2 text-[color:var(--color-on-primary,#ffffff)] disabled:opacity-60"
+                className="rounded-md bg-[color:var(--color-primary)] px-3 py-2 text-[color:var(--color-on-primary)] disabled:opacity-60"
               >
                 {isSuspending ? 'Suspendiendo...' : 'Confirmar'}
               </button>
@@ -431,7 +431,7 @@ const AdminUsers = () => {
           <div className="w-full max-w-md rounded-xl bg-surface p-6 shadow-xl space-y-4">
             <div>
               <h2 className="text-lg font-semibold">Reactivar cuenta</h2>
-              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+              <p className="text-sm text-[color:var(--color-text-soft)]">
                 Estás reactivando la cuenta {selectedUser.email}. Puedes añadir notas opcionales.
               </p>
               {selectedUser.suspensionReason && (
@@ -452,7 +452,7 @@ const AdminUsers = () => {
               <button
                 type="button"
                 onClick={() => setShowReactivateModal(false)}
-                className="px-3 py-2 text-[var(--color-text-soft,#6b7280)]"
+                className="px-3 py-2 text-[color:var(--color-text-soft)]"
               >
                 Cancelar
               </button>

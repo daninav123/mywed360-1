@@ -793,7 +793,7 @@ const AdminTaskTemplates = () => {
       <header className="flex items-start justify-between">
         <div>
           <h1 className="text-xl font-semibold">Plantillas de tareas</h1>
-          <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+          <p className="text-sm text-[color:var(--color-text-soft)]">
             Gestiona el seed de tareas padre y subtareas aplicado a cada nueva boda.
           </p>
         </div>
@@ -976,20 +976,20 @@ const AdminTaskTemplates = () => {
             <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase text-[var(--color-text-soft,#6b7280)]">
+            <h2 className="text-sm font-semibold uppercase text-[color:var(--color-text-soft)]">
               Versiones disponibles
             </h2>
             <button
               type="button"
               onClick={handleNewDraft}
-              className="rounded-md border border-dashed border-[var(--color-border-soft,#d1d5db)] px-2 py-1 text-xs font-medium text-[var(--color-primary,#2563eb)] hover:border-[var(--color-primary,#2563eb)]"
+              className="rounded-md border border-dashed border-[color:var(--color-border-soft)] px-2 py-1 text-xs font-medium text-[color:var(--color-primary)] hover:border-[color:var(--color-primary)]"
             >
               Nuevo borrador
             </button>
           </div>
           <div className="space-y-2">
             {loading && !templates.length ? (
-              <div className="rounded-lg border border-soft bg-surface px-3 py-4 text-sm text-[var(--color-text-soft,#6b7280)]">
+              <div className="rounded-lg border border-soft bg-surface px-3 py-4 text-sm text-[color:var(--color-text-soft)]">
                 Cargando plantillas...
               </div>
             ) : null}
@@ -1004,8 +1004,8 @@ const AdminTaskTemplates = () => {
                   onClick={() => selectTemplate(tpl.id)}
                   className={`w-full rounded-lg border px-3 py-3 text-left transition ${
                     isActive
-                      ? 'border-[var(--color-primary,#2563eb)] bg-[var(--color-bg-soft,#f3f4f6)] ring-1 ring-[var(--color-primary,#2563eb)]'
-                      : 'border-[var(--color-border-soft,#d1d5db)] hover:border-[var(--color-primary,#2563eb)]'
+                      ? 'border-[color:var(--color-primary)] bg-[var(--color-bg-soft)] ring-1 ring-[color:var(--color-primary)]'
+                      : 'border-[color:var(--color-border-soft)] hover:border-[color:var(--color-primary)]'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2 text-sm font-medium">
@@ -1013,31 +1013,31 @@ const AdminTaskTemplates = () => {
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs ${
                         tpl.status === 'published'
-                          ? 'bg-[var(--color-primary-muted,#dbeafe)] text-[var(--color-primary,#2563eb)]'
-                          : 'bg-[var(--color-border-soft,#d1d5db)] text-[var(--color-text-soft,#6b7280)]'
+                          ? 'bg-[var(--color-primary-muted)] text-[color:var(--color-primary)]'
+                          : 'bg-[var(--color-border-soft)] text-[color:var(--color-text-soft)]'
                       }`}
                     >
                       {statusLabel}
                     </span>
                   </div>
-                  <div className="mt-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+                  <div className="mt-1 text-xs text-[color:var(--color-text-soft)]">
                     v{tpl.version || '—'} · {formatCount(totals.blocks)} bloques · {formatCount(totals.subtasks)} subtareas
                   </div>
-                  <div className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                  <div className="text-xs text-[color:var(--color-text-soft)]">
                     {tpl.updatedAt ? `Actualizado ${tpl.updatedAt}` : 'Sin fecha de actualización'}
                   </div>
                 </button>
               );
             })}
             {!loading && !templates.length ? (
-              <div className="rounded-lg border border-dashed border-[var(--color-border-soft,#d1d5db)] px-3 py-4 text-xs text-[var(--color-text-soft,#6b7280)]">
+              <div className="rounded-lg border border-dashed border-[color:var(--color-border-soft)] px-3 py-4 text-xs text-[color:var(--color-text-soft)]">
                 Aún no hay plantillas guardadas. Crea un borrador para empezar.
               </div>
             ) : null}
           </div>
           {meta?.latestPublished ? (
-            <div className="rounded-lg border border-soft bg-surface px-3 py-3 text-xs text-[var(--color-text-soft,#6b7280)]">
-              <div className="font-semibold text-[var(--color-text,#111827)]">Última publicada</div>
+            <div className="rounded-lg border border-soft bg-surface px-3 py-3 text-xs text-[color:var(--color-text-soft)]">
+              <div className="font-semibold text-[color:var(--color-text)]">Última publicada</div>
               <div>ID: {meta.latestPublished.id}</div>
               <div>Versión: {meta.latestPublished.version}</div>
               <div>Actualizada: {meta.latestPublished.updatedAt || '—'}</div>
@@ -1050,11 +1050,11 @@ const AdminTaskTemplates = () => {
             <div className="border-b border-soft px-4 py-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-sm font-semibold text-[var(--color-text,#111827)]">
+                  <h2 className="text-sm font-semibold text-[color:var(--color-text)]">
                     {form.id ? `Plantilla ${form.name || form.id}` : 'Nuevo borrador'}
                   </h2>
                   {templateSummary ? (
-                    <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                    <p className="text-xs text-[color:var(--color-text-soft)]">
                       {formatCount(templateSummary.blocks)} bloques · {formatCount(templateSummary.subtasks)} subtareas ·{' '}
                       Última actualización {templateSummary.updatedAt}
                     </p>
@@ -1067,8 +1067,8 @@ const AdminTaskTemplates = () => {
                     disabled={!form.id || previewing}
                     className={`rounded-md border px-3 py-1 text-xs font-medium ${
                       !form.id || previewing
-                        ? 'cursor-not-allowed border-[var(--color-border-soft,#d1d5db)] text-[var(--color-text-soft,#9ca3af)]'
-                        : 'border-[var(--color-border-soft,#d1d5db)] text-[var(--color-text,#111827)] hover:border-[var(--color-primary,#2563eb)]'
+                        ? 'cursor-not-allowed border-[color:var(--color-border-soft)] text-[color:var(--color-text-soft)]'
+                        : 'border-[color:var(--color-border-soft)] text-[color:var(--color-text)] hover:border-[color:var(--color-primary)]'
                     }`}
                   >
                     {previewing ? 'Generando vista...' : 'Vista previa'}
@@ -1079,8 +1079,8 @@ const AdminTaskTemplates = () => {
                     disabled={saving}
                     className={`rounded-md px-3 py-1 text-xs font-semibold text-white ${
                       saving
-                        ? 'bg-[var(--color-primary-muted,#93c5fd)]'
-                        : 'bg-[var(--color-primary,#2563eb)] hover:bg-[var(--color-primary-dark,#1d4ed8)]'
+                        ? 'bg-[var(--color-primary-muted)]'
+                        : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)]'
                     }`}
                   >
                     {saving ? 'Guardando...' : 'Guardar borrador'}
@@ -1091,8 +1091,8 @@ const AdminTaskTemplates = () => {
                     disabled={!form.id || publishing}
                     className={`rounded-md border px-3 py-1 text-xs font-medium ${
                       !form.id || publishing
-                        ? 'cursor-not-allowed border-[var(--color-border-soft,#d1d5db)] text-[var(--color-text-soft,#9ca3af)]'
-                        : 'border-[var(--color-primary,#2563eb)] text-[var(--color-primary,#2563eb)] hover:bg-[var(--color-primary-muted,#dbeafe)]'
+                        ? 'cursor-not-allowed border-[color:var(--color-border-soft)] text-[color:var(--color-text-soft)]'
+                        : 'border-[color:var(--color-primary)] text-[color:var(--color-primary)] hover:bg-[var(--color-primary-muted)]'
                     }`}
                   >
                     {publishing ? 'Publicando...' : 'Publicar'}
@@ -1104,7 +1104,7 @@ const AdminTaskTemplates = () => {
             <div className="space-y-4 px-4 py-5 text-sm">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold uppercase text-[var(--color-text-soft,#6b7280)]" htmlFor="task-template-name">
+                  <label className="text-xs font-semibold uppercase text-[color:var(--color-text-soft)]" htmlFor="task-template-name">
                     Nombre interno
                   </label>
                   <input
@@ -1116,7 +1116,7 @@ const AdminTaskTemplates = () => {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold uppercase text-[var(--color-text-soft,#6b7280)]" htmlFor="task-template-version">
+                  <label className="text-xs font-semibold uppercase text-[color:var(--color-text-soft)]" htmlFor="task-template-version">
                     Versión
                   </label>
                   <input
@@ -1132,7 +1132,7 @@ const AdminTaskTemplates = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold uppercase text-[var(--color-text-soft,#6b7280)]" htmlFor="task-template-notes">
+                <label className="text-xs font-semibold uppercase text-[color:var(--color-text-soft)]" htmlFor="task-template-notes">
                   Notas
                 </label>
                 <textarea
@@ -1146,7 +1146,7 @@ const AdminTaskTemplates = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold uppercase text-[var(--color-text-soft,#6b7280)]" htmlFor="task-template-json">
+                <label className="text-xs font-semibold uppercase text-[color:var(--color-text-soft)]" htmlFor="task-template-json">
                   Bloques (JSON)
                 </label>
                 <textarea
@@ -1157,7 +1157,7 @@ const AdminTaskTemplates = () => {
                   className="w-full rounded-md border border-soft px-3 py-2 font-mono text-xs leading-5"
                   spellCheck={false}
                 />
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                <p className="text-xs text-[color:var(--color-text-soft)]">
                   Debe ser un array de bloques. Cada bloque admite propiedades como <code>name</code>, <code>startPct</code>, <code>endPct</code>, <code>admin</code> e <code>items</code> (subtareas con campos opcionales como <code>category</code>, <code>assigneeSuggestion</code>, <code>checklist</code>, etc.).
                 </p>
               </div>
@@ -1195,13 +1195,13 @@ const AdminTaskTemplates = () => {
           {preview ? (
             <div className="rounded-xl border border-soft bg-surface shadow-sm">
               <div className="border-b border-soft px-4 py-3">
-                <h3 className="text-sm font-semibold text-[var(--color-text,#111827)]">Vista previa (ejemplo)</h3>
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                <h3 className="text-sm font-semibold text-[color:var(--color-text)]">Vista previa (ejemplo)</h3>
+                <p className="text-xs text-[color:var(--color-text-soft)]">
                   Wedding date: {preview.weddingDate} · {formatCount(preview.blocks?.length || 0)} bloques · {formatCount(preview.totals?.subtasks || 0)} subtareas
                 </p>
               </div>
               <div className="px-4 py-4">
-                <div className="max-h-64 overflow-auto rounded-md border border-soft bg-[var(--color-bg-soft,#f9fafb)] p-3 text-xs font-mono leading-5">
+                <div className="max-h-64 overflow-auto rounded-md border border-soft bg-[var(--color-bg-soft)] p-3 text-xs font-mono leading-5">
                   <pre>
                     {JSON.stringify(
                       (preview.blocks || []).slice(0, 3),
@@ -1211,7 +1211,7 @@ const AdminTaskTemplates = () => {
                     {(preview.blocks || []).length > 3 ? '\n…' : ''}
                   </pre>
                 </div>
-                <p className="mt-2 text-xs text-[var(--color-text-soft,#6b7280)]">
+                <p className="mt-2 text-xs text-[color:var(--color-text-soft)]">
                   Se muestran los primeros bloques de la vista previa. La respuesta completa incluye todas las fechas y subtareas generadas para el ejemplo.
                 </p>
               </div>

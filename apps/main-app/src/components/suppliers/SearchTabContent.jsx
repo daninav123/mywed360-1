@@ -217,7 +217,7 @@ const SearchTabContent = ({
       {!searchCompleted && !aiLoading && (
         <Card className="p-12 text-center">
           <div className="space-y-4 max-w-md mx-auto">
-            <div className="p-4 rounded-full bg-primary/10 w-16 h-16 mx-auto flex items-center justify-center">
+            <div className="p-4 rounded-full bg-[var(--color-primary-10)] w-16 h-16 mx-auto flex items-center justify-center">
               <Search className="w-8 h-8 text-primary" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900">

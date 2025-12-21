@@ -6,14 +6,9 @@
  *  - docs/ROADMAP_DIFF.md (resumen legible)
  */
 
-const fs = require('fs');
-const path = require('path');
-let fg;
-try {
-  fg = require('fast-glob');
-} catch (_) {
-  fg = null;
-}
+import fs from 'node:fs';
+import path from 'node:path';
+import fg from 'fast-glob';
 
 function readJSON(p) {
   const txt = fs.readFileSync(p, 'utf8');

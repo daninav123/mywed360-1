@@ -13,6 +13,12 @@ describe('Admin Metrics Backfill', () => {
   it('POST /api/admin/metrics/backfill agrega series diarias desde eventos', async () => {
     const ops = { sets: [], commits: 0 };
 
+    const baseDate = new Date();
+    baseDate.setUTCHours(8, 0, 0, 0);
+    baseDate.setUTCDate(baseDate.getUTCDate() - 1);
+    const baseDate2 = new Date(baseDate);
+    baseDate2.setUTCHours(9, 0, 0, 0);
+
     // Eventos con eventAt (>= startTs)
     const eventsWithEventAt = [
       {
@@ -21,7 +27,7 @@ describe('Admin Metrics Backfill', () => {
           weddingId: 'w1',
           module: 'finance',
           event: 'email_bounced',
-          eventAt: { toDate: () => new Date('2025-10-10T08:00:00Z') },
+          eventAt: { toDate: () => baseDate },
         }),
       },
     ];
@@ -33,7 +39,7 @@ describe('Admin Metrics Backfill', () => {
           weddingId: 'w1',
           module: 'finance',
           event: 'budget_over_threshold',
-          receivedAt: { toDate: () => new Date('2025-10-10T09:00:00Z') },
+          receivedAt: { toDate: () => baseDate2 },
         }),
       },
     ];

@@ -1,4 +1,4 @@
-# MaLove.APP – Monorepo (Frontend + Backend + Docs)
+# MaLove.App – Monorepo (Frontend + Backend + Docs)
 
 ## Propósito del producto
 
@@ -10,7 +10,7 @@ Este repositorio contiene el frontend (React + Vite + Tailwind, PWA), el backend
 Resumen de módulos:
 - Frontend: React 18 + Vite + TailwindCSS (PWA, offline-first) en `apps/main-app/src/`
 - Backend: Express + middleware de seguridad en `backend/`
-- Funciones/Utilities: scripts y helpers en `scripts/`, `functions/`
+- Utilities: scripts y helpers en `scripts/` y `backend/scripts/`
 - Documentación: guías técnicas y operativas en `docs/`
 
 ## Tabla de Contenidos
@@ -32,8 +32,9 @@ Resumen de módulos:
    - Backend: ver `docs/deploy-backend.md`
 
 3) Ejecutar servicios en local
-   - Backend: `npm start` (o `node backend/index.js`)
-   - Frontend: `npm run dev` (Vite en `http://localhost:5173` con `--strictPort`)
+   - Backend: `npm run backend` (ejecuta `node backend/index.js`)
+   - Frontend: `npm run dev:main` (Vite en `http://localhost:5173` con `--strictPort`)
+   - Alternativa (todo en uno): `npm run dev` (backend + frontend main)
    - Health: backend `GET /health` y `GET /api/health`, métricas `GET /metrics`
 
 4) Documentación clave
@@ -45,7 +46,7 @@ Resumen de módulos:
    - API (OpenAPI): `docs/api/openapi.yaml`
    - API (Ejemplos/Próximos endpoints): `docs/api/OPENAPI_NEXT.md`
    - Monitorización: `docs/monitoring/README.md`
-   - Roadmap: `docs/roadmap-2025-v2.md`
+   - Roadmap: `docs/ROADMAP.md` (actual) y `docs/archive/roadmap-2025-v2.md` (snapshot histórico)
    - CI/CD: `docs/DEPLOYMENT_CI.md`
    - Testing (incluye webhook pagos en CI): `docs/TESTING.md`
    - Seguridad: `docs/SECURITY_PRIVACY.md`

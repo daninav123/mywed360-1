@@ -1,10 +1,87 @@
-import { beforeAll, afterEach, expect, vi } from 'vitest';
+import { beforeAll, afterEach, afterAll, expect, vi } from 'vitest';
 import matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
+
+vi.mock('../firebaseConfig', () => ({
+  auth: null,
+  db: null,
+  storage: null,
+  analytics: null,
+  firebaseReady: Promise.resolve(),
+  getFirebaseAuth: () => null,
+  isOnline: true,
+}));
 
 if (matchers && typeof expect?.extend === 'function') {
   expect.extend(matchers);
 }
+
+if (!globalThis.vi) {
+  globalThis.vi = vi;
+}
+if (!globalThis.vitest) {
+  globalThis.vitest = true;
+}
+
+if (!globalThis.fetch || !globalThis.fetch.__vitestMock) {
+  const makeHeaders = () => {
+    try {
+      return typeof Headers !== 'undefined' ? new Headers() : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const makeBlob = () => {
+    try {
+      return typeof Blob !== 'undefined' ? new Blob([]) : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const mockFetch = vi.fn(async () => ({
+    ok: true,
+    status: 200,
+    headers: makeHeaders(),
+    json: async () => ({}),
+    text: async () => '',
+    blob: async () => makeBlob(),
+    arrayBuffer: async () => new ArrayBuffer(0),
+  }));
+  mockFetch.__vitestMock = true;
+  globalThis.fetch = mockFetch;
+}
+
+const __realSetTimeout = globalThis.setTimeout;
+const __realClearTimeout = globalThis.clearTimeout;
+const __realSetInterval = globalThis.setInterval;
+const __realClearInterval = globalThis.clearInterval;
+
+const __activeTimeouts = new Set();
+const __activeIntervals = new Set();
+
+globalThis.setTimeout = (...args) => {
+  const id = __realSetTimeout(...args);
+  __activeTimeouts.add(id);
+  return id;
+};
+
+globalThis.clearTimeout = (id) => {
+  __activeTimeouts.delete(id);
+  return __realClearTimeout(id);
+};
+
+globalThis.setInterval = (...args) => {
+  const id = __realSetInterval(...args);
+  __activeIntervals.add(id);
+  return id;
+};
+
+globalThis.clearInterval = (id) => {
+  __activeIntervals.delete(id);
+  return __realClearInterval(id);
+};
 
 // Alias global "jest" apuntando a la API de "vi" para compatibilidad con pruebas que usan Jest
 if (!globalThis.jest) {
@@ -15,26 +92,68 @@ if (!globalThis.jest) {
 }
 
 // ---------- Render con proveedores globales ----------
-// Para evitar el error de solo-lectura, mockeamos todo el módulo de
-// @testing-library/react y sustituimos únicamente la función render con un
-// wrapper que añade los providers. El resto de la API se mantiene intacto.
+// DESHABILITADO TEMPORALMENTE: Mock incompatible con Vitest v1.x
+// Para tests que requieran providers, se deben envolver manualmente
+// TODO: Implementar solución alternativa compatible con Vitest v1.x
 
-vi.mock('@testing-library/react', async () => {
-  // Importamos el módulo real para conservar todo lo demás
-  const rtl = await vi.importActual('@testing-library/react');
-  // Importamos el wrapper con providers
-  const { default: AllProviders } = await import('./AllProviders.jsx');
-
-  return {
-    __esModule: true,
-    ...rtl,
-    render: (ui, options = {}) => rtl.render(ui, { wrapper: AllProviders, ...options }),
-  };
-});
+// vi.mock('@testing-library/react', async () => {
+//   const rtl = await vi.importActual('@testing-library/react');
+//   const { default: AllProviders } = await import('./AllProviders.jsx');
+//   return {
+//     __esModule: true,
+//     ...rtl,
+//     render: (ui, options = {}) => rtl.render(ui, { wrapper: AllProviders, ...options }),
+//   };
+// });
 
 // Limpieza automática después de cada prueba
 afterEach(() => {
   cleanup();
+});
+
+afterEach(() => {
+  __activeTimeouts.forEach((id) => {
+    try {
+      __realClearTimeout(id);
+    } catch {}
+  });
+  __activeTimeouts.clear();
+
+  __activeIntervals.forEach((id) => {
+    try {
+      __realClearInterval(id);
+    } catch {}
+  });
+  __activeIntervals.clear();
+});
+
+afterAll(() => {
+  try {
+    __activeTimeouts.forEach((id) => {
+      try {
+        __realClearTimeout(id);
+      } catch {}
+    });
+    __activeTimeouts.clear();
+
+    __activeIntervals.forEach((id) => {
+      try {
+        __realClearInterval(id);
+      } catch {}
+    });
+    __activeIntervals.clear();
+
+    if (typeof process !== 'undefined' && process.env && process.env.VITEST_DEBUG_HANDLES === '1') {
+      const handles = typeof process._getActiveHandles === 'function' ? process._getActiveHandles() : [];
+      const summary = Array.isArray(handles)
+        ? handles
+            .map((h) => (h && h.constructor && h.constructor.name ? h.constructor.name : typeof h))
+            .filter(Boolean)
+        : [];
+      // eslint-disable-next-line no-console
+      console.error('[VITEST_DEBUG_HANDLES] active handles:', summary);
+    }
+  } catch {}
 });
 
 // ---------- Mocks genericos ----------
@@ -80,27 +199,49 @@ vi.mock('lucide-react', () => {
   );
 });
 
-// Mockear localStorage
-beforeAll(() => {
-  // Solo en entorno jsdom (frontend). En backend (node) 'window' no existe.
-  if (typeof window === 'undefined') return;
-
-  // Implementación de localStorage para pruebas
-  const localStorageMock = {
-    getItem: vi.fn(),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
-    key: vi.fn(),
-    length: 0,
+// Implementación de localStorage para pruebas (global)
+// IMPORTANTE: Debe definirse ANTES de importar módulos que lo usen
+const localStorageMock = (() => {
+  let store = {};
+  return {
+    getItem: vi.fn((key) => store[key] || null),
+    setItem: vi.fn((key, value) => {
+      store[key] = String(value);
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+    key: vi.fn((index) => Object.keys(store)[index] || null),
+    get length() {
+      return Object.keys(store).length;
+    },
   };
+})();
 
+// Exponer localStorage como global inmediatamente
+global.localStorage = localStorageMock;
+
+// Si window existe (jsdom), configurar también window.localStorage
+if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'localStorage', {
     value: localStorageMock,
     writable: true,
+    configurable: true,
   });
 
-  // Mock para matchMedia que es usado por algunos componentes
+  // Mock de navigator.onLine
+  if (window.navigator) {
+    Object.defineProperty(window.navigator, 'onLine', {
+      value: true,
+      writable: true,
+      configurable: true,
+    });
+  }
+
+  // Mock para matchMedia
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: vi.fn().mockImplementation((query) => ({
@@ -114,5 +255,5 @@ beforeAll(() => {
       dispatchEvent: vi.fn(),
     })),
   });
-});
+}
 

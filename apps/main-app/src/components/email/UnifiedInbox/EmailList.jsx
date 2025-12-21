@@ -294,7 +294,7 @@ const EmailList = ({
                       <div className="flex flex-wrap items-center gap-2 text-sm">
                         <span
                           className={`truncate font-medium ${
-                            hasUnread ? 'text-body' : 'text-body/80'
+                            hasUnread ? 'text-body' : 'text-[color:var(--color-text-80)]'
                           }`}
                           title={senderValue}
                         >

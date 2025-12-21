@@ -11,6 +11,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import zlib from 'zlib';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,9 +44,9 @@ function walk(dir) {
 
 function main() {
   const { maxBytes, metric } = parseArgs();
-  const dist = path.resolve(process.cwd(), 'dist');
+  const dist = path.resolve(process.cwd(), 'apps/main-app/dist');
   if (!fs.existsSync(dist)) {
-    console.error('[bundleBudget] dist/ not found. Run vite build first.');
+    console.error('[bundleBudget] apps/main-app/dist/ not found. Run npm run build first.');
     process.exit(1);
   }
   const assetsDir = path.join(dist, 'assets');
@@ -53,7 +54,6 @@ function main() {
   const jsFiles = files.filter((f) => /\.(m?js|cjs)$/i.test(f));
   let total = 0;
   if (metric === 'gzip') {
-    const zlib = require('zlib');
     for (const f of jsFiles) {
       const buf = fs.readFileSync(f);
       const gz = zlib.gzipSync(buf, { level: 9 });

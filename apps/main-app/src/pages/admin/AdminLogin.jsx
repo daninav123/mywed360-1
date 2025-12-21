@@ -213,21 +213,21 @@ const AdminLogin = () => {
   const buttonLabel = isSubmitting ? 'Accediendo...' : 'Acceder';
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg,#f4f5f7)] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md rounded-xl bg-surface shadow-lg border border-soft p-8 space-y-6"
       >
         <div>
-          <h1 className="text-2xl font-semibold text-[var(--color-text,#111827)]">Acceso Administrador</h1>
-          <p className="text-sm text-[var(--color-text-soft,#6b7280)] mt-1">
+          <h1 className="text-2xl font-semibold text-[color:var(--color-text)]">Acceso Administrador</h1>
+          <p className="text-sm text-[color:var(--color-text-soft)] mt-1">
             Introduce tus credenciales corporativas para acceder al panel global.
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="admin-email" className="text-sm font-medium text-[var(--color-text,#111827)]">
+            <label htmlFor="admin-email" className="text-sm font-medium text-[color:var(--color-text)]">
               Email corporativo
             </label>
             <input
@@ -239,11 +239,11 @@ const AdminLogin = () => {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               disabled={isSubmitting}
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)] disabled:bg-[var(--color-bg-soft,#f3f4f6)]"
+              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] disabled:bg-[var(--color-bg-soft)]"
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="admin-password" className="text-sm font-medium text-[var(--color-text,#111827)]">
+            <label htmlFor="admin-password" className="text-sm font-medium text-[color:var(--color-text)]">
               Contraseña
             </label>
             <input
@@ -256,7 +256,7 @@ const AdminLogin = () => {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               disabled={isSubmitting}
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)] disabled:bg-[var(--color-bg-soft,#f3f4f6)]"
+              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] disabled:bg-[var(--color-bg-soft)]"
             />
           </div>
         </div>
@@ -274,7 +274,7 @@ const AdminLogin = () => {
           type="submit"
           data-testid="admin-login-submit"
           disabled={isBlocked || isSubmitting}
-          className="w-full rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] transition-colors hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:cursor-not-allowed disabled:opacity-70"
+          className="w-full rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary)] transition-colors hover:bg-[color:var(--color-primary-dark)] disabled:cursor-not-allowed disabled:opacity-70"
         >
           {buttonLabel}
         </button>
@@ -286,7 +286,7 @@ const AdminLogin = () => {
           </p>
         )}
 
-        <div className="text-xs text-[var(--color-text-soft,#6b7280)] flex justify-between items-center">
+        <div className="text-xs text-[color:var(--color-text-soft)] flex justify-between items-center">
           <label className="inline-flex items-center gap-2 cursor-pointer">
             <input 
               type="checkbox" 
@@ -298,7 +298,7 @@ const AdminLogin = () => {
           </label>
           <button
             type="button"
-            className="text-[color:var(--color-primary,#6366f1)] hover:underline"
+            className="text-[color:var(--color-primary)] hover:underline"
             data-testid="admin-login-help"
             onClick={() => setShowHelp(true)}
           >
@@ -312,14 +312,14 @@ const AdminLogin = () => {
           <div className="w-full max-w-sm rounded-xl bg-surface p-6 shadow-xl space-y-4">
             <div>
               <h2 className="text-lg font-semibold">¿Necesitas ayuda?</h2>
-              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+              <p className="text-sm text-[color:var(--color-text-soft)]">
                 Escríbenos a <a className="underline" href={`mailto:${supportEmail}`}>{supportEmail}</a> o llámanos al{' '}
                 <a className="underline" href={`tel:${supportPhone}`}>{supportPhone}</a>.
               </p>
             </div>
             <button
               type="button"
-              className="w-full rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
+              className="w-full rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary)] hover:bg-[color:var(--color-primary-dark)]"
               onClick={() => setShowHelp(false)}
             >
               Entendido
@@ -336,11 +336,11 @@ const AdminLogin = () => {
           >
             <div>
               <h3 className="text-lg font-semibold">Verificación MFA</h3>
-              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+              <p className="text-sm text-[color:var(--color-text-soft)]">
                 Introduce el código de {MFA_CODE_LENGTH} dígitos enviado al canal seguro configurado.
               </p>
               {mfaExpiresAt && (
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)]" data-testid="admin-mfa-countdown">
+                <p className="text-xs text-[color:var(--color-text-soft)]" data-testid="admin-mfa-countdown">
                   Caduca en {mfaSecondsLeft}s
                 </p>
               )}
@@ -369,14 +369,14 @@ const AdminLogin = () => {
                 type="button"
                 onClick={handleCancelMfa}
                 disabled={isVerifyingMfa}
-                className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft)]"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isVerifyingMfa || !mfaCode || mfaCode.length < MFA_CODE_LENGTH}
-                className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                className="rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark)] disabled:opacity-50"
               >
                 {isVerifyingMfa ? 'Verificando...' : 'Verificar código'}
               </button>

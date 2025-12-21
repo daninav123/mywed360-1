@@ -1,11 +1,18 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  createSignatureRequest,
-  listSignatureRequests,
-  getSignatureStatus,
-  updateSignatureStatus,
-} from '../services/SignatureService';
+vi.mock('../firebaseConfig', () => ({
+  auth: {
+    currentUser: {
+      getIdToken: vi.fn(async () => 'test-token'),
+    },
+  },
+  db: null,
+  storage: null,
+  analytics: null,
+  firebaseReady: Promise.resolve(),
+  getFirebaseAuth: () => null,
+  isOnline: true,
+}));
 
 const okJson = (data) => Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
 
@@ -13,6 +20,7 @@ describe('SignatureService', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     globalThis.fetch = vi.fn();
+    vi.resetModules();
     Object.defineProperty(window, 'location', {
       value: { origin: 'http://localhost:5173', hostname: 'localhost' },
       writable: true,
@@ -24,9 +32,11 @@ describe('SignatureService', () => {
   });
 
   it('createSignatureRequest hace POST a /api/signature/create', async () => {
+    const { createSignatureRequest } = await import('../services/SignatureService');
     fetch.mockImplementation((url, opts) => {
       expect(String(url)).toContain('/api/signature/create');
       expect(opts?.method).toBe('POST');
+      expect(String(opts?.headers?.Authorization || '')).toContain('Bearer ');
       const body = JSON.parse(opts.body);
       expect(body.weddingId).toBe('w1');
       expect(body.documentMeta?.title).toBe('Contrato');
@@ -39,6 +49,7 @@ describe('SignatureService', () => {
   });
 
   it('listSignatureRequests llama /api/signature/list con query', async () => {
+    const { listSignatureRequests } = await import('../services/SignatureService');
     fetch.mockImplementation((url) => {
       const u = new URL(String(url));
       expect(u.pathname).toContain('/api/signature/list');
@@ -51,6 +62,7 @@ describe('SignatureService', () => {
   });
 
   it('getSignatureStatus llama /api/signature/status/:id', async () => {
+    const { getSignatureStatus } = await import('../services/SignatureService');
     fetch.mockImplementation((url) => {
       const u = new URL(String(url));
       expect(u.pathname).toContain('/api/signature/status/s1');
@@ -62,9 +74,11 @@ describe('SignatureService', () => {
   });
 
   it('updateSignatureStatus hace POST /api/signature/status/:id', async () => {
+    const { updateSignatureStatus } = await import('../services/SignatureService');
     fetch.mockImplementation((url, opts) => {
       expect(String(url)).toContain('/api/signature/status/s1');
       expect(opts?.method).toBe('POST');
+      expect(String(opts?.headers?.Authorization || '')).toContain('Bearer ');
       const body = JSON.parse(opts.body);
       expect(body.weddingId).toBe('w4');
       expect(body.updates).toEqual({ status: 'completed' });

@@ -212,80 +212,88 @@ const EmailList = ({
         style={style}
         data-testid="email-list-item"
         key={email.id}
-        className={`py-3 px-2 cursor-pointer transition-colors hover:bg-gray-50 divide-y divide-gray-200 ${
-          selectedEmailId === email.id ? 'bg-blue-50 ring-2 ring-blue-400' : ''
-        } ${!email.read ? 'font-semibold' : ''} focus:outline-none focus:ring-2 focus:ring-blue-500`}
-        onClick={() => onSelectEmail(email)}
-        onKeyDown={(e) => handleKeyDown(e, email, index)}
-        tabIndex="0"
         role="listitem"
-        aria-selected={selectedEmailId === email.id}
         aria-labelledby={`email-${email.id}-subject`}
       >
-        <div className="flex justify-between items-center mb-1">
-          <div className="flex items-center">
-            {!email.read && (
-              <span
-                className="w-2 h-2 bg-blue-500 rounded-full mr-2"
-                aria-label="No leído"
-                role="status"
-              ></span>
-            )}
-            <span className="text-sm text-gray-800">
-              {folder === 'sent' ? `Para: ${email.to}` : `De: ${email.from}`}
+        <button
+          type="button"
+          className={`w-full h-full py-3 px-2 cursor-pointer text-left transition-colors hover:bg-gray-50 divide-y divide-gray-200 ${
+            selectedEmailId === email.id ? 'bg-blue-50 ring-2 ring-blue-400' : ''
+          } ${!email.read ? 'font-semibold' : ''} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          onClick={() => onSelectEmail(email)}
+          onKeyDown={(e) => handleKeyDown(e, email, index)}
+          aria-current={selectedEmailId === email.id ? 'true' : undefined}
+        >
+          <div className="flex justify-between items-center mb-1">
+            <div className="flex items-center">
+              {!email.read && (
+                <span
+                  className="w-2 h-2 bg-blue-500 rounded-full mr-2"
+                  aria-label="No leído"
+                  role="status"
+                ></span>
+              )}
+              <span className="text-sm text-gray-800">
+                {folder === 'sent' ? `Para: ${email.to}` : `De: ${email.from}`}
+              </span>
+            </div>
+            <span className="text-xs text-gray-600">
+              {formatDate(email.date || email.timestamp)}
             </span>
           </div>
-          <span className="text-xs text-gray-600" aria-label={`Fecha: ${email.date}`}>
-            {formatDate(email.date)}
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <h4
-            id={`email-${email.id}-subject`}
-            className="text-sm mb-1 flex-grow pr-2 truncate font-medium text-gray-800"
-          >
-            {email.subject || '(Sin asunto)'}
-          </h4>
-          {totalActions > 0 && (
-            <span
-              title={`Acciones IA: ${totalActions}`}
-              className="ml-2 inline-flex items-center rounded-full bg-violet-100 text-violet-700 px-2 py-px text-[10px] font-semibold"
+          <div className="flex justify-between">
+            <h4
+              id={`email-${email.id}-subject`}
+              className="text-sm mb-1 flex-grow pr-2 truncate font-medium text-gray-800"
             >
-              IA {totalActions}
-            </span>
-          )}
-          {email.attachments && email.attachments.length > 0 && (
-            <span aria-label="Contiene archivos adjuntos">
-              <Paperclip size={14} className="text-gray-600 shrink-0" />
-            </span>
-          )}
-        </div>
-        <p className="text-xs text-gray-600 line-clamp-1" aria-label="Vista previa del mensaje">
-          {truncate(stripHtml(email.body), 120)}
-        </p>
-        {email.aiClassification?.tags?.length ? (
-          <div className="mt-1 flex flex-wrap gap-1">
-            {email.aiClassification.tags.slice(0, 3).map((tag) => (
+              {email.subject || '(Sin asunto)'}
+            </h4>
+            {totalActions > 0 && (
               <span
-                key={`${email.id}-tag-${tag}`}
-                className="inline-flex items-center rounded-full bg-blue-50 px-2 py-px text-[10px] font-medium text-blue-700"
+                title={`Acciones IA: ${totalActions}`}
+                className="ml-2 inline-flex items-center rounded-full bg-violet-100 text-violet-700 px-2 py-px text-[10px] font-semibold"
               >
-                {tag}
+                IA {totalActions}
               </span>
-            ))}
-            {email.aiClassification.folder && (
-              <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-px text-[10px] font-medium text-gray-600">
-                Carpeta sugerida: {email.aiClassification.folder}
+            )}
+            {email.attachments && email.attachments.length > 0 && (
+              <span role="img" aria-label="Contiene archivos adjuntos">
+                <Paperclip size={14} className="text-gray-600 shrink-0" aria-hidden="true" />
               </span>
             )}
           </div>
-        ) : null}
+          <p className="text-xs text-gray-600 line-clamp-1">
+            {truncate(stripHtml(email.body), 120)}
+          </p>
+          {email.aiClassification?.tags?.length ? (
+            <div className="mt-1 flex flex-wrap gap-1">
+              {email.aiClassification.tags.slice(0, 3).map((tag) => (
+                <span
+                  key={`${email.id}-tag-${tag}`}
+                  className="inline-flex items-center rounded-full bg-blue-50 px-2 py-px text-[10px] font-medium text-blue-700"
+                >
+                  {tag}
+                </span>
+              ))}
+              {email.aiClassification.folder && (
+                <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-px text-[10px] font-medium text-gray-600">
+                  Carpeta sugerida: {email.aiClassification.folder}
+                </span>
+              )}
+            </div>
+          ) : null}
+        </button>
       </div>
     );
   };
 
   return (
-    <div data-testid="email-list" className="h-full">
+    <div
+      data-testid="email-list"
+      className="h-full"
+      role="list"
+      aria-label={`Correos en ${folder === 'inbox' ? 'bandeja de entrada' : folder === 'sent' ? 'enviados' : folder === 'trash' ? 'papelera' : folder}`}
+    >
       <List
         height={height}
         width="100%"
@@ -293,8 +301,6 @@ const EmailList = ({
         itemSize={itemHeight}
         outerElementType="div"
         className="divide-y divide-gray-200"
-        role="list"
-        aria-label={`Correos en ${folder === 'inbox' ? 'bandeja de entrada' : folder === 'sent' ? 'enviados' : folder === 'trash' ? 'papelera' : folder}`}
         ref={listRef}
         itemKey={(index) => emails[index].id}
       >

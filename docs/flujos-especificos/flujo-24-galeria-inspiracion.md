@@ -1,4 +1,4 @@
-﻿# 24. Inspiracion Visual Unificada (estado 2025-10-12)
+# 24. Inspiracion Visual Unificada (estado 2025-10-12)
 
 > Consolidado (2025-10-12): Unifica los flujos 24 (galeria) y 25 (inspiracion personalizada) en la pagina unica `/inspiracion`.
 > Implementado (codigo 2025-10-12):

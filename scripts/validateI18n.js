@@ -15,7 +15,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const LOCALES_DIR = path.resolve(process.cwd(), 'src/i18n/locales');
+const LOCALES_DIR = path.resolve(process.cwd(), 'apps/main-app/src/i18n/locales');
 const LOCALES = ['en', 'es'];
 const BASE = 'en';
 

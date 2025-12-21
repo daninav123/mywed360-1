@@ -160,7 +160,75 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
     }
 
     // Enviar email de notificación al proveedor
-    const supplierEmail = supplier.contact?.email || supplier.email;
+    let supplierEmail = supplier.contact?.email || supplier.email;
+    
+    // 🔍 Si no hay email, intentar extraerlo de la web
+    if (!supplierEmail && (supplier.contact?.website || supplier.website)) {
+      const websiteUrl = supplier.contact?.website || supplier.website;
+      logger.info(`📧 [QuoteRequest] No hay email, extrayendo de web: ${websiteUrl}`);
+      
+      try {
+        const { getCachedWebAnalysis } = await import('../services/webScraperService.js');
+        const cachedAnalysis = await getCachedWebAnalysis(websiteUrl);
+        
+        if (cachedAnalysis?.data?.contactEmail) {
+          supplierEmail = cachedAnalysis.data.contactEmail;
+          logger.info(`✅ [QuoteRequest] Email extraído de caché: ${supplierEmail}`);
+          
+          // Actualizar el documento con el email encontrado
+          await docRef.update({
+            supplierEmail: supplierEmail,
+            supplierInfo: {
+              ...quoteRequestData.supplierInfo,
+              email: supplierEmail
+            }
+          });
+        } else {
+          logger.warn(`⚠️ [QuoteRequest] No se encontró email en caché para: ${websiteUrl}`);
+          
+          // 📧 Fallback: emails conocidos de proveedores específicos
+          const knownEmails = {
+            'resonaevents.com': 'info@resonaevents.com',
+            'www.resonaevents.com': 'info@resonaevents.com',
+          };
+          
+          const domain = websiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '').toLowerCase();
+          if (knownEmails[domain]) {
+            supplierEmail = knownEmails[domain];
+            logger.info(`✅ [QuoteRequest] Usando email conocido para ${domain}: ${supplierEmail}`);
+            
+            // Actualizar el documento con el email
+            await docRef.update({
+              supplierEmail: supplierEmail,
+              supplierInfo: {
+                ...quoteRequestData.supplierInfo,
+                email: supplierEmail
+              }
+            });
+          }
+        }
+      } catch (emailExtractionError) {
+        logger.error(`❌ [QuoteRequest] Error extrayendo email:`, emailExtractionError.message);
+      }
+    }
+    
+    logger.info(`📧 [QuoteRequest] Email final para envío: ${supplierEmail || 'NO DISPONIBLE'}`);
+
+    // Obtener email configurado del usuario (myWed360Email es el principal @malove.app)
+    let clientEmail = contacto.email;
+    if (userId) {
+      try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          // Priorizar myWed360Email (danielnavarrocampos@malove.app) sobre maLoveEmail
+          clientEmail = userData.myWed360Email || userData.maLoveEmail || contacto.email;
+          logger.info(`📧 [QuoteRequest] Usando email configurado del usuario: ${clientEmail}`);
+        }
+      } catch (userError) {
+        logger.warn(`⚠️ No se pudo obtener perfil usuario ${userId}, usando contacto.email`);
+      }
+    }
 
     if (supplierEmail) {
       try {
@@ -168,7 +236,7 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
           supplierEmail,
           supplierName: supplier.profile?.name || supplier.name || 'Proveedor',
           clientName: contacto.nombre,
-          clientEmail: contacto.email,
+          clientEmail: clientEmail,
           clientPhone: contacto.telefono,
           weddingDate: weddingInfo?.fecha,
           city: weddingInfo?.ciudad,
@@ -179,6 +247,7 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
           customMessage: customMessage || '',
           responseUrl: quoteRequestData.responseUrl,
           requestId,
+          userId: userId || null,
           isInternetSupplier,
         });
 

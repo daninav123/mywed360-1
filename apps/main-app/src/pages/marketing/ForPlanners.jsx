@@ -476,20 +476,20 @@ const ForPlanners = () => {
       </Helmet>
 
       <MarketingLayout>
-        <section className="layout-container grid gap-12 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 lg:grid-cols-[1.15fr,0.85fr] lg:items-center">
+        <section className="layout-container grid gap-12 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg lg:grid-cols-[1.15fr,0.85fr] lg:items-center">
           <div>
             <div className="flex items-center gap-3">
               <img
                 src={logoApp}
                 alt={t('planners.hero.logoAlt', 'MaLove.App')}
-                className="h-12 w-12 rounded-2xl bg-white object-contain shadow-sm ring-1 ring-[var(--color-primary)]/25"
+                className="h-12 w-12 rounded-2xl bg-white object-contain shadow-sm ring-1 ring-[color:var(--color-primary-25)]"
               />
               <span className="text-sm font-semibold uppercase tracking-widest text-muted">
                 {t('planners.hero.brand', 'MaLove.App')}
               </span>
             </div>
-            <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted">
-              <Crown className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+            <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-primary-40)] bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted">
+              <Crown className="h-3.5 w-3.5 text-[color:var(--color-primary)]" />
               {t('planners.hero.badge', 'Para Wedding Planners')}
             </span>
             <h1 className="mt-6 text-4xl font-semibold leading-tight text-body md:text-5xl">
@@ -513,13 +513,13 @@ const ForPlanners = () => {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
                 to="/signup"
-                className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
               >
                 {t('planners.hero.primaryCta', 'Prueba gratis 14 días')}
               </Link>
               <a
                 href="#planes"
-                className="inline-flex items-center justify-center rounded-md border border-[var(--color-primary)]/45 px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[var(--color-primary)] hover:text-body focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-md border border-[color:var(--color-primary-45)] px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[color:var(--color-primary)] hover:text-body focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
               >
                 {t('planners.hero.secondaryCta', 'Ver planes')}
               </a>
@@ -527,7 +527,7 @@ const ForPlanners = () => {
           </div>
 
           <div className="relative">
-            <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg shadow-[var(--color-primary)]/12">
+            <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-widest text-muted">
@@ -537,7 +537,7 @@ const ForPlanners = () => {
                     {t('planners.hero.stats.title', 'Vista de Planners')}
                   </h3>
                 </div>
-                <span className="rounded-full bg-[var(--color-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
+                <span className="rounded-full bg-[var(--color-primary-10)] px-3 py-1 text-xs font-semibold text-[color:var(--color-primary)]">
                   {t('planners.hero.stats.badge', '8 bodas activas')}
                 </span>
               </div>
@@ -595,7 +595,7 @@ const ForPlanners = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-3xl font-semibold text-body">
               {t(
@@ -614,9 +614,9 @@ const ForPlanners = () => {
             {benefits.map((benefit) => (
               <article
                 key={benefit.title}
-                className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+                className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-[color:var(--color-primary)]">
                   {benefit.icon}
                 </span>
                 <h3 className="mt-4 text-lg font-semibold text-body">{benefit.title}</h3>
@@ -626,9 +626,9 @@ const ForPlanners = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               <Briefcase className="h-3.5 w-3.5" />
               {t('planners.useCases.badge', 'Casos de Uso')}
             </span>
@@ -640,14 +640,14 @@ const ForPlanners = () => {
             {useCases.map((useCase) => (
               <article
                 key={useCase.title}
-                className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+                className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm"
               >
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-[color:var(--color-primary)]">
                   {useCase.icon}
                 </span>
                 <h3 className="mt-4 text-lg font-semibold text-body">{useCase.title}</h3>
                 <p className="mt-2 text-sm text-muted">{useCase.description}</p>
-                <div className="mt-4 rounded-lg bg-primary-soft/40 px-3 py-2">
+                <div className="mt-4 rounded-lg bg-primary-soft px-3 py-2">
                   <p className="text-xs font-medium text-body">
                     {t('planners.useCases.recommendedLabel', 'Recomendado')}:{' '}
                     <span className="font-semibold">{useCase.recommendedPlan}</span>
@@ -660,10 +660,10 @@ const ForPlanners = () => {
 
         <section
           id="planes"
-          className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15"
+          className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg"
         >
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               <Crown className="h-3.5 w-3.5" />
               {t('planners.plans.badge', 'Planes para Planners')}
             </span>
@@ -680,16 +680,16 @@ const ForPlanners = () => {
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {plannerPlans.map((plan) => {
               const cardClasses = [
-                'flex h-full flex-col rounded-3xl border bg-surface p-6 shadow-sm shadow-[var(--color-primary)]/12 transition-transform hover:-translate-y-1 hover:shadow-lg hover:shadow-[var(--color-primary)]/20',
+                'flex h-full flex-col rounded-3xl border bg-surface p-6 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg',
                 plan.highlight
-                  ? 'border-[var(--color-primary)]/55 ring-2 ring-[var(--color-primary)]/20'
+                  ? 'border-[color:var(--color-primary-55)] ring-2 ring-[color:var(--color-primary-20)]'
                   : 'border-soft',
               ].join(' ');
 
               return (
                 <article key={plan.key} className={cardClasses}>
                   {plan.badge && (
-                    <span className="inline-flex self-start rounded-full bg-[var(--color-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
+                    <span className="inline-flex self-start rounded-full bg-[var(--color-primary-10)] px-3 py-1 text-xs font-semibold text-[color:var(--color-primary)]">
                       {plan.badge}
                     </span>
                   )}
@@ -704,7 +704,7 @@ const ForPlanners = () => {
                       <span className="text-sm text-muted">{plan.suffix}</span>
                     </div>
                     <p className="mt-2 text-sm text-muted">{plan.description}</p>
-                    <div className="mt-3 rounded-lg bg-primary-soft/40 px-3 py-2">
+                    <div className="mt-3 rounded-lg bg-primary-soft px-3 py-2">
                       <p className="text-xs font-semibold text-body">{plan.weddings}</p>
                     </div>
                   </div>
@@ -712,7 +712,7 @@ const ForPlanners = () => {
                   <ul className="mt-6 flex flex-1 flex-col gap-3 text-sm text-muted">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--color-primary)]" />
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[color:var(--color-primary)]" />
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -720,10 +720,10 @@ const ForPlanners = () => {
 
                   <Link
                     to="/signup"
-                    className={`mt-8 inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 ${
+                    className={`mt-8 inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2 ${
                       plan.highlight
                         ? 'bg-[var(--color-primary)] text-white hover:brightness-95'
-                        : 'border border-[var(--color-primary)]/45 text-body hover:border-[var(--color-primary)]'
+                        : 'border border-[color:var(--color-primary-45)] text-body hover:border-[color:var(--color-primary)]'
                     }`}
                   >
                     {plan.cta}
@@ -734,9 +734,9 @@ const ForPlanners = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 space-y-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="layout-container mt-24 space-y-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               <Star className="h-3.5 w-3.5" />
               {t('planners.testimonials.badge', 'Testimonios')}
             </span>
@@ -751,13 +751,13 @@ const ForPlanners = () => {
             {testimonials.map((testimonial) => (
               <article
                 key={testimonial.name}
-                className="flex h-full flex-col gap-4 rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+                className="flex h-full flex-col gap-4 rounded-2xl border border-soft bg-white/95 p-6 shadow-sm"
               >
                 <div className="flex gap-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star
                       key={i}
-                      className="h-4 w-4 fill-[var(--color-primary)] text-[var(--color-primary)]"
+                      className="h-4 w-4 fill-[var(--color-primary)] text-[color:var(--color-primary)]"
                     />
                   ))}
                 </div>
@@ -771,9 +771,9 @@ const ForPlanners = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 grid gap-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 lg:grid-cols-2">
+        <section className="layout-container mt-24 grid gap-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg lg:grid-cols-2">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               <MessageSquare className="h-3.5 w-3.5" />
               {t('planners.demo.badge', 'Demo Personalizada')}
             </span>
@@ -789,14 +789,14 @@ const ForPlanners = () => {
             <ul className="mt-6 space-y-3 text-sm text-muted">
               {demoChecklist.map((item) => (
                 <li key={item} className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 text-[var(--color-primary)]" />
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 text-[color:var(--color-primary)]" />
                   <span>{item}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="rounded-3xl border border-soft bg-white/95 p-8 shadow-lg shadow-[var(--color-primary)]/15">
+          <div className="rounded-3xl border border-soft bg-white/95 p-8 shadow-lg">
             <h3 className="text-2xl font-semibold text-body">
               {t('planners.demo.form.title', 'Solicita tu demo')}
             </h3>
@@ -817,7 +817,7 @@ const ForPlanners = () => {
                   value={demoName}
                   onChange={(event) => setDemoName(event.target.value)}
                   placeholder={t('planners.demo.form.fields.name.placeholder', 'Tu nombre')}
-                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                   required
                 />
               </div>
@@ -831,7 +831,7 @@ const ForPlanners = () => {
                   value={demoEmail}
                   onChange={(event) => setDemoEmail(event.target.value)}
                   placeholder={t('planners.demo.form.fields.email.placeholder', 'tu@email.com')}
-                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                   required
                 />
               </div>
@@ -848,7 +848,7 @@ const ForPlanners = () => {
                     'planners.demo.form.fields.company.placeholder',
                     'Nombre de tu agencia'
                   )}
-                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                 />
               </div>
               <button
@@ -864,7 +864,7 @@ const ForPlanners = () => {
               {demoMessage && (
                 <p
                   className={`text-sm ${
-                    demoStatus === 'success' ? 'text-[var(--color-primary)]' : 'text-red-600'
+                    demoStatus === 'success' ? 'text-[color:var(--color-primary)]' : 'text-red-600'
                   }`}
                 >
                   {demoMessage}
@@ -874,7 +874,7 @@ const ForPlanners = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 rounded-3xl border border-[var(--color-primary)]/45 bg-[var(--color-primary)] px-8 py-10 text-white shadow-lg shadow-[var(--color-primary)]/30 md:px-12">
+        <section className="layout-container mt-24 rounded-3xl border border-[color:var(--color-primary-45)] bg-[var(--color-primary)] px-8 py-10 text-white shadow-lg md:px-12">
           <div className="grid gap-10 md:grid-cols-[2fr,1fr] md:items-center">
             <div>
               <h2 className="text-3xl font-semibold">
@@ -890,13 +890,13 @@ const ForPlanners = () => {
             <div className="flex flex-col gap-3">
               <Link
                 to="/signup"
-                className="inline-flex items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-[var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
+                className="inline-flex items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-[color:var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[color:var(--color-primary)]"
               >
                 {t('planners.finalCta.primary', 'Comenzar prueba gratis')}
               </Link>
               <a
                 href="#planes"
-                className="inline-flex items-center justify-center rounded-md border border-white/70 px-4 py-3 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
+                className="inline-flex items-center justify-center rounded-md border border-white/70 px-4 py-3 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[color:var(--color-primary)]"
               >
                 {t('planners.finalCta.secondary', 'Ver todos los planes')}
               </a>

@@ -238,7 +238,7 @@ export default function PublicQuoteResponse() {
   // Formulario principal
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="mshadow-md mx-auto">
+      <div className="layout-container-wide">
         {/* Header */}
         <Card className="mb-6">
           <div className="flex items-center gap-4">

@@ -1,4 +1,4 @@
-# Política de Seguridad — MaLoveApp
+# Política de Seguridad — MaLove.App
 
 Gracias por ayudarnos a mantener segura la plataforma.
 
@@ -24,4 +24,3 @@ Por favor no publiques la vulnerabilidad ni abras issues públicos hasta que con
 
 ## Divulgación Responsable
 Tras liberar el parche y coordinar con quienes reportaron, podremos publicar detalles no sensibles del fallo y su resolución.
-

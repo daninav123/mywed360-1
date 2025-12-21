@@ -5,6 +5,55 @@ import request from 'supertest';
 // Mock mínimo de firebase-admin para no tocar servicios reales
 vi.mock('firebase-admin', () => {
   const apps = [];
+
+  const makeQuery = () => ({
+    get: vi.fn(async () => ({ empty: true, docs: [], size: 0, forEach: () => {} })),
+    limit: vi.fn(() => makeQuery()),
+    orderBy: vi.fn(() => makeQuery()),
+    where: vi.fn(() => makeQuery()),
+    select: vi.fn(() => ({ get: vi.fn(async () => ({ forEach: () => {} })) })),
+  });
+
+  const makeCollectionRef = () => ({
+    doc: vi.fn(() => makeDocRef()),
+    where: vi.fn(() => makeQuery()),
+    orderBy: vi.fn(() => makeCollectionRef()),
+    limit: vi.fn(() => makeQuery()),
+    select: vi.fn(() => ({ get: vi.fn(async () => ({ forEach: () => {} })) })),
+    get: vi.fn(async () => ({ empty: true, docs: [], size: 0, forEach: () => {} })),
+    add: vi.fn(async () => ({ id: 'id1' })),
+  });
+
+  const makeDocRef = () => {
+    const ref = {
+      get: vi.fn(async () => ({ exists: false, data: () => ({}) })),
+      set: vi.fn(async () => {}),
+      update: vi.fn(async () => {}),
+      delete: vi.fn(async () => {}),
+    };
+    ref.collection = vi.fn(() => makeCollectionRef());
+    return ref;
+  };
+
+  const firestoreFn = vi.fn(() => ({
+    collection: vi.fn(() => makeCollectionRef()),
+    doc: vi.fn(() => makeDocRef()),
+    batch: vi.fn(() => ({
+      set: vi.fn(() => {}),
+      update: vi.fn(() => {}),
+      delete: vi.fn(() => {}),
+      commit: vi.fn(async () => {}),
+    })),
+  }));
+  firestoreFn.FieldValue = {
+    serverTimestamp: () => new Date(),
+    increment: () => 0,
+    arrayUnion: (...vals) => ({ __op: 'arrayUnion', vals }),
+  };
+  firestoreFn.Timestamp = {
+    fromDate: (d) => ({ toDate: () => d, toMillis: () => d.getTime() }),
+  };
+
   return {
     __esModule: true,
     default: {
@@ -12,17 +61,12 @@ vi.mock('firebase-admin', () => {
       initializeApp: () => { apps.push({}); },
       credential: {
         applicationDefault: () => ({}),
-        cert: () => ({})
+        cert: () => ({}),
       },
-      firestore: () => ({
-        collection: () => ({
-          limit: () => ({
-            get: async () => ({ size: 0, docs: [] })
-          })
-        })
-      }),
-      storage: () => ({ bucket: () => ({ file: () => ({ save: async () => {} }) }) })
-    }
+      firestore: firestoreFn,
+      auth: () => ({ verifyIdToken: async () => ({ uid: 'test' }) }),
+      storage: () => ({ bucket: () => ({ file: () => ({ save: async () => {} }) }) }),
+    },
   };
 });
 
@@ -31,7 +75,13 @@ vi.mock('helmet', () => ({ __esModule: true, default: () => (req, _res, next) =>
 vi.mock('cors', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
 vi.mock('express-rate-limit', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
 vi.mock('axios', () => ({ __esModule: true, default: { get: vi.fn(), post: vi.fn() } }));
-vi.mock('multer', () => ({ __esModule: true, default: () => ({ any: () => (req, _res, next) => next() }) }));
+vi.mock('multer', () => {
+  const middleware = (_req, _res, next) => next();
+  const instance = { any: () => middleware, single: () => middleware, array: () => middleware, fields: () => middleware };
+  const fn = () => instance;
+  fn.memoryStorage = () => ({});
+  return { __esModule: true, default: fn };
+});
 
 let app;
 beforeAll(async () => {

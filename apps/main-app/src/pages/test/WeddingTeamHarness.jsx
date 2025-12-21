@@ -10,7 +10,7 @@ export default function WeddingTeamHarness() {
     <div className="min-h-screen bg-[var(--color-bg)] text-[color:var(--color-text)] p-6 space-y-4">
       <header>
         <h1 className="text-2xl font-semibold">Harness - Gestion de equipo</h1>
-        <p className="text-sm text-[color:var(--color-text)]/70">
+        <p className="text-sm text-[color:var(--color-text-70)]">
           Esta vista de pruebas permite ejercitar el modal de seleccion/invitacion de planners y
           generacion de codigos externos sin depender de Firestore.
         </p>
@@ -30,7 +30,7 @@ export default function WeddingTeamHarness() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md text-sm font-semibold hover:bg-[var(--color-primary)]/80 transition"
+            className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md text-sm font-semibold hover:bg-[var(--color-primary-80)] transition"
             data-testid="open-team-modal"
           >
             Abrir modal de equipo
@@ -43,7 +43,7 @@ export default function WeddingTeamHarness() {
                 window.localStorage.removeItem('maloveapp_team_codes');
               }
             }}
-            className="px-4 py-2 bg-[var(--color-accent)]/40 text-[color:var(--color-text)] rounded-md text-sm font-semibold hover:bg-[var(--color-accent)]/60 transition"
+            className="px-4 py-2 bg-[var(--color-accent-40)] text-[color:var(--color-text)] rounded-md text-sm font-semibold hover:bg-[var(--color-accent-60)] transition"
             data-testid="reset-team-storage"
           >
             Limpiar storage de invitaciones

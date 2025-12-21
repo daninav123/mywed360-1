@@ -362,7 +362,7 @@ const BlogPost = () => {
         <div className="mb-6">
           <Link
             to="/blog"
-            className="text-sm text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]"
+            className="text-sm text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)]"
           >
             ← Volver al blog
           </Link>
@@ -388,7 +388,7 @@ const BlogPost = () => {
                 {post?.byline?.name ? (
                   <Link
                     to={`/blog/autor/${post.byline.slug || post.byline.id}`}
-                    className="text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]"
+                    className="text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)]"
                   >
                     Por <span className="font-semibold text-gray-900">{post.byline.name}</span>
                     {post.byline.title ? ` · ${post.byline.title}` : ''}
@@ -429,21 +429,21 @@ const BlogPost = () => {
 
             <MarkdownRenderer markdown={post.content?.markdown || ''} />
 
-            <section className="rounded-2xl border border-[var(--color-primary,#6366f1)]/20 bg-[var(--color-primary,#6366f1)]/5 p-6 space-y-3">
-              <h2 className="text-xl font-semibold text-[var(--color-primary,#6366f1)]">
+            <section className="rounded-2xl border border-[color:var(--color-primary-20)] bg-[var(--color-primary-5)] p-6 space-y-3">
+              <h2 className="text-xl font-semibold text-[color:var(--color-primary)]">
                 {ctaCopy.title}
               </h2>
               <p className="text-sm text-gray-700">{ctaCopy.description}</p>
               <div className="flex flex-wrap gap-3">
                 <Link
                   to="/signup"
-                  className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary,#6366f1)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-95"
+                  className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-95"
                 >
                   {ctaCopy.primary}
                 </Link>
                 <Link
                   to="/app"
-                  className="inline-flex items-center justify-center rounded-md border border-[var(--color-primary,#6366f1)] px-5 py-2.5 text-sm font-semibold text-[var(--color-primary,#6366f1)] transition hover:bg-[var(--color-primary,#6366f1)]/10"
+                  className="inline-flex items-center justify-center rounded-md border border-[color:var(--color-primary)] px-5 py-2.5 text-sm font-semibold text-[color:var(--color-primary)] transition hover:bg-[var(--color-primary-10)]"
                 >
                   {ctaCopy.secondary}
                 </Link>
@@ -456,13 +456,13 @@ const BlogPost = () => {
                 <ul className="space-y-2 text-sm text-gray-600">
                   {references.map((ref, index) => (
                     <li key={`${ref.url || ref.title}-${index}`} className="flex items-start gap-2">
-                      <span className="mt-1 h-2 w-2 rounded-full bg-[var(--color-primary,#6366f1)]" />
+                      <span className="mt-1 h-2 w-2 rounded-full bg-[var(--color-primary)]" />
                       {ref.url ? (
                         <a
                           href={ref.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]"
+                          className="text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)]"
                         >
                           {ref.title || ref.url}
                         </a>
@@ -497,7 +497,7 @@ const BlogPost = () => {
                   <p className="text-sm text-gray-600">{authorProfile.bio}</p>
                   <Link
                     to={`/blog/autor/${authorProfile.slug}`}
-                    className="inline-flex text-sm font-medium text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]"
+                    className="inline-flex text-sm font-medium text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)]"
                   >
                     {t('blog.author.viewAll', { defaultValue: 'Ver artículos del autor' })}
                   </Link>
@@ -518,7 +518,7 @@ const BlogPost = () => {
                 <Link
                   key={item.slug}
                   to={`/blog/${item.slug}`}
-                  className="rounded-lg border border-soft bg-white p-4 shadow-sm transition hover:border-[var(--color-primary,#6366f1)] hover:shadow"
+                  className="rounded-lg border border-soft bg-white p-4 shadow-sm transition hover:border-[color:var(--color-primary)] hover:shadow"
                 >
                   <p className="text-sm font-semibold text-gray-900 line-clamp-2">{item.title}</p>
                   {item.publishedAt ? (

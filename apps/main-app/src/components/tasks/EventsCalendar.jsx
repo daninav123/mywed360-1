@@ -41,7 +41,7 @@ export default function EventsCalendar({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[var(--color-surface)] rounded-xl shadow-md p-6 overflow-x-auto border border-[color:var(--color-text)]/10">
+    <div className="flex-1 flex flex-col h-full bg-[var(--color-surface)] rounded-xl shadow-md p-6 overflow-x-auto border border-[color:var(--color-text-10)]">
       <h2 className="text-xl font-semibold mb-4">{t('tasks.page.calendar.title')}</h2>
 
       <div className="flex justify-between items-center mb-4">

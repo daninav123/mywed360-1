@@ -12,10 +12,10 @@ import EmailSettings from '../../components/email/EmailSettings';
 import EmailStats from '../../components/email/EmailStats';
 
 // Servicios
-import * as EmailService from '../../services/EmailService';
-import * as FolderService from '../../services/FolderService';
-import * as StatsService from '../../services/StatsService';
-import * as TagService from '../../services/TagService';
+import * as EmailService from '../../services/emailService';
+import * as FolderService from '../../services/folderService';
+import * as StatsService from '../../services/statsService';
+import * as TagService from '../../services/tagService';
 
 // Mock para localStorage
 const localStorageMock = (() => {
@@ -43,10 +43,10 @@ Object.defineProperty(window, 'localStorage', {
 global.fetch = vi.fn();
 
 // Mock para los servicios
-vi.mock('../../services/EmailService');
-vi.mock('../../services/TagService');
-vi.mock('../../services/FolderService');
-vi.mock('../../services/StatsService');
+vi.mock('../../services/emailService');
+vi.mock('../../services/tagService');
+vi.mock('../../services/folderService');
+vi.mock('../../services/statsService');
 
 // Mock para File y FileReader
 global.File = class MockFile {

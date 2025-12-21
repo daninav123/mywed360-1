@@ -208,20 +208,20 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg,#f4f5f7)] px-4 py-8">
+    <div className="min-h-screen bg-[var(--color-bg)] px-4 py-8">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl flex-col items-center justify-center">
         <div className="w-full max-w-5xl overflow-hidden rounded-2xl border border-soft bg-surface shadow-xl md:grid md:grid-cols-2">
-          <div className="hidden bg-[color:var(--color-primary,#6366f1)]/10 p-10 md:flex md:flex-col md:justify-between md:gap-10">
+          <div className="hidden bg-[color:var(--color-primary-10)] p-10 md:flex md:flex-col md:justify-between md:gap-10">
             <div>
-              <h2 className="text-3xl font-bold text-[color:var(--color-primary,#6366f1)]">
+              <h2 className="text-3xl font-bold text-[color:var(--color-primary)]">
                 {t('authSignup.hero.title')}
               </h2>
-              <p className="mt-4 text-base text-[color:var(--color-primary-dark,#4338ca)]/80">
+              <p className="mt-4 text-base text-[color:var(--color-primary-dark)]">
                 {t('authSignup.hero.description')}
               </p>
             </div>
             {Array.isArray(heroFeatures) && heroFeatures.length > 0 ? (
-              <ul className="space-y-3 text-sm text-[color:var(--color-primary-dark,#4338ca)]/80">
+              <ul className="space-y-3 text-sm text-[color:var(--color-primary-dark)]">
                 {heroFeatures.map((feature, index) => (
                   <li key={index}>- {feature}</li>
                 ))}
@@ -230,10 +230,10 @@ export default function Signup() {
           </div>
 
           <div className="p-8 sm:p-10">
-            <h1 className="text-2xl font-semibold text-[color:var(--color-text,#111827)]">
+            <h1 className="text-2xl font-semibold text-[color:var(--color-text)]">
               {t('authSignup.title')}
             </h1>
-            <p className="mt-2 text-sm text-[color:var(--color-text-soft,#6b7280)]">
+            <p className="mt-2 text-sm text-[color:var(--color-text-soft)]">
               {t('authSignup.subtitle')}
             </p>
 
@@ -280,17 +280,17 @@ export default function Signup() {
                 id={INFO_MESSAGE_ID}
                 role="status"
                 aria-live="polite"
-                className="mt-3 text-center text-sm text-[color:var(--color-primary,#6366f1)]"
+                className="mt-3 text-center text-sm text-[color:var(--color-primary)]"
               >
                 {infoMessage}
               </p>
             ) : null}
 
-            <p className="mt-6 text-center text-sm text-[color:var(--color-text-soft,#6b7280)]">
+            <p className="mt-6 text-center text-sm text-[color:var(--color-text-soft)]">
               {t('authSignup.alreadyHaveAccount')}{' '}
               <Link
                 to="/login"
-                className="font-medium text-[color:var(--color-primary,#6366f1)] hover:underline"
+                className="font-medium text-[color:var(--color-primary)] hover:underline"
               >
                 {t('authSignup.loginLink')}
               </Link>

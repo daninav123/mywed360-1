@@ -6,7 +6,7 @@ import Card from '../../components/ui/Card';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import { useAuth } from '../../hooks/useAuth';
 import useTranslations from '../../hooks/useTranslations';
-import * as EmailService from '../../services/EmailService';
+import * as EmailService from '../../services/emailService';
 import { formatDate } from '../../utils/formatUtils';
 import { useProviderEmail } from '../../hooks/useProviderEmail';
 import sanitizeHtml from '../../utils/sanitizeHtml';

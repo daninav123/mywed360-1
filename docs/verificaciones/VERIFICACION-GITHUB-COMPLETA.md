@@ -1,5 +1,7 @@
 # ✅ VERIFICACIÓN COMPLETA - TODO SUBIDO A GITHUB
 
+> Nota: documento histórico. Los hashes/branch/remotos aquí listados pueden no coincidir con el estado actual del repo.
+
 ## 🎉 CONFIRMACIÓN: TODO ESTÁ CORRECTO
 
 ---

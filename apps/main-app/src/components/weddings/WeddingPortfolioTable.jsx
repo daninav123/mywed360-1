@@ -205,7 +205,7 @@ export default function WeddingPortfolioTable({
 
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-[color:var(--color-border)] text-sm">
-          <thead className="bg-[var(--color-surface)]/70 text-xs uppercase tracking-wide text-muted">
+          <thead className="bg-[var(--color-surface-70)] text-xs uppercase tracking-wide text-muted">
             <tr>
               <th className="px-3 py-2 text-left font-semibold">Evento</th>
               <th className="px-3 py-2 text-left font-semibold">Fecha</th>

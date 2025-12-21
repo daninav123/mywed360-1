@@ -28,12 +28,14 @@ export default function FinanceHeroSection({
   const overdueExpenses = toFinite(stats?.overdueExpenses);
   const pendingExpenses = toFinite(stats?.pendingExpenses);
   
-  // Disponible AHORA (ingresos confirmados - gastado)
-  const availableNow = totalIncome - totalSpent;
+  // Disponible AHORA (saldo inicial + ingresos confirmados - gastado + ajustes)
+  const initialBalance = toFinite(stats?.initialBalance);
+  const adjustments = toFinite(stats?.adjustments);
+  const availableNow = initialBalance + totalIncome - totalSpent + adjustments;
   
   // Análisis de pagos críticos
   const paymentAnalysis = useMemo(() => {
-    if (!Array.isArray(transactions)) return { overdue: [], upcoming7d: [], upcoming30d: [] };
+    if (!Array.isArray(transactions)) return { overdue: [], upcoming7d: [], upcoming30d: [], nextPayment: null };
     
     const now = new Date();
     const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -42,6 +44,7 @@ export default function FinanceHeroSection({
     const overdue = [];
     const upcoming7d = [];
     const upcoming30d = [];
+    const allUpcoming = [];
     
     transactions.forEach(tx => {
       if (tx.type !== 'expense' || tx.status === 'paid') return;
@@ -57,15 +60,23 @@ export default function FinanceHeroSection({
       if (outstanding <= 0) return;
       
       if (dueDate < now) {
-        overdue.push({ ...tx, outstanding });
-      } else if (dueDate <= in7Days) {
-        upcoming7d.push({ ...tx, outstanding });
-      } else if (dueDate <= in30Days) {
-        upcoming30d.push({ ...tx, outstanding });
+        overdue.push({ ...tx, outstanding, dueDate });
+      } else {
+        allUpcoming.push({ ...tx, outstanding, dueDate });
+        if (dueDate <= in7Days) {
+          upcoming7d.push({ ...tx, outstanding, dueDate });
+        } else if (dueDate <= in30Days) {
+          upcoming30d.push({ ...tx, outstanding, dueDate });
+        }
       }
     });
     
-    return { overdue, upcoming7d, upcoming30d };
+    // Próximo pago: el más cercano en el futuro
+    const nextPayment = allUpcoming.length > 0 
+      ? allUpcoming.sort((a, b) => a.dueDate - b.dueDate)[0]
+      : null;
+    
+    return { overdue, upcoming7d, upcoming30d, nextPayment };
   }, [transactions]);
   
   // Runway (días hasta quedarse sin fondos)
@@ -104,7 +115,7 @@ export default function FinanceHeroSection({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
       {/* HERO CARD - Disponible Ahora */}
-      <Card className="bg-[var(--color-surface)] rounded-xl shadow-md border border-[color:var(--color-text)]/10 p-6 md:p-8">
+      <Card className="p-6 md:p-8">
         <div className="space-y-6">
           {/* Header - Disponible Ahora */}
           <div className="flex items-start justify-between">
@@ -116,7 +127,7 @@ export default function FinanceHeroSection({
                 </p>
               </div>
               {isLoading ? (
-                <div className="h-16 md:h-20 w-64 bg-[color:var(--color-text)]/10 rounded-xl animate-pulse" />
+                <div className="h-16 md:h-20 w-64 bg-[color:var(--color-text-10)] rounded-xl animate-pulse" />
               ) : (
                 <>
                   <h1 
@@ -131,7 +142,7 @@ export default function FinanceHeroSection({
                 </>
               )}
             </div>
-            <div className="p-4 md:p-5 rounded-2xl bg-[var(--color-text)]/5 shadow-md">
+            <div className="p-4 md:p-5 rounded-2xl bg-[var(--color-text-5)] shadow-sm">
               {isHealthy ? (
                 <TrendingUp className="w-8 h-8 md:w-10 md:h-10" style={{ color: colorMap[healthColor] }} />
               ) : (
@@ -140,11 +151,38 @@ export default function FinanceHeroSection({
             </div>
           </div>
 
-          {/* Runway y Próximos Pagos */}
+          {/* Próximo Pago y Runway */}
           {!isLoading && (
             <div className="grid grid-cols-2 gap-4">
+              {/* Próximo Pago Individual */}
+              <div className="bg-[var(--color-text-5)] rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Calendar className="w-4 h-4 text-muted" />
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted">
+                    {t('finance.hero.nextPayment', { defaultValue: 'Próximo pago' })}
+                  </p>
+                </div>
+                {paymentAnalysis.nextPayment ? (
+                  <>
+                    <p className="text-xl font-bold text-[color:var(--color-warning)]">
+                      {formatCurrency(paymentAnalysis.nextPayment.outstanding)}
+                    </p>
+                    <p className="text-xs text-muted mt-1">
+                      {new Date(paymentAnalysis.nextPayment.dueDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}
+                    </p>
+                    <p className="text-xs text-muted truncate">
+                      {paymentAnalysis.nextPayment.concept || paymentAnalysis.nextPayment.description || 'Sin concepto'}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-sm text-muted">
+                    {t('finance.hero.noPayments', { defaultValue: 'Sin pagos' })}
+                  </p>
+                )}
+              </div>
+              
               {/* Runway */}
-              <div className="bg-[var(--color-text)]/5 rounded-xl p-4">
+              <div className="bg-[var(--color-text-5)] rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Clock className="w-4 h-4 text-muted" />
                   <p className="text-xs font-bold uppercase tracking-wider text-muted">
@@ -164,30 +202,6 @@ export default function FinanceHeroSection({
                   </p>
                 )}
               </div>
-              
-              {/* Próximos Pagos 7d */}
-              <div className="bg-[var(--color-text)]/5 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-4 h-4 text-muted" />
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted">
-                    {t('finance.hero.next7d', { defaultValue: 'Próximos 7d' })}
-                  </p>
-                </div>
-                {paymentAnalysis.upcoming7d.length > 0 ? (
-                  <>
-                    <p className="text-xl font-bold text-[color:var(--color-warning)]">
-                      {formatCurrency(paymentAnalysis.upcoming7d.reduce((sum, p) => sum + p.outstanding, 0))}
-                    </p>
-                    <p className="text-xs text-muted mt-1">
-                      {paymentAnalysis.upcoming7d.length} {t('finance.hero.payments', { defaultValue: 'pagos' })}
-                    </p>
-                  </>
-                ) : (
-                  <p className="text-sm text-muted">
-                    {t('finance.hero.noPayments', { defaultValue: 'Sin pagos' })}
-                  </p>
-                )}
-              </div>
             </div>
           )}
 
@@ -200,7 +214,7 @@ export default function FinanceHeroSection({
                   {t('finance.hero.overdue', { defaultValue: '⚠️ Pagos Vencidos' })}
                 </h4>
               </div>
-              <div className="bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30 rounded-lg p-3">
+              <div className="bg-[var(--color-danger-10)] border border-[color:var(--color-danger-30)] rounded-lg p-3">
                 <p className="text-lg font-black text-[color:var(--color-danger)]">
                   {paymentAnalysis.overdue.length} {t('finance.hero.payments', { defaultValue: 'pagos' })}: {formatCurrency(overdueExpenses)}
                 </p>
@@ -217,7 +231,7 @@ export default function FinanceHeroSection({
       </Card>
 
       {/* Estado de Categorías */}
-      <Card className="bg-[var(--color-surface)] rounded-xl shadow-md border border-[color:var(--color-text)]/10 p-6">
+      <Card className="p-6">
         <div className="space-y-5">
           <div>
             <p className="text-sm font-bold uppercase tracking-wider text-muted mb-4">
@@ -226,7 +240,7 @@ export default function FinanceHeroSection({
           </div>
 
           {/* Categorías OK */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-success)]/10">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-success-10)]">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-muted mb-1">
                 {t('finance.hero.categoriesOk', { defaultValue: '✅ Categorías OK' })}
@@ -239,7 +253,7 @@ export default function FinanceHeroSection({
 
           {/* Categorías en Alerta */}
           {categoryStatus.warning > 0 && (
-            <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-warning)]/10">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-warning-10)]">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted mb-1">
                   {t('finance.hero.categoriesWarning', { defaultValue: '⚠️ En alerta (>75%)' })}
@@ -253,7 +267,7 @@ export default function FinanceHeroSection({
 
           {/* Categorías Críticas */}
           {categoryStatus.critical > 0 && (
-            <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-danger)]/10">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-danger-10)]">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted mb-1">
                   {t('finance.hero.categoriesCritical', { defaultValue: '🔴 Críticas (>90%)' })}

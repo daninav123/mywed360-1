@@ -3,6 +3,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { generateUserStats, getUserStats, saveUserStats } from '../../services/statsService';
 
 // Mock de los servicios dependientes
+vi.mock('../../services/emailMetricsService', () => ({
+  getAggregatedStats: vi.fn(),
+  getDailyStats: vi.fn(),
+}));
+
 vi.mock('../../services/emailService', () => ({
   getMails: vi.fn(),
 }));
@@ -19,6 +24,7 @@ vi.mock('../../services/tagService', () => ({
 }));
 
 // Importar servicios después del mock para poder manipularlos
+import { getAggregatedStats } from '../../services/emailMetricsService';
 import { getMails } from '../../services/emailService';
 import { getUserFolders, getEmailsInFolder } from '../../services/folderService';
 import { getUserTags, getEmailsByTag, getEmailTagsDetails } from '../../services/tagService';
@@ -96,6 +102,7 @@ describe('statsService', () => {
       body: 'Pregunta',
       date: '2025-05-04T16:00:00Z',
       folder: 'sent',
+      inReplyTo: 'email2',
     },
   ];
 
@@ -129,6 +136,8 @@ describe('statsService', () => {
     vi.clearAllMocks();
     localStorageMock.clear();
 
+    getAggregatedStats.mockResolvedValue(null);
+
     // Configurar mocks por defecto
     getMails.mockImplementation((folder) => {
       if (folder === 'inbox') return Promise.resolve(mockInboxEmails);
@@ -137,7 +146,8 @@ describe('statsService', () => {
       return Promise.resolve([]);
     });
 
-    getUserFolders.mockReturnValue(mockFolders);
+    getUserFolders.mockReturnValue([mockFolders[3]]);
+    getEmailsInFolder.mockReturnValue([]);
     getUserTags.mockReturnValue(mockTags);
     getEmailsByTag.mockImplementation(() => []);
     getEmailTagsDetails.mockImplementation(() => []);
@@ -228,8 +238,8 @@ describe('statsService', () => {
 
       // contact@example.com aparece 2 veces
       const topContact = stats.contactAnalysis.topContacts[0];
-      expect(topContact.email).toBe('contact@example.com');
-      expect(topContact.count).toBe(2);
+      expect(topContact.name).toBe('contact');
+      expect(topContact.received).toBe(2);
     });
 
     it('calcula correctamente métricas de respuesta', async () => {
@@ -239,7 +249,6 @@ describe('statsService', () => {
       expect(stats.responseMetrics).toHaveProperty('averageResponseTime');
 
       // Verificar tasa de respuesta
-      // Hay un email (email3) que es respuesta al email sent1
       expect(stats.responseMetrics.responseRate).toBeGreaterThan(0);
     });
 
@@ -266,21 +275,20 @@ describe('statsService', () => {
 
     it('calcula correctamente la distribución por carpetas', async () => {
       // Añadir un email en una carpeta personalizada
-      const mockWorkEmail = { id: 'work1', folder: 'work', subject: 'Trabajo' };
-      getEmailsInFolder.mockResolvedValue([mockWorkEmail]);
+      getEmailsInFolder.mockReturnValue(['work1']);
 
       const stats = await generateUserStats(mockUserId);
 
-      expect(stats.folderDistribution).toHaveProperty('data');
-      expect(stats.folderDistribution).toHaveProperty('labels');
-
-      // Verificar que incluye la carpeta personalizada
-      expect(stats.folderDistribution.labels).toContain('Trabajo');
+      expect(stats.folderDistribution).toHaveProperty('custom');
+      const workFolder = stats.folderDistribution.custom.find((folder) => folder.id === 'work');
+      expect(workFolder).toBeDefined();
+      expect(workFolder.name).toBe('Trabajo');
+      expect(workFolder.count).toBe(1);
     });
 
     it('calcula correctamente la distribución por etiquetas', async () => {
       // Configurar emails con etiquetas
-      getEmailsByTag.mockImplementation((tagId) => {
+      getEmailsByTag.mockImplementation((_, tagId) => {
         if (tagId === 'important') return [mockInboxEmails[0]];
         if (tagId === 'work') return [mockInboxEmails[1], mockSentEmails[0]];
         return [];
@@ -288,14 +296,11 @@ describe('statsService', () => {
 
       const stats = await generateUserStats(mockUserId);
 
-      expect(stats.tagDistribution).toHaveProperty('data');
-      expect(stats.tagDistribution).toHaveProperty('labels');
-      expect(stats.tagDistribution).toHaveProperty('colors');
-
-      // Verificar que las etiquetas tienen datos
-      const workIndex = stats.tagDistribution.labels.indexOf('Trabajo');
-      expect(workIndex).not.toBe(-1);
-      expect(stats.tagDistribution.data[workIndex]).toBe(2); // 2 emails con esta etiqueta
+      expect(Array.isArray(stats.tagDistribution)).toBe(true);
+      const workTag = stats.tagDistribution.find((tag) => tag.id === 'work');
+      expect(workTag).toBeDefined();
+      expect(workTag.name).toBe('Trabajo');
+      expect(workTag.count).toBe(2); // 2 emails con esta etiqueta
     });
   });
 });

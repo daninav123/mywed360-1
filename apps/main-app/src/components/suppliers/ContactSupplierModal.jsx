@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { X, Send, Calendar, MapPin, Users, Check } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { X, Send, Calendar, MapPin, Users, Check, Clock, DollarSign } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useWedding } from '../../context/WeddingContext';
 import useTranslations from '../../hooks/useTranslations';
+import useFinance from '../../hooks/useFinance';
+import { normalizeBudgetCategoryKey } from '../../utils/budgetCategories';
 
 /**
  * Modal para solicitar presupuesto a un proveedor
@@ -12,21 +14,75 @@ export default function ContactSupplierModal({ supplier, onClose }) {
   const { currentUser } = useAuth();
   const { activeWedding } = useWedding();
   const { t } = useTranslations();
+  const { budget } = useFinance();
 
   const [formData, setFormData] = useState({
     clientName: '',
     clientEmail: '',
     clientPhone: '',
     weddingDate: '',
+    weddingTime: '',
+    weddingVenue: '',
     weddingLocation: '',
     guestCount: '',
-    budget: '',
     message: '',
   });
+
+  const [includeBudget, setIncludeBudget] = useState(false);
+  const [assignedBudget, setAssignedBudget] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState(null);
+
+  // Calcular presupuesto automáticamente basado en servicios del proveedor
+  const calculatedBudget = useMemo(() => {
+    if (!budget?.categories || !supplier) return null;
+
+    const supplierCategories = [];
+    
+    if (supplier.category) {
+      supplierCategories.push({
+        original: supplier.category,
+        normalized: normalizeBudgetCategoryKey(supplier.category),
+        name: supplier.categoryName || supplier.category
+      });
+    }
+    
+    if (supplier.alternativeCategories && Array.isArray(supplier.alternativeCategories)) {
+      supplier.alternativeCategories.forEach(alt => {
+        if (alt.category && alt.confidence > 20) {
+          supplierCategories.push({
+            original: alt.category,
+            normalized: normalizeBudgetCategoryKey(alt.category),
+            name: alt.categoryName || alt.category
+          });
+        }
+      });
+    }
+
+    const matchedBudgets = [];
+    let totalBudget = 0;
+
+    supplierCategories.forEach(supplierCat => {
+      const budgetCategory = budget.categories.find(budgetCat => 
+        normalizeBudgetCategoryKey(budgetCat.name) === supplierCat.normalized
+      );
+
+      if (budgetCategory && budgetCategory.amount > 0) {
+        matchedBudgets.push({
+          category: supplierCat.name,
+          amount: budgetCategory.amount
+        });
+        totalBudget += budgetCategory.amount;
+      }
+    });
+
+    return matchedBudgets.length > 0 ? {
+      total: totalBudget,
+      breakdown: matchedBudgets
+    } : null;
+  }, [budget, supplier]);
 
   // Precargar datos de la boda activa
   useEffect(() => {
@@ -34,13 +90,22 @@ export default function ContactSupplierModal({ supplier, onClose }) {
       clientName: activeWedding?.names || currentUser?.displayName || '',
       clientEmail: currentUser?.email || '',
       clientPhone: activeWedding?.phone || '',
-      weddingDate: activeWedding?.weddingDate || '',
-      weddingLocation: activeWedding?.location || '',
+      weddingDate: activeWedding?.weddingDate || activeWedding?.date || '',
+      weddingTime: activeWedding?.time || activeWedding?.ceremonyTime || '',
+      weddingVenue: activeWedding?.venue?.name || activeWedding?.celebrationPlace || '',
+      weddingLocation: activeWedding?.location?.city || activeWedding?.city || '',
       guestCount: activeWedding?.guestCount || '',
-      budget: '',
       message: `Hola ${supplier.name},\n\nEstamos organizando nuestra boda y nos gustaría recibir más información sobre sus servicios.\n\n¡Gracias!`,
     });
   }, [activeWedding, currentUser, supplier.name]);
+
+  // Inicializar presupuesto automáticamente
+  useEffect(() => {
+    if (calculatedBudget && calculatedBudget.total > 0) {
+      setAssignedBudget(calculatedBudget.total.toString());
+      setIncludeBudget(true);
+    }
+  }, [calculatedBudget]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,9 +122,11 @@ export default function ContactSupplierModal({ supplier, onClose }) {
           // Datos de la pareja
           coupleName: formData.clientName,
           weddingDate: formData.weddingDate || null,
+          weddingTime: formData.weddingTime || null,
+          venue: formData.weddingVenue || null,
           location: formData.weddingLocation || null,
           guestCount: formData.guestCount ? parseInt(formData.guestCount) : null,
-          budget: formData.budget || null,
+          assignedBudget: includeBudget && assignedBudget ? parseFloat(assignedBudget) : null,
 
           // Servicios y mensaje
           services: [supplier.category || 'General'],
@@ -205,8 +272,33 @@ export default function ContactSupplierModal({ supplier, onClose }) {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
+                  <Clock size={16} className="inline mr-1" />
+                  Hora
+                </label>
+                <input
+                  type="time"
+                  value={formData.weddingTime}
+                  onChange={(e) => setFormData({ ...formData, weddingTime: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
                   <MapPin size={16} className="inline mr-1" />
-                  Lugar
+                  Lugar de celebración
+                </label>
+                <input
+                  type="text"
+                  value={formData.weddingVenue}
+                  onChange={(e) => setFormData({ ...formData, weddingVenue: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Ej: Finca El Olivar"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  <MapPin size={16} className="inline mr-1" />
+                  Ciudad
                 </label>
                 <input
                   type="text"
@@ -231,19 +323,57 @@ export default function ContactSupplierModal({ supplier, onClose }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Presupuesto Estimado</label>
-                <select
-                  value={formData.budget}
-                  onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="">Selecciona un rango</option>
-                  <option value="< 1000€">Menos de 1.000€</option>
-                  <option value="1000-2000€">1.000€ - 2.000€</option>
-                  <option value="2000-3000€">2.000€ - 3.000€</option>
-                  <option value="3000-5000€">3.000€ - 5.000€</option>
-                  <option value="> 5000€">Más de 5.000€</option>
-                </select>
+                <label className="block text-sm font-medium mb-1">
+                  <DollarSign size={16} className="inline mr-1" />
+                  Presupuesto asignado (opcional)
+                </label>
+                
+                {calculatedBudget && (
+                  <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
+                    <p className="text-green-800 mb-1">✨ Presupuesto detectado:</p>
+                    {calculatedBudget.breakdown.length > 1 ? (
+                      <div className="space-y-1">
+                        {calculatedBudget.breakdown.map((item, idx) => (
+                          <div key={idx} className="flex justify-between text-green-700">
+                            <span>• {item.category}</span>
+                            <span className="font-semibold">{item.amount.toLocaleString('es-ES')}€</span>
+                          </div>
+                        ))}
+                        <div className="border-t border-green-300 pt-1 flex justify-between font-bold">
+                          <span>Total:</span>
+                          <span>{calculatedBudget.total.toLocaleString('es-ES')}€</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="font-semibold text-green-800">
+                        {calculatedBudget.total.toLocaleString('es-ES')}€
+                      </p>
+                    )}
+                  </div>
+                )}
+                
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={includeBudget}
+                      onChange={(e) => setIncludeBudget(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                    />
+                    <span className="text-sm text-gray-700">Incluir presupuesto para este servicio</span>
+                  </label>
+                  {includeBudget && (
+                    <input
+                      type="number"
+                      value={assignedBudget}
+                      onChange={(e) => setAssignedBudget(e.target.value)}
+                      placeholder="Ej: 5000"
+                      min="0"
+                      step="100"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>

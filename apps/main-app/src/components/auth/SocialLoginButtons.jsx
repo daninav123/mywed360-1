@@ -52,11 +52,11 @@ export default function SocialLoginButtons({
             type="button"
             onClick={() => onProviderClick?.(provider)}
             disabled={disabled || isLoading}
-            className="flex items-center justify-center gap-3 rounded-md border border-soft bg-surface py-2.5 text-sm font-medium transition-colors hover:bg-[color:var(--color-bg-soft,#f9fafb)] disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex items-center justify-center gap-3 rounded-md border border-soft bg-surface py-2.5 text-sm font-medium transition-colors hover:bg-[color:var(--color-bg-soft)] disabled:cursor-not-allowed disabled:opacity-70"
             data-provider={provider}
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-primary,#6366f1)]" />
+              <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-primary)]" />
             ) : (
               <Icon className="h-4 w-4" style={{ color }} />
             )}

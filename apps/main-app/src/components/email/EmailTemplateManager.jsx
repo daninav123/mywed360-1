@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import * as EmailService from '../../services/EmailService';
+import * as EmailService from '../../services/emailService';
 import Button from '../Button';
 import Card from '../ui/Card';
 

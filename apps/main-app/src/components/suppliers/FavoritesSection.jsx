@@ -108,7 +108,7 @@ const FavoritesSection = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[var(--color-primary)]accent/5 border-primary/20">
+      <Card className="bg-[var(--color-primary-5)] border-[color:var(--color-primary-20)]">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -221,7 +221,7 @@ const FavoritesSection = () => {
                     setSelectedSupplier(favorite.supplier);
                     setShowQuoteModal(true);
                   }}
-                  className="p-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors shadow-lg"
+                  className="p-2 bg-primary text-white rounded-full hover:bg-[var(--color-primary-90)] transition-colors shadow-lg"
                   title={t('suppliers.detail.actions.requestQuote')}
                 >
                   <Send className="h-4 w-4" />

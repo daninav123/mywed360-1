@@ -320,20 +320,20 @@ const Partners = () => {
       </Helmet>
 
       <MarketingLayout>
-        <section className="layout-container rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="layout-container rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
           <div className="mx-auto max-w-4xl text-center">
             <div className="flex items-center justify-center gap-3">
               <img
                 src={logoApp}
                 alt={hero.logoAlt ?? fallbackContent.hero.logoAlt}
-                className="h-12 w-12 rounded-2xl bg-white object-contain shadow-sm ring-1 ring-[var(--color-primary)]/25"
+                className="h-12 w-12 rounded-2xl bg-white object-contain shadow-sm ring-1 ring-[color:var(--color-primary-25)]"
               />
               <span className="text-sm font-semibold uppercase tracking-widest text-muted">
                 {hero.brand ?? fallbackContent.hero.brand}
               </span>
             </div>
-            <span className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted">
-              <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+            <span className="mt-6 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-primary-40)] bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted">
+              <Sparkles className="h-3.5 w-3.5 text-[color:var(--color-primary)]" />
               {hero.badge ?? fallbackContent.hero.badge}
             </span>
             <h1 className="mt-6 text-4xl font-semibold leading-tight text-body md:text-5xl">
@@ -347,7 +347,7 @@ const Partners = () => {
             <div className="mt-8 flex justify-center">
               <a
                 href={`#${formAnchor}`}
-                className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
               >
                 {hero.cta ?? fallbackContent.hero.cta}
               </a>
@@ -355,7 +355,7 @@ const Partners = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-3xl font-semibold text-body">
               {benefitsSection.title ?? fallbackContent.benefits.title}
@@ -368,9 +368,9 @@ const Partners = () => {
             {benefits.map((benefit) => (
               <article
                 key={benefit.title}
-                className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+                className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-[color:var(--color-primary)]">
                   <benefit.Icon className="h-5 w-5" />
                 </span>
                 <h3 className="mt-4 text-lg font-semibold text-body">{benefit.title}</h3>
@@ -380,9 +380,9 @@ const Partners = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               <CheckCircle2 className="h-3.5 w-3.5" />
               {processSection.badge ?? fallbackContent.process.badge}
             </span>
@@ -396,7 +396,7 @@ const Partners = () => {
           <div className="mt-12 grid gap-8 md:grid-cols-4">
             {processSteps.map((item, index) => (
               <article key={item.title} className="relative text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-primary)] text-2xl font-bold text-white shadow-lg shadow-[var(--color-primary)]/30">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-primary)] text-2xl font-bold text-white shadow-lg">
                   {item.step ?? String(index + 1)}
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-body">{item.title}</h3>
@@ -406,9 +406,9 @@ const Partners = () => {
           </div>
         </section>
 
-        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg">
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
               <Users className="h-3.5 w-3.5" />
               {content.profiles?.badge ?? fallbackContent.profiles.badge}
             </span>
@@ -423,9 +423,9 @@ const Partners = () => {
             {profiles.map((profile) => (
               <article
                 key={profile.title}
-                className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+                className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm"
               >
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-[color:var(--color-primary)]">
                   <profile.Icon className="h-6 w-6" />
                 </span>
                 <h3 className="mt-4 text-lg font-semibold text-body">{profile.title}</h3>
@@ -437,11 +437,11 @@ const Partners = () => {
 
         <section
           id={formAnchor}
-          className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15"
+          className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg"
         >
           <div className="mx-auto max-w-2xl">
             <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
                 <Send className="h-3.5 w-3.5" />
                 {formSection.badge ?? fallbackContent.form.badge}
               </span>
@@ -466,7 +466,7 @@ const Partners = () => {
                   placeholder={
                     formFields.name?.placeholder ?? fallbackContent.form.fields.name.placeholder
                   }
-                  className="mt-2 w-full rounded-md border border-soft bg-surface px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-2 w-full rounded-md border border-soft bg-surface px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                   required
                 />
               </div>
@@ -483,7 +483,7 @@ const Partners = () => {
                   placeholder={
                     formFields.email?.placeholder ?? fallbackContent.form.fields.email.placeholder
                   }
-                  className="mt-2 w-full rounded-md border border-soft bg-surface px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-2 w-full rounded-md border border-soft bg-surface px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                   required
                 />
               </div>
@@ -496,7 +496,7 @@ const Partners = () => {
                   id="contact-experience"
                   value={contactExperience}
                   onChange={(event) => setContactExperience(event.target.value)}
-                  className="mt-2 w-full rounded-md border border-soft bg-surface px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-2 w-full rounded-md border border-soft bg-surface px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                 >
                   <option value="">
                     {experienceField.placeholder ??
@@ -522,7 +522,7 @@ const Partners = () => {
                     formFields.about?.placeholder ?? fallbackContent.form.fields.about.placeholder
                   }
                   rows={5}
-                  className="mt-2 w-full rounded-md border border-soft bg-surface px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  className="mt-2 w-full rounded-md border border-soft bg-surface px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                 />
               </div>
 
@@ -540,7 +540,7 @@ const Partners = () => {
               {formMessage && (
                 <p
                   className={`text-sm ${
-                    formStatus === 'success' ? 'text-[var(--color-primary)]' : 'text-red-600'
+                    formStatus === 'success' ? 'text-[color:var(--color-primary)]' : 'text-red-600'
                   }`}
                 >
                   {formMessage}
@@ -548,13 +548,13 @@ const Partners = () => {
               )}
             </form>
 
-            <div className="mt-8 rounded-2xl border border-soft bg-primary-soft/40 p-6 text-center text-sm text-muted">
+            <div className="mt-8 rounded-2xl border border-soft bg-primary-soft p-6 text-center text-sm text-muted">
               <p>{formSection.consent ?? fallbackContent.form.consent}</p>
             </div>
           </div>
         </section>
 
-        <section className="layout-container mt-24 rounded-3xl border border-[var(--color-primary)]/45 bg-[var(--color-primary)] px-8 py-10 text-white shadow-lg shadow-[var(--color-primary)]/30 md:px-12">
+        <section className="layout-container mt-24 rounded-3xl border border-[color:var(--color-primary-45)] bg-[var(--color-primary)] px-8 py-10 text-white shadow-lg md:px-12">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-3xl font-semibold">
               {finalCta.title ?? fallbackContent.finalCta.title}
@@ -565,7 +565,7 @@ const Partners = () => {
             <div className="mt-8">
               <a
                 href={`#${formAnchor}`}
-                className="inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-semibold text-[var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
+                className="inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-semibold text-[color:var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[color:var(--color-primary)]"
               >
                 {finalCta.primary ?? fallbackContent.finalCta.primary}
               </a>

@@ -225,8 +225,8 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
             type="button"
             className={`px-3 py-2 rounded-md text-sm font-medium ${
               tab === t.id
-                ? 'bg-[var(--color-primary)]/20 text-[color:var(--color-text)]'
-                : 'bg-transparent text-[color:var(--color-text)]/70 hover:bg-[var(--color-primary)]/10'
+                ? 'bg-[var(--color-primary-20)] text-[color:var(--color-text)]'
+                : 'bg-transparent text-[color:var(--color-text-70)] hover:bg-[var(--color-primary-10)]'
             }`}
             onClick={() => {
               setTab(t.id);
@@ -240,7 +240,7 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
 
       {tab === 'planners' && (
         <div className="space-y-4" data-testid="marketplace-pane">
-          <p className="text-sm text-[color:var(--color-text)]/70">
+          <p className="text-sm text-[color:var(--color-text-70)]">
             Elige un planner certificado en la plataforma. Se enviara una invitacion automatica con los
             detalles de la boda.
           </p>
@@ -250,7 +250,7 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
             </div>
           ) : null}
           {plannersLoading ? (
-            <div className="text-sm text-[color:var(--color-text)]/60">Cargando planners…</div>
+            <div className="text-sm text-[color:var(--color-text-60)]">Cargando planners…</div>
           ) : null}
           <div className="grid gap-3 md:grid-cols-2" data-testid="marketplace-grid">
             {plannerCandidates.map((planner) => {
@@ -269,12 +269,12 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
                       <h4 className="text-base font-semibold text-[color:var(--color-text)]">
                         {planner.name}
                       </h4>
-                      <span className="text-xs text-[color:var(--color-text)]/60">
+                      <span className="text-xs text-[color:var(--color-text-60)]">
                         {planner.city}
                         {ratingText ? ` | ${ratingText}` : ''}
                       </span>
                     </div>
-                    <span className="text-xs text-[color:var(--color-text)]/50">
+                    <span className="text-xs text-[color:var(--color-text-50)]">
                       {planner.weddingsActive} bodas activas
                     </span>
                   </div>
@@ -283,7 +283,7 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
                       {tags.map((tag) => (
                         <span
                           key={`${planner.id}-${tag}`}
-                          className="text-[10px] uppercase tracking-wide bg-[var(--color-primary)]/10 text-[color:var(--color-text)]/70 px-2 py-1 rounded"
+                          className="text-[10px] uppercase tracking-wide bg-[var(--color-primary-10)] text-[color:var(--color-text-70)] px-2 py-1 rounded"
                         >
                           {tag}
                         </span>
@@ -291,13 +291,13 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
                     </div>
                   )}
                   {specialties.length > 0 && (
-                    <div className="text-xs text-[color:var(--color-text)]/60">
+                    <div className="text-xs text-[color:var(--color-text-60)]">
                       Especialidades: {specialties.join(', ')}
                     </div>
                   )}
                   <button
                     type="button"
-                    className="w-full px-3 py-2 text-sm font-semibold bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary)]/80 transition"
+                    className="w-full px-3 py-2 text-sm font-semibold bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-80)] transition"
                     onClick={() => handleInvitePlanner(planner)}
                     data-testid="invite-planner"
                   >
@@ -312,24 +312,24 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
 
       {tab === 'code' && (
         <div className="space-y-4" data-testid="code-pane">
-          <p className="text-sm text-[color:var(--color-text)]/70">
+          <p className="text-sm text-[color:var(--color-text-70)]">
             Comparte este codigo con tu wedding planner externo. Podra introducirlo en su cuenta para vincularse
             automaticamente a la boda.
           </p>
           <div className="flex items-center gap-3">
             <button
               type="button"
-              className="px-3 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary)]/80 transition text-sm font-semibold"
+              className="px-3 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-80)] transition text-sm font-semibold"
               onClick={generateCode}
               data-testid="generate-code"
             >
               {generatedCode ? 'Regenerar codigo' : 'Generar codigo'}
             </button>
             {generatedCode ? (
-              <div className="text-sm font-mono bg-[var(--color-accent)]/20 px-3 py-2 rounded-md">
+              <div className="text-sm font-mono bg-[var(--color-accent-20)] px-3 py-2 rounded-md">
                 <span data-testid="generated-code">{generatedCode}</span>
                 {expiresAt ? (
-                  <span className="ml-2 text-xs text-[color:var(--color-text)]/60" data-testid="code-expiration">
+                  <span className="ml-2 text-xs text-[color:var(--color-text-60)]" data-testid="code-expiration">
                     expira: {formatDate(expiresAt, 'short')}
                   </span>
                 ) : null}
@@ -341,11 +341,11 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
 
       {tab === 'assistants' && (
         <div className="space-y-4" data-testid="assistant-pane">
-          <p className="text-sm text-[color:var(--color-text)]/70">
+          <p className="text-sm text-[color:var(--color-text-70)]">
             Los planners pueden sumar assistants internos para ayudar en la ejecucion diaria. Proximamente
             habilitaremos invitaciones automaticas desde aqui.
           </p>
-          <div className="border border-dashed border-[color:var(--color-border)] rounded-lg p-4 text-sm text-[color:var(--color-text)]/60">
+          <div className="border border-dashed border-[color:var(--color-border)] rounded-lg p-4 text-sm text-[color:var(--color-text-60)]">
             Esta seccion esta en fase de diseno. Usala como referencia en tests y documentacion.
           </div>
         </div>

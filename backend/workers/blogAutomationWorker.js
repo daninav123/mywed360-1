@@ -9,6 +9,15 @@ export function startBlogAutomationWorker() {
     return () => {};
   }
 
+  const isProduction = process.env.NODE_ENV === 'production';
+  const enabledExplicitly = process.env.BLOG_AUTOMATION_ENABLED === '1';
+  if (!isProduction && !enabledExplicitly) {
+    console.log(
+      '[blog-automation] Worker not started (set BLOG_AUTOMATION_ENABLED=1 to enable outside production)'
+    );
+    return () => {};
+  }
+
   if (process.env.NODE_ENV === 'test') {
     return () => {};
   }

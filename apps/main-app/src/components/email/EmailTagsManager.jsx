@@ -26,11 +26,12 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
   const [isSelectingTag, setIsSelectingTag] = useState(false);
   const { currentUser } = useAuth();
 
-  const resolveUserId = () => currentUser?.uid || 'cypress-user';
+  const resolveUserId = () => currentUser?.uid || (IS_CYPRESS ? 'cypress-user' : null);
 
   useEffect(() => {
     if (!emailId) return;
     const uid = resolveUserId();
+    if (!uid) return;
     try {
       const availableTags = getUserTags(uid);
       setAllTags(Array.isArray(availableTags) ? availableTags : []);
@@ -47,6 +48,7 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
   const handleAddTag = async (tagId) => {
     if (!emailId || !tagId) return;
     const uid = resolveUserId();
+    if (!uid) return;
     try {
       try {
         await apiPost(`/api/email/${emailId}/tag`, { tagId }, apiOptions());
@@ -82,6 +84,7 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
   const handleRemoveTag = async (tagId) => {
     if (!emailId || !tagId) return;
     const uid = resolveUserId();
+    if (!uid) return;
     try {
       try {
         await apiDel(`/api/email/${emailId}/tag/${tagId}`, apiOptions());

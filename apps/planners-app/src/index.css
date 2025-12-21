@@ -17,12 +17,85 @@
   --color-info: #0ea5e9; /* sky-500 */
   /* Derived tokens */
   --color-border: rgba(31, 41, 55, 0.14);
+  --color-border-50: color-mix(in srgb, var(--color-border) 50%, transparent);
+  --color-border-60: color-mix(in srgb, var(--color-border) 60%, transparent);
   --color-muted: rgba(31, 41, 55, 0.72);
   --radius-md: 0.75rem;
+  /* Compatibility aliases (legacy vars used in some pages) */
+  --color-border-soft: var(--color-border);
+  --color-text-soft: var(--color-muted);
+  --color-bg-soft: var(--color-surface-70);
+  --color-primary-muted: var(--color-primary-10);
+  --color-primary-dark: color-mix(in srgb, var(--color-primary) 70%, var(--color-text) 30%);
+  --color-primary-dark-80: color-mix(in srgb, var(--color-primary-dark) 80%, transparent);
   /* Layout tokens */
   --layout-max-width: 1120px;
   --layout-wide-width: 1280px;
   --layout-padding: clamp(16px, 4vw, 32px);
+  /* Color-mix variants (avoid Tailwind /opacity with CSS vars) */
+  --color-bg-90: color-mix(in srgb, var(--color-bg) 90%, transparent);
+  --color-surface-50: color-mix(in srgb, var(--color-surface) 50%, transparent);
+  --color-surface-60: color-mix(in srgb, var(--color-surface) 60%, transparent);
+  --color-surface-70: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  --color-surface-80: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  --color-text-5: color-mix(in srgb, var(--color-text) 5%, transparent);
+  --color-text-10: color-mix(in srgb, var(--color-text) 10%, transparent);
+  --color-text-12: color-mix(in srgb, var(--color-text) 12%, transparent);
+  --color-text-15: color-mix(in srgb, var(--color-text) 15%, transparent);
+  --color-text-20: color-mix(in srgb, var(--color-text) 20%, transparent);
+  --color-text-25: color-mix(in srgb, var(--color-text) 25%, transparent);
+  --color-text-30: color-mix(in srgb, var(--color-text) 30%, transparent);
+  --color-text-40: color-mix(in srgb, var(--color-text) 40%, transparent);
+  --color-text-50: color-mix(in srgb, var(--color-text) 50%, transparent);
+  --color-text-55: color-mix(in srgb, var(--color-text) 55%, transparent);
+  --color-text-60: color-mix(in srgb, var(--color-text) 60%, transparent);
+  --color-text-70: color-mix(in srgb, var(--color-text) 70%, transparent);
+  --color-text-75: color-mix(in srgb, var(--color-text) 75%, transparent);
+  --color-text-80: color-mix(in srgb, var(--color-text) 80%, transparent);
+  --color-primary-5: color-mix(in srgb, var(--color-primary) 5%, transparent);
+  --color-primary-10: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  --color-primary-12: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --color-primary-15: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  --color-primary-20: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  --color-primary-25: color-mix(in srgb, var(--color-primary) 25%, transparent);
+  --color-primary-30: color-mix(in srgb, var(--color-primary) 30%, transparent);
+  --color-primary-35: color-mix(in srgb, var(--color-primary) 35%, transparent);
+  --color-primary-40: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  --color-primary-45: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  --color-primary-55: color-mix(in srgb, var(--color-primary) 55%, transparent);
+  --color-primary-60: color-mix(in srgb, var(--color-primary) 60%, transparent);
+  --color-primary-70: color-mix(in srgb, var(--color-primary) 70%, transparent);
+  --color-primary-80: color-mix(in srgb, var(--color-primary) 80%, transparent);
+  --color-primary-90: color-mix(in srgb, var(--color-primary) 90%, transparent);
+  --color-accent-10: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --color-accent-20: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  --color-accent-25: color-mix(in srgb, var(--color-accent) 25%, transparent);
+  --color-accent-40: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  --color-accent-60: color-mix(in srgb, var(--color-accent) 60%, transparent);
+  --color-success-5: color-mix(in srgb, var(--color-success) 5%, transparent);
+  --color-success-10: color-mix(in srgb, var(--color-success) 10%, transparent);
+  --color-success-15: color-mix(in srgb, var(--color-success) 15%, transparent);
+  --color-success-20: color-mix(in srgb, var(--color-success) 20%, transparent);
+  --color-success-30: color-mix(in srgb, var(--color-success) 30%, transparent);
+  --color-success-40: color-mix(in srgb, var(--color-success) 40%, transparent);
+  --color-warning-10: color-mix(in srgb, var(--color-warning) 10%, transparent);
+  --color-warning-15: color-mix(in srgb, var(--color-warning) 15%, transparent);
+  --color-warning-20: color-mix(in srgb, var(--color-warning) 20%, transparent);
+  --color-warning-30: color-mix(in srgb, var(--color-warning) 30%, transparent);
+  --color-warning-40: color-mix(in srgb, var(--color-warning) 40%, transparent);
+  --color-danger-10: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  --color-danger-15: color-mix(in srgb, var(--color-danger) 15%, transparent);
+  --color-danger-20: color-mix(in srgb, var(--color-danger) 20%, transparent);
+  --color-danger-30: color-mix(in srgb, var(--color-danger) 30%, transparent);
+  --color-danger-40: color-mix(in srgb, var(--color-danger) 40%, transparent);
+  --color-danger-50: color-mix(in srgb, var(--color-danger) 50%, transparent);
+  --color-danger-90: color-mix(in srgb, var(--color-danger) 90%, transparent);
+  --color-danger-5: color-mix(in srgb, var(--color-danger) 5%, transparent);
+  --color-info-10: color-mix(in srgb, var(--color-info) 10%, transparent);
+  --color-info-15: color-mix(in srgb, var(--color-info) 15%, transparent);
+  --color-info-5: color-mix(in srgb, var(--color-info) 5%, transparent);
+  --color-info-30: color-mix(in srgb, var(--color-info) 30%, transparent);
+  --color-info-40: color-mix(in srgb, var(--color-info) 40%, transparent);
 }
 .dark {
   --color-bg: #1f2937;
@@ -81,22 +154,75 @@ input[type='number'] {
     @apply list-disc pl-5 mb-4;
   }
   button {
-    background-color: var(--color-primary);
-    color: var(--color-text);
-    @apply font-semibold py-2 px-4 rounded transition-colors duration-200;
+    background-color: transparent;
+    color: inherit;
+    @apply font-semibold rounded transition-colors duration-200;
   }
   button:hover {
-    background-color: var(--color-accent);
+    /* Hover styles should be applied via utility classes/components */
+  }
+  /* Fallback for legacy <button> without classes */
+  button:not([class]) {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    @apply px-4 py-2;
+  }
+  button:not([class]):hover {
+    background-color: var(--color-primary-dark);
   }
   input,
   select,
   textarea {
     @apply border rounded p-2 focus:outline-none focus:ring-2 focus:border-transparent;
-    border-color: var(--color-text);
+    border-color: var(--color-border);
   }
   input:focus,
   select:focus,
   textarea:focus {
+    --tw-ring-color: var(--color-primary);
+  }
+
+  /* MUI compatibility layer (keep admin/email screens consistent with Home/Tasks) */
+  :where(.MuiTypography-root, .MuiButton-root, .MuiInputBase-root, .MuiFormLabel-root) {
+    font-family: inherit !important;
+  }
+  :where(.MuiPaper-root, .MuiDialog-paper) {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    border-radius: var(--radius-md) !important;
+  }
+  :where(.MuiDialog-paper) {
+    border: 1px solid var(--color-border) !important;
+  }
+  :where(.MuiBackdrop-root) {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+  :where(.MuiButton-root) {
+    text-transform: none !important;
+    font-weight: 600 !important;
+    border-radius: var(--radius-md) !important;
+  }
+  :where(.MuiButton-containedPrimary) {
+    background-color: var(--color-primary) !important;
+    color: var(--color-on-primary) !important;
+  }
+  :where(.MuiButton-containedPrimary:hover) {
+    background-color: var(--color-primary-dark) !important;
+  }
+  :where(.MuiButton-outlinedPrimary) {
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
+  }
+  :where(.MuiButton-textPrimary) {
+    color: var(--color-primary) !important;
+  }
+  :where(.MuiOutlinedInput-notchedOutline) {
+    border-color: var(--color-border) !important;
+  }
+  :where(.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline) {
+    border-color: var(--color-primary) !important;
+  }
+  :where(.Mui-focused) {
     --tw-ring-color: var(--color-primary);
   }
 }
@@ -136,10 +262,26 @@ input[type='number'] {
   .text-muted {
     color: var(--color-muted);
   }
+  /* Compatibility: shadcn-like utility names used in some modules */
+  .text-foreground {
+    color: var(--color-text);
+  }
+  .bg-background {
+    background-color: var(--color-surface);
+  }
+  .border-border {
+    border-color: var(--color-border);
+  }
+  .bg-muted {
+    background-color: var(--color-text-5);
+  }
   .border-soft {
     border-color: var(--color-border);
   }
   .ring-primary {
+    --tw-ring-color: var(--color-primary);
+  }
+  .focus\\:ring-primary:focus {
     --tw-ring-color: var(--color-primary);
   }
   .bg-primary {
@@ -196,6 +338,445 @@ input[type='number'] {
   }
   .bg-info {
     background-color: var(--color-info);
+  }
+
+  /* Map common Tailwind grays/whites to MaLove tokens (migration layer) */
+  .bg-white {
+    background-color: var(--color-surface);
+  }
+  /* Common opacity variants (avoid white overlays breaking dark mode) */
+  [class~='bg-white/95'] {
+    background-color: var(--color-surface) !important;
+  }
+  [class~='bg-white/90'] {
+    background-color: var(--color-surface-80) !important;
+  }
+  [class~='bg-white/80'] {
+    background-color: var(--color-surface-80) !important;
+  }
+  [class~='bg-white/70'] {
+    background-color: var(--color-surface-70) !important;
+  }
+  [class~='bg-white/20'] {
+    background-color: var(--color-text-10) !important;
+  }
+  [class~='bg-white/10'] {
+    background-color: var(--color-text-5) !important;
+  }
+  [class~='bg-white/5'] {
+    background-color: var(--color-text-5) !important;
+  }
+  [class~='border-white/20'],
+  [class~='border-white/10'],
+  [class~='border-white/5'],
+  [class~='divide-white/10'],
+  [class~='divide-white/20'] {
+    border-color: var(--color-border) !important;
+  }
+  .bg-gray-50 {
+    background-color: var(--color-bg);
+  }
+  .bg-gray-100 {
+    background-color: var(--color-text-5);
+  }
+  .bg-gray-200 {
+    background-color: var(--color-text-10);
+  }
+  [class~='bg-gray-50/50'],
+  [class~='bg-gray-50/60'],
+  [class~='bg-gray-50/70'] {
+    background-color: var(--color-bg) !important;
+  }
+  [class~='bg-gray-100/50'],
+  [class~='bg-gray-100/60'],
+  [class~='bg-gray-100/70'] {
+    background-color: var(--color-text-5) !important;
+  }
+  .text-gray-900,
+  .text-gray-800 {
+    color: var(--color-text);
+  }
+  .text-gray-700 {
+    color: var(--color-text-80);
+  }
+  .text-gray-600 {
+    color: var(--color-text-70);
+  }
+  .text-gray-500 {
+    color: var(--color-text-60);
+  }
+  .text-gray-400 {
+    color: var(--color-text-50);
+  }
+  .text-gray-300 {
+    color: var(--color-text-40);
+  }
+  .border-gray-200,
+  .border-gray-300,
+  .divide-gray-200,
+  .divide-gray-300 {
+    border-color: var(--color-border);
+  }
+
+  /* Treat other neutral Tailwind palettes like gray (slate/zinc/neutral/stone) */
+  .bg-slate-50,
+  .bg-zinc-50,
+  .bg-neutral-50,
+  .bg-stone-50 {
+    background-color: var(--color-bg);
+  }
+  .bg-slate-100,
+  .bg-zinc-100,
+  .bg-neutral-100,
+  .bg-stone-100 {
+    background-color: var(--color-text-5);
+  }
+  .bg-slate-200,
+  .bg-zinc-200,
+  .bg-neutral-200,
+  .bg-stone-200 {
+    background-color: var(--color-text-10);
+  }
+  .border-slate-200,
+  .border-slate-300,
+  .border-zinc-200,
+  .border-zinc-300,
+  .border-neutral-200,
+  .border-neutral-300,
+  .border-stone-200,
+  .border-stone-300,
+  .divide-slate-200,
+  .divide-slate-300,
+  .divide-zinc-200,
+  .divide-zinc-300,
+  .divide-neutral-200,
+  .divide-neutral-300,
+  .divide-stone-200,
+  .divide-stone-300 {
+    border-color: var(--color-border);
+  }
+  .text-slate-900,
+  .text-zinc-900,
+  .text-neutral-900,
+  .text-stone-900,
+  .text-slate-800,
+  .text-zinc-800,
+  .text-neutral-800,
+  .text-stone-800 {
+    color: var(--color-text);
+  }
+  .text-slate-700,
+  .text-zinc-700,
+  .text-neutral-700,
+  .text-stone-700 {
+    color: var(--color-text-80);
+  }
+  .text-slate-600,
+  .text-zinc-600,
+  .text-neutral-600,
+  .text-stone-600 {
+    color: var(--color-text-70);
+  }
+  .text-slate-500,
+  .text-zinc-500,
+  .text-neutral-500,
+  .text-stone-500 {
+    color: var(--color-text-60);
+  }
+  .text-slate-400,
+  .text-zinc-400,
+  .text-neutral-400,
+  .text-stone-400 {
+    color: var(--color-text-50);
+  }
+
+  /* Map common Tailwind “brand” colors to semantic tokens */
+  .bg-blue-50,
+  .bg-indigo-50,
+  [class~='bg-blue-50/20'],
+  [class~='bg-blue-50/40'],
+  [class~='bg-blue-50/60'],
+  [class~='bg-blue-50/70'],
+  [class~='bg-blue-50/80'],
+  [class~='bg-indigo-50/50'],
+  [class~='bg-indigo-50/60'] {
+    background-color: var(--color-primary-10) !important;
+  }
+  .bg-blue-100,
+  .bg-indigo-100,
+  [class~='bg-blue-100/20'],
+  [class~='bg-blue-100/40'],
+  [class~='bg-blue-100/60'],
+  [class~='bg-blue-100/80'] {
+    background-color: var(--color-primary-15) !important;
+  }
+  .bg-blue-200,
+  .bg-indigo-200,
+  [class~='bg-blue-200/20'] {
+    background-color: var(--color-primary-20) !important;
+  }
+  .bg-blue-500,
+  .bg-blue-600,
+  .bg-indigo-500,
+  .bg-indigo-600,
+  [class~='bg-blue-500/80'],
+  [class~='bg-indigo-500/80'] {
+    background-color: var(--color-primary) !important;
+  }
+  [class~='bg-blue-500/10'],
+  [class~='bg-indigo-500/10'] {
+    background-color: var(--color-primary-10) !important;
+  }
+  [class~='bg-blue-500/20'],
+  [class~='bg-indigo-500/20'] {
+    background-color: var(--color-primary-20) !important;
+  }
+  .bg-blue-700,
+  .bg-indigo-700 {
+    background-color: var(--color-primary-dark) !important;
+  }
+  .text-blue-900,
+  .text-blue-800,
+  .text-blue-700,
+  .text-indigo-900,
+  .text-indigo-800,
+  .text-indigo-700 {
+    color: var(--color-primary-dark) !important;
+  }
+  .text-blue-600,
+  .text-blue-500,
+  .text-indigo-600,
+  .text-indigo-500 {
+    color: var(--color-primary) !important;
+  }
+  .border-blue-200,
+  .border-blue-300,
+  .border-indigo-200,
+  .border-indigo-300,
+  [class~='border-blue-400/40'],
+  [class~='border-blue-500/40'],
+  [class~='border-indigo-400/40'] {
+    border-color: var(--color-primary-30) !important;
+  }
+  .ring-blue-500,
+  .ring-blue-400,
+  .ring-indigo-500,
+  .ring-indigo-400,
+  .focus\\:ring-blue-500:focus,
+  .focus\\:ring-indigo-500:focus,
+  .focus-visible\\:ring-blue-500:focus-visible,
+  .focus-visible\\:ring-indigo-500:focus-visible {
+    --tw-ring-color: var(--color-primary) !important;
+  }
+  .focus\\:border-blue-500:focus,
+  .focus\\:border-indigo-500:focus {
+    border-color: var(--color-primary) !important;
+  }
+
+  .bg-emerald-50,
+  .bg-green-50,
+  [class~='bg-emerald-50/60'],
+  [class~='bg-emerald-50/80'],
+  [class~='bg-green-50/70'],
+  [class~='bg-green-50/80'] {
+    background-color: var(--color-success-10) !important;
+  }
+  .bg-emerald-100,
+  .bg-green-100,
+  [class~='bg-emerald-100/60'],
+  [class~='bg-emerald-100/80'] {
+    background-color: var(--color-success-15) !important;
+  }
+  .bg-emerald-500,
+  .bg-green-500,
+  .bg-emerald-600,
+  .bg-green-600,
+  [class~='bg-green-500/80'],
+  [class~='bg-emerald-500/80'] {
+    background-color: var(--color-success) !important;
+  }
+  [class~='bg-green-500/10'],
+  [class~='bg-emerald-500/10'] {
+    background-color: var(--color-success-10) !important;
+  }
+  [class~='bg-green-500/20'],
+  [class~='bg-emerald-500/20'] {
+    background-color: var(--color-success-20) !important;
+  }
+  [class~='bg-emerald-500/30'] {
+    background-color: var(--color-success-30) !important;
+  }
+  .text-emerald-900,
+  .text-emerald-800,
+  .text-emerald-700,
+  .text-green-900,
+  .text-green-800,
+  .text-green-700 {
+    color: var(--color-success) !important;
+  }
+  .text-emerald-600,
+  .text-green-600 {
+    color: var(--color-success) !important;
+  }
+  .border-emerald-200,
+  .border-emerald-300,
+  .border-green-200,
+  .border-green-300,
+  [class~='border-emerald-200/70'] {
+    border-color: var(--color-success-30) !important;
+  }
+  .ring-green-400,
+  .ring-green-500,
+  .focus\\:ring-green-500:focus {
+    --tw-ring-color: var(--color-success) !important;
+  }
+
+  .bg-amber-50,
+  .bg-yellow-50,
+  .bg-orange-50,
+  [class~='bg-amber-50/60'],
+  [class~='bg-amber-50/80'] {
+    background-color: var(--color-warning-10) !important;
+  }
+  .bg-amber-100,
+  .bg-yellow-100,
+  .bg-orange-100,
+  [class~='bg-amber-100/60'],
+  [class~='bg-orange-100/90'] {
+    background-color: var(--color-warning-15) !important;
+  }
+  .bg-amber-500,
+  .bg-yellow-500,
+  .bg-orange-500,
+  [class~='bg-amber-500/80'],
+  [class~='bg-yellow-500/80'],
+  [class~='bg-orange-500/80'] {
+    background-color: var(--color-warning) !important;
+  }
+  [class~='bg-amber-500/10'],
+  [class~='bg-yellow-500/10'],
+  [class~='bg-orange-500/10'] {
+    background-color: var(--color-warning-10) !important;
+  }
+  [class~='bg-amber-500/20'],
+  [class~='bg-yellow-500/20'],
+  [class~='bg-orange-500/20'] {
+    background-color: var(--color-warning-20) !important;
+  }
+  .text-amber-900,
+  .text-amber-800,
+  .text-amber-700,
+  .text-yellow-900,
+  .text-yellow-800,
+  .text-yellow-700,
+  .text-orange-900,
+  .text-orange-800,
+  .text-orange-700,
+  .text-amber-600,
+  .text-yellow-600,
+  .text-orange-600 {
+    color: var(--color-warning) !important;
+  }
+  .border-amber-200,
+  .border-amber-300,
+  .border-yellow-200,
+  .border-yellow-300,
+  .border-orange-200,
+  .border-orange-300,
+  [class~='border-amber-400/40'],
+  [class~='border-amber-500/30'] {
+    border-color: var(--color-warning-30) !important;
+  }
+  .ring-amber-500,
+  .ring-yellow-500,
+  .focus\\:ring-amber-500:focus {
+    --tw-ring-color: var(--color-warning) !important;
+  }
+
+  .bg-red-50,
+  .bg-rose-50,
+  [class~='bg-red-50/80'],
+  [class~='bg-red-50/90'] {
+    background-color: var(--color-danger-10) !important;
+  }
+  .bg-red-500,
+  .bg-red-600,
+  .bg-rose-500,
+  .bg-rose-600,
+  [class~='bg-red-500/90'],
+  [class~='bg-rose-500/90'],
+  [class~='bg-red-500/80'],
+  [class~='bg-rose-500/80'] {
+    background-color: var(--color-danger) !important;
+  }
+  [class~='bg-red-500/10'],
+  [class~='bg-rose-500/10'] {
+    background-color: var(--color-danger-10) !important;
+  }
+  [class~='bg-red-500/20'],
+  [class~='bg-rose-500/20'] {
+    background-color: var(--color-danger-20) !important;
+  }
+  [class~='bg-red-500/30'],
+  [class~='bg-rose-500/30'] {
+    background-color: var(--color-danger-30) !important;
+  }
+  .text-red-900,
+  .text-red-800,
+  .text-red-700,
+  .text-rose-900,
+  .text-rose-800,
+  .text-rose-700,
+  .text-red-600,
+  .text-rose-600,
+  [class~='text-red-700/90'] {
+    color: var(--color-danger) !important;
+  }
+  [class~='text-rose-50/80'] {
+    color: var(--color-on-primary) !important;
+  }
+  .border-red-200,
+  .border-red-300,
+  .border-rose-200,
+  .border-rose-300 {
+    border-color: var(--color-danger-30) !important;
+  }
+  .ring-red-500,
+  .ring-rose-500,
+  .focus\\:ring-rose-400:focus,
+  .focus-visible\\:ring-rose-200:focus-visible {
+    --tw-ring-color: var(--color-danger) !important;
+  }
+
+  /* Neutralize banned effects globally (Home/Tasks style) */
+  .bg-gradient-to-b,
+  .bg-gradient-to-bl,
+  .bg-gradient-to-br,
+  .bg-gradient-to-l,
+  .bg-gradient-to-r,
+  .bg-gradient-to-t,
+  .bg-gradient-to-tl,
+  .bg-gradient-to-tr {
+    background-image: none !important;
+  }
+  .backdrop-blur,
+  .backdrop-blur-sm,
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-3xl {
+    backdrop-filter: none !important;
+  }
+  .blur-none,
+  .blur-sm,
+  .blur,
+  .blur-md,
+  .blur-lg,
+  .blur-xl,
+  .blur-2xl,
+  .blur-3xl {
+    filter: none !important;
   }
 }
 

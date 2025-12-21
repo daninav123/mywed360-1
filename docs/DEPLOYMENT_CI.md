@@ -1,4 +1,4 @@
-﻿# Despliegue y CI
+# Despliegue y CI
 
 ## Despliegue Frontend
 
@@ -32,7 +32,7 @@ Pasos mínimos:
 
 ## Versionado/Entornos
 
-- Ramas: `main` (prod), `develop` (staging)
+- Ramas: `main` (prod), `windows` (desarrollo activo)
 - Entornos: dev/staging/prod con proyectos Firebase separados
 
 ## Gates de calidad (PR)

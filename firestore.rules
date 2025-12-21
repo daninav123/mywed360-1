@@ -391,5 +391,66 @@ service cloud.firestore {
       allow update: if request.resource.data.diff(resource.data).affectedKeys()
         .hasOnly(['status', 'confirmed', 'companions', 'dietaryRestrictions', 'notes', 'updatedAt']);
     }
+
+    // 💰 Solicitudes de presupuesto de proveedores REGISTRADOS
+    match /suppliers/{supplierId}/quote-requests/{requestId} {
+      // Lectura: el usuario que hizo la solicitud o el proveedor dueño
+      allow read: if request.auth != null && (
+        request.auth.uid == resource.data.userId ||
+        resource.data.supplierId == supplierId
+      );
+      
+      // List/query: solo el usuario puede listar sus propias solicitudes
+      allow list: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // El backend crea las solicitudes (via Admin SDK), pero permitir creación pública también
+      allow create: if true;
+      
+      // Actualizar: solo el proveedor puede actualizar (cambiar status, añadir quotes)
+      allow update: if request.auth != null;
+      
+      // Eliminar: solo el usuario que hizo la solicitud
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // 💰 Solicitudes de presupuesto de proveedores de INTERNET (Google Places)
+    match /quote-requests-internet/{requestId} {
+      // Lectura: el usuario que hizo la solicitud
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // List/query: solo el usuario puede listar sus propias solicitudes
+      allow list: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // Crear: público (sin auth) para proveedores de internet
+      allow create: if true;
+      
+      // Actualizar: solo el usuario propietario
+      allow update: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // Eliminar: solo el usuario propietario
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // 📊 Lectura pública de proveedores (para búsqueda y solicitud de presupuestos)
+    match /suppliers/{supplierId} {
+      allow read: if true;
+      allow list: if true;
+      allow write: if false; // Solo backend puede escribir
+    }
+
+    // ⚙️ Configuración del sistema (specs de proveedores, etc.)
+    match /systemConfig/{configId} {
+      // Solo admins pueden leer/escribir configuración del sistema
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // 👥 Colección de administradores (solo lectura para verificar permisos)
+    match /admins/{userId} {
+      // Solo el propio admin puede leer su documento
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Solo backend puede escribir (Admin SDK)
+      allow write: if false;
+    }
   }
 }

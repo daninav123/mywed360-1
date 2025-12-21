@@ -57,7 +57,7 @@ export default function AILayoutAnalyzer({ tables, hallSize, guests, onApplyOpti
       ) : (
         <>
           {/* Score */}
-          <div className="mb-4 p-4 rounded-lg bg-[var(--color-primary)]/10">
+          <div className="mb-4 p-4 rounded-lg bg-[var(--color-primary-10)]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Puntuación</span>
               <span className="text-3xl font-bold text-[color:var(--color-primary)]">

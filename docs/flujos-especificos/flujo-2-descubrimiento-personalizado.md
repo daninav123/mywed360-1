@@ -1,4 +1,4 @@
-﻿# 2. Descubrimiento Personalizado de la Boda
+# 2. Descubrimiento Personalizado de la Boda
 
 > Estado 2025-10-14. Este flujo inicia la experiencia y alimenta el `weddingProfile`. Cada iteración debe registrarse aquí y sincronizar datos con `docs/DATA_MODEL.md`.
 

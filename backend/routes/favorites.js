@@ -75,20 +75,47 @@ router.post('/', async (req, res) => {
     const weddingId = req.headers['x-wedding-id'];
     const { supplier, notes } = req.body;
 
+    logger.info('[favorites] POST request received:', {
+      userId,
+      weddingId,
+      supplierName: supplier?.name,
+      supplierId: supplier?.id,
+      supplierSlug: supplier?.slug,
+      supplierCategory: supplier?.category,
+      hasSupplier: !!supplier,
+      hasSupplierId: !!supplier?.id
+    });
+
     if (!userId) {
+      logger.warn('[favorites] Unauthorized - no userId');
       return res.status(401).json({ error: 'unauthorized' });
     }
 
     if (!weddingId) {
+      logger.warn('[favorites] No wedding ID provided');
       return res.status(400).json({
         error: 'wedding-required',
         message: 'Se requiere una boda activa para gestionar favoritos',
       });
     }
 
-    if (!supplier || !supplier.id) {
-      return res.status(400).json({ error: 'invalid-supplier' });
+    // Aceptar id, slug o googlePlaceId como identificador válido
+    const supplierId = supplier?.id || supplier?.slug || supplier?.googlePlaceId;
+    
+    if (!supplier || !supplierId) {
+      logger.error('[favorites] Invalid supplier - no valid ID:', { 
+        supplier,
+        hasId: !!supplier?.id,
+        hasSlug: !!supplier?.slug,
+        hasGooglePlaceId: !!supplier?.googlePlaceId
+      });
+      return res.status(400).json({ 
+        error: 'invalid-supplier',
+        details: 'Supplier must have id, slug, or googlePlaceId'
+      });
     }
+    
+    logger.info('[favorites] Using supplier ID:', supplierId);
 
     const favoritesRef = db
       .collection('weddings')
@@ -99,7 +126,7 @@ router.post('/', async (req, res) => {
 
     // Verificar si ya existe en favoritos
     const existingSnapshot = await favoritesRef
-      .where('supplierId', '==', supplier.id)
+      .where('supplierId', '==', supplierId)
       .limit(1)
       .get();
 
@@ -133,9 +160,11 @@ router.post('/', async (req, res) => {
     const favoriteData = cleanObject({
       userId,
       weddingId,
-      supplierId: supplier.id,
+      supplierId: supplierId, // Usar el ID válido detectado
       supplier: {
         id: supplier.id,
+        slug: supplier.slug,
+        googlePlaceId: supplier.googlePlaceId,
         name: supplier.name || 'Sin nombre',
         category: supplier.category || 'Sin categoría',
         location: supplier.location,
@@ -153,7 +182,7 @@ router.post('/', async (req, res) => {
     const docRef = await favoritesRef.add(favoriteData);
 
     logger.info(
-      `[favorites] Boda ${weddingId} añadió proveedor ${supplier.id} (expira: ${expiresAt.toISOString()})`
+      `[favorites] Boda ${weddingId} añadió proveedor ${supplierId} (${supplier.name}) (expira: ${expiresAt.toISOString()})`
     );
 
     res.status(201).json({

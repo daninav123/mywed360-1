@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { CheckCircle2, Circle, ChevronRight } from 'lucide-react';
 
-const primaryColor = 'var(--color-primary, #6366f1)';
-const softColor = 'var(--color-primary-soft, rgba(99, 102, 241, 0.16))';
+const primaryColor = 'var(--color-primary)';
+const softColor = 'var(--color-primary-soft))';
 
 function formatPercent(value) {
   if (!Number.isFinite(value)) return '0%';
@@ -65,7 +65,7 @@ export default function SupplierProgressIndicator({
                 stage.completed
                   ? 'border-emerald-200 bg-emerald-50/80 text-emerald-700'
                   : stage.isCurrent
-                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    ? 'border-[color:var(--color-primary-40)] bg-[var(--color-primary-10)] text-primary'
                     : 'border-soft bg-surface text-muted'
               }`}
             >
@@ -80,7 +80,7 @@ export default function SupplierProgressIndicator({
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-[13px]">{stage.label}</span>
                   {(Number(stage.count) || 0) > 0 && (
-                    <span className="rounded-full bg-[var(--color-primary)].5 text-[10px] font-semibold uppercase tracking-wide">
+                    <span className="rounded-full bg-[var(--color-primary-5)] text-[10px] font-semibold uppercase tracking-wide">
                       {stage.count}
                     </span>
                   )}

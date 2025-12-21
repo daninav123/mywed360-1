@@ -1,7 +1,8 @@
-# 21. Sitio Publico (estado 2025-10-07)
+# 21. Sitio Público (estado 2025-10-07)
 
-> Implementado: `WeddingSite.jsx` (ruta `/w/:uid`), `PublicWedding.jsx`, articulos auxiliares (`SeatingPlanPost.jsx`, `MomentosEspeciales.jsx`), integracion con `websiteService` y contenido Firestore.
-> Pendiente: personalizacion avanzada desde panel, dominios personalizados, SEO/analytics y medicion de conversion.
+> Implementado: `WeddingSite.jsx`, `PublicWedding.jsx`, artículos auxiliares (`SeatingPlanPost.jsx`, `MomentosEspecialesSimple.jsx`), integración con `websiteService` y contenido Firestore.
+> Ruta principal: /w/:uid.
+> Pendiente: personalización avanzada desde panel, dominios personalizados, SEO/analytics y medición de conversión.
 
 ## 1. Objetivo y alcance
 - Publicar una landing publica de la boda compartible con invitados y proveedores.

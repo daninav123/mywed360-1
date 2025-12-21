@@ -52,8 +52,8 @@ export const CraftDressCodeSection = ({
       ref={(ref) => connect(drag(ref))}
       className="py-16 px-4"
       style={{
-        backgroundColor: 'var(--color-fondo, #F9FAFB)',
-        color: 'var(--color-texto, #1F2937)',
+        backgroundColor: 'var(--color-fondo)',
+        color: 'var(--color-texto)',
       }}
     >
       <div className="max-w-6xl mx-auto">
@@ -62,14 +62,14 @@ export const CraftDressCodeSection = ({
           <h2
             className="text-4xl md:text-5xl font-bold mb-4"
             style={{
-              color: 'var(--color-primario, #9333EA)',
+              color: 'var(--color-primario)',
               fontFamily: 'var(--fuente-titulo, inherit)',
             }}
           >
             {titulo}
           </h2>
           <div className="inline-block bg-white rounded-full px-8 py-4 shadow-lg mb-4">
-            <p className="text-2xl font-bold" style={{ color: 'var(--color-secundario, #9333EA)' }}>
+            <p className="text-2xl font-bold" style={{ color: 'var(--color-secundario)' }}>
               {dresscodeFinal}
             </p>
           </div>
@@ -85,7 +85,7 @@ export const CraftDressCodeSection = ({
                 <div className="text-5xl mb-3">🤵</div>
                 <h3
                   className="text-2xl font-bold"
-                  style={{ color: 'var(--color-secundario, #1F2937)' }}
+                  style={{ color: 'var(--color-secundario)' }}
                 >
                   Para Ellos
                 </h3>
@@ -106,7 +106,7 @@ export const CraftDressCodeSection = ({
                 <div className="text-5xl mb-3">👗</div>
                 <h3
                   className="text-2xl font-bold"
-                  style={{ color: 'var(--color-secundario, #1F2937)' }}
+                  style={{ color: 'var(--color-secundario)' }}
                 >
                   Para Ellas
                 </h3>
@@ -127,7 +127,7 @@ export const CraftDressCodeSection = ({
         <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
           <h3
             className="text-2xl font-bold text-center mb-6"
-            style={{ color: 'var(--color-secundario, #1F2937)' }}
+            style={{ color: 'var(--color-secundario)' }}
           >
             🎨 Paleta de Colores Sugeridos
           </h3>

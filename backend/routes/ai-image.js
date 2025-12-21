@@ -1,15 +1,12 @@
 import express from 'express';
 import axios from 'axios';
-import dotenv from 'dotenv';
-import path from 'path';
 import logger from '../utils/logger.js';
 
-// Cargar variables .env por si este archivo se ejecuta aislado
-dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
-
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
-
 const router = express.Router();
+
+function resolveOpenAIKey() {
+  return process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+}
 
 /**
  * POST /api/ai-image
@@ -40,7 +37,8 @@ router.post('/', async (req, res) => {
         return res.status(400).json({ error: 'prompt required' });
     }
   } catch {}
-  if (!OPENAI_API_KEY) {
+  const apiKey = resolveOpenAIKey();
+  if (!apiKey) {
     return res.status(500).json({ error: 'OPENAI_API_KEY missing' });
   }
 
@@ -57,9 +55,9 @@ router.post('/', async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          Authorization: `Bearer ${apiKey}`,
         },
-        timeout: 15000,
+        timeout: 20000,
       }
     );
 

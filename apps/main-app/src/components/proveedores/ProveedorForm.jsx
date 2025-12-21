@@ -1,9 +1,13 @@
-import { X } from 'lucide-react';
+import { X, Calendar } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import useTranslations from '../../hooks/useTranslations';
+import { SUPPLIER_CATEGORIES } from '../../shared/supplierCategories';
+import PaymentScheduleEditor from './PaymentScheduleEditor';
+import { useWedding } from '../../context/WeddingContext';
+import { formatCurrency } from '../../utils/formatUtils';
 
 /**
  * Componente de formulario para crear o editar un proveedor.
@@ -17,6 +21,7 @@ import useTranslations from '../../hooks/useTranslations';
  */
 const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
   const { t } = useTranslations();
+  const { activeWeddingData } = useWedding();
   const [formData, setFormData] = useState({
     name: '',
     service: '',
@@ -26,13 +31,16 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
     link: '',
     location: '',
     date: '',
+    assignedBudget: '',
     priceRange: '',
     status: t('status.pending'),
     snippet: '',
     image: '',
+    paymentSchedule: [],
   });
 
   const [errors, setErrors] = useState({});
+  const [showPaymentScheduleEditor, setShowPaymentScheduleEditor] = useState(false);
 
   // Cargar datos iniciales si existen (modo edición)
   useEffect(() => {
@@ -68,35 +76,31 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
   // Manejar envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) onSubmit(formData);
+    if (!validateForm()) return;
+
+    const parsedAssignedBudget = formData.assignedBudget
+      ? parseFloat(String(formData.assignedBudget).replace(/[^0-9.,-]/g, '').replace(',', '.'))
+      : null;
+
+    onSubmit({
+      ...formData,
+      assignedBudget: Number.isFinite(parsedAssignedBudget) ? parsedAssignedBudget : null,
+      paymentSchedule: formData.paymentSchedule || [],
+    });
   };
 
-  // Lista de servicios disponibles
-  const serviceOptions = [
-    t('services.catering'),
-    t('services.photography'),
-    t('services.video'),
-    t('services.music'),
-    t('services.decoration'),
-    t('services.flowers'),
-    t('services.transport'),
-    t('services.dresses'),
-    t('services.suits'),
-    t('services.pastry'),
-    t('services.invitations'),
-    t('services.furnitureRental'),
-    t('services.lighting'),
-    t('services.makeup'),
-    t('services.hairdressing'),
-    t('services.jewelry'),
-    t('services.entertainment'),
-    t('services.weddingPlanner'),
-    t('services.ceremonyVenue'),
-    t('services.receptionVenue'),
-    t('services.accommodation'),
-    t('services.honeymoon'),
-    t('services.other'),
-  ];
+  const handleSavePaymentSchedule = (schedule) => {
+    setFormData(prev => ({ ...prev, paymentSchedule: schedule }));
+    setShowPaymentScheduleEditor(false);
+  };
+
+  const totalScheduled = formData.paymentSchedule?.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0) || 0;
+
+  const serviceOptions = SUPPLIER_CATEGORIES.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    nameEn: cat.nameEn,
+  }));
 
   // Lista de estados disponibles
   const statusOptions = [
@@ -160,12 +164,15 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                 >
                   <option value="">Seleccionar servicio</option>
                   {serviceOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
+                    <option key={option.id} value={option.name}>
+                      {option.name}
                     </option>
                   ))}
                 </select>
                 {errors.service && <p className="text-red-500 text-sm mt-1">{errors.service}</p>}
+                <p className="text-xs text-gray-500 mt-1">
+                  💡 Este servicio se vinculará automáticamente con tu presupuesto
+                </p>
               </div>
             </div>
 
@@ -204,6 +211,55 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                   placeholder="Ej: 1000 € - 2000 €"
                 />
               </div>
+            </div>
+
+            {/* Presupuesto asignado */}
+            <div className="mb-4">
+              <label htmlFor="assignedBudget" className="block mb-1 text-sm font-medium">
+                Presupuesto asignado
+              </label>
+              <input
+                type="text"
+                id="assignedBudget"
+                name="assignedBudget"
+                value={formData.assignedBudget}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Ej: 2000"
+              />
+            </div>
+
+            {/* Plan de pagos */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium">
+                  Plan de pagos
+                </label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPaymentScheduleEditor(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  {formData.paymentSchedule?.length > 0 ? 'Editar plan' : 'Definir plan'}
+                </Button>
+              </div>
+              {formData.paymentSchedule?.length > 0 ? (
+                <div className="p-3 border border-gray-300 rounded-md bg-gray-50">
+                  <p className="text-sm text-gray-700 mb-2">
+                    <span className="font-semibold">{formData.paymentSchedule.length}</span> cuotas programadas
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    Total: {formatCurrency(totalScheduled)}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-500">
+                  💡 Define cómo y cuándo debes pagar a este proveedor. Recibirás alertas en Finanzas.
+                </p>
+              )}
             </div>
 
             {/* Fecha */}
@@ -352,6 +408,17 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
           {initialData ? 'Guardar cambios' : 'Crear proveedor'}
         </Button>
       </div>
+
+      {/* Payment Schedule Editor Modal */}
+      {showPaymentScheduleEditor && (
+        <PaymentScheduleEditor
+          totalAmount={parseFloat(formData.assignedBudget) || 0}
+          schedule={formData.paymentSchedule || []}
+          weddingDate={activeWeddingData?.weddingDate || activeWeddingData?.date}
+          onSave={handleSavePaymentSchedule}
+          onCancel={() => setShowPaymentScheduleEditor(false)}
+        />
+      )}
     </div>
   );
 };

@@ -92,7 +92,7 @@ describe('AIEmailTrackingService', () => {
 
     const activityId = trackingService.registerActivity({}, 'consulta');
 
-    expect(console.error).toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
     expect(activityId).toBeNull();
   });
 

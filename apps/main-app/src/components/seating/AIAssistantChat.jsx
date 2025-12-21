@@ -6,6 +6,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, X, Sparkles, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { post as apiPost } from '../../services/apiClient';
 
 const AIAssistantChat = ({ guests = [], tables = [], isOpen, onClose, onSuggestion }) => {
   const [messages, setMessages] = useState([
@@ -86,30 +87,44 @@ Responde siempre en español, de forma amigable y profesional.`;
     }));
 
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer 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`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...conversationHistory,
-            { role: 'user', content: userMessage },
-          ],
-          max_tokens: 500,
-          temperature: 0.7,
-        }),
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status}`);
+      try {
+        const response = await apiPost(
+          '/api/proxy/openai',
+          {
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              ...conversationHistory,
+              { role: 'user', content: userMessage },
+            ],
+            maxTokens: 500,
+          },
+          { auth: true, signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          let details = '';
+          try {
+            const errData = await response.clone().json();
+            details = errData?.details || errData?.error || '';
+          } catch {}
+          throw new Error(
+            `Proxy OpenAI error: ${response.status}${details ? ` - ${details}` : ''}`
+          );
+        }
+
+        const data = await response.json();
+        const content = data?.response;
+        if (typeof content !== 'string' || !content.trim()) {
+          throw new Error('Proxy OpenAI: respuesta vacía');
+        }
+        return content;
+      } finally {
+        clearTimeout(timeoutId);
       }
-
-      const data = await response.json();
-      return data.choices[0].message.content;
     } catch (error) {
       console.error('[AIAssistantChat] Error calling OpenAI:', error);
       throw error;

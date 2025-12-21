@@ -3,6 +3,12 @@
 **Fecha:** Diciembre 2024  
 **Estado:** 51→4 archivos .md en raíz (limpieza completada)
 
+> ⚠️ Documento histórico (Diciembre 2024). Varias recomendaciones ya fueron aplicadas.
+>
+> - **Nombre oficial (actual):** MaLove.App
+> - **Roadmap canónico (actual):** `docs/ROADMAP.md` (generado por `node scripts/aggregateRoadmap.js`)
+> - **Snapshots:** `docs/archive/`
+
 ---
 
 ## 🔴 Inconsistencias Críticas
@@ -35,12 +41,12 @@ apps/
 
 **Archivos conflictivos:**
 
-1. **`docs/roadmap-2025-v2.md`**
+1. **`docs/archive/roadmap-2025-v2.md`**
    - Marcado como "documento congelado (snapshot 2025-10-09)"
    - Contiene estado antiguo: "85% IMPLEMENTADO"
    - 212 líneas
 
-2. **`docs/NUEVO-ROADMAP-PRIORIZADO-2025.md`**
+2. **`docs/archive/NUEVO-ROADMAP-PRIORIZADO-2025.md`**
    - Fecha: 12 de noviembre de 2025
    - Contiene prioridades actualizadas
    - 374 líneas
@@ -55,12 +61,12 @@ apps/
 **Impacto:** Alto - No está claro cuáles son las prioridades reales del proyecto  
 **Recomendación:** 
 - Mantener solo `docs/ROADMAP.md` como documento oficial
-- Mover `roadmap-2025-v2.md` y `NUEVO-ROADMAP-PRIORIZADO-2025.md` a `docs/archive/`
+- Mantener snapshots en `docs/archive/` y actualizar referencias
 - Actualizar todas las referencias a un único roadmap
 
 ---
 
-### 3. **Referencias a Nombre Antiguo del Proyecto (MaLove.App)**
+### 3. **Referencias a nombres legacy (mywed360 / Lovenda / MaLoveApp)**
 
 **Cantidad:** 250+ referencias encontradas en 88 archivos
 
@@ -70,7 +76,7 @@ apps/
 - `docs/analisis/INFORME-FINAL-MIGRACION-MALOVEAPP.md` (21 referencias)
 - Y 85 archivos más...
 
-**Problema:** El proyecto se llama "MaLove.APP" pero la documentación usa "MaLove.App"
+**Problema:** Hay referencias a nombres antiguos (mywed360/Lovenda) que ya no son la marca actual.
 
 **Ejemplos:**
 ```bash
@@ -83,8 +89,8 @@ git clone ... && cd MaLove.App && npm install
 
 **Impacto:** Medio - Confusión de marca y referencias obsoletas  
 **Recomendación:** 
-- Decidir nombre oficial: "MaLove.APP" o "MaLove.App"
-- Ejecutar búsqueda y reemplazo global si se cambia
+- Mantener el nombre oficial como **MaLove.App**
+- Reducir/retirar referencias legacy (`mywed360`, `Lovenda`) en documentos operativos
 - Actualizar rutas absolutas en documentación
 
 ---

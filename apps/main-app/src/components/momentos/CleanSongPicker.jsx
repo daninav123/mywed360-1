@@ -1,18 +1,26 @@
-import { Search, Music, X, Loader2, Play, ExternalLink } from 'lucide-react';
-import React, { useState } from 'react';
+import { Search, Music, X, Loader2, Play, ExternalLink, Sparkles } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { Button } from '../ui';
+import { getSongSuggestions } from '../../utils/popularWeddingSongs';
 
 /**
  * CleanSongPicker - Modal ultra-limpio para buscar canciones
  * Búsqueda directa en Spotify con reproducción completa
  */
-const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '' }) => {
+const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentType = '' }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState(null);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+
+  // Obtener sugerencias populares según el tipo de momento
+  const suggestions = useMemo(() => {
+    if (!momentType) return [];
+    return getSongSuggestions(momentType, 8);
+  }, [momentType]);
 
   // Búsqueda en Spotify
   const handleSearch = async () => {
@@ -59,6 +67,36 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '' }) => {
     onSelect(song);
     toast.success(`"${song.title}" seleccionada`);
     // No cerrar automáticamente, permitir múltiples búsquedas
+  };
+
+  const handleSelectSuggestion = async (suggestion) => {
+    // Buscar automáticamente la sugerencia en Spotify
+    setSearchQuery(`${suggestion.title} ${suggestion.artist}`);
+    setShowSuggestions(false);
+    
+    setIsSearching(true);
+    setError(null);
+
+    try {
+      const term = `${suggestion.title} ${suggestion.artist}`;
+      const response = await fetch(
+        `http://localhost:4004/api/spotify/search?q=${encodeURIComponent(term)}&limit=5`
+      );
+      const data = await response.json();
+
+      if (data.ok && Array.isArray(data.tracks) && data.tracks.length > 0) {
+        setResults(data.tracks);
+      } else {
+        setResults([]);
+        toast.info('No se encontró en Spotify. Intenta buscar manualmente.');
+      }
+    } catch (err) {
+      console.error('Error searching suggestion:', err);
+      setError('No se pudo buscar la sugerencia.');
+      setResults([]);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -127,6 +165,54 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '' }) => {
           {error && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
               {error}
+            </div>
+          )}
+
+          {/* Sugerencias populares */}
+          {showSuggestions && suggestions.length > 0 && !searchQuery && (
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles size={18} className="text-yellow-500" />
+                <h3 className="text-sm font-semibold text-gray-900">
+                  Canciones populares para este momento
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {suggestions.map((song, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSelectSuggestion(song)}
+                    className="text-left border border-gray-200 rounded-lg p-3 hover:border-blue-300 hover:bg-blue-50 transition-all group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        {idx + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm text-gray-900 truncate">
+                          {song.title}
+                        </div>
+                        <div className="text-xs text-gray-600 truncate">
+                          {song.artist}
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity text-blue-600 text-xs font-medium">
+                          Buscar →
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3 text-center">
+                <button
+                  onClick={() => setShowSuggestions(false)}
+                  className="text-xs text-gray-600 hover:text-gray-800 font-medium"
+                >
+                  Ocultar sugerencias
+                </button>
+              </div>
             </div>
           )}
 
@@ -253,6 +339,7 @@ CleanSongPicker.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   momentTitle: PropTypes.string,
+  momentType: PropTypes.string,
 };
 
 export default CleanSongPicker;

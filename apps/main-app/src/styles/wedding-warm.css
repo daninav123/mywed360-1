@@ -1,0 +1,352 @@
+/**
+ * WEDDING WARM - Sistema de diseño basado en imagen de referencia del usuario
+ * Beige cálido + verde salvia + tarjetas blancas
+ * Balance perfecto: no amarillo intenso, no apagado
+ */
+
+:root {
+  /* === COLORES BASE === */
+  --ww-bg-primary: #F5F1E8;           /* Beige cálido (fondo principal) */
+  --ww-bg-surface: #FFFFFF;            /* Blanco para tarjetas */
+  --ww-bg-hover: #FAFAF8;              /* Hover muy sutil */
+  
+  /* === COLORES DE ACENTO - VERDE SALVIA === */
+  --ww-accent-primary: #7A9B8E;        /* Verde salvia principal */
+  --ww-accent-light: #A3BCAE;          /* Verde salvia claro */
+  --ww-accent-pale: #E8F0ED;           /* Verde salvia ultra pálido */
+  
+  /* === TEXTOS === */
+  --ww-text-primary: #2D3E3C;          /* Gris verdoso oscuro */
+  --ww-text-secondary: #6B7C78;        /* Gris verdoso medio */
+  --ww-text-muted: #9FA9A6;            /* Gris claro */
+  
+  /* === BORDES Y SOMBRAS === */
+  --ww-border: rgba(122, 155, 142, 0.15);
+  --ww-shadow-sm: 0 2px 8px rgba(122, 155, 142, 0.08);
+  --ww-shadow-md: 0 4px 16px rgba(122, 155, 142, 0.12);
+  
+  /* === ESPACIADO Y BORDES === */
+  --ww-radius-sm: 12px;
+  --ww-radius-md: 16px;
+  --ww-radius-lg: 20px;
+  --ww-radius-pill: 999px;
+  
+  /* === TRANSICIONES === */
+  --ww-transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* === PÁGINA PRINCIPAL === */
+.ww-page {
+  background: #F5F1E8;
+  min-height: 100vh;
+  color: var(--ww-text-primary);
+}
+
+/* === TÍTULOS === */
+.ww-title {
+  font-family: 'Georgia', 'Cambria', 'Times New Roman', serif;
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--ww-text-primary);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.ww-subtitle {
+  font-size: 15px;
+  color: var(--ww-text-secondary);
+  font-weight: 400;
+  margin: 0 0 32px 0;
+}
+
+.ww-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ww-text-primary);
+  margin: 0 0 16px 0;
+}
+
+/* === TARJETAS === */
+.ww-card {
+  background: var(--ww-bg-surface);
+  border-radius: var(--ww-radius-lg);
+  padding: 20px;
+  box-shadow: var(--ww-shadow-sm);
+  border: 1px solid var(--ww-border);
+  transition: all var(--ww-transition);
+}
+
+.ww-card:hover {
+  box-shadow: var(--ww-shadow-md);
+  transform: translateY(-1px);
+}
+
+/* === INPUTS Y SELECTS === */
+.ww-input,
+.ww-select {
+  background: var(--ww-bg-surface);
+  border: 1.5px solid var(--ww-border);
+  border-radius: var(--ww-radius-sm);
+  padding: 10px 14px;
+  color: var(--ww-text-primary);
+  font-size: 14px;
+  transition: all var(--ww-transition);
+  outline: none;
+}
+
+.ww-input:focus,
+.ww-select:focus {
+  border-color: var(--ww-accent-primary);
+  box-shadow: 0 0 0 3px var(--ww-accent-pale);
+}
+
+.ww-input::placeholder {
+  color: var(--ww-text-muted);
+}
+
+/* === BOTONES === */
+.ww-btn {
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all var(--ww-transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.ww-btn-primary {
+  background: var(--ww-accent-primary);
+  color: white;
+  border-radius: var(--ww-radius-pill);
+  padding: 12px 24px;
+  min-height: 44px;
+}
+
+.ww-btn-primary:hover {
+  background: var(--ww-accent-light);
+  transform: translateY(-1px);
+  box-shadow: var(--ww-shadow-sm);
+}
+
+.ww-btn-primary:active {
+  transform: translateY(0);
+}
+
+.ww-btn-secondary {
+  background: transparent;
+  color: var(--ww-text-secondary);
+  padding: 12px 24px;
+  border-radius: var(--ww-radius-pill);
+  border: 1.5px solid var(--ww-border);
+}
+
+.ww-btn-secondary:hover {
+  background: var(--ww-bg-surface);
+  border-color: var(--ww-accent-primary);
+  color: var(--ww-accent-primary);
+}
+
+/* === TOOLBAR === */
+.ww-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  background: var(--ww-bg-surface);
+  padding: 20px;
+  border-radius: var(--ww-radius-lg);
+  box-shadow: var(--ww-shadow-sm);
+  border: 1px solid var(--ww-border);
+  margin-bottom: 24px;
+}
+
+/* === TABLA === */
+.ww-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--ww-bg-surface);
+  border-radius: var(--ww-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--ww-shadow-sm);
+  border: 1px solid var(--ww-border);
+}
+
+.ww-table thead {
+  background: var(--ww-accent-pale);
+}
+
+.ww-table thead th {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ww-text-primary);
+  text-align: left;
+  padding: 14px 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--ww-border);
+}
+
+.ww-table tbody td {
+  padding: 16px 18px;
+  border-top: 1px solid var(--ww-border);
+  font-size: 14px;
+  color: var(--ww-text-primary);
+}
+
+.ww-table tbody tr {
+  transition: background var(--ww-transition);
+}
+
+.ww-table tbody tr:hover {
+  background: var(--ww-bg-hover);
+}
+
+.ww-table tbody tr:first-child td {
+  border-top: none;
+}
+
+/* === MODAL === */
+.ww-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 62, 60, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: wwFadeIn 250ms ease-out;
+}
+
+.ww-modal {
+  background: var(--ww-bg-surface);
+  border-radius: var(--ww-radius-lg);
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(122, 155, 142, 0.25);
+  border: 1px solid var(--ww-border);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  animation: wwSlideUp 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ww-modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ww-text-primary);
+  margin: 0 0 24px 0;
+}
+
+/* === BADGES === */
+.ww-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: var(--ww-radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--ww-accent-pale);
+  color: var(--ww-accent-primary);
+  border: 1px solid var(--ww-border);
+}
+
+.ww-badge-completed {
+  background: #E8F5E9;
+  color: #388E3C;
+  border-color: rgba(56, 142, 60, 0.2);
+}
+
+.ww-badge-pending {
+  background: #FFF3E0;
+  color: #F57C00;
+  border-color: rgba(245, 124, 0, 0.2);
+}
+
+/* === ICONOS === */
+.ww-icon {
+  color: var(--ww-text-secondary);
+  transition: color var(--ww-transition);
+}
+
+.ww-icon:hover {
+  color: var(--ww-accent-primary);
+}
+
+.ww-icon-accent {
+  color: var(--ww-accent-primary);
+}
+
+/* === ESTADOS === */
+.ww-completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+/* === FORM GROUPS === */
+.ww-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ww-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ww-text-primary);
+  letter-spacing: 0.3px;
+}
+
+/* === ALERT === */
+.ww-alert {
+  background: var(--ww-bg-surface);
+  border-left: 3px solid var(--ww-accent-primary);
+  padding: 16px;
+  border-radius: var(--ww-radius-sm);
+  box-shadow: var(--ww-shadow-sm);
+  border: 1px solid var(--ww-border);
+  border-left-width: 3px;
+  border-left-color: var(--ww-accent-primary);
+}
+
+/* === ANIMACIONES === */
+@keyframes wwFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wwSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ww-fade-in {
+  animation: wwFadeIn 250ms ease-out;
+}
+
+/* === TEXTOS AUXILIARES === */
+.ww-text-sm {
+  font-size: 13px;
+}
+
+.ww-text-secondary {
+  color: var(--ww-text-secondary);
+}
+
+.ww-text-muted {
+  color: var(--ww-text-muted);
+}

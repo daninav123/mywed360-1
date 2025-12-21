@@ -1172,21 +1172,6 @@ export default function TasksRefactored() {
     return { minStart, maxEnd };
   }, [uniqueGanttTasks]);
 
-  const ganttProjectStart = useMemo(() => {
-    const candidates = [projectStart, authCreationDate, taskTemporalBounds.minStart]
-      .map((candidate) => {
-        if (!candidate) return null;
-        if (candidate instanceof Date) return Number.isNaN(candidate.getTime()) ? null : candidate;
-        const normalized = normalizeAnyDate(candidate);
-        return normalized && !Number.isNaN(normalized.getTime()) ? normalized : null;
-      })
-      .filter(Boolean);
-    if (candidates.length === 0) return null;
-    return candidates.reduce((earliest, current) =>
-      current.getTime() < earliest.getTime() ? current : earliest
-    );
-  }, [projectStart, authCreationDate, taskTemporalBounds]);
-
   const weddingDateFromMeetings = useMemo(() => {
     const meetings = Array.isArray(meetingsState) ? meetingsState : [];
     for (const meeting of meetings) {
@@ -1201,6 +1186,42 @@ export default function TasksRefactored() {
     }
     return null;
   }, [meetingsState]);
+
+  const ganttWeddingDate = useMemo(() => {
+    const candidates = [projectEnd, weddingDateFromMeetings, taskTemporalBounds.maxEnd]
+      .map((candidate) => {
+        if (!candidate) return null;
+        if (candidate instanceof Date) return Number.isNaN(candidate.getTime()) ? null : candidate;
+        const normalized = normalizeAnyDate(candidate);
+        return normalized && !Number.isNaN(normalized.getTime()) ? normalized : null;
+      })
+      .filter(Boolean);
+    if (candidates.length === 0) return null;
+    return candidates.reduce((latest, current) =>
+      current.getTime() > latest.getTime() ? current : latest
+    );
+  }, [projectEnd, weddingDateFromMeetings, taskTemporalBounds]);
+
+  const ganttProjectStart = useMemo(() => {
+    const normalizedProjectStart = normalizeAnyDate(projectStart);
+    if (normalizedProjectStart && !Number.isNaN(normalizedProjectStart.getTime())) {
+      return normalizedProjectStart;
+    }
+
+    if (ganttWeddingDate && !Number.isNaN(ganttWeddingDate.getTime())) {
+      return addMonths(ganttWeddingDate, -12);
+    }
+
+    if (taskTemporalBounds.minStart && !Number.isNaN(taskTemporalBounds.minStart.getTime())) {
+      return taskTemporalBounds.minStart;
+    }
+
+    if (authCreationDate && !Number.isNaN(authCreationDate.getTime())) {
+      return authCreationDate;
+    }
+
+    return null;
+  }, [projectStart, ganttWeddingDate, taskTemporalBounds, authCreationDate]);
 
   const ganttProjectEnd = useMemo(() => {
     const candidates = [projectEnd, weddingDateFromMeetings, taskTemporalBounds.maxEnd]
@@ -1274,12 +1295,9 @@ export default function TasksRefactored() {
       frame = null;
       try {
         const viewport = scrollEl.clientWidth || 0;
-        const content = scrollEl.scrollWidth || 0;
         const base = Math.max(1, Number(columnWidthState) || 90);
-        const colWidth = Math.max(GANTT_COLUMN_WIDTH_MIN, Number(zoomedColumnWidth) || base);
-        if (viewport <= 0 || content <= 0 || base <= 0 || colWidth <= 0) return;
-        const units = content / colWidth;
-        if (!Number.isFinite(units) || units <= 0) return;
+        const units = Math.max(1, Number(ganttTimelineMonths) || 0);
+        if (viewport <= 0 || base <= 0 || units <= 0) return;
         const targetColumnWidth = viewport / units;
         if (!Number.isFinite(targetColumnWidth) || targetColumnWidth <= 0) return;
         const ratio = targetColumnWidth / base;
@@ -2934,11 +2952,11 @@ export default function TasksRefactored() {
           </div>
         </div>
         {showEmptyGanttState ? (
-          <div className="bg-[var(--color-surface)] rounded-xl shadow-md border border-gray-100 px-6 py-10 text-center text-sm text-gray-500">
+          <div className="bg-surface rounded-xl shadow-md border border-soft px-6 py-10 text-center text-sm text-muted">
             {t('tasks.page.list.empty.filters')}
           </div>
         ) : noTasksScheduled ? (
-          <div className="bg-[var(--color-surface)] rounded-xl shadow-md border border-gray-100 px-6 py-10 text-center text-sm text-gray-500">
+          <div className="bg-surface rounded-xl shadow-md border border-soft px-6 py-10 text-center text-sm text-muted">
             {t('tasks.page.gantt.empty.noScheduled')}
           </div>
         ) : (

@@ -296,7 +296,7 @@ export default function Contratos() {
         {/* Escritorio */}
         <div className="hidden md:block overflow-auto">
           <table className="w-full table-auto">
-            <thead className="bg-[color:var(--color-text)]/5">
+            <thead className="bg-[color:var(--color-text-5)]">
               <tr>
                 <th className="p-2">
                   <input
@@ -319,7 +319,7 @@ export default function Contratos() {
               {contracts.map((c) => (
                 <tr
                   key={c.id}
-                  className={`${isNearExpiry(c.serviceDate) ?'bg-[var(--color-warning)]/20' : ''} border-b border-[color:var(--color-text)]/10`}
+                  className={`${isNearExpiry(c.serviceDate) ?'bg-[var(--color-warning-20)]' : ''} border-b border-[color:var(--color-text-10)]`}
                 >
                   <td className="p-2">
                     <input
@@ -362,7 +362,7 @@ export default function Contratos() {
                         href={c.docUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center text-[var(--color-primary)]"
+                        className="flex items-center text-[color:var(--color-primary)]"
                       >
                         <Eye size={16} className="mr-1" /> Ver
                       </a>
@@ -725,11 +725,11 @@ export default function Contratos() {
 function ContractItem({ contract, isSelected, onToggle }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-[color:var(--color-text)]/15 rounded p-4 bg-[var(--color-surface)]">
+    <div className="border border-[color:var(--color-text-15)] rounded p-4 bg-[var(--color-surface)]">
       <div className="flex justify-between items-center">
         <div>
           <p className="font-semibold">{contract.provider}</p>
-          <p className="text-sm text-[color:var(--color-text)]/60">
+          <p className="text-sm text-[color:var(--color-text-60)]">
             {contract.type} - {contract.status}
           </p>
         </div>
@@ -745,7 +745,7 @@ function ContractItem({ contract, isSelected, onToggle }) {
             href={contract.docUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center text-[var(--color-primary)]"
+            className="flex items-center text-[color:var(--color-primary)]"
           >
             <Eye size={16} className="mr-1" /> Ver documento
           </a>

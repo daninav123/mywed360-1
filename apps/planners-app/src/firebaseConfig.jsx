@@ -88,11 +88,15 @@ let db =
               localCache: persistentLocalCache(),
             });
           } catch (_e2) {
-            return initializeFirestore(app, {
-              experimentalForceLongPolling: true,
-              ignoreUndefinedProperties: true,
-              localCache: memoryLocalCache(),
-            });
+            try {
+              return initializeFirestore(app, {
+                experimentalForceLongPolling: true,
+                ignoreUndefinedProperties: true,
+                localCache: memoryLocalCache(),
+              });
+            } catch (_e3) {
+              return getFirestore(app);
+            }
           }
         }
       })()

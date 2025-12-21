@@ -81,8 +81,10 @@ export default function QuoteRequestsTracker() {
         const internetRequestsRef = collection(db, 'quote-requests-internet');
         const qInternet = query(
           internetRequestsRef,
-          where('userId', '==', user.uid),
-          orderBy('createdAt', 'desc')
+          where('userId', '==', user.uid)
+          // NOTE: orderBy removido temporalmente hasta crear índice en Firestore
+          // Para crear el índice: Firestore Console > Indexes > Create
+          // Collection: quote-requests-internet, Fields: userId (asc), createdAt (desc)
         );
 
         const internetSnapshot = await getDocs(qInternet);
@@ -98,7 +100,8 @@ export default function QuoteRequestsTracker() {
         });
       } catch (err) {
         // Puede fallar si no existe el índice
-        console.warn('Error cargando solicitudes de internet:', err);
+        console.error('Error cargando solicitudes de internet:', err);
+        console.error('Si ves un link para crear el índice, haz click en él');
       }
 
       // Ordenar por fecha (más recientes primero)
@@ -309,11 +312,11 @@ export default function QuoteRequestsTracker() {
 
       {/* Sección de comparar presupuestos */}
       {categoriesToCompare.length > 0 && (
-        <Card className="bg-[var(--color-primary)]digo-50 border-2 border-purple-200">
+        <Card className="bg-[var(--color-primary-10)] border-2 border-[color:var(--color-primary-30)]">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <GitCompare className="text-purple-600" size={24} />
+                <GitCompare className="text-primary" size={24} />
                 📊 Comparar Presupuestos
               </h3>
               <p className="text-sm text-gray-600 mt-1">

@@ -1,4 +1,4 @@
-﻿# Panel Admin – Estado actual (2025-10-15)
+# Panel Admin – Estado actual (2025-10-15)
 
 Este documento describe el panel de administración que ya está implementado en el proyecto, módulo por módulo, incluyendo fuentes de datos, acciones disponibles y limitaciones detectadas. Todas las rutas se sirven bajo el layout seguro (`AdminLayout.jsx`) y están protegidas por las reglas de autenticación admin (`RequireAdmin`).
 
@@ -218,7 +218,7 @@ Otros endpoints admin (fuera de `admin-dashboard.js`):
 - Muchos datasets dependen de seeds demo (si Firestore no tiene datos reales, el backend genera elementos ficticios para mantener la UI funcional).
 - El componente `AdminHealth.jsx` existe (métricas de errores vía `VITE_METRICS_ENDPOINT`) pero no está enroutado actualmente; se prevé incorporarlo en la vista “Alertas técnicas” para centralizar incidentes backend/mobile.
 - Las credenciales de servicio (`FIREBASE_SERVICE_ACCOUNT_JSON` o `GOOGLE_APPLICATION_CREDENTIALS`) son necesarias para que los contadores reales funcionen; sin ellas la mayoría de vistas muestran datos de demostración.
-- El seed local `src/data/tasks/masterTimelineTemplate.json` se mantiene como fallback para entornos sin backend; la creación de bodas en producción debe usar siempre la versión publicada en `adminTaskTemplates`.
+- El seed local `apps/main-app/src/data/tasks/masterTimelineTemplate.json` se mantiene como fallback para entornos sin backend; la creación de bodas en producción debe usar siempre la versión publicada en `adminTaskTemplates`.
 
 ## 6. Cobertura QA existente
 - Cypress: `cypress/e2e/admin/admin-flow.cy.js` recorre login y flujos básicos (dashboard, filtros, verificación de roles).
@@ -226,5 +226,4 @@ Otros endpoints admin (fuera de `admin-dashboard.js`):
 
 ---
 Para ampliar o priorizar mejoras, revisar la hoja de ruta y pendientes originales (`docs/flujos-especificos/flujo-0-administracion-global.md` apunta al dossier) y contrastar con los gaps listados en el punto 5.
-
 

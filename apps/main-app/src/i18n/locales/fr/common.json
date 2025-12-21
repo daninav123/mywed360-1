@@ -735,7 +735,7 @@
   "enviar_invitacion_formal_por_whatsapp": "envoyer la invitation formal por whatsapp api",
   "enviar_recordatorios_por_email_pendientes": "¿enviar recordatorios por email a pendientes?",
   "envio_briefing_inicial_con_playlist": "se envió briefing inicial con playlist preferida.",
-  "envio_completado_0xitos_fallos_fail": "envío completado. �0xitos: {{ok}}, fallos: {{fail}}",
+  "envio_completado_0xitos_fallos_fail": "envío completado. éxitos: {{ok}}, fallos: {{fail}}",
   "envio_iniciado_whatsapp_web_para": "envío iniciado en whatsapp web para {{count}} invitado(s).",
   "eres_asistente_que_devuelve_json": "eres un asistente que devuelve un json con el programa típico de una mariage en españa. ejemplo: [{\"time\":\"12:00\",\"title\":\"ceremonia\"}]",
   "eres_asistente_que_redacta_textos": "eres un asistente que redacta textos románticos para webs de mariage en español.",
@@ -1000,7 +1000,8 @@
         "category": "Category",
         "type": "Type",
         "status": "Status",
-        "amount": "Amount"
+        "amount": "Amount",
+        "actions": "Actions"
       },
       "noConcept": "No Concept",
       "dueOn": "Due On"
@@ -1026,6 +1027,14 @@
       "used": "Used",
       "title": "Title",
       "subtitle": "Subtitle",
+      "lastSync": "Dernière synchronisation",
+      "synced": "Synchronisé",
+      "offline": "Hors ligne",
+      "totalBudget": "Budget total",
+      "totalSpent": "Total dépensé",
+      "ofBudget": "du budget",
+      "currentBalance": "Solde actuel",
+      "expectedIncome": "Revenus attendus",
       "predictiveTitle": "Predictive Title",
       "predictiveSubtitle": "Predictive Subtitle",
       "trendUp": "Trend Up",
@@ -1043,6 +1052,8 @@
       "categoryStatus": "Category Status"
     },
     "charts": {
+      "title": "Charts",
+      "subtitle": "Summary",
       "totalTransactions": "Total Transactions",
       "activeCategories": "Active Categories",
       "budgetEfficiency": "Budget Efficiency",

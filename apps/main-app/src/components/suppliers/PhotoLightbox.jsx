@@ -185,7 +185,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
                     <span className="text-sm font-medium text-foreground">
                       {t('suppliers.portfolio.lightbox.view.categoryLabel')}
                     </span>
-                    <span className="px-2 py-1 bg-primary/10 text-primary rounded text-sm capitalize">
+                    <span className="px-2 py-1 bg-[var(--color-primary-10)] text-primary rounded text-sm capitalize">
                       {categoryLabel}
                     </span>
                   </div>
@@ -312,14 +312,14 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
                 <div className="flex items-center gap-3 pt-4">
                   <button
                     onClick={handleCancel}
-                    className="flex-1 px-4 py-2 border border-border rounded-lg text-body hover:bg-muted/50 transition-colors"
+                    className="flex-1 px-4 py-2 border border-border rounded-lg text-body hover:bg-surface-muted transition-colors"
                     disabled={saving}
                   >
                     {t('app.cancel')}
                   </button>
                   <button
                     onClick={handleSave}
-                    className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                    className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-[var(--color-primary-90)] transition-colors disabled:opacity-50"
                     disabled={saving}
                   >
                     {saving

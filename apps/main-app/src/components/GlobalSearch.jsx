@@ -3,7 +3,7 @@ import { Search, Mail, Calendar, User, X, Clock } from 'lucide-react';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import * as EmailService from '../services/EmailService';
+import * as EmailService from '../services/emailService';
 import * as ProveedorService from '../services/ProveedorService';
 import useTranslations from '../hooks/useTranslations';
 

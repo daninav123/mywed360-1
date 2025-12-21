@@ -208,7 +208,7 @@ El script procesó **todos los archivos JSON** en `src/i18n/locales/`:
 ### Antes de la Corrección
 
 - ❌ **1,036+ caracteres corruptos** en archivos español
-- ❌ Usuarios veían "�" o caracteres incorrectos
+- ❌ Usuarios veían "" o caracteres incorrectos
 - ❌ Mala experiencia de usuario (UX)
 - ❌ Apariencia poco profesional
 
@@ -264,7 +264,7 @@ Get-ChildItem -Path "src\i18n\locales" -Recurse -Filter "*.bak3" | ForEach-Objec
 ### Test 1: Sin Mojibake
 
 ```bash
-node -e "const fs=require('fs'); const json=JSON.parse(fs.readFileSync('src/i18n/locales/es/common.json', 'utf8')); const str=JSON.stringify(json, null, 2); const mojibake=str.match(/[�\\uFFFD]/g); console.log(mojibake ? 'MOJIBAKE: ' + mojibake.length : '✅ CLEAN');"
+node -e "const fs=require('fs'); const json=JSON.parse(fs.readFileSync('src/i18n/locales/es/common.json', 'utf8')); const str=JSON.stringify(json, null, 2); const mojibake=str.match(/[\\uFFFD]/g); console.log(mojibake ? 'MOJIBAKE: ' + mojibake.length : '✅ CLEAN');"
 
 # Resultado:
 ✅ CLEAN - Sin mojibake

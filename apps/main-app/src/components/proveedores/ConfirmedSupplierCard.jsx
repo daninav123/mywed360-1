@@ -53,8 +53,8 @@ export default function ConfirmedSupplierCard({
 
   return (
     <Card
-      className={`relative bg-[var(--color-primary)]emerald-50/80  transition ${
-        selected ? 'ring-2 ring-emerald-400' : ''
+      className={`relative bg-[var(--color-success-10)] transition ${
+        selected ? 'ring-2 ring-[color:var(--color-success)]' : ''
       }`}
     >
       <div className="absolute top-3 left-3">

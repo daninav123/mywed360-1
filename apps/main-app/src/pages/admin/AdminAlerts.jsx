@@ -43,7 +43,7 @@ const AdminAlerts = () => {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
         Cargando alertas...
       </div>
     );
@@ -53,7 +53,7 @@ const AdminAlerts = () => {
     <div className="space-y-6">
       <header>
         <h1 className="text-xl font-semibold">Alertas</h1>
-        <p className="text-sm text-[var(--color-text-soft,#6b7280)]">Revisión detallada de incidentes críticos registrados.</p>
+        <p className="text-sm text-[color:var(--color-text-soft)]">Revisión detallada de incidentes críticos registrados.</p>
       </header>
 
       <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
@@ -62,7 +62,7 @@ const AdminAlerts = () => {
             {alerts.map((alert) => (
               <li
                 key={alert.id}
-                className={selected?.id === alert.id ? 'px-4 py-3 text-sm bg-[var(--color-bg-soft,#f3f4f6)]' : 'px-4 py-3 text-sm'}
+                className={selected?.id === alert.id ? 'px-4 py-3 text-sm bg-[var(--color-bg-soft)]' : 'px-4 py-3 text-sm'}
                 data-testid="admin-alert-item"
               >
                 <div className="flex items-center justify-between gap-3">
@@ -73,11 +73,11 @@ const AdminAlerts = () => {
                       )}
                       <p className="font-medium">{alert.service || alert.module}</p>
                     </div>
-                    <p className="text-xs text-[var(--color-text-soft,#6b7280)] mt-1">
+                    <p className="text-xs text-[color:var(--color-text-soft)] mt-1">
                       {severityLabels[alert.severity]} · {alert.timestamp}
                     </p>
                     {alert.count && (
-                      <p className="text-xs text-[var(--color-text-soft,#6b7280)] mt-0.5">
+                      <p className="text-xs text-[color:var(--color-text-soft)] mt-0.5">
                         {alert.count} activaciones
                       </p>
                     )}
@@ -87,7 +87,7 @@ const AdminAlerts = () => {
                       type="button"
                       data-testid="admin-alert-resolve-list"
                       onClick={() => { setSelected(alert); setResolveNotes(''); setShowResolve(true); }}
-                      className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                      className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft)]"
                     >
                       Marcar resuelta
                     </button>
@@ -96,7 +96,7 @@ const AdminAlerts = () => {
               </li>
             ))}
             {alerts.length === 0 && (
-              <li className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]">
+              <li className="px-4 py-6 text-center text-sm text-[color:var(--color-text-soft)]">
                 No hay alertas registradas.
               </li>
             )}
@@ -114,7 +114,7 @@ const AdminAlerts = () => {
                     <h2 className="text-lg font-semibold">{selected.service || selected.module}</h2>
                   </div>
                   {selected.module && selected.service && (
-                    <p className="text-xs text-[var(--color-text-soft,#6b7280)] mt-1">
+                    <p className="text-xs text-[color:var(--color-text-soft)] mt-1">
                       Categoría: {selected.module}
                     </p>
                   )}
@@ -124,12 +124,12 @@ const AdminAlerts = () => {
                 </span>
               </div>
               
-              <div className="p-3 bg-[var(--color-bg-soft,#f3f4f6)] rounded-lg">
+              <div className="p-3 bg-[var(--color-bg-soft)] rounded-lg">
                 <p className="text-sm">{selected.message}</p>
               </div>
               
               {selected.count && (
-                <div className="flex items-center gap-4 text-xs text-[var(--color-text-soft,#6b7280)]">
+                <div className="flex items-center gap-4 text-xs text-[color:var(--color-text-soft)]">
                   <span>📊 Activaciones: <strong>{selected.count}</strong></span>
                   {selected.threshold && (
                     <span>⚠️ Umbral: {selected.threshold}/hora</span>
@@ -137,7 +137,7 @@ const AdminAlerts = () => {
                 </div>
               )}
               
-              <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+              <p className="text-xs text-[color:var(--color-text-soft)]">
                 📅 {selected.timestamp}
               </p>
               
@@ -147,7 +147,7 @@ const AdminAlerts = () => {
                   <ul className="space-y-1.5 text-sm">
                     {selected.actions.map((action, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <span className="text-[var(--color-text-soft,#6b7280)] mt-0.5">•</span>
+                        <span className="text-[color:var(--color-text-soft)] mt-0.5">•</span>
                         <span className={action.startsWith('🚨') ? 'font-semibold text-red-700' : ''}>
                           {action}
                         </span>
@@ -162,7 +162,7 @@ const AdminAlerts = () => {
                   <button
                     type="button"
                     data-testid="admin-alert-resolve"
-                    className="rounded-md border border-soft px-4 py-2 text-sm font-medium text-[color:var(--color-primary,#6366f1)] hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                    className="rounded-md border border-soft px-4 py-2 text-sm font-medium text-[color:var(--color-primary)] hover:bg-[var(--color-bg-soft)]"
                     onClick={() => setShowResolve(true)}
                   >
                     ✓ Marcar como resuelta
@@ -171,7 +171,7 @@ const AdminAlerts = () => {
               )}
             </div>
           ) : (
-            <p className="text-sm text-[var(--color-text-soft,#6b7280)]">Selecciona una alerta para ver los detalles.</p>
+            <p className="text-sm text-[color:var(--color-text-soft)]">Selecciona una alerta para ver los detalles.</p>
           )}
         </div>
       </div>
@@ -180,7 +180,7 @@ const AdminAlerts = () => {
           <div className="w-full max-w-md rounded-xl bg-surface p-6 shadow-xl space-y-4">
             <div>
               <h3 className="text-lg font-semibold">Resolver alerta</h3>
-              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">{selected.message}</p>
+              <p className="text-sm text-[color:var(--color-text-soft)]">{selected.message}</p>
             </div>
             <textarea
               data-testid="admin-alert-resolve-notes"
@@ -191,7 +191,7 @@ const AdminAlerts = () => {
               placeholder="Describe la acción tomada"
             />
             <div className="flex justify-end gap-3 text-sm">
-              <button type="button" onClick={() => setShowResolve(false)} className="px-3 py-2 text-[var(--color-text-soft,#6b7280)]">
+              <button type="button" onClick={() => setShowResolve(false)} className="px-3 py-2 text-[color:var(--color-text-soft)]">
                 Cancelar
               </button>
               <button
@@ -209,7 +209,7 @@ const AdminAlerts = () => {
                     setShowResolve(false);
                   }
                 }}
-                className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-3 py-2 text-[color:var(--color-on-primary,#ffffff)]"
+                className="rounded-md bg-[color:var(--color-primary)] px-3 py-2 text-[color:var(--color-on-primary)]"
               >
                 Confirmar
               </button>

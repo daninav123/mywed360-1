@@ -12,7 +12,9 @@ async function ensure() {
     const mod = await import('prom-client');
     prom = mod.default || mod;
     registry = new prom.Registry();
-    prom.collectDefaultMetrics({ register: registry });
+    if (process.env.NODE_ENV !== 'test') {
+      prom.collectDefaultMetrics({ register: registry });
+    }
     return true;
   } catch (e) {
     // prom-client not available; metrics disabled

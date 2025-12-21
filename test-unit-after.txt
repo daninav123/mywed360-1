@@ -1,0 +1,1 @@
+TIMEOUT: npm run test:unit excedió 600s

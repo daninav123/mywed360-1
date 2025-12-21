@@ -73,7 +73,7 @@ export const VendorPayments = ({ transactions }) => {
                   <span className="font-medium">{item.provider}</span>
                   <span>{formatCurrency(item.realCost)}</span>
                 </div>
-                <div className="text-xs text-[color:var(--color-text)]/60">
+                <div className="text-xs text-[color:var(--color-text-60)]">
                   {item.item} •{' '}
                   {(() => {
                     try {
@@ -96,7 +96,7 @@ export const VendorPayments = ({ transactions }) => {
   );
 
   return (
-    <Card className="p-4 space-y-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+    <Card className="p-4 space-y-4">
       <h3 className="text-lg font-semibold flex items-center gap-2">
         <AlertCircle className="text-[color:var(--color-primary)]" />
         Seguimiento de Pagos a Proveedores
@@ -108,28 +108,28 @@ export const VendorPayments = ({ transactions }) => {
           items={paymentStatus.overdue}
           total={totals.overdue}
           icon={<AlertCircle className="w-4 h-4" />}
-          color={{ bg: 'bg-[var(--color-danger)]/10', text: 'text-[color:var(--color-danger)]' }}
+          color={{ bg: 'bg-[var(--color-danger-10)]', text: 'text-[color:var(--color-danger)]' }}
         />
         <PaymentStatusCard
           title="Próximos Pagos"
           items={paymentStatus.upcoming}
           total={totals.upcoming}
           icon={<Clock className="w-4 h-4" />}
-          color={{ bg: 'bg-[var(--color-warning)]/10', text: 'text-[color:var(--color-warning)]' }}
+          color={{ bg: 'bg-[var(--color-warning-10)]', text: 'text-[color:var(--color-warning)]' }}
         />
         <PaymentStatusCard
           title="Pagos Futuros"
           items={paymentStatus.future}
           total={totals.future}
           icon={<AlertTriangle className="w-4 h-4" />}
-          color={{ bg: 'bg-[var(--color-primary)]/10', text: 'text-[color:var(--color-primary)]' }}
+          color={{ bg: 'bg-[var(--color-primary-10)]', text: 'text-[color:var(--color-primary)]' }}
         />
         <PaymentStatusCard
           title="Pagos Realizados"
           items={paymentStatus.paid}
           total={totals.paid}
           icon={<CheckCircle className="w-4 h-4" />}
-          color={{ bg: 'bg-[var(--color-success)]/10', text: 'text-[color:var(--color-success)]' }}
+          color={{ bg: 'bg-[var(--color-success-10)]', text: 'text-[color:var(--color-success)]' }}
         />
       </div>
     </Card>

@@ -8,8 +8,9 @@ Gracias por tu interés en contribuir. Esta guía resume cómo trabajar con el r
 - Variables de entorno según `docs/ENVIRONMENT.md` (no subas secretos).
 
 ## Flujo de trabajo
-- Rama base: `main` (prod) y `develop` (staging si aplica).
-- Crea ramas desde `develop` con prefijo: `feature/`, `fix/`, `docs/`.
+- Rama base: `main` (prod) y `windows` (desarrollo activo).
+- Crea ramas desde `windows` con prefijo: `feature/`, `fix/`, `docs/`.
+- No hacer push directo a `main` sin aprobación.
 - Pequeños PRs enfocados son preferibles a PRs grandes.
 
 ## Estándares de código

@@ -159,7 +159,7 @@ export const CraftCountdownSection = ({
       <div
         className="text-5xl font-bold mb-2"
         style={{
-          color: 'var(--color-primario, #9333EA)',
+          color: 'var(--color-primario)',
           fontFamily: 'var(--fuente-titulo, inherit)',
         }}
       >
@@ -167,7 +167,7 @@ export const CraftCountdownSection = ({
       </div>
       <div
         className="text-sm font-semibold uppercase tracking-wide"
-        style={{ color: 'var(--color-texto, #6B7280)' }}
+        style={{ color: 'var(--color-texto)' }}
       >
         {etiqueta}
       </div>
@@ -180,8 +180,8 @@ export const CraftCountdownSection = ({
       className="py-16 px-4"
       style={{
         background:
-          'linear-gradient(135deg, var(--color-fondo, #F9FAFB) 0%, var(--color-fondo-secundario, #FDF2F8) 100%)',
-        color: 'var(--color-texto, #1F2937)',
+          'linear-gradient(135deg, var(--color-fondo) 0%, var(--color-fondo-secundario) 100%)',
+        color: 'var(--color-texto)',
       }}
     >
       <div className="max-w-6xl mx-auto text-center">
@@ -189,7 +189,7 @@ export const CraftCountdownSection = ({
         <h2
           className="text-4xl md:text-5xl font-bold mb-12"
           style={{
-            color: 'var(--color-primario, #9333EA)',
+            color: 'var(--color-primario)',
             fontFamily: 'var(--fuente-titulo, inherit)',
           }}
         >
@@ -240,7 +240,7 @@ export const CraftCountdownSection = ({
           // Mensaje cuando la fecha llegó
           <div className="py-12">
             <div className="text-7xl mb-6">🎉💒✨</div>
-            <h3 className="text-4xl font-bold" style={{ color: 'var(--color-primario, #9333EA)' }}>
+            <h3 className="text-4xl font-bold" style={{ color: 'var(--color-primario)' }}>
               {mensajeFinal}
             </h3>
           </div>

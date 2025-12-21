@@ -67,23 +67,23 @@ const PortalBadge = ({ status }) => {
 const KPICard = ({ title, value, subtitle, tone = 'neutral' }) => {
   const palette = {
     neutral: 'bg-surface',
-    primary: 'bg-[color:var(--color-primary,#6366f1)]/10 text-[color:var(--color-primary,#6366f1)]',
+    primary: 'bg-[color:var(--color-primary-10)] text-[color:var(--color-primary)]',
     success: 'bg-green-50 text-green-700',
     warning: 'bg-amber-50 text-amber-700',
   };
 
   return (
     <div className={`rounded-xl border border-soft px-4 py-3 ${palette[tone] || palette.neutral}`}>
-      <p className="text-xs uppercase tracking-wide text-[color:var(--color-text-soft,#6b7280)]">{title}</p>
-      <p className="mt-1 text-2xl font-semibold text-[color:var(--color-text,#111827)]">{value}</p>
-      {subtitle && <p className="mt-1 text-xs text-[color:var(--color-text-soft,#6b7280)]">{subtitle}</p>}
+      <p className="text-xs uppercase tracking-wide text-[color:var(--color-text-soft)]">{title}</p>
+      <p className="mt-1 text-2xl font-semibold text-[color:var(--color-text)]">{value}</p>
+      {subtitle && <p className="mt-1 text-xs text-[color:var(--color-text-soft)]">{subtitle}</p>}
     </div>
   );
 };
 
 const EmptyState = ({ title, description }) => (
-  <div className="rounded-xl border border-dashed border-soft bg-surface px-6 py-12 text-center text-sm text-[color:var(--color-text-soft,#6b7280)]">
-    <h3 className="text-base font-medium text-[color:var(--color-text,#111827)]">{title}</h3>
+  <div className="rounded-xl border border-dashed border-soft bg-surface px-6 py-12 text-center text-sm text-[color:var(--color-text-soft)]">
+    <h3 className="text-base font-medium text-[color:var(--color-text)]">{title}</h3>
     <p className="mt-2">{description}</p>
   </div>
 );
@@ -235,8 +235,8 @@ const AdminSuppliers = () => {
     <div className="space-y-6">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-[color:var(--color-text,#111827)]">Proveedores</h1>
-          <p className="text-sm text-[color:var(--color-text-soft,#6b7280)]">
+          <h1 className="text-xl font-semibold text-[color:var(--color-text)]">Proveedores</h1>
+          <p className="text-sm text-[color:var(--color-text-soft)]">
             Supervisa el catálogo de proveedores registrados, su estado de verificación y la cobertura
             por servicio. Aplica filtros para detectar huecos o incidencias.
           </p>
@@ -245,7 +245,7 @@ const AdminSuppliers = () => {
           <button
             type="button"
             onClick={resetFilters}
-            className="inline-flex items-center gap-2 rounded-md border border-soft bg-surface px-3 py-2 text-sm font-medium text-[color:var(--color-text,#111827)] hover:bg-[color:var(--color-bg-soft,#f3f4f6)]"
+            className="inline-flex items-center gap-2 rounded-md border border-soft bg-surface px-3 py-2 text-sm font-medium text-[color:var(--color-text)] hover:bg-[color:var(--color-bg-soft)]"
           >
             <Filter size={16} />
             Limpiar filtros
@@ -253,7 +253,7 @@ const AdminSuppliers = () => {
           <button
             type="button"
             onClick={handleRefresh}
-            className="inline-flex items-center gap-2 rounded-md border border-soft bg-surface px-3 py-2 text-sm font-medium text-[color:var(--color-text,#111827)] hover:bg-[color:var(--color-bg-soft,#f3f4f6)]"
+            className="inline-flex items-center gap-2 rounded-md border border-soft bg-surface px-3 py-2 text-sm font-medium text-[color:var(--color-text)] hover:bg-[color:var(--color-bg-soft)]"
           >
             {analyticsLoading || listLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw size={16} />}
             Actualizar
@@ -296,8 +296,8 @@ const AdminSuppliers = () => {
       <section className="grid gap-4 lg:grid-cols-5">
         <div className="lg:col-span-3 rounded-xl border border-soft bg-surface p-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[color:var(--color-text,#111827)]">Distribución de score</h2>
-            {analyticsLoading && <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-text-soft,#6b7280)]" />}
+            <h2 className="text-sm font-semibold text-[color:var(--color-text)]">Distribución de score</h2>
+            {analyticsLoading && <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-text-soft)]" />}
           </div>
           <div className="h-56">
             {analytics.score.distribution.length > 0 ? (
@@ -321,26 +321,26 @@ const AdminSuppliers = () => {
 
         <div className="lg:col-span-2 rounded-xl border border-soft bg-surface p-4 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[color:var(--color-text,#111827)]">Estado operativo</h2>
-            {analyticsLoading && <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-text-soft,#6b7280)]" />}
+            <h2 className="text-sm font-semibold text-[color:var(--color-text)]">Estado operativo</h2>
+            {analyticsLoading && <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-text-soft)]" />}
           </div>
           <ul className="space-y-3 text-sm">
             {analytics.statusBreakdown.length > 0 ? (
               analytics.statusBreakdown.map((item) => (
                 <li key={item.status} className="flex items-center justify-between">
                   <span>{item.status}</span>
-                  <span className="text-[color:var(--color-text-soft,#6b7280)]">
+                  <span className="text-[color:var(--color-text-soft)]">
                     {formatNumber(item.count)} · {formatPercent(item.percentage)}
                   </span>
                 </li>
               ))
             ) : (
-              <li className="text-[color:var(--color-text-soft,#6b7280)]">Sin datos registrados.</li>
+              <li className="text-[color:var(--color-text-soft)]">Sin datos registrados.</li>
             )}
           </ul>
           <div className="border-t border-soft pt-3 text-sm">
-            <p className="font-medium text-[color:var(--color-text,#111827)]">Portal proveedores</p>
-            <p className="text-[color:var(--color-text-soft,#6b7280)]">
+            <p className="font-medium text-[color:var(--color-text)]">Portal proveedores</p>
+            <p className="text-[color:var(--color-text-soft)]">
               {formatNumber(analytics.portal.responded)} formularios respondidos · {formatNumber(analytics.portal.pending)} pendientes
             </p>
           </div>
@@ -349,14 +349,14 @@ const AdminSuppliers = () => {
 
       <section className="rounded-xl border border-soft bg-surface p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[color:var(--color-text,#111827)]">Servicios mejor cubiertos</h2>
-          {analyticsLoading && <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-text-soft,#6b7280)]" />}
+          <h2 className="text-sm font-semibold text-[color:var(--color-text)]">Servicios mejor cubiertos</h2>
+          {analyticsLoading && <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-text-soft)]" />}
         </div>
         {analytics.serviceStats.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-soft text-left text-xs uppercase text-[color:var(--color-text-soft,#6b7280)]">
+                <tr className="border-b border-soft text-left text-xs uppercase text-[color:var(--color-text-soft)]">
                   <th className="px-3 py-2">Servicio</th>
                   <th className="px-3 py-2 text-right">Proveedores</th>
                   <th className="px-3 py-2 text-right">Score medio</th>
@@ -367,7 +367,7 @@ const AdminSuppliers = () => {
               <tbody className="divide-y divide-soft">
                 {analytics.serviceStats.slice(0, 8).map((service) => (
                   <tr key={service.service}>
-                    <td className="px-3 py-2 font-medium text-[color:var(--color-text,#111827)]">{service.service}</td>
+                    <td className="px-3 py-2 font-medium text-[color:var(--color-text)]">{service.service}</td>
                     <td className="px-3 py-2 text-right">{formatNumber(service.total)}</td>
                     <td className="px-3 py-2 text-right">{formatNumber(service.averageScore)}</td>
                     <td className="px-3 py-2 text-right">{formatNumber(service.averageMatch)}</td>
@@ -386,11 +386,11 @@ const AdminSuppliers = () => {
       </section>
 
       <section className="rounded-xl border border-soft bg-surface p-4 space-y-4">
-        <h2 className="text-sm font-semibold text-[color:var(--color-text,#111827)]">Filtros</h2>
+        <h2 className="text-sm font-semibold text-[color:var(--color-text)]">Filtros</h2>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <div className="md:col-span-2 space-y-1">
-            <label className="text-xs font-medium text-[color:var(--color-text-soft,#6b7280)]">Buscar proveedor</label>
-            <div className="flex rounded-md border border-soft bg-surface focus-within:ring-2 focus-within:ring-[color:var(--color-primary,#6366f1)]">
+            <label className="text-xs font-medium text-[color:var(--color-text-soft)]">Buscar proveedor</label>
+            <div className="flex rounded-md border border-soft bg-surface focus-within:ring-2 focus-within:ring-[color:var(--color-primary)]">
               <input
                 type="text"
                 value={searchDraft}
@@ -404,7 +404,7 @@ const AdminSuppliers = () => {
               <button
                 type="button"
                 onClick={applySearch}
-                className="flex items-center gap-1 border-l border-soft px-3 text-sm text-[color:var(--color-text,#111827)] hover:bg-[color:var(--color-bg-soft,#f3f4f6)]"
+                className="flex items-center gap-1 border-l border-soft px-3 text-sm text-[color:var(--color-text)] hover:bg-[color:var(--color-bg-soft)]"
               >
                 <Search size={16} />
                 Buscar
@@ -413,11 +413,11 @@ const AdminSuppliers = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-[color:var(--color-text-soft,#6b7280)]">Estado</label>
+            <label className="text-xs font-medium text-[color:var(--color-text-soft)]">Estado</label>
             <select
               value={filters.status}
               onChange={handleFilterChange('status')}
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
+              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
             >
               {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -428,11 +428,11 @@ const AdminSuppliers = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-[color:var(--color-text-soft,#6b7280)]">Servicio</label>
+            <label className="text-xs font-medium text-[color:var(--color-text-soft)]">Servicio</label>
             <select
               value={filters.service}
               onChange={handleFilterChange('service')}
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
+              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
             >
               {serviceOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -443,11 +443,11 @@ const AdminSuppliers = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-[color:var(--color-text-soft,#6b7280)]">Ubicación</label>
+            <label className="text-xs font-medium text-[color:var(--color-text-soft)]">Ubicación</label>
             <select
               value={filters.city}
               onChange={handleFilterChange('city')}
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
+              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
             >
               {cityOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -458,11 +458,11 @@ const AdminSuppliers = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-[color:var(--color-text-soft,#6b7280)]">Portal proveedor</label>
+            <label className="text-xs font-medium text-[color:var(--color-text-soft)]">Portal proveedor</label>
             <select
               value={filters.portal}
               onChange={handleFilterChange('portal')}
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
+              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
             >
               {portalOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -472,12 +472,12 @@ const AdminSuppliers = () => {
             </select>
           </div>
 
-          <label className="flex items-center gap-2 rounded-lg border border-soft bg-surface px-3 py-2 text-sm text-[color:var(--color-text,#111827)]">
+          <label className="flex items-center gap-2 rounded-lg border border-soft bg-surface px-3 py-2 text-sm text-[color:var(--color-text)]">
             <input
               type="checkbox"
               checked={filters.registered}
               onChange={handleRegisteredToggle}
-              className="h-4 w-4 rounded border-soft text-[color:var(--color-primary,#6366f1)] focus:ring-[color:var(--color-primary,#6366f1)]"
+              className="h-4 w-4 rounded border-soft text-[color:var(--color-primary)] focus:ring-[color:var(--color-primary)]"
             />
             Mostrar solo verificados
           </label>
@@ -487,13 +487,13 @@ const AdminSuppliers = () => {
       <section className="rounded-xl border border-soft bg-surface p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-[color:var(--color-text,#111827)]">Directorio de proveedores</h2>
-            <p className="text-xs text-[color:var(--color-text-soft,#6b7280)]">
+            <h2 className="text-sm font-semibold text-[color:var(--color-text)]">Directorio de proveedores</h2>
+            <p className="text-xs text-[color:var(--color-text-soft)]">
               {formatNumber(listData.total)} resultados · mostrando {formatNumber(listData.items.length)}
               {listData.hasMore ? ' (limite alcanzado, refina filtros para ver más)' : ''}
             </p>
           </div>
-          {listLoading && <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-text-soft,#6b7280)]" />}
+          {listLoading && <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-text-soft)]" />}
         </div>
 
         {listError && (
@@ -506,7 +506,7 @@ const AdminSuppliers = () => {
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-soft text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase text-[color:var(--color-text-soft,#6b7280)]">
+                <tr className="text-left text-xs uppercase text-[color:var(--color-text-soft)]">
                   <th className="px-3 py-2">Proveedor</th>
                   <th className="px-3 py-2">Servicio</th>
                   <th className="px-3 py-2">Ubicación</th>
@@ -519,19 +519,19 @@ const AdminSuppliers = () => {
                   <th className="px-3 py-2 text-center">Verificado</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-soft text-[color:var(--color-text,#111827)]">
+              <tbody className="divide-y divide-soft text-[color:var(--color-text)]">
                 {supplierItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-[color:var(--color-bg-soft,#f3f4f6)]/50">
+                  <tr key={item.id} className="hover:bg-[color:var(--color-bg-soft)]">
                     <td className="px-3 py-3 align-top">
                       <div className="flex flex-col gap-1">
                         <span className="font-medium">{item.name}</span>
-                        <span className="text-xs text-[color:var(--color-text-soft,#6b7280)]">
+                        <span className="text-xs text-[color:var(--color-text-soft)]">
                           {item.emails[0] || item.phone || 'Sin contacto'}
                         </span>
                         {item.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 text-[0.65rem] text-[color:var(--color-text-soft,#6b7280)]">
+                          <div className="flex flex-wrap gap-1 text-[0.65rem] text-[color:var(--color-text-soft)]">
                             {item.tags.slice(0, 3).map((tag) => (
-                              <span key={tag} className="rounded-full bg-[color:var(--color-bg-soft,#f3f4f6)] px-2 py-0.5">
+                              <span key={tag} className="rounded-full bg-[color:var(--color-bg-soft)] px-2 py-0.5">
                                 #{tag}
                               </span>
                             ))}
@@ -544,7 +544,7 @@ const AdminSuppliers = () => {
                       <div className="flex flex-col gap-1">
                         <span>{item.service}</span>
                         {item.services.length > 1 && (
-                          <span className="text-xs text-[color:var(--color-text-soft,#6b7280)]">
+                          <span className="text-xs text-[color:var(--color-text-soft)]">
                             +{item.services.length - 1} servicios relacionados
                           </span>
                         )}
@@ -555,7 +555,7 @@ const AdminSuppliers = () => {
                         <>
                           <span>{item.city}</span>
                           {item.country && (
-                            <span className="ml-1 text-xs text-[color:var(--color-text-soft,#6b7280)]">
+                            <span className="ml-1 text-xs text-[color:var(--color-text-soft)]">
                               ({item.country})
                             </span>
                           )}
@@ -568,13 +568,13 @@ const AdminSuppliers = () => {
                       <StatusBadge status={item.status} />
                     </td>
                     <td className="px-3 py-3 text-right align-top font-medium">{formatNumber(item.score)}</td>
-                    <td className="px-3 py-3 text-right align-top text-[color:var(--color-text-soft,#6b7280)]">
+                    <td className="px-3 py-3 text-right align-top text-[color:var(--color-text-soft)]">
                       {formatNumber(item.match)}
                     </td>
                     <td className="px-3 py-3 align-top text-center">
                       <PortalBadge status={item.portal.status} />
                     </td>
-                    <td className="px-3 py-3 align-top text-[color:var(--color-text-soft,#6b7280)]">
+                    <td className="px-3 py-3 align-top text-[color:var(--color-text-soft)]">
                       {formatDateTime(item.lastInteractionAt || item.updatedAt || item.createdAt)}
                     </td>
                     <td className="px-3 py-3 align-top text-right">{formatNumber(item.weddingsCount)}</td>
@@ -600,14 +600,14 @@ const AdminSuppliers = () => {
 
       <section className="rounded-xl border border-soft bg-surface p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[color:var(--color-text,#111827)]">Top proveedores por score</h2>
-          {analyticsLoading && <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-text-soft,#6b7280)]" />}
+          <h2 className="text-sm font-semibold text-[color:var(--color-text)]">Top proveedores por score</h2>
+          {analyticsLoading && <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-text-soft)]" />}
         </div>
         {analytics.topProviders.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase text-[color:var(--color-text-soft,#6b7280)]">
+                <tr className="text-left text-xs uppercase text-[color:var(--color-text-soft)]">
                   <th className="px-3 py-2">Proveedor</th>
                   <th className="px-3 py-2">Servicio</th>
                   <th className="px-3 py-2">Estado</th>
@@ -616,8 +616,8 @@ const AdminSuppliers = () => {
               </thead>
               <tbody className="divide-y divide-soft">
                 {analytics.topProviders.map((provider) => (
-                  <tr key={`${provider.id}-${provider.weddingId}`} className="hover:bg-[color:var(--color-bg-soft,#f3f4f6)]/50">
-                    <td className="px-3 py-2 font-medium text-[color:var(--color-text,#111827)]">{provider.name}</td>
+                  <tr key={`${provider.id}-${provider.weddingId}`} className="hover:bg-[color:var(--color-bg-soft)]">
+                    <td className="px-3 py-2 font-medium text-[color:var(--color-text)]">{provider.name}</td>
                     <td className="px-3 py-2">{provider.service}</td>
                     <td className="px-3 py-2">
                       <StatusBadge status={provider.status} />

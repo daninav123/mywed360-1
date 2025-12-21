@@ -1614,7 +1614,7 @@ async function aggregateWebVisitStats(days = 30) {
 
     try {
       const docs = await fetchDocuments(() => factory(), [], 5000);
-      if (docs.length > 0) source = candidate.key;
+      if (docs.length > 0 && source === 'fallback') source = candidate.key;
       total += docs.length;
       docs.forEach((doc) => {
         const data = doc.data() || {};

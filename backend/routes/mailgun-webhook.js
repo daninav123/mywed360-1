@@ -7,8 +7,12 @@ import admin from 'firebase-admin';
 import { Buffer } from 'buffer';
 import { seenOrMark } from '../utils/idempotency.js';
 
+const isTest = process.env.NODE_ENV === 'test';
+
 // Asegura que variables estén disponibles
-dotenv.config();
+if (!isTest) {
+  dotenv.config();
+}
 
 const router = express.Router();
 

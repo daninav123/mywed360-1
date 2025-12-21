@@ -12,9 +12,9 @@ import EmailSettings from '../../components/email/EmailSettings';
 import FolderSelectionModal from '../../components/email/FolderSelectionModal';
 
 // Servicios
-import * as EmailService from '../../services/EmailService';
-import * as FolderService from '../../services/FolderService';
-import * as TagService from '../../services/TagService';
+import * as EmailService from '../../services/emailService';
+import * as FolderService from '../../services/folderService';
+import * as TagService from '../../services/tagService';
 
 // Mock para localStorage
 const localStorageMock = (() => {
@@ -42,9 +42,9 @@ Object.defineProperty(window, 'localStorage', {
 global.fetch = vi.fn();
 
 // Mock para los servicios
-vi.mock('../../services/EmailService');
-vi.mock('../../services/TagService');
-vi.mock('../../services/FolderService');
+vi.mock('../../services/emailService');
+vi.mock('../../services/tagService');
+vi.mock('../../services/folderService');
 
 // Componente para envolver los tests y proporcionar el contexto necesario
 const TestWrapper = ({ children, initialRoute = '/' }) => {

@@ -1,4 +1,4 @@
-﻿# 14. Checklist Avanzado (estado 2025-10-07)
+# 14. Checklist Avanzado (estado 2025-10-07)
 
 > Implementado: `Checklist.jsx`, `Tasks.jsx`, `TaskSidePanel.jsx`, hook `useWeddingTasksHierarchy`, servicios `automationService.js` (basico).
 > Pendiente: generacion inteligente de checklists, dependencias avanzadas, gamificacion completa y plantillas compartidas por comunidad.

@@ -26,6 +26,7 @@ const ProveedorFormModal = ({
     nombre: '',
     servicio: '',
     presupuesto: '',
+    assignedBudget: '',
     estado: 'Nuevo',
     contacto: '',
     email: '',
@@ -50,6 +51,7 @@ const ProveedorFormModal = ({
         nombre: proveedorEditar.nombre || '',
         servicio: proveedorEditar.servicio || '',
         presupuesto: proveedorEditar.presupuesto || '',
+        assignedBudget: proveedorEditar.assignedBudget || proveedorEditar.presupuestoAsignado || '',
         estado: proveedorEditar.estado || 'Nuevo',
         contacto: proveedorEditar.contacto || '',
         email: proveedorEditar.email || '',
@@ -66,6 +68,7 @@ const ProveedorFormModal = ({
         nombre: '',
         servicio: '',
         presupuesto: '',
+        assignedBudget: '',
         estado: 'Nuevo',
         contacto: '',
         email: '',
@@ -86,8 +89,8 @@ const ProveedorFormModal = ({
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Si es presupuesto, asegurar que sea numérico
-    if (name === 'presupuesto') {
+    // Si es presupuesto o presupuesto asignado, asegurar que sea numérico
+    if (name === 'presupuesto' || name === 'assignedBudget') {
       const numericValue = value.replace(/\D/g, '');
       setFormData({ ...formData, [name]: numericValue });
       return;
@@ -149,6 +152,7 @@ const ProveedorFormModal = ({
       const datosFinales = {
         ...formData,
         presupuesto: formData.presupuesto ? parseInt(formData.presupuesto, 10) : null,
+        assignedBudget: formData.assignedBudget ? parseFloat(formData.assignedBudget) : null,
       };
 
       // Si estamos editando, incluir el ID
@@ -268,17 +272,17 @@ const ProveedorFormModal = ({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Presupuesto */}
+                {/* Presupuesto (propuesta proveedor) */}
                 <div>
                   <label
                     htmlFor="presupuesto"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    {t('suppliers.formModal.fields.budget.label')}
+                    {t('suppliers.formModal.fields.budget.label', { defaultValue: 'Presupuesto (Proveedor)' })}
                   </label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                      {t('suppliers.formModal.fields.budget.prefix')}
+                      {t('suppliers.formModal.fields.budget.prefix', { defaultValue: '€' })}
                     </span>
                     <input
                       type="text"
@@ -287,11 +291,43 @@ const ProveedorFormModal = ({
                       value={formData.presupuesto}
                       onChange={handleChange}
                       className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      placeholder={t('suppliers.formModal.fields.budget.placeholder')}
+                      placeholder={t('suppliers.formModal.fields.budget.placeholder', { defaultValue: '0' })}
                     />
                   </div>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {t('suppliers.formModal.fields.budget.help', { defaultValue: 'Precio propuesto por el proveedor' })}
+                  </p>
                 </div>
 
+                {/* Presupuesto Asignado */}
+                <div>
+                  <label
+                    htmlFor="assignedBudget"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    {t('suppliers.formModal.fields.assignedBudget.label', { defaultValue: 'Presupuesto Asignado' })}
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                      {t('suppliers.formModal.fields.budget.prefix', { defaultValue: '€' })}
+                    </span>
+                    <input
+                      type="text"
+                      id="assignedBudget"
+                      name="assignedBudget"
+                      value={formData.assignedBudget}
+                      onChange={handleChange}
+                      className="w-full pl-8 pr-3 py-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
+                      placeholder={t('suppliers.formModal.fields.assignedBudget.placeholder', { defaultValue: '0' })}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {t('suppliers.formModal.fields.assignedBudget.help', { defaultValue: 'Presupuesto que asignas de tu boda' })}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Estado */}
                 <div>
                   <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1">

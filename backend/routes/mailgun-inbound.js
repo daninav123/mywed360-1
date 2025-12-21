@@ -8,6 +8,12 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { applyEmailInsightsToSystem } from '../services/emailActionRouter.js';
 import { classifyEmailContent } from '../services/emailClassification.js';
 import { extractTextFromAttachment } from '../services/attachmentText.js';
+import { 
+  isQuoteResponse, 
+  findMatchingQuoteRequest, 
+  analyzeQuoteResponse 
+} from '../services/quoteResponseAnalysis.js';
+import { sendQuoteReceivedNotification } from '../services/quoteRequestEmailService.js';
 
 const router = express.Router();
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
@@ -45,15 +51,23 @@ router.post('/', upload.any(), async (req, res) => {
   // Extraer datos de cabecera common para la firma
   const { timestamp, token, signature } = req.body || {};
 
+  // En desarrollo, solo advertir pero continuar
+  const isDevelopment = process.env.NODE_ENV !== 'production';
+
   if (anyKey) {
     const ok = verifyWithAnyKey({ timestamp, token, signature });
     if (!ok) {
-      console.warn('Webhook Mailgun firma no válida');
-      return res.status(403).json({ success: false, message: 'Invalid signature' });
+      console.warn('⚠️ [Mailgun] Webhook con firma no válida');
+      if (!isDevelopment) {
+        return res.status(403).json({ success: false, message: 'Invalid signature' });
+      }
+      console.warn('⚠️ [Mailgun] Continuando en modo desarrollo sin verificación');
+    } else {
+      console.log('✅ [Mailgun] Firma verificada correctamente');
     }
   } else {
     // Entorno local / CI sin clave: continuar pero advertir
-    console.warn('MAILGUN_SIGNING_KEY no definido; se omite verificación de firma (solo dev)');
+    console.warn('⚠️ [Mailgun] MAILGUN_SIGNING_KEY no definido; se omite verificación de firma (solo dev)');
   }
 
   // Extraer campos principales del mensaje
@@ -74,7 +88,12 @@ router.post('/', upload.any(), async (req, res) => {
   const recipients = recipient ? recipient.split(/,\s*/).map(r => r.trim()).filter(Boolean) : [];
 
   const savePromises = recipients.map(async (rcptRaw) => {
-    const rcpt = String(rcptRaw || '').trim().toLowerCase();
+    // Normalizar @mg.malove.app a @malove.app para que coincida con perfil usuario
+    let rcpt = String(rcptRaw || '').trim().toLowerCase();
+    if (rcpt.endsWith('@mg.malove.app')) {
+      rcpt = rcpt.replace('@mg.malove.app', '@malove.app');
+      console.log(`📧 [Mailgun] Destinatario normalizado: ${rcptRaw} → ${rcpt}`);
+    }
     const senderNorm = String(sender || '').trim().toLowerCase();
     try {
       // Adjuntos (multipart)
@@ -153,21 +172,45 @@ router.post('/', upload.any(), async (req, res) => {
       // Guardar copia bajo subcolecci�n del usuario si podemos resolverlo por email
       let ownerUid = null;
       try {
-        // Buscar por maLoveEmail primero (nuevo sistema)
-        let userSnap = await db.collection('users').where('maLoveEmail', '==', rcpt).limit(1).get();
+        console.log(`📧 [Mailgun] Procesando mail para destinatario: ${rcpt}`);
+        console.log(`📧 [Mailgun] Remitente: ${senderNorm}`);
+        console.log(`📧 [Mailgun] Asunto: ${subject}`);
         
-        // Fallback a myWed360Email (legacy)
-        if (userSnap.empty) {
-          userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
+        // Lista de emails a probar (incluyendo versión sin mg. si aplica)
+        const emailsToTry = [rcpt];
+        
+        // Si el email es @mg.malove.app, también probar con @malove.app
+        if (rcpt.endsWith('@mg.malove.app')) {
+          const withoutMg = rcpt.replace('@mg.malove.app', '@malove.app');
+          emailsToTry.push(withoutMg);
+          console.log(`📧 [Mailgun] Email detectado en @mg.malove.app, también probaré: ${withoutMg}`);
         }
         
-        // Fallback a email login
-        if (userSnap.empty) {
-          userSnap = await db.collection('users').where('email', '==', rcpt).limit(1).get();
+        let userSnap = { empty: true };
+        
+        // Buscar por cada email candidato
+        for (const emailToTry of emailsToTry) {
+          // Buscar por maLoveEmail primero (nuevo sistema)
+          userSnap = await db.collection('users').where('maLoveEmail', '==', emailToTry).limit(1).get();
+          console.log(`📧 [Mailgun] Búsqueda por maLoveEmail (${emailToTry}): ${userSnap.empty ? 'NO ENCONTRADO' : 'ENCONTRADO'}`);
+          if (!userSnap.empty) break;
+          
+          // Fallback a myWed360Email (legacy)
+          userSnap = await db.collection('users').where('myWed360Email', '==', emailToTry).limit(1).get();
+          console.log(`📧 [Mailgun] Búsqueda por myWed360Email (${emailToTry}): ${userSnap.empty ? 'NO ENCONTRADO' : 'ENCONTRADO'}`);
+          if (!userSnap.empty) break;
+          
+          // Fallback a email login
+          userSnap = await db.collection('users').where('email', '==', emailToTry).limit(1).get();
+          console.log(`📧 [Mailgun] Búsqueda por email login (${emailToTry}): ${userSnap.empty ? 'NO ENCONTRADO' : 'ENCONTRADO'}`);
+          if (!userSnap.empty) break;
         }
         
         if (!userSnap.empty) {
           ownerUid = userSnap.docs[0].id;
+          console.log(`✅ [Mailgun] Usuario encontrado: ${ownerUid}`);
+          console.log(`✅ [Mailgun] Guardando mail ${mailRef.id} en subcolección de usuario ${ownerUid}`);
+          
           await db.collection('users')
             .doc(ownerUid)
             .collection('mails')
@@ -183,12 +226,19 @@ router.post('/', upload.any(), async (req, res) => {
               read: false,
               via: 'mailgun'
             });
+          
+          console.log(`✅ [Mailgun] Mail guardado exitosamente en subcolección`);
+        } else {
+          console.warn(`⚠️ [Mailgun] NO SE ENCONTRÓ USUARIO para destinatario: ${rcpt}`);
+          console.warn(`⚠️ [Mailgun] El mail ${mailRef.id} NO se guardará en subcolección de usuario`);
+          console.warn(`⚠️ [Mailgun] Solo estará en colección global 'mails'`);
         }
       } catch (subErr) {
-        console.warn('Could not write inbound mail to user subcollection:', subErr?.message || subErr);
+        console.error('❌ [Mailgun] Error escribiendo mail en subcolección:', subErr?.message || subErr);
+        console.error('❌ [Mailgun] Stack:', subErr?.stack);
       }
 
-      // Clasificaci�n IA del correo (persistencia en Firestore)
+      // Clasificación IA del correo (persistencia en Firestore)
       try {
         await classifyEmailContent({
           subject,
@@ -198,6 +248,185 @@ router.post('/', upload.any(), async (req, res) => {
         });
       } catch (clsErr) {
         console.warn('Could not classify inbound email:', clsErr?.message || clsErr);
+      }
+
+      // 🤖 NUEVO: Detectar y procesar respuestas de presupuestos automáticamente
+      try {
+        if (isQuoteResponse({ subject, body: bodyContent, fromEmail: senderNorm })) {
+          console.log('🎯 [QuoteResponse] Email detectado como posible respuesta de presupuesto');
+          
+          // Buscar solicitud correspondiente
+          const matchingRequest = await findMatchingQuoteRequest({
+            fromEmail: senderNorm,
+            subject,
+            body: bodyContent,
+            db,
+          });
+
+          if (matchingRequest) {
+            console.log(`✅ [QuoteResponse] Solicitud encontrada: ${matchingRequest.requestId}`);
+            
+            // Extraer texto de adjuntos (especialmente PDFs)
+            let attachmentsText = [];
+            try {
+              for (const d of attachmentDocs) {
+                if (!d || !d.buffer) continue;
+                const text = await extractTextFromAttachment({ 
+                  buffer: d.buffer, 
+                  contentType: d.contentType || '', 
+                  filename: d.filename || '' 
+                });
+                if (text && text.trim()) {
+                  attachmentsText.push({ 
+                    filename: d.filename || '', 
+                    mime: d.contentType || '', 
+                    text 
+                  });
+                }
+              }
+            } catch (attErr) {
+              console.warn('[QuoteResponse] Error extrayendo texto de adjuntos:', attErr?.message);
+            }
+
+            // Analizar presupuesto con IA
+            const quoteData = await analyzeQuoteResponse({
+              subject,
+              body: bodyContent,
+              attachments: attachmentsText,
+              supplierName: matchingRequest.data.supplierName || '',
+              categoryName: matchingRequest.data.supplierCategoryName || '',
+            });
+
+            if (quoteData) {
+              console.log(`🎉 [QuoteResponse] Presupuesto analizado - Precio: ${quoteData.totalPrice || 'N/A'}€`);
+
+              // Guardar presupuesto en Firestore
+              const quoteRef = db.collection('quote-responses').doc();
+              await quoteRef.set({
+                // IDs de referencia
+                id: quoteRef.id,
+                requestId: matchingRequest.requestId,
+                supplierId: matchingRequest.supplierId,
+                mailId: mailRef.id,
+                
+                // Info del proveedor
+                supplierEmail: senderNorm,
+                supplierName: matchingRequest.data.supplierName || '',
+                
+                // Info del cliente
+                clientEmail: matchingRequest.data.contacto?.email || null,
+                clientName: matchingRequest.data.contacto?.nombre || null,
+                userId: matchingRequest.data.userId || null,
+                weddingId: matchingRequest.data.weddingId || null,
+                
+                // Datos del presupuesto extraídos por IA
+                ...quoteData,
+                
+                // Email original
+                emailSubject: subject,
+                emailBody: bodyContent,
+                hasAttachments: attachmentDocs.length > 0,
+                attachmentCount: attachmentDocs.length,
+                
+                // Estado
+                status: 'received',
+                source: 'email_auto',
+                
+                // Timestamps
+                createdAt: FieldValue.serverTimestamp(),
+                receivedAt: date,
+              });
+
+              const requestOwnerUid = matchingRequest.data.userId || null;
+              if (requestOwnerUid) {
+                try {
+                  await db.collection('mails').doc(mailRef.id).set(
+                    {
+                      ownerUid: requestOwnerUid,
+                      weddingId: matchingRequest.data.weddingId || null,
+                      linkedQuoteRequestId: matchingRequest.requestId,
+                      linkedQuoteResponseId: quoteRef.id,
+                      updatedAt: FieldValue.serverTimestamp(),
+                    },
+                    { merge: true }
+                  );
+                } catch (mailLinkErr) {
+                  console.warn('[QuoteResponse] Error enlazando mail con user:', mailLinkErr?.message);
+                }
+
+                // Actualizar subcolección (no crear nuevo, ya existe del guardado inicial)
+                try {
+                  await db
+                    .collection('users')
+                    .doc(requestOwnerUid)
+                    .collection('mails')
+                    .doc(mailRef.id)
+                    .set(
+                      {
+                        ownerUid: requestOwnerUid,
+                        weddingId: matchingRequest.data.weddingId || null,
+                        linkedQuoteRequestId: matchingRequest.requestId,
+                        linkedQuoteResponseId: quoteRef.id,
+                        updatedAt: FieldValue.serverTimestamp(),
+                      },
+                      { merge: true }
+                    );
+                } catch (subLinkErr) {
+                  console.warn('[QuoteResponse] Error actualizando mail en subcolección de usuario:', subLinkErr?.message);
+                }
+              }
+
+              // Actualizar estado de la solicitud
+              if (matchingRequest.source === 'registered_supplier') {
+                await db
+                  .collection('suppliers')
+                  .doc(matchingRequest.supplierId)
+                  .collection('quote-requests')
+                  .doc(matchingRequest.requestId)
+                  .update({
+                    status: 'quoted',
+                    respondedAt: FieldValue.serverTimestamp(),
+                    quoteResponseId: quoteRef.id,
+                  });
+              } else if (matchingRequest.source === 'internet_supplier') {
+                await db
+                  .collection('quote-requests-internet')
+                  .doc(matchingRequest.requestId)
+                  .update({
+                    status: 'quoted',
+                    respondedAt: FieldValue.serverTimestamp(),
+                    quoteResponseId: quoteRef.id,
+                  });
+              }
+
+              // Notificar al usuario
+              if (matchingRequest.data.contacto?.email) {
+                try {
+                  await sendQuoteReceivedNotification({
+                    userEmail: matchingRequest.data.contacto.email,
+                    userName: matchingRequest.data.contacto.nombre || 'Usuario',
+                    supplierName: matchingRequest.data.supplierName || 'Proveedor',
+                    categoryName: matchingRequest.data.supplierCategoryName || 'Servicio',
+                    quoteAmount: quoteData.totalPrice,
+                    viewUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/proveedores/presupuesto/${quoteRef.id}`,
+                  });
+                  console.log('📧 [QuoteResponse] Notificación enviada al usuario');
+                } catch (notifErr) {
+                  console.warn('[QuoteResponse] Error enviando notificación:', notifErr?.message);
+                }
+              }
+
+              console.log(`💾 [QuoteResponse] Presupuesto guardado exitosamente: ${quoteRef.id}`);
+            } else {
+              console.warn('[QuoteResponse] No se pudo analizar el presupuesto con IA');
+            }
+          } else {
+            console.log('⚠️ [QuoteResponse] No se encontró solicitud correspondiente para este email');
+          }
+        }
+      } catch (quoteErr) {
+        console.error('[QuoteResponse] Error procesando respuesta de presupuesto:', quoteErr);
+        // No fallar el procesamiento del email si falla el análisis de presupuesto
       }
 
       // Análisis IA automático -> extraer texto de adjuntos, guardar insights y generar notificaciones

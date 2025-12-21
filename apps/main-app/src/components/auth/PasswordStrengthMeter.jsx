@@ -39,13 +39,13 @@ export default function PasswordStrengthMeter({ password }) {
 
   return (
     <div className="mt-2" data-testid="password-strength-meter">
-      <div className="flex items-center justify-between text-xs text-[color:var(--color-text-soft,#6b7280)]">
+      <div className="flex items-center justify-between text-xs text-[color:var(--color-text-soft)]">
         <span>{t('passwordStrength.title')}</span>
         <span className="font-medium" style={{ color: strength.color }}>
           {labelText}
         </span>
       </div>
-      <div className="mt-1 h-2 rounded bg-[color:var(--color-border-soft,#e5e7eb)] overflow-hidden">
+      <div className="mt-1 h-2 rounded bg-[color:var(--color-border-soft)] overflow-hidden">
         <div
           className="h-full transition-all duration-300 ease-out"
           style={{
@@ -55,7 +55,7 @@ export default function PasswordStrengthMeter({ password }) {
         />
       </div>
       {strength.suggestions?.length ? (
-        <ul className="mt-2 text-xs text-[color:var(--color-text-soft,#6b7280)] space-y-1 list-disc list-inside">
+        <ul className="mt-2 text-xs text-[color:var(--color-text-soft)] space-y-1 list-disc list-inside">
           {strength.suggestions.map((suggestion) => {
             const key = SUGGESTION_KEYS[suggestion] || suggestion;
             return <li key={suggestion}>{t(key, { defaultValue: suggestion })}</li>;

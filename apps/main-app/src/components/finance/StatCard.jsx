@@ -10,10 +10,10 @@ const toneToVar = {
 };
 
 const toneToBg = {
-  primary: 'bg-[var(--color-primary)]/10',
-  success: 'bg-[var(--color-success)]/10',
-  warning: 'bg-[var(--color-warning)]/10',
-  danger: 'bg-[var(--color-danger)]/10',
+  primary: 'bg-[var(--color-primary-10)]',
+  success: 'bg-[var(--color-success-10)]',
+  warning: 'bg-[var(--color-warning-10)]',
+  danger: 'bg-[var(--color-danger-10)]',
 };
 
 export default function StatCard({
@@ -60,9 +60,6 @@ export default function StatCard({
       })
       .join(' ');
     
-    // Crear área para el gradiente
-    const areaPoints = `${points} ${w},${h} 0,${h}`;
-    
     return (
       <svg
         width={w}
@@ -71,16 +68,6 @@ export default function StatCard({
         aria-hidden="true"
         focusable="false"
       >
-        <defs>
-          <linearGradient id={`gradient-${tone}`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="currentColor" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <polygon
-          points={areaPoints}
-          fill={`url(#gradient-${tone})`}
-        />
         <polyline
           points={points}
           fill="none"
@@ -115,14 +102,14 @@ export default function StatCard({
       >
         <span aria-hidden className="text-sm">{arrow}</span>
         <span>{Math.abs(deltaValue).toFixed(1)}%</span>
-        {deltaLabel && <span className="text-[color:var(--color-text)]/60 font-normal ml-1">{deltaLabel}</span>}
+        {deltaLabel && <span className="text-[color:var(--color-text-60)] font-normal ml-1">{deltaLabel}</span>}
       </div>
     );
   };
 
   return (
     <Card
-      className={`${padding} group relative bg-[var(--color-surface)] ${bgTone} rounded-xl shadow-md border border-[color:var(--color-text)]/10 ${clickable ? 'cursor-pointer transition-all duration-300 hover:shadow-lg focus-within:ring-2 focus-within:ring-[color:var(--color-primary)]/50' : 'transition-all duration-300'} ${className}`}
+      className={`${padding} group relative ${clickable ? 'cursor-pointer transition-shadow duration-300 hover:shadow-lg focus-within:ring-2 focus-within:ring-[color:var(--color-primary-50)]' : 'transition-shadow duration-300'} ${className}`}
       onClick={onClick}
       role={role}
       tabIndex={tabIndex}
@@ -141,7 +128,7 @@ export default function StatCard({
           )}
           <div className="space-y-2">
             {loading ? (
-              <div className="h-9 md:h-10 w-32 bg-[color:var(--color-text)]/10 rounded-lg animate-pulse" />
+              <div className="h-9 md:h-10 w-32 bg-[color:var(--color-text-10)] rounded-lg animate-pulse" />
             ) : (
               <div className="text-3xl md:text-4xl font-bold text-body tracking-tight">
                 {value}
@@ -157,11 +144,7 @@ export default function StatCard({
         </div>
         {icon && (
           <div 
-            className="relative p-3 md:p-4 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300"
-            style={{ 
-              backgroundColor: `color-mix(in srgb, ${color} 15%, var(--color-surface))`,
-              boxShadow: `0 4px 14px color-mix(in srgb, ${color} 25%, transparent)`
-            }}
+            className={`relative p-3 md:p-4 rounded-2xl border border-soft ${bgTone}`}
           >
             <div className="w-6 h-6 md:w-7 md:h-7" style={{ color }}>{icon}</div>
           </div>

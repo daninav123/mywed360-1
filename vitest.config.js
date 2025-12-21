@@ -8,14 +8,24 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 export default defineConfig({
   plugins: [react()],
   test: {
-    // Estabilizar ejecución en Windows: usar threads en vez de forks
-    pool: 'threads',
+    // Pool configurable para evitar procesos colgados en algunos entornos
+    // - forks: tiende a terminar limpio (sin MessagePorts)
+    // - threads: puede ser más rápido pero en algunos casos deja handles abiertos
+    pool: process.env.VITEST_POOL || 'forks',
     minThreads: 1,
     maxThreads: 1,
+    minForks: 1,
+    maxForks: 1,
+
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
 
     // Ámbitos de tests: frontend + backend
     include: [
-      'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'apps/main-app/src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'backend/**/*.{test,spec}.{js,ts}',
       'functions/**/*.{test,spec}.{js,ts}',
     ],
@@ -24,6 +34,8 @@ export default defineConfig({
       '**/dist/**',
       // Excluir tests de Firestore rules (requieren emulador)
       '**/firestore.rules*.test.js',
+      // Tests legacy/manuales: pueden arrancar el servidor por orden de imports y duplican cobertura
+      'backend/test/**',
     ],
     passWithNoTests: false,
     testTimeout: 30000,
@@ -32,8 +44,13 @@ export default defineConfig({
     // Entornos por ruta: jsdom para src, node para backend
     globals: true,
     environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost:3000'
+      }
+    },
     environmentMatchGlobs: [
-      ['src/**', 'jsdom'],
+      ['apps/**/src/**', 'jsdom'],
       ['backend/**', 'node'],
       ['functions/**', 'node'],
     ],
@@ -42,7 +59,23 @@ export default defineConfig({
     reporters: ['default'],
 
     // Setups para front (src) y mocks globales controlados
-    setupFiles: ['src/test/setup.js', 'backend/vitest.setup.js'],
+    setupFiles: ['apps/main-app/src/test/setup.js', 'backend/vitest.setup.js'],
+
+    deps: {
+      inline: [
+        /@testing-library\/(react|dom|user-event)/,
+        /^react-i18next$/,
+        /^react-i18next\/(.+)$/,
+        /^i18next$/,
+        /^i18next\/(.+)$/,
+        /^react$/,
+        /^react\/jsx-runtime$/,
+        /^react\/jsx-dev-runtime$/,
+        /^react-dom$/,
+        /^react-dom\/client$/,
+        /^react-dom\/test-utils$/,
+      ],
+    },
 
     coverage: {
       provider: 'v8',
@@ -56,7 +89,7 @@ export default defineConfig({
         '**/coverage/**',
         '**/cypress/**',
         '**/logs/**',
-        'src/test/**',
+        'apps/**/src/test/**',
         'backend/vitest.setup.js',
       ],
       thresholds: {
@@ -68,10 +101,50 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: {
-      '@': resolve(__dirname, './src'),
+    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
+    alias: [
+      { find: /^react$/, replacement: resolve(__dirname, './node_modules/react') },
+      {
+        find: /^react\/(.+)$/,
+        replacement: resolve(__dirname, './node_modules/react/$1'),
+      },
+      { find: /^react-dom$/, replacement: resolve(__dirname, './node_modules/react-dom') },
+      {
+        find: /^react-dom\/(.+)$/,
+        replacement: resolve(__dirname, './node_modules/react-dom/$1'),
+      },
+      {
+        find: /^react-i18next$/,
+        replacement: resolve(__dirname, './node_modules/react-i18next'),
+      },
+      {
+        find: /^react-i18next\/(.+)$/,
+        replacement: resolve(__dirname, './node_modules/react-i18next/$1'),
+      },
+      {
+        find: /^i18next$/,
+        replacement: resolve(__dirname, './node_modules/i18next'),
+      },
+      {
+        find: /^i18next\/(.+)$/,
+        replacement: resolve(__dirname, './node_modules/i18next/$1'),
+      },
+      {
+        find: /^react-router-dom$/,
+        replacement: resolve(__dirname, './node_modules/react-router-dom'),
+      },
+      {
+        find: /^react-router-dom\/(.+)$/,
+        replacement: resolve(__dirname, './node_modules/react-router-dom/$1'),
+      },
+      { find: /^react-router$/, replacement: resolve(__dirname, './node_modules/react-router') },
+      {
+        find: /^react-router\/(.+)$/,
+        replacement: resolve(__dirname, './node_modules/react-router/$1'),
+      },
+      { find: '@', replacement: resolve(__dirname, './apps/main-app/src') },
       // Permitir imports absolutos tipo 'src/...'
-      src: resolve(__dirname, './src'),
-    },
+      { find: 'src', replacement: resolve(__dirname, './apps/main-app/src') },
+    ],
   },
 });

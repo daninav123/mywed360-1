@@ -115,7 +115,7 @@ const WeddingDayMode = () => {
 
   return (
     <PageWrapper title="Modo Día de la Boda">
-      <div className="mshadow-md mx-auto space-y-4">
+      <div className="layout-container-wide space-y-4">
         {/* Header con hora actual */}
         <div className="bg-[var(--color-primary)] text-white rounded-lg p-6 text-center">
           <h1 className="text-3xl font-bold mb-2">¡Día de la Boda!</h1>

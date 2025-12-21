@@ -116,9 +116,9 @@ export default function SupplierPublicPage() {
         <link rel="canonical" href={`${window.location.origin}/p/${slug}`} />
       </Helmet>
 
-      <div className="min-h-screen bg-nd">
+      <div className="min-h-screen bg-app">
         {/* Hero Section con Foto de Portada */}
-        <div className="relative h-96 bg-[var(--color-primary)]accent/20">
+        <div className="relative h-96 bg-[var(--color-primary-20)]">
           {coverPhoto && (
             <img
               src={coverPhoto.original}
@@ -126,11 +126,11 @@ export default function SupplierPublicPage() {
               className="w-full h-full object-cover"
             />
           )}
-          <div className="absolute inset-0 bg-[var(--color-primary)]black/30 to-transparent" />
+          <div className="absolute inset-0 bg-black/40" />
 
           {/* Nombre del Proveedor */}
           <div className="absolute bottom-0 left-0 right-0 p-8">
-            <div className="mshadow-md mx-auto">
+            <div className="shadow-md mx-auto">
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{supplier.name}</h1>
               <p className="text-xl text-white/90">
                 {supplier.profile?.category || 'Servicios de boda'}
@@ -162,7 +162,7 @@ export default function SupplierPublicPage() {
         </div>
 
         {/* Contenido Principal */}
-        <div className="mshadow-md mx-auto px-4 py-8">
+        <div className="layout-container-wide py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Columna Principal - Portfolio */}
             <div className="lg:col-span-2 space-y-8">
@@ -233,16 +233,16 @@ export default function SupplierPublicPage() {
             <div className="lg:col-span-1 space-y-6">
               {/* Botones de Acción */}
               <div className="bg-surface border border-border rounded-lg p-6 sticky top-4 space-y-4">
-                <button className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors">
+                <button className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-[var(--color-primary-90)] transition-colors">
                   Solicitar Presupuesto
                 </button>
 
                 <div className="flex gap-2">
-                  <button className="flex-1 flex items-center justify-center gap-2 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                  <button className="flex-1 flex items-center justify-center gap-2 py-2 border border-border rounded-lg hover:bg-surface-muted transition-colors">
                     <Heart className="h-5 w-5" />
                     Guardar
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                  <button className="flex-1 flex items-center justify-center gap-2 py-2 border border-border rounded-lg hover:bg-surface-muted transition-colors">
                     <Share2 className="h-5 w-5" />
                     Compartir
                   </button>

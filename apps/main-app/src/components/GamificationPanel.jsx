@@ -89,7 +89,7 @@ export default function GamificationPanel({ embed = false, className = '' }) {
         <>
           <header className="flex items-start justify-between gap-2">
             <div>
-              <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
+              <p className="text-xs uppercase tracking-wide text-[color:var(--color-text-60)]">
                 Gamificación
               </p>
               <h3
@@ -99,14 +99,14 @@ export default function GamificationPanel({ embed = false, className = '' }) {
                 Nivel {summary.level}
               </h3>
               <p
-                className="text-sm text-[color:var(--color-text)]/70"
+                className="text-sm text-[color:var(--color-text-70)]"
                 data-testid="gamification-points"
               >
                 {summary.points} puntos
               </p>
             </div>
             <span
-              className="text-xs text-[color:var(--color-text)]/60 font-medium"
+              className="text-xs text-[color:var(--color-text-60)] font-medium"
               data-testid="gamification-progress-label"
             >
               {progressPercent}%
@@ -114,7 +114,7 @@ export default function GamificationPanel({ embed = false, className = '' }) {
           </header>
 
           <p
-            className="text-sm text-[color:var(--color-text)]/60"
+            className="text-sm text-[color:var(--color-text-60)]"
             data-testid="gamification-progress-text"
           >
             Progreso hacia el siguiente nivel: {progressPercent}%
@@ -123,26 +123,26 @@ export default function GamificationPanel({ embed = false, className = '' }) {
       )}
 
       {loading ? (
-        <div className="animate-pulse space-y-2 text-xs text-[color:var(--color-text)]/50">
+        <div className="animate-pulse space-y-2 text-xs text-[color:var(--color-text-50)]">
           Cargando progreso...
         </div>
       ) : (
         <div className="space-y-4">
           {hasAchievements && (
             <section data-testid="gamification-achievements" className="space-y-2">
-              <h4 className="text-xs font-semibold text-[color:var(--color-text)]/70 uppercase tracking-wide">
+              <h4 className="text-xs font-semibold text-[color:var(--color-text-70)] uppercase tracking-wide">
                 Logros recientes
               </h4>
-              <ul className="space-y-1 text-sm text-[color:var(--color-text)]/80">
+              <ul className="space-y-1 text-sm text-[color:var(--color-text-80)]">
                 {achievementsPreview.map((ach) => (
                   <li key={ach.id} className="flex items-start gap-2">
-                    <span className="mt-1 block h-2 w-2 rounded-full bg-[var(--color-primary)]/70" />
+                    <span className="mt-1 block h-2 w-2 rounded-full bg-[var(--color-primary-70)]" />
                     <div>
                       <p className="font-medium text-[color:var(--color-text)]">
                         {ach.name}
                       </p>
                       {ach.description && (
-                        <p className="text-xs text-[color:var(--color-text)]/60">
+                        <p className="text-xs text-[color:var(--color-text-60)]">
                           {ach.description}
                         </p>
                       )}
@@ -155,15 +155,15 @@ export default function GamificationPanel({ embed = false, className = '' }) {
 
           {hasHistory && (
             <section data-testid="gamification-history" className="space-y-2">
-              <h4 className="text-xs font-semibold text-[color:var(--color-text)]/70 uppercase tracking-wide">
+              <h4 className="text-xs font-semibold text-[color:var(--color-text-70)] uppercase tracking-wide">
                 Historial reciente
               </h4>
-              <ul className="space-y-1 text-xs text-[color:var(--color-text)]/70">
+              <ul className="space-y-1 text-xs text-[color:var(--color-text-70)]">
                 {historyPreview.map((item) => (
                   <li key={item.id} className="flex items-center justify-between gap-3">
                     <span>{item.label}</span>
                     {item.date && (
-                      <span className="text-[color:var(--color-text)]/40 whitespace-nowrap">
+                      <span className="text-[color:var(--color-text-40)] whitespace-nowrap">
                         {item.date}
                       </span>
                     )}
@@ -190,7 +190,7 @@ export default function GamificationPanel({ embed = false, className = '' }) {
   if (embed) {
     return (
       <section
-        className={`mt-4 border-t border-[color:var(--color-text)]/10 pt-4 ${sharedContainerClasses} ${className}`}
+        className={`mt-4 border-t border-[color:var(--color-text-10)] pt-4 ${sharedContainerClasses} ${className}`}
         data-testid="gamification-card"
       >
         {body}
@@ -200,7 +200,7 @@ export default function GamificationPanel({ embed = false, className = '' }) {
 
   return (
     <Card
-      className={`h-full bg-[var(--color-surface)]/80 backdrop-blur-md p-4 ${sharedContainerClasses} ${className}`}
+      className={`h-full bg-[var(--color-surface-80)] backdrop-blur-md p-4 ${sharedContainerClasses} ${className}`}
       data-testid="gamification-card"
     >
       {body}

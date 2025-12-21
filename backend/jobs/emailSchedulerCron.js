@@ -5,7 +5,7 @@
  * la cola de emails programados (emailAutomationQueue).
  * 
  * Configuración en Cloud Scheduler / Render Cron / etc:
- * - Frecuencia: */1 * * * * (cada minuto) o */5 * * * * (cada 5 min)
+ * - Frecuencia: cada 1 minuto o cada 5 minutos (ver render.yaml)
  * - URL: POST https://tu-backend.com/api/email-automation/schedule/process
  * - Header: x-cron-key: ${EMAIL_AUTOMATION_CRON_KEY}
  */

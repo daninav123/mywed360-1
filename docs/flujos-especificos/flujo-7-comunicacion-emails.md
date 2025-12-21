@@ -125,7 +125,7 @@ svp). |
 - users/{uid}/emailFolders/{folderId}: { name, color, unreadCount, system }.
 - users/{uid}/emailTags/{tagId}: { name, color, automationRule? }.
 - users/{uid}/emailFolderAssignments/{emailId}: preserva carpeta original para restauraciones.
-- olderService y 	agService mantienen espejo local (maloveapp_email_*) mientras se consolida backend.
+- olderService y 	agService mantienen espejo local (maloveapp_email_*) mientras se consolida backend.
 
 ### 4.4 Eventos derivados
 - `emailEvents/{eventId}`: `{ emailId, weddingId, title, startAt, endAt, location, attendees[], status, taskId? }` (creados desde CalendarIntegration.jsx).
@@ -298,7 +298,7 @@ svp). |
    - Onboarding completo con validación DKIM/SPF y correo de prueba automatizado.
 3. **Analítica y monitoreo (Owner: Data/Analytics, ETA Q1 2026)**
    - Dashboard Grafana/BigQuery con KPIs (deliverySuccess, openRate, 
-eplyTimeMedian, utoReplyCoverage, iaAdoption, cleanupRate).
+eplyTimeMedian, utoReplyCoverage, iaAdoption, cleanupRate).
    - Alertas automáticas: rebotes >5% diario, complained >0.5%, SLA respuesta >24h.
 4. **Integraciones cruzadas (Owner: Orquestador/IA, ETA Q2 2026)**
    - Consolidar workflows IA (Flujo 16) con etiquetado y borradores state=draft.

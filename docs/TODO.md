@@ -1,4 +1,4 @@
-﻿# TODO - Lovenda/MaLoveApp
+# TODO - MaLove.App
 
 > Lista única de pendientes operativos consolidada con análisis de gaps de implementación.
 > Usa `docs/ROADMAP.md` para la perspectiva estratégica y `docs/ANALYSIS_GAPS_CONSOLIDATED.md` para análisis detallado.
@@ -7,7 +7,7 @@
 
 ### Tests y Calidad
 
-- [ ] **FIX BLOQUEADOR:** Corregir 3 tests unitarios de reglas Firestore (unit_rules, unit_rules_exhaustive, unit_rules_extended)
+- [ ] **FIX BLOQUEADOR:** Corregir 4 tests unitarios de reglas Firestore (unit_rules, unit_rules_exhaustive, unit_rules_extended, unit_rules_collections)
 - [ ] Estabilizar seeds y fixtures para tests
 
 ### API y Seguridad
@@ -37,7 +37,7 @@
 
 ### Email y Comunicaciones (Flujo 7, 20)
 
-- [ ] Resolver búsqueda/sort duplicado en `UnifiedInbox/EmailList.jsx`
+- [ ] Resolver búsqueda/sort duplicado en `apps/main-app/src/components/email/UnifiedInbox/EmailList.jsx`
 - [ ] Completar onboarding con validaciones DKIM/SPF y envío correo de prueba
 - [ ] Implementar persistencia server-side de auto-respuestas (no solo localStorage)
 - [ ] Migrar definitivamente del buzón legacy (`Buzon_fixed_complete.jsx`) a UnifiedInbox

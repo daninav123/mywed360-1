@@ -99,15 +99,15 @@ node scripts/i18n/fixMojibakeV2.js
 ```
 
 **Funcionalidad:**
-- Detecta caracteres corruptos (� → ñ, etc.)
+- Detecta caracteres corruptos ( → ñ, etc.)
 - Corrige encoding UTF-8
 - Valida JSON después de la corrección
 - Crea backup antes de modificar
 
 **Cuándo usar:**
-- Cuando encuentres caracteres �
+- Cuando encuentres caracteres 
 - Después de ediciones manuales de JSON
-- Si aparecen "�"
+- Si aparecen ""
 
 ---
 
@@ -360,7 +360,7 @@ npm run lint
 ### Para Corregir Mojibake
 
 ```bash
-# Si encuentras caracteres �:
+# Si encuentras caracteres :
 node scripts/i18n/fixMojibake.js src/i18n/locales/es/common.json
 
 # O script mejorado:

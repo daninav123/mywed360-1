@@ -103,6 +103,11 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
               size="sm"
               onClick={() => onToggleImportant(email.id, !isImportant)}
               className="flex items-center"
+              aria-label={
+                isImportant
+                  ? t('email.viewer.unstar', { defaultValue: 'Quitar estrella' })
+                  : t('email.viewer.star', { defaultValue: 'Marcar con estrella' })
+              }
               title={
                 isImportant
                   ? t('email.viewer.unstar', { defaultValue: 'Quitar estrella' })
@@ -120,6 +125,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
               size="sm"
               onClick={() => onReply(email)}
               className="flex items-center"
+              aria-label={t('email.viewer.reply', { defaultValue: 'Responder' })}
               title={t('email.viewer.reply', { defaultValue: 'Responder' })}
             >
               <Reply size={18} className="text-gray-600" />
@@ -129,6 +135,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
               size="sm"
               onClick={() => onForward(email)}
               className="flex items-center"
+              aria-label={t('email.viewer.forward', { defaultValue: 'Reenviar' })}
               title={t('email.viewer.forward', { defaultValue: 'Reenviar' })}
             >
               <Forward size={18} className="text-gray-600" />
@@ -138,6 +145,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
               size="sm"
               onClick={() => onDelete(email.id)}
               className="flex items-center"
+              aria-label={t('email.viewer.delete', { defaultValue: 'Eliminar' })}
               title="Eliminar"
             >
               <Trash size={18} className="text-gray-600" />
@@ -194,30 +202,38 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
       {/* Adjuntos si existen */}
       {email.attachments && email.attachments.length > 0 && (
         <div className="border-t border-gray-200 p-4">
-          <h3 className="flex items-center text-sm font-medium mb-2">
+          <h2 className="flex items-center text-sm font-medium mb-2">
             <Paperclip size={16} className="mr-1" />
             Adjuntos ({email.attachments.length})
-          </h3>
+          </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
             {email.attachments.map((attachment, index) => (
               <div key={index} className="border border-gray-200 rounded p-2 flex items-center">
                 <div className="flex-grow truncate">
-                  {attachment.name || `Archivo ${index + 1}`}
+                  <a
+                    href={attachment.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2"
+                  >
+                    {attachment.name || `Archivo ${index + 1}`}
+                  </a>
                   <span className="text-xs text-gray-500 block">
                     {attachment.size ? `${Math.round(attachment.size / 1024)} KB` : ''}
                   </span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <a
+                  href={attachment.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex-shrink-0"
-                  onClick={() => {
-                    /* Lógica de descarga */
-                  }}
+                  aria-label={t('email.viewer.downloadAttachment', {
+                    defaultValue: `Descargar ${attachment.name || `Archivo ${index + 1}`}`,
+                  })}
                 >
                   <Download size={16} />
-                </Button>
+                </a>
               </div>
             ))}
           </div>

@@ -1,4 +1,4 @@
-﻿# Roadmap Estratégico MaLoveApp - 2025 v2
+# Roadmap Estratégico MaLoveApp - 2025 v2
 
 > ⚠️ **Documento congelado (snapshot 2025-10-09).** Usa [`docs/ROADMAP.md`](./ROADMAP.md) para el estado y los planes vigentes.
 

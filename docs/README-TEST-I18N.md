@@ -49,7 +49,7 @@ npx cypress open
 ## 📋 Qué Verifica
 
 ### ✅ Sin Mojibake
-- Detecta: `�`, `\uFFFD`, entidades HTML sin decodificar
+- Detecta: ``, `\uFFFD`, entidades HTML sin decodificar
 - **27 palabras corruptas** comunes (sin acentos)
 
 ### ✅ Palabras Correctas
@@ -89,7 +89,7 @@ npx cypress open
 ❌ Mojibake detectado en:
   {
     "page": "/finanzas",
-    "matches": ["�", "�"]
+    "matches": ["", ""]
   }
 
 ❌ Palabras corruptas encontradas:

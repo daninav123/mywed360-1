@@ -41,12 +41,14 @@
 ## Pruebas rápidas
 - Eventos Mailgun: `GET https://<backend>/api/mailgun/events→recipient=tu@correo.com&event=delivered&limit=10`.
 - Envío de prueba: `POST https://<backend>/api/mail/test-personal-email` con JSON:
+  ```json
   {
-     – from – :  – usuario@malove.app – ,
-     – to – :  – destino@dominio.com – ,
-     – subject – :  – Prueba – ,
-     – message – :  – Hola – 
+    "from": "usuario@malove.app",
+    "to": "destino@dominio.com",
+    "subject": "Prueba",
+    "message": "Hola"
   }
+  ```
 
 ## Seguridad y buenas prácticas
 - No hay API keys hardcodeadas en el código. Las rutas de Mailgun usan variables de entorno.

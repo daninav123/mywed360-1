@@ -1,4 +1,4 @@
-﻿# Especificación de prototipos
+# Especificación de prototipos
 
 ## Wizard de exportación avanzada
 - **Objetivo**: definir la experiencia de generación de planos listos para compartir con proveedores.

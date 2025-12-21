@@ -192,9 +192,9 @@ npm run i18n:sync-translations
 **Antes:**
 ```json
 {
-  "success": "�xito",
-  "add": "A�adir",
-  "yes": "S�"
+  "success": "xito",
+  "add": "Añadir",
+  "yes": "S"
 }
 ```
 
@@ -254,8 +254,8 @@ tEmail('providerSearch.title')  // ✅ Existe en todos los idiomas
 ### Antes (Problemas)
 
 🔴 **UX Rota:**
-- Usuarios veían "�" en toda la UI
-- Strings como "Correo electr�nico" en vez de "Correo electrónico"
+- Usuarios veían "" en toda la UI
+- Strings como "Correo electránico" en vez de "Correo electrónico"
 - Tests de i18n fallando constantemente
 
 🔴 **Idiomas Incompletos:**

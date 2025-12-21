@@ -21,7 +21,7 @@
    - Campos de branding: colores, tipografia, hero y copy principal cargados desde `ProfileSummary` y editables via prompt.
 2. Generacion y personalizacion  
    - `WebGenerator.jsx` arma el mensaje usando `websitePromptBuilder.js` (tokens de estilo + datos de `weddingInfo`).  
-   - Boton **Generar Pagina Web** hace `fetch` directo a `https://api.openai.com/v1/chat/completions` cuando `VITE_ENABLE_DIRECT_OPENAI === 'true'` o en modo dev; si no hay clave o la bandera esta deshabilitada, usa `buildFallbackHtml` + `enhanceWeddingHtml`.  
+- Botón **Generar Página Web** hace `fetch` directo a `https://api.openai.com/v1/chat/completions` cuando `VITE_ENABLE_DIRECT_OPENAI === 'true'` o en modo dev; si no hay clave o la bandera está deshabilitada, usa `buildFallbackHtml` + `enhanceWeddingHtml`.  
    - Editor logistico lateral (`LogisticsEditor`) permite ajustar historia, transporte, hospedajes, guia de viaje y FAQs antes de publicar; los datos previos se toman del mapa `weddingInfo` si existe.  
    - Contenido logistico 100 % manual por ahora (las sugerencias de Flow 7 llegan solo si ya viven en Firestore).
 3. Publicacion y comparticion  
@@ -51,7 +51,7 @@
 - Falta de datos minimos (nombres, fecha) -> `missingBasics` muestra banner con CTA a Perfil.  
 - Error IA (401, rate limit, etc.) -> fallback automatico a plantilla base y mensaje "Generacion IA no disponible".  
 - Publicacion fallida -> alerta, log en `analytics/websiteEvents`, se restaura ultimo HTML guardado.  
-- Offline -> boton publicar deberia deshabilitarse (ver bug en seccion 13).  
+- Offline -> botón publicar debería deshabilitarse (ver bug en sección 13).  
 - Slug reservado/ocupado -> mensaje de estado y sugerencias alternativas.
 
 ## 7. Integracion con otros flujos
@@ -64,7 +64,7 @@
 - Eventos ya grabados: `website_generated`, `website_logistics_saved`, `website_publish_started`, `website_published`, `website_publish_failed`.  
 - Pendiente activar `website_regenerated` y `website_theme_changed` (placeholders).  
 - Falta dashboard que consuma `analytics/websiteEvents` y tracking de visitas reales a `/p/{slug}`.  
-- Metricas planeadas: visitas unicas, tiempo entre generacion y publicacion, clicks en bloques logisticos, descargas de QR.
+- Métricas planeadas: visitas únicas, tiempo entre generación y publicación, clicks en bloques logísticos, descargas de QR.
 
 ## 9. Pruebas recomendadas
 - Unitarias: parseo de prompts (`websitePromptBuilder`), normalizacion de logistica (`sanitizeLogisticsDraft`), helpers de slug/domino (`buildSlugSuggestions`, `checkSlugAvailability`).  
@@ -92,7 +92,7 @@
 
 ## 12. Motor IA premium
 - **Prompt framework**: plantilla base con identidad visual curada, tokens de paleta y tipografia por estilo, secciones obligatorias e indicaciones de tono.  
-- **Postprocesador HTML**: garantiza `<!doctype html>`, inyecta estilo con variables (`--color-*`, `--font-*`), normaliza layout responsive (grid/flex), genera tarjetas logisticas y contador regresivo si hay fecha valida.  
+- **Postprocesador HTML**: garantiza `<!doctype html>`, inyecta estilo con variables (`--color-*`, `--font-*`), normaliza layout responsive (grid/flex), genera tarjetas logísticas y contador regresivo si hay fecha válida.  
 - **Extensibilidad**: nuevos estilos/bloques se registran en `websitePromptBuilder.js` + reglas en `websiteHtmlPostProcessor.js`; admite datos enriquecidos desde correos de proveedores o entrada manual.
 
 ## 13. Pendientes detectados en codigo (2025-10-08)

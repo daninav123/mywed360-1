@@ -336,14 +336,14 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-border rounded-lg text-body hover:bg-muted/50 transition-colors"
+              className="flex-1 px-4 py-2 border border-border rounded-lg text-body hover:bg-surface-muted transition-colors"
               disabled={uploading}
             >
               {t('app.cancel')}
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-[var(--color-primary-90)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!file || uploading}
             >
               {uploading

@@ -1,4 +1,4 @@
-﻿# Mejoras del Seating Plan - Generación Automática
+# Mejoras del Seating Plan - Generación Automática
 
 **Fecha:** 29 de Octubre, 2025
 **Estado:** ✅ Implementado

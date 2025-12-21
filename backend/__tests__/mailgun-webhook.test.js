@@ -1,13 +1,20 @@
 /* @vitest-environment node */
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import request from 'supertest';
+import crypto from 'crypto';
 
 // Mocks para evitar dependencias externas reales
 vi.mock('helmet', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
 vi.mock('cors', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
 vi.mock('express-rate-limit', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
 vi.mock('axios', () => ({ __esModule: true, default: { get: vi.fn(), post: vi.fn() } }));
-vi.mock('multer', () => ({ __esModule: true, default: () => ({ any: () => (req, _res, next) => next() }) }));
+vi.mock('multer', () => {
+  const middleware = (_req, _res, next) => next();
+  const instance = { any: () => middleware, single: () => middleware, array: () => middleware, fields: () => middleware };
+  const fn = () => instance;
+  fn.memoryStorage = () => ({});
+  return { __esModule: true, default: fn };
+});
 
 // Mock de firebase-admin y firestore helper para backend/db.js
 const apps = [];
@@ -38,13 +45,21 @@ vi.mock('firebase-admin/firestore', () => ({ __esModule: true, getFirestore: () 
 
 let app;
 beforeAll(async () => {
+  process.env.MAILGUN_SIGNING_KEY = 'test_mailgun_signing_key';
   app = (await import('../index.js')).default;
 });
 
 describe('Mailgun Webhook', () => {
   it('POST /api/mailgun/webhook -> 200 with minimal payload when signature check bypassed', async () => {
-    // No MAILGUN_SIGNING_KEY in env => route allows processing in dev/tests
+    const timestamp = String(Math.floor(Date.now() / 1000));
+    const token = 't_' + Math.random().toString(36).slice(2, 10);
+    const signature = crypto
+      .createHmac('sha256', process.env.MAILGUN_SIGNING_KEY)
+      .update(timestamp + token)
+      .digest('hex');
+
     const payload = {
+      signature: { timestamp, token, signature },
       'event-data': {
         event: 'delivered',
         recipient: 'user@maloveapp.com',

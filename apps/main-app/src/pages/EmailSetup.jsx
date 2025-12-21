@@ -288,7 +288,7 @@ const EmailSetup = () => {
 
         <div className="mt-3 space-y-2 text-xs text-[color:var(--color-muted)]">
           {records.length === 0 ? (
-            <div className="rounded border border-dashed border-[color:var(--color-border)]/60 bg-[color:var(--color-surface)]/40 px-3 py-2">
+            <div className="rounded border border-dashed border-[color:var(--color-border-60)] bg-[color:var(--color-surface-40)] px-3 py-2">
               <p className="text-[color:var(--color-muted)]">
                 Mailgun a�n no detecta registros publicados para este apartado. A�ade los valores
                 sugeridos en tu proveedor DNS y espera unos minutos.
@@ -329,7 +329,7 @@ const EmailSetup = () => {
               return (
                 <div
                   key={recordKeyBase}
-                  className="rounded border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/60 px-3 py-2"
+                  className="rounded border border-[color:var(--color-border)] bg-[color:var(--color-surface-60)] px-3 py-2"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
@@ -412,9 +412,9 @@ const EmailSetup = () => {
         </h1>
       </div>
 
-      <div className="rounded-xl border border-[color:var(--color-primary)]/40 bg-[color:var(--color-primary)]/10 px-4 py-4">
+      <div className="rounded-xl border border-[color:var(--color-primary-40)] bg-[color:var(--color-primary-10)] px-4 py-4">
         <div className="flex items-start gap-3">
-          <Mail className="h-5 w-5 text-[var(--color-primary)]" />
+          <Mail className="h-5 w-5 text-[color:var(--color-primary)]" />
           <p className="text-sm text-[color:var(--color-text)]">
             Configura tu direcci�n de correo personalizada para comunicarte con proveedores y otros
             usuarios desde la plataforma MaLove.App.
@@ -423,7 +423,7 @@ const EmailSetup = () => {
       </div>
 
       {generalError && (
-        <div className="rounded-xl border border-[color:var(--color-danger)]/50 bg-[color:var(--color-danger)]/10 px-4 py-4 text-sm text-[color:var(--color-danger)]">
+        <div className="rounded-xl border border-[color:var(--color-danger-50)] bg-[color:var(--color-danger-10)] px-4 py-4 text-sm text-[color:var(--color-danger)]">
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5" />
             <p>{generalError}</p>
@@ -438,7 +438,7 @@ const EmailSetup = () => {
       )}
 
       {saveSuccess && (
-        <div className="rounded-xl border border-[color:var(--color-success)]/40 bg-[color:var(--color-success)]/10 px-4 py-4 text-sm text-[color:var(--color-success)]">
+        <div className="rounded-xl border border-[color:var(--color-success-40)] bg-[color:var(--color-success-10)] px-4 py-4 text-sm text-[color:var(--color-success)]">
           <div className="flex items-start gap-3">
             <CheckCircle className="h-5 w-5" />
             <p>

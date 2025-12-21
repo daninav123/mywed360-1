@@ -7,7 +7,7 @@ import LanguageSelector from '../ui/LanguageSelector';
 
 const linkBaseClasses =
   'px-3 py-2 text-sm font-medium transition-colors duration-150 text-muted hover:text-body border-b-2 border-transparent';
-const activeClasses = 'text-body border-[var(--color-primary)]';
+const activeClasses = 'text-body border-[color:var(--color-primary)]';
 
 const MarketingLayout = ({ children }) => {
   const { t, i18n } = useTranslation('marketing');
@@ -74,7 +74,7 @@ const MarketingLayout = ({ children }) => {
             <img
               src={logoApp}
               alt={safeT('common.logoAlt', 'Logo MaLove.App')}
-              className="h-9 w-9 rounded-xl bg-white object-contain shadow-sm ring-1 ring-[var(--color-primary)]/20"
+              className="h-9 w-9 rounded-xl bg-white object-contain shadow-sm ring-1 ring-[color:var(--color-primary-20)]"
             />
             <span>MaLove.App</span>
           </Link>
@@ -123,7 +123,7 @@ const MarketingLayout = ({ children }) => {
             {/* Signup */}
             <Link
               to="/signup"
-              className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
             >
               {safeT('nav.signupShort', 'Crear cuenta')}
             </Link>
@@ -141,7 +141,7 @@ const MarketingLayout = ({ children }) => {
                   `rounded-full px-4 py-2 text-xs font-medium transition-colors ${
                     isActive
                       ? 'bg-[var(--color-primary)] text-white'
-                      : 'bg-[var(--color-accent)]/25 text-muted hover:text-body'
+                      : 'bg-[var(--color-accent-25)] text-muted hover:text-body'
                   }`
                 }
               >
@@ -166,7 +166,7 @@ const MarketingLayout = ({ children }) => {
             {/* Login Parejas - Mobile */}
             <Link
               to="/login"
-              className="w-full rounded-md border border-[color:var(--color-text)]/20 px-4 py-2 text-center text-sm font-medium text-[color:var(--color-text)] transition-colors hover:bg-[var(--color-accent)]/20"
+              className="w-full rounded-md border border-[color:var(--color-text-20)] px-4 py-2 text-center text-sm font-medium text-[color:var(--color-text)] transition-colors hover:bg-[var(--color-accent-20)]"
             >
               {safeT('nav.loginShort', 'Iniciar sesión')}
             </Link>
@@ -174,7 +174,7 @@ const MarketingLayout = ({ children }) => {
             {/* Signup - Mobile */}
             <Link
               to="/signup"
-              className="w-full rounded-md bg-[var(--color-primary)] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+              className="w-full rounded-md bg-[var(--color-primary)] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
             >
               {safeT('nav.signupShort', 'Crear cuenta')}
             </Link>
@@ -186,7 +186,7 @@ const MarketingLayout = ({ children }) => {
         <div className="layout-container w-full py-12 md:py-16">{children}</div>
       </main>
 
-      <footer className="border-t border-soft bg-app/90">
+      <footer className="border-t border-soft bg-[var(--color-bg-90)]">
         <div className="layout-container flex flex-col gap-4 py-6 text-sm text-muted md:flex-row md:items-center md:justify-between">
           <p>
             {safeT(

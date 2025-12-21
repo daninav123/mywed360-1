@@ -69,12 +69,12 @@ export default function More() {
               onFocus={pfInvitadosMenu}
               onTouchStart={pfInvitadosMenu}
             >
-              <Link to="/invitados" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
+              <Link to="/invitados" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
                 {t('pages.more.sections.guests.links.guests')}
               </Link>
               <Link
                 to="/invitados/seating"
-                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
+                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
               >
                 {t('pages.more.sections.guests.links.seating')}
               </Link>
@@ -98,12 +98,12 @@ export default function More() {
               onFocus={pfProveedoresMenu}
               onTouchStart={pfProveedoresMenu}
             >
-              <Link to="/proveedores" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
+              <Link to="/proveedores" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
                 {t('pages.more.sections.providers.links.providers')}
               </Link>
               <Link
                 to="/proveedores/contratos"
-                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
+                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
               >
                 {t('pages.more.sections.providers.links.contracts')}
               </Link>
@@ -129,31 +129,31 @@ export default function More() {
             >
               <Link
                 to="/protocolo/momentos-especiales"
-                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
+                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
               >
                 {t('pages.more.sections.protocol.links.specialMoments')}
               </Link>
               <Link
                 to="/protocolo/timing"
-                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
+                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
               >
                 {t('pages.more.sections.protocol.links.timing')}
               </Link>
               <Link
                 to="/protocolo/checklist"
-                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
+                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
               >
                 {t('pages.more.sections.protocol.links.checklist')}
               </Link>
               <Link
                 to="/protocolo/ayuda-ceremonia"
-                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
+                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
               >
                 {t('pages.more.sections.protocol.links.ceremonyHelp')}
               </Link>
               <Link
                 to="/protocolo/documentos"
-                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
+                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
               >
                 {t('pages.more.sections.protocol.links.documents')}
               </Link>
@@ -177,16 +177,16 @@ export default function More() {
               onFocus={pfExtrasMenu}
               onTouchStart={pfExtrasMenu}
             >
-              <Link to="/diseno-web" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
+              <Link to="/diseno-web" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
                 {t('pages.more.sections.extras.links.web')}
               </Link>
-              <Link to="/disenos" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
+              <Link to="/disenos" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
                 {t('pages.more.sections.extras.links.designs')}
               </Link>
-              <Link to="/ideas" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
+              <Link to="/ideas" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
                 {t('pages.more.sections.extras.links.ideas')}
               </Link>
-              <Link to="/momentos" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
+              <Link to="/momentos" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
                 {t('pages.more.sections.extras.links.moments')}
               </Link>
             </div>

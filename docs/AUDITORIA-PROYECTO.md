@@ -2,6 +2,8 @@
 
 **Fecha:** 30/10/2025, 4:41:02
 
+> Nota: este informe es un snapshot puntual y su métrica de TODOs/FIXMEs puede diferir de `docs/AUDITORIA-CODIGO.md` por alcance, reglas de conteo y fecha de generación.
+
 ---
 
 ## 📋 Resumen Ejecutivo

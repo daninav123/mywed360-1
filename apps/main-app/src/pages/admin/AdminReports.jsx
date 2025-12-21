@@ -84,7 +84,7 @@ const AdminReports = () => {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
         Cargando reportes...
       </div>
     );
@@ -100,14 +100,14 @@ const AdminReports = () => {
             data-testid="admin-report-generate"
             onClick={handleGenerateReport}
             disabled={generating}
-            className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary)] hover:bg-[color:var(--color-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Generar informe
           </button>
         </div>
 
         <table className="mt-6 w-full text-left text-sm">
-          <thead className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+          <thead className="text-xs uppercase text-[color:var(--color-text-soft)]">
             <tr>
               <th className="py-2">Nombre</th>
               <th className="py-2">Cadencia</th>
@@ -121,7 +121,7 @@ const AdminReports = () => {
               <tr key={report.id}>
                 <td className="py-3">{report.name}</td>
                 <td className="py-3">{report.cadence}</td>
-                <td className="py-3 text-xs text-[var(--color-text-soft,#6b7280)]">
+                <td className="py-3 text-xs text-[color:var(--color-text-soft)]">
                   {Array.isArray(report.recipients) ? report.recipients.join(', ') : ''}
                 </td>
                 <td className="py-3">{report.format}</td>
@@ -130,7 +130,7 @@ const AdminReports = () => {
             ))}
             {reports.length === 0 && (
               <tr>
-                <td className="py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={5}>
+                <td className="py-6 text-center text-sm text-[color:var(--color-text-soft)]" colSpan={5}>
                   No hay reportes configurados.
                 </td>
               </tr>
@@ -192,7 +192,7 @@ const AdminReports = () => {
             type="submit"
             data-testid="admin-report-submit"
             disabled={generating}
-            className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary)] hover:bg-[color:var(--color-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {generating ? 'Generando...' : 'Enviar'}
           </button>
@@ -208,19 +208,19 @@ const AdminReports = () => {
               <button
                 type="button"
                 onClick={() => setShowGenerateModal(false)}
-                className="text-sm text-[var(--color-text-soft,#6b7280)] hover:text-gray-900"
+                className="text-sm text-[color:var(--color-text-soft)] hover:text-gray-900"
               >
                 Cerrar
               </button>
             </header>
-            <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+            <p className="text-sm text-[color:var(--color-text-soft)]">
               Usa el formulario de abajo para generar un informe on-demand. Selecciona la plantilla y añade los destinatarios.
             </p>
             <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => setShowGenerateModal(false)}
-                className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
+                className="rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary)] hover:bg-[color:var(--color-primary-dark)]"
               >
                 Entendido
               </button>

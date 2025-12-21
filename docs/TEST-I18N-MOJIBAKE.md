@@ -9,7 +9,7 @@
 ## 🎯 Objetivo
 
 Test end-to-end completo que verifica:
-1. ✅ **Sin mojibake** - No hay caracteres corruptos (�, \uFFFD, etc.)
+1. ✅ **Sin mojibake** - No hay caracteres corruptos (, \uFFFD, etc.)
 2. ✅ **Sin palabras sin acentos** - Todas las palabras tienen sus tildes correctas
 3. ✅ **Palabras correctas** - Se verifican palabras clave en español
 
@@ -21,7 +21,7 @@ Test end-to-end completo que verifica:
 
 Detecta automáticamente:
 ```javascript
-- � (carácter de reemplazo Unicode)
+- → (carácter de reemplazo Unicode)
 - \uFFFD (U+FFFD)
 - &#1234; (entidades HTML sin decodificar)
 - &aacute; (entidades sin procesar)
@@ -174,7 +174,7 @@ Si encuentra problemas, mostrará:
 ❌ Mojibake detectado en:
   {
     "page": "/finanzas",
-    "matches": ["�", "�", "�"]
+    "matches": ["", "", ""]
   }
 
 ❌ Palabras corruptas encontradas:
@@ -191,7 +191,7 @@ Si encuentra problemas, mostrará:
 ### `checkNoMojibake()`
 
 Verifica que el contenido de la página NO tenga:
-- Caracteres mojibake (�, \uFFFD)
+- Caracteres mojibake (, \uFFFD)
 - Palabras sin acentos (Anlisis, Gestin, etc.)
 
 ```javascript

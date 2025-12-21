@@ -14,17 +14,22 @@ const rootDir = process.cwd();
 const envPath = path.resolve(rootDir, '.env');
 const envLocalPath = path.resolve(rootDir, '.env.local');
 
-if (fs.existsSync(secretEnvPath)) {
-  dotenv.config({ path: secretEnvPath, override: false });
-  console.log('[env] Variables de entorno cargadas desde secret file', secretEnvPath);
-}
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath, override: false });
-  console.log('[env] .env loaded from', envPath);
-}
-if (fs.existsSync(envLocalPath)) {
-  dotenv.config({ path: envLocalPath, override: true });
-  console.log('[env] .env.local loaded from', envLocalPath);
+const isProd = process.env.NODE_ENV === 'production';
+const isTest = process.env.NODE_ENV === 'test';
+
+if (!isTest) {
+  if (fs.existsSync(secretEnvPath)) {
+    dotenv.config({ path: secretEnvPath, override: false });
+    console.log('[env] Variables de entorno cargadas desde secret file', secretEnvPath);
+  }
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath, override: !isProd });
+    console.log('[env] .env loaded from', envPath);
+  }
+  if (fs.existsSync(envLocalPath)) {
+    dotenv.config({ path: envLocalPath, override: true });
+    console.log('[env] .env.local loaded from', envLocalPath);
+  }
 }
 import express from 'express';
 import cors from 'cors';
@@ -80,6 +85,7 @@ import logger from './utils/logger.js';
 import instagramWallRouter from './routes/instagram-wall.js';
 import imageProxyRouter from './routes/image-proxy.js';
 import proxyRouter from './routes/proxy.js';
+import googlePlacesRouter from './routes/google-places.js';
 import weddingNewsRouter from './routes/wedding-news.js';
 import supplierPortalRouter from './routes/supplier-portal.js';
 import supplierRegistrationRouter from './routes/supplier-registration.js';
@@ -96,6 +102,7 @@ import migrateSuppliersRouter from './routes/migrate-suppliers.js';
 import publicWeddingRouter from './routes/public-wedding.js';
 import weddingServicesRouter from './routes/wedding-services.js';
 import rsvpRouter from './routes/rsvp.js';
+import resendQuoteEmailRouter from './routes/resend-quote-email.js';
 import automationRouter from './routes/automation.js';
 import automationOrchestratorRouter from './routes/automation-orchestrator.js';
 import emailAutomationRouter from './routes/email-automation.js';
@@ -138,19 +145,19 @@ import taskTemplatesRouter from './routes/task-templates.js';
 import mobileRouter from './routes/mobile.js';
 import quoteRequestsRouter from './routes/quote-requests.js';
 import adminQuoteRequestsRouter from './routes/admin-quote-requests.js';
-import googlePlacesRouter from './routes/google-places.js';
+import quoteResponsesRouter from './routes/quote-responses.js';
+import quoteStatsRouter from './routes/quote-stats.js';
+import quoteValidationRouter from './routes/quote-validation.js';
+import suppliersAnalyzeWebRouter from './routes/suppliers-analyze-web.js';
 
 import ipAllowlist from './middleware/ipAllowlist.js';
 import adminAuthRouter from './routes/admin-auth.js';
 import adminSuppliersRouter from './routes/admin-suppliers.js';
 import adminAuditRouter from './routes/admin-audit.js';
 import blogRouter from './routes/blog.js';
-import { startEmailSchedulerWorker } from './workers/emailSchedulerWorker.js';
-import { startMetricAggregatorWorker } from './workers/metricAggregatorWorker.js';
-import { startMomentosCleanupWorker } from './workers/momentosCleanupWorker.js';
-import { startMomentosModerationWorker } from './workers/momentosModerationWorker.js';
-import { startBlogAutomationWorker } from './workers/blogAutomationWorker.js';
 import { cleanupExpiredFavorites } from './tasks/cleanupExpiredFavorites.js';
+import adminAITraining from './routes/admin-ai-training.js';
+import weddingDesignRouter from './routes/wedding-design.js';
 
 const {
   PORT,
@@ -204,7 +211,7 @@ app.use(
       return cb(new Error('Not allowed by CORS'));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
       'Authorization',
@@ -231,7 +238,7 @@ app.options(
       return cb(new Error('Not allowed by CORS'));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
       'Authorization',
@@ -343,7 +350,10 @@ async function ensureMetrics() {
     const mod = await import('prom-client');
     const prom = mod.default || mod;
     const registry = new prom.Registry();
-    prom.collectDefaultMetrics({ register: registry });
+    // En entorno test no iniciamos métricas por defecto (crean timers/handles que impiden que Vitest termine)
+    if (process.env.NODE_ENV !== 'test') {
+      prom.collectDefaultMetrics({ register: registry });
+    }
     const httpRequestsTotal = new prom.Counter({
       name: 'http_requests_total',
       help: 'Total de peticiones HTTP',
@@ -617,12 +627,18 @@ app.use('/api/rsvp', rsvpRouter); // Endpoints públicos por token para RSVP
 app.use('/api/task-templates', taskTemplatesRouter); // Plantillas de tareas (endpoint público para obtener activa)
 
 // Rutas que requieren autenticación específica para correo
-app.use('/api/mail', requireMailAccess, mailRouter);
+app.use('/api/mail', (req, res, next) => {
+  console.error(`🚨 [INDEX] PRE-AUTH: ${req.method} ${req.url}`);
+  next();
+}, authMiddleware(), (req, res, next) => {
+  console.error(`✅ [INDEX] POST-AUTH: ${req.method} ${req.url} user=${req.user?.uid}`);
+  next();
+}, mailRouter);
 app.use('/api/mail', mailOpsRouter);
 app.use('/api/mail', mailStatsRouter);
 app.use('/api/mail', mailSearchRouter);
-app.use('/api/email/folders', requireMailAccess, emailFoldersRouter);
-app.use('/api/email/tags', requireMailAccess, emailTagsRouter);
+app.use('/api/email/folders', authMiddleware(), emailFoldersRouter);
+app.use('/api/email/tags', authMiddleware(), emailTagsRouter);
 app.use('/api/email/validate', requireAuth, emailValidationRouter); // Validación DKIM/SPF
 app.use('/api/email', emailDocsRouter);
 app.use('/api/email-templates', optionalAuth, emailTemplatesRouter); // Plantillas de email
@@ -656,6 +672,8 @@ app.use('/api/suppliers', supplierPortfolioRouter); // Catálogo de productos/se
 app.use('/api/suppliers', supplierQuoteRequestsRouter); // Solicitudes de presupuesto (público)
 app.use('/api/quote-requests', supplierQuoteRequestsRouter); // Rutas públicas de respuesta de presupuestos
 app.use('/api/suppliers', supplierRequestsRouter); // Solicitudes de presupuesto (legacy - mantener por compatibilidad)
+app.use('/api', resendQuoteEmailRouter); // Reenviar emails de solicitudes de presupuesto (debug)
+app.use('/api/suppliers', suppliersAnalyzeWebRouter); // Análisis web de proveedores (público)
 app.use('/api/favorites', authMiddleware(), favoritesRouter); // Favoritos requiere auth
 app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
 app.use('/api/ai/search', requireAuth, aiSearchRouter); // Búsqueda inteligente con IA
@@ -663,6 +681,7 @@ app.use('/api/ai', authMiddleware(), aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
 app.use('/api/ai-songs', requireAuth, aiSongsRouter);
 app.use('/api/ai-website', requireAuth, aiWebsiteRouter);
+app.use('/api/wedding-design', requireAuth, weddingDesignRouter); // Chat IA para diseño de boda
 app.use('/api/instagram-wall', optionalAuth, instagramWallRouter); // Puede ser público
 // Alias para compatibilidad con frontend: /api/instagram/wall -> mismo router
 app.use('/api/instagram/wall', optionalAuth, instagramWallRouter);
@@ -801,6 +820,14 @@ try {
   console.error('[backend] Failed to load admin dashboard routes:', error.message);
 }
 
+try {
+  const adminAITrainingRouter = (await import('./routes/admin-ai-training.js')).default;
+  app.use('/api/admin/ai-training', ipAllowlist(ADMIN_IP_ALLOWLIST), adminAITrainingRouter);
+  console.log('[backend] Admin AI Training routes mounted on /api/admin/ai-training');
+} catch (error) {
+  console.error('[backend] Failed to load admin AI training routes:', error.message);
+}
+
 // Quote Requests routes
 try {
   app.use('/api/quote-requests', requireAuth, quoteRequestsRouter);
@@ -819,6 +846,30 @@ try {
   console.log('[backend] Admin quote requests routes mounted on /api/admin/quote-requests');
 } catch (error) {
   console.error('[backend] Failed to load admin quote requests routes:', error.message);
+}
+
+// Quote Responses routes (presupuestos recibidos por email con IA)
+try {
+  app.use('/api/quote-responses', requireAuth, quoteResponsesRouter);
+  console.log('[backend] Quote responses routes mounted on /api/quote-responses');
+} catch (error) {
+  console.error('[backend] Failed to load quote responses routes:', error.message);
+}
+
+// Quote Stats routes (estadísticas de presupuestos por categoría)
+try {
+  app.use('/api/quote-stats', quoteStatsRouter);
+  console.log('[backend] Quote stats routes mounted on /api/quote-stats');
+} catch (error) {
+  console.error('[backend] Failed to load quote stats routes:', error.message);
+}
+
+// Quote Validation routes (validación y entrenamiento de IA)
+try {
+  app.use('/api/quote-validation', quoteValidationRouter);
+  console.log('[backend] Quote validation routes mounted on /api/quote-validation');
+} catch (error) {
+  console.error('[backend] Failed to load quote validation routes:', error.message);
 }
 
 // Admin tasks - Limpieza de favoritos expirados
@@ -1003,27 +1054,74 @@ app.use((err, req, res, _next) => {
 });
 
 // Captura de errores globales para que se muestren en CMD
-process.on('unhandledRejection', (reason) => {
-  logger.error('UnhandledRejection:', reason);
-});
-process.on('uncaughtException', (err) => {
-  logger.error('UncaughtException:', err);
-});
+if (!globalThis.__malove_backend_process_handlers_registered) {
+  globalThis.__malove_backend_process_handlers_registered = true;
+  process.on('unhandledRejection', (reason) => {
+    logger.error('UnhandledRejection:', reason);
+  });
+  process.on('uncaughtException', (err) => {
+    logger.error('UncaughtException:', err);
+  });
+}
 
 // TODO: Crear índice en Firestore antes de habilitar
 // https://console.firebase.google.com/v1/r/project/lovenda-98c77/firestore/indexes
 // startEmailSchedulerWorker();
 
 if (process.env.NODE_ENV !== 'test') {
-  startMetricAggregatorWorker();
-  startMomentosCleanupWorker();
-  startMomentosModerationWorker();
-  startBlogAutomationWorker();
+  try {
+    const mod = await import('./workers/metricAggregatorWorker.js');
+    if (mod && typeof mod.startMetricAggregatorWorker === 'function') {
+      mod.startMetricAggregatorWorker();
+    }
+  } catch (e) {
+    try {
+      logger.error('Failed to start metric aggregator worker', e);
+    } catch {}
+  }
+
+  try {
+    const mod = await import('./workers/momentosCleanupWorker.js');
+    if (mod && typeof mod.startMomentosCleanupWorker === 'function') {
+      mod.startMomentosCleanupWorker();
+    }
+  } catch (e) {
+    try {
+      logger.error('Failed to start momentos cleanup worker', e);
+    } catch {}
+  }
+
+  try {
+    const mod = await import('./workers/momentosModerationWorker.js');
+    if (mod && typeof mod.startMomentosModerationWorker === 'function') {
+      mod.startMomentosModerationWorker();
+    }
+  } catch (e) {
+    try {
+      logger.error('Failed to start momentos moderation worker', e);
+    } catch {}
+  }
+
+  try {
+    const mod = await import('./workers/blogAutomationWorker.js');
+    if (mod && typeof mod.startBlogAutomationWorker === 'function') {
+      mod.startBlogAutomationWorker();
+    }
+  } catch (e) {
+    try {
+      logger.error('Failed to start blog automation worker', e);
+    } catch {}
+  }
 }
 
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`MaLoveApp backend up on http://localhost:${PORT}`);
+  });
+
+  server.on('error', (err) => {
+    logger.error('Server listen error:', err);
+    process.exit(1);
   });
 }
 

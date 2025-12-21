@@ -141,7 +141,7 @@ export default function MultiWeddingSummary({
           <p className="text-3xl font-semibold text-[color:var(--color-text)]">
             {filteredStats.active}
           </p>
-          <p className="text-xs text-[color:var(--color-text)]/60">
+          <p className="text-xs text-[color:var(--color-text-60)]">
             Total: {totalStats.active}
           </p>
         </Card>
@@ -150,7 +150,7 @@ export default function MultiWeddingSummary({
           <p className="text-3xl font-semibold text-[color:var(--color-text)]">
             {filteredStats.upcomingWithin60.length}
           </p>
-          <p className="text-xs text-[color:var(--color-text)]/60">
+          <p className="text-xs text-[color:var(--color-text-60)]">
             Próximos 30 días:{' '}
             {
               filteredStats.upcomingWithin60.filter(
@@ -167,7 +167,7 @@ export default function MultiWeddingSummary({
             </span>
             <Progress value={filteredStats.averageProgress} className="h-2 flex-1" />
           </div>
-          <p className="text-xs text-[color:var(--color-text)]/60">
+          <p className="text-xs text-[color:var(--color-text-60)]">
             Sobre {filteredStats.count} bodas seleccionadas
           </p>
         </Card>
@@ -205,7 +205,7 @@ export default function MultiWeddingSummary({
           <h3 className="text-lg font-semibold text-[color:var(--color-text)]">
             Próximos eventos
           </h3>
-          <span className="text-xs text-[color:var(--color-text)]/60">
+          <span className="text-xs text-[color:var(--color-text-60)]">
             Mostrando {upcomingHighlights.length} de {filteredStats.upcoming.length}
           </span>
         </header>
@@ -229,7 +229,7 @@ export default function MultiWeddingSummary({
                     <p className="font-medium text-[color:var(--color-text)]">
                       {item.name}
                     </p>
-                    <p className="text-xs text-[color:var(--color-text)]/60">
+                    <p className="text-xs text-[color:var(--color-text-60)]">
                       {item.location || 'Ubicación pendiente'}
                     </p>
                   </div>

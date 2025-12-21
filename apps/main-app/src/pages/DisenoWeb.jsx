@@ -1984,13 +1984,6 @@ export default function DisenoWeb() {
     };
 
     try {
-      const aiEnabled = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
-      if (!aiEnabled) {
-        await applyFallback('fallback-ai-disabled');
-        setLoading(false);
-        return;
-      }
-
       const { systemMessage, userMessage } = buildDesignerPrompt({
         templateKey: selectedTemplate,
         weddingInfo,
@@ -2003,7 +1996,6 @@ export default function DisenoWeb() {
         templateKey: selectedTemplate,
         weddingId: activeWedding,
         temperature: 0.55,
-        model: import.meta.env.VITE_OPENAI_MODEL || undefined,
       });
 
       let htmlGen = aiResult.html || '';
@@ -2039,6 +2031,9 @@ export default function DisenoWeb() {
     } catch (err) {
       // console.error('Error en la generaci�n de la p�gina:', err);
       let fallbackReason = 'fallback-ai-error';
+      if (err?.name === 'AbortError') {
+        fallbackReason = 'fallback-ai-unavailable';
+      }
       if (err?.status === 503) {
         fallbackReason = 'fallback-ai-unavailable';
       } else if (err?.status === 429) {

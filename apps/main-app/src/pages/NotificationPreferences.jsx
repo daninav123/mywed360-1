@@ -83,7 +83,7 @@ export default function NotificationPreferences() {
                 type="checkbox"
                 checked={channels.email}
                 onChange={() => handleToggle('email')}
-                className="h-4 w-4 rounded border-[color:var(--color-border)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                className="h-4 w-4 rounded border-[color:var(--color-border)] text-[color:var(--color-primary)] focus:ring-[color:var(--color-primary)]"
               />
               {t('notificationPreferences.channels.email')}
             </label>
@@ -92,7 +92,7 @@ export default function NotificationPreferences() {
                 type="checkbox"
                 checked={channels.inapp}
                 onChange={() => handleToggle('inapp')}
-                className="h-4 w-4 rounded border-[color:var(--color-border)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                className="h-4 w-4 rounded border-[color:var(--color-border)] text-[color:var(--color-primary)] focus:ring-[color:var(--color-primary)]"
               />
               {t('notificationPreferences.channels.inapp')}
             </label>
@@ -101,7 +101,7 @@ export default function NotificationPreferences() {
                 type="checkbox"
                 checked={channels.push}
                 onChange={() => handleToggle('push')}
-                className="h-4 w-4 rounded border-[color:var(--color-border)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                className="h-4 w-4 rounded border-[color:var(--color-border)] text-[color:var(--color-primary)] focus:ring-[color:var(--color-primary)]"
               />
               {t('notificationPreferences.channels.push')}
             </label>
@@ -117,7 +117,7 @@ export default function NotificationPreferences() {
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <input
-              className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+              className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
               placeholder={t('notificationPreferences.quietHours.startPlaceholder')}
               value={quietHours.start}
               onChange={(event) =>
@@ -126,7 +126,7 @@ export default function NotificationPreferences() {
             />
             <span className="text-sm text-[color:var(--color-muted)]">{t('notificationPreferences.quietHours.from')}</span>
             <input
-              className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+              className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
               placeholder={t('notificationPreferences.quietHours.endPlaceholder')}
               value={quietHours.end}
               onChange={(event) =>

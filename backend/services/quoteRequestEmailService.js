@@ -94,6 +94,7 @@ export async function sendQuoteRequestEmail({
   customMessage = '',
   responseUrl,
   requestId,
+  userId = null,
 }) {
   try {
     if (!emailTemplate) {
@@ -157,11 +158,12 @@ MyWed360 - Plataforma de gestión de bodas
     const { mgClient, domainName } = await createMailgunClients();
 
     const messageData = {
-      from: `MyWed360 - Solicitudes <solicitudes@${domainName}>`,
+      from: `${clientName} <${clientEmail}>`,
       to: supplierEmail,
       subject: `💼 Nueva solicitud de presupuesto de ${clientName}`,
       text: textContent,
       html: htmlContent,
+      'h:Reply-To': clientEmail,
       'h:X-Mailgun-Variables': JSON.stringify({
         requestId,
         type: 'quote_request',
@@ -169,11 +171,58 @@ MyWed360 - Plataforma de gestión de bodas
       }),
     };
 
-    const result = await mgClient.messages.create(domainName, messageData);
+    // mailgun-js usa .messages().send(), no .messages.create()
+    const result = await new Promise((resolve, reject) => {
+      mgClient.messages().send(messageData, (error, body) => {
+        if (error) reject(error);
+        else resolve(body);
+      });
+    });
 
     logger.info(
       `✅ Email enviado a ${supplierEmail} - Request ID: ${requestId} - Mailgun ID: ${result.id}`
     );
+
+    // Guardar email en Firebase para que aparezca en bandeja de salida
+    try {
+      const { db } = await import('../db.js');
+      const emailData = {
+        from: clientEmail,
+        to: supplierEmail,
+        toList: [supplierEmail],
+        recipients: [supplierEmail],
+        subject: `💼 Nueva solicitud de presupuesto de ${clientName}`,
+        body: textContent,
+        bodyText: textContent,
+        bodyHtml: htmlContent,
+        date: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        folder: 'sent',
+        read: true,
+        starred: false,
+        type: 'quote_request',
+        metadata: {
+          requestId,
+          supplierId: supplierEmail,
+          mailgunId: result.id
+        }
+      };
+
+      // Guardar en colección global
+      const mailDoc = await db.collection('mails').add(emailData);
+      logger.info(`💾 Email guardado en colección global - ID: ${mailDoc.id}`);
+
+      // Guardar en subcolección del usuario si tenemos userId
+      if (userId) {
+        await db.collection('users').doc(userId).collection('mails').doc(mailDoc.id).set(emailData);
+        logger.info(`💾 Email guardado en subcolección usuario ${userId} - bandeja: sent`);
+      } else {
+        logger.warn('⚠️ No se proporcionó userId, email solo guardado en colección global');
+      }
+    } catch (saveError) {
+      logger.error('[quoteRequestEmailService] Error guardando en Firebase:', saveError);
+      // No fallar el envío si falla el guardado
+    }
 
     return {
       success: true,
@@ -272,7 +321,13 @@ MyWed360
       html: htmlContent,
     };
 
-    const result = await mgClient.messages.create(domainName, messageData);
+    // mailgun-js usa .messages().send(), no .messages.create()
+    const result = await new Promise((resolve, reject) => {
+      mgClient.messages().send(messageData, (error, body) => {
+        if (error) reject(error);
+        else resolve(body);
+      });
+    });
 
     logger.info(`✅ Notificación enviada a ${userEmail} - Mailgun ID: ${result.id}`);
 

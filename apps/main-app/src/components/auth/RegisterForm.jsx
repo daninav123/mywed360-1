@@ -24,7 +24,7 @@ export default function RegisterForm({
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <div className="space-y-2">
-        <label htmlFor="signup-email" className="text-sm font-medium text-[color:var(--color-text,#111827)]">
+        <label htmlFor="signup-email" className="text-sm font-medium text-[color:var(--color-text)]">
           {t('authSignup.emailLabel')}
         </label>
         <input
@@ -38,12 +38,12 @@ export default function RegisterForm({
           ref={emailInputRef}
           aria-invalid={hasError ? 'true' : 'false'}
           aria-describedby={hasError ? errorId : undefined}
-          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
+          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
         />
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="signup-password" className="text-sm font-medium text-[color:var(--color-text,#111827)]">
+        <label htmlFor="signup-password" className="text-sm font-medium text-[color:var(--color-text)]">
           {t('authSignup.passwordLabel')}
         </label>
         <input
@@ -58,13 +58,13 @@ export default function RegisterForm({
           ref={passwordInputRef}
           aria-invalid={hasError ? 'true' : 'false'}
           aria-describedby={hasError ? errorId : undefined}
-          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
+          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
         />
         <PasswordStrengthMeter password={password} />
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="signup-role" className="text-sm font-medium text-[color:var(--color-text,#111827)]">
+        <label htmlFor="signup-role" className="text-sm font-medium text-[color:var(--color-text)]">
           {t('authSignup.roleLabel')}
         </label>
         <select
@@ -72,7 +72,7 @@ export default function RegisterForm({
           value={role}
           onChange={(event) => onRoleChange?.(event.target.value)}
           ref={roleSelectRef}
-          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
+          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
         >
           <option value="particular">{t('authSignup.roleOptions.particular')}</option>
           <option value="planner">{t('authSignup.roleOptions.planner')}</option>
@@ -89,7 +89,7 @@ export default function RegisterForm({
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] transition-colors hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:cursor-not-allowed disabled:opacity-70"
+        className="w-full rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary)] transition-colors hover:bg-[color:var(--color-primary-dark)] disabled:cursor-not-allowed disabled:opacity-70"
       >
         {isSubmitting ? t('authSignup.submitting') : t('authSignup.submit')}
       </button>

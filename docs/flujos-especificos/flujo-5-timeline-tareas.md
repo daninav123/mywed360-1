@@ -1,6 +1,6 @@
 # 5b. Timeline y Tareas (estado 2025-10-07)
 
-> Implementado: `Tasks.jsx`, `TaskSidePanel.jsx`, `Checklist.jsx`, `SmartChecklist.jsx`, `TaskList.jsx`, `EventsCalendar.jsx`, `LongTermTasksGantt.jsx`, `CalendarSync.jsx`, `TaskEventBridge.jsx`, `TaskNotificationWatcher.jsx`, hook `useWeddingTasksHierarchy.js`, utilidades `taskAutomations`, `CalendarComponents.jsx`, plantilla `src/data/tasks/masterTimelineTemplate.json`, indicadores de riesgo en el Gantt y comentarios colaborativos con menciones y notificaciones en `TaskSidePanel.jsx`.
+> Implementado: `Tasks.jsx`, `TaskSidePanel.jsx`, `Checklist.jsx`, `TaskList.jsx`, `EventsCalendar.jsx`, `LongTermTasksGantt.jsx`, `CalendarSync.jsx`, `TaskEventBridge.jsx`, `TaskNotificationWatcher.jsx`, `TasksRefactored.jsx`, hook `useWeddingTasksHierarchy.js`, `CalendarComponents.jsx`, plantilla `apps/main-app/src/data/tasks/masterTimelineTemplate.json`, indicadores de riesgo en el Gantt y comentarios colaborativos con menciones y notificaciones en `TaskSidePanel.jsx`.
 > Pendiente: Motor IA que personaliza un plan de tareas padre/subtareas a partir de una plantilla maestra y matriz de responsabilidades.
 
 ## 1. Objetivo y alcance
@@ -15,7 +15,8 @@
 
 ## 3. Paso a paso UX
 1. Configuración inicial
-   - `SmartChecklist` propone plantillas según tipo de boda, estado y temporada.
+   - (Actual) El usuario aplica una plantilla desde el módulo (CTA `Aplicar plantilla`) y ajusta tareas/categorías.
+   - (Pendiente) `SmartChecklist` propondrá plantillas según tipo de boda, estado y temporada.
    - El usuario ajusta categorías, prioridades, fechas relativas y responsables. Categorías base: `FUNDAMENTOS`, `PROVEEDORES`, `VESTUARIO`, `DETALLES`, `LOGISTICA`, `EVENTOS`, `BELLEZA`, `ANILLOS`, `VIAJE`, `POST_EVENTO`.
 2. Gestión diaria
    - `TasksRefactored` muestra la lista principal (`TaskList`) agrupada por estado con filtros persistentes (categoría, responsable, rango de fechas) y buscador.
@@ -32,7 +33,7 @@
      - Layout: cabecera doble (año/mes), columna izquierda fija (220px) con árbol interactivo, leyenda y toggle “Mostrar subtareas” en cabecera.
      - Rango visible: `[weddingDate - 12 meses, weddingDate + 1 mes]`. En resoluciones 1366/1440 px no requiere scroll; si hay overflow se muestran fades laterales.
      - Línea “Hoy” azul (#1E88E5); hito boda línea roja (#F44336) con bandera.
-     - Riesgos: `riskLevel=low` verde (#43A047), `medium` ámbar (#FB8C00), `high` rojo (#E53935). Subtareas usan gradiente por estado (`planned` gris, `in_progress` azul, `done` gris claro). Progreso agregado (`completedSubtasks/totalSubtasks`) se muestra como anillo en la cabecera del bloque padre.
+     - Riesgos: `riskLevel=low` verde (#43A047), `medium` ámbar (#FB8C00), `high` rojo (#E53935). Subtareas usan colores por estado (sin degradados) (`planned` gris, `in_progress` azul, `done` gris claro). Progreso agregado (`completedSubtasks/totalSubtasks`) se muestra como anillo en la cabecera del bloque padre.
 4. Automatizaciones y panel lateral
    - `TaskEventBridge` crea tareas a partir de eventos (`provider.contract_signed`, `finance.contribution_scheduled`, `rsvp.reminder_triggered`, `ceremony.rehearsal_scheduled`) según reglas definidas en `weddings/{id}/taskAutomations/{ruleId}` (`trigger`, `templateId`, `delayDays`, `assigneeRoles`, `priority`, `enabled`). Las tareas generadas se marcan con `automationId` y sólo planner puede eliminarlas.
    - `TaskNotificationWatcher` revisa cada 60 s las tareas con `nextReminderAt` vencido, envía notificaciones (in-app/email) mediante `NotificationService`, reintenta a 10/30/60 min y, tras 3 fallos, marca `notification_failed`. Respeta `muteNotifications` e intervalo mínimo de 4 h.
@@ -49,7 +50,7 @@
 - `weddings/{id}/checklist/{itemId}`: ítems clave y porcentaje de avance.
 - `weddings/{id}/taskAutomations` / `taskTemplates`: reglas y plantillas.
 - `calendarTokens` (backend) para feeds iCal; `taskEvents` para auditoría.
-- Plantilla maestra gestionada desde `adminTaskTemplates` (fallback local `src/data/tasks/masterTimelineTemplate.json`).
+- Plantilla maestra gestionada desde `adminTaskTemplates` (fallback local `apps/main-app/src/data/tasks/masterTimelineTemplate.json`).
 
 ## 5. Reglas de negocio
 - Dependencias `dependsOn` bloquean completar hasta cerrar tareas previas.

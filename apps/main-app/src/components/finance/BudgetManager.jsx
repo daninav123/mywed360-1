@@ -21,14 +21,17 @@ import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
 import { normalizeBudgetCategoryKey } from '../../utils/budgetCategories';
+import { SUPPLIER_CATEGORIES } from '../../shared/supplierCategories';
 import Modal from '../Modal';
 import { Card, Button } from '../ui';
 import BudgetCategoryCard from './BudgetCategoryCard';
+import BudgetRebalanceModal from './BudgetRebalanceModal';
 
 export default function BudgetManager({
   budget,
   budgetUsage,
   stats,
+  providerCommittedByCategory,
   benchmarks,
   onApplyBenchmark,
   onCaptureSnapshot,
@@ -46,16 +49,19 @@ export default function BudgetManager({
   advisorError = null,
   onApplyAdvisorScenario,
   onRefreshAdvisor,
+  onOpenWizard,
 }) {
   const { t } = useTranslations();
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingCategoryIndex, setEditingCategoryIndex] = useState(-1);
-  const [newCategory, setNewCategory] = useState({ name: '', amount: '' });
+  const [newCategory, setNewCategory] = useState({ name: '', amount: '', categoryId: '' });
   const [showAdvisorModal, setShowAdvisorModal] = useState(false);
   const [localAdvisorLoading, setLocalAdvisorLoading] = useState(false);
   const autoSaveTimeoutRef = useRef(null);
   const lastSnapshotSignatureRef = useRef('');
+  const [showRebalanceModal, setShowRebalanceModal] = useState(false);
+  const [rebalanceData, setRebalanceData] = useState(null);
   const benchmarkState = benchmarks || {};
   const benchmarkSampleSize = benchmarkState.sampleSize || benchmarkState.total?.count || 0;
   const benchmarkConfidence = benchmarkState.confidence || 'very-low';
@@ -63,6 +69,15 @@ export default function BudgetManager({
   const benchmarkApply =
     typeof onApplyBenchmark === 'function' ? onApplyBenchmark : () => {};
   const categories = Array.isArray(budget?.categories) ? budget.categories : [];
+  const committedMap = useMemo(() => {
+    if (providerCommittedByCategory instanceof Map) return providerCommittedByCategory;
+    if (!providerCommittedByCategory || typeof providerCommittedByCategory !== 'object') return new Map();
+    try {
+      return new Map(Object.entries(providerCommittedByCategory));
+    } catch {
+      return new Map();
+    }
+  }, [providerCommittedByCategory]);
   const computedTotal = Number(budget?.total);
   const categoriesTotal = categories.reduce(
     (sum, cat) => sum + (Number(cat?.amount) || 0),
@@ -380,19 +395,73 @@ const distributeIncrease = (amounts, indices, delta) => {
   const handleAddCategory = () => {
     setEditingCategory(null);
     setEditingCategoryIndex(-1);
-    setNewCategory({ name: '', amount: '' });
+    setNewCategory({ name: '', amount: '', categoryId: '' });
     setShowCategoryModal(true);
   };
 
   const handleEditCategory = (category, index) => {
     setEditingCategory(category);
     setEditingCategoryIndex(index);
-    setNewCategory({ name: category.name, amount: String(Number(category.amount || 0)) });
+    // Buscar categoryId si existe
+    const matchedCategory = SUPPLIER_CATEGORIES.find(cat => 
+      cat.name === category.name || cat.id === normalizeBudgetCategoryKey(category.name)
+    );
+    setNewCategory({ 
+      name: category.name, 
+      amount: String(Number(category.amount || 0)),
+      categoryId: matchedCategory?.id || ''
+    });
     setShowCategoryModal(true);
+  };
+
+  const handleUpdateCategory = (index, updatedCategory) => {
+    const oldCategory = categories[index];
+    const oldAmount = Number(oldCategory?.amount) || 0;
+    const newAmount = Number(updatedCategory?.amount) || 0;
+    
+    const currentTotal = categories.reduce((sum, cat, idx) => {
+      if (idx === index) return sum;
+      return sum + (Number(cat?.amount) || 0);
+    }, 0);
+    
+    const totalAfterChange = currentTotal + newAmount;
+    const totalBudgetValue = Number(budget?.total) || 0;
+    
+    if (newAmount > oldAmount && totalAfterChange > totalBudgetValue) {
+      setRebalanceData({
+        categoryName: updatedCategory.name,
+        oldAmount,
+        newAmount,
+        categoryIndex: index,
+        updatedCategory,
+      });
+      setShowRebalanceModal(true);
+    } else {
+      const updated = [...categories];
+      updated[index] = updatedCategory;
+      onUpdateCategory(index, updatedCategory);
+      setEditingCategory(null);
+      setEditingCategoryIndex(-1);
+    }
+  };
+
+  const handleRebalanceApply = (rebalancedCategories) => {
+    onReallocateCategories(rebalancedCategories);
+    setShowRebalanceModal(false);
+    setRebalanceData(null);
+    setEditingCategory(null);
+    setEditingCategoryIndex(-1);
   };
 
   const handleSaveCategory = () => {
     const amount = Number(newCategory.amount);
+    
+    // Validar que se haya seleccionado una categoría (solo para nuevas)
+    if (!editingCategory && !newCategory.categoryId) {
+      toast.error(t('finance.budget.errors.categoryRequired', { defaultValue: 'Por favor selecciona una categoría' }));
+      return;
+    }
+    
     if (!newCategory.name.trim()) {
       toast.error(t('finance.budget.errors.nameRequired'));
       return;
@@ -401,19 +470,27 @@ const distributeIncrease = (amounts, indices, delta) => {
       toast.error(t('finance.budget.errors.amountInvalid'));
       return;
     }
+    
     if (editingCategory) {
-      onUpdateCategory(editingCategoryIndex, { name: newCategory.name.trim(), amount });
+      const updatedCategory = { name: newCategory.name.trim(), amount };
+      handleUpdateCategory(editingCategoryIndex, updatedCategory);
+      setShowCategoryModal(false);
+      setNewCategory({ name: '', amount: '', categoryId: '' });
     } else {
-      const result = onAddCategory(newCategory.name.trim(), amount);
+      // Usar el nombre oficial de SUPPLIER_CATEGORIES
+      const selectedCategory = SUPPLIER_CATEGORIES.find(cat => cat.id === newCategory.categoryId);
+      const categoryName = selectedCategory?.name || newCategory.name.trim();
+      
+      const result = onAddCategory(categoryName, amount);
       if (!result.success) {
         toast.error(result.error);
         return;
       }
+      setShowCategoryModal(false);
+      setEditingCategory(null);
+      setEditingCategoryIndex(-1);
+      setNewCategory({ name: '', amount: '', categoryId: '' });
     }
-    setShowCategoryModal(false);
-    setEditingCategory(null);
-    setEditingCategoryIndex(-1);
-    setNewCategory({ name: '', amount: '' });
   };
 
   const handleDeleteCategory = (index, categoryName) => {
@@ -502,7 +579,7 @@ const distributeIncrease = (amounts, indices, delta) => {
     <div className="space-y-6">
       {/* Stats Cards Premium */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-primary)]/30">
+        <Card className="p-4 border-[color:var(--color-primary-30)]">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
@@ -510,11 +587,11 @@ const distributeIncrease = (amounts, indices, delta) => {
               </p>
               <p className="text-2xl font-black text-body">{formatCurrency(totalBudgetValue)}</p>
             </div>
-            <Wallet className="w-8 h-8 text-[color:var(--color-primary)]/40" />
+            <Wallet className="w-8 h-8 text-[color:var(--color-primary-40)]" />
           </div>
         </Card>
 
-        <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-danger)]/30">
+        <Card className="p-4 border-[color:var(--color-danger-30)]">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-danger)] mb-1">
@@ -524,11 +601,11 @@ const distributeIncrease = (amounts, indices, delta) => {
                 {formatCurrency(totalSpent)}
               </p>
             </div>
-            <TrendingDown className="w-8 h-8 text-[color:var(--color-danger)]/40" />
+            <TrendingDown className="w-8 h-8 text-[color:var(--color-danger-40)]" />
           </div>
         </Card>
 
-        <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-success)]/30">
+        <Card className="p-4 border-[color:var(--color-success-30)]">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
@@ -538,11 +615,11 @@ const distributeIncrease = (amounts, indices, delta) => {
                 {formatCurrency(budgetRemaining)}
               </p>
             </div>
-            <TrendingUp className="w-8 h-8 text-[color:var(--color-success)]/40" />
+            <TrendingUp className="w-8 h-8 text-[color:var(--color-success-40)]" />
           </div>
         </Card>
 
-        <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-warning)]/30">
+        <Card className="p-4 border-[color:var(--color-warning-30)]">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
@@ -552,38 +629,49 @@ const distributeIncrease = (amounts, indices, delta) => {
                 {totalUsagePercent.toFixed(1)}%
               </p>
             </div>
-            <PieChart className="w-8 h-8 text-[color:var(--color-warning)]/40" />
+            <PieChart className="w-8 h-8 text-[color:var(--color-warning-40)]" />
           </div>
         </Card>
       </div>
 
       {/* Actions Bar */}
-      <Card className="p-4 bg-[var(--color-surface)]/80 border-soft">
+      <Card className="p-4">
         <div className="flex justify-between items-center flex-wrap gap-3">
           <div>
             <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
               {t('finance.budget.title', { defaultValue: 'Categorías de Presupuesto' })}
             </h2>
-            <p className="text-sm text-[color:var(--color-text)]/70">
+            <p className="text-sm text-[color:var(--color-text-70)]">
               {categories.length} {t('finance.budget.categories', { defaultValue: 'categorías' })}
             </p>
           </div>
-          <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
-            {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
-          </Button>
+          <div className="flex gap-2">
+            {onOpenWizard && (
+              <Button 
+                variant="outline" 
+                leftIcon={<Sparkles size={16} />} 
+                onClick={onOpenWizard}
+              >
+                {t('finance.budget.reopenWizard', { defaultValue: 'Rehacer Asistente' })}
+              </Button>
+            )}
+            <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
+              {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
+            </Button>
+          </div>
         </div>
       </Card>
 
       {/* Categories Grid */}
       {categories.length === 0 ? (
-        <Card className="p-12 text-center bg-[var(--color-surface)]/80 border-soft">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-text)]/5 mb-4">
-            <PieChart className="w-8 h-8 text-[color:var(--color-text)]/40" />
+        <Card className="p-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-text-5)] mb-4">
+            <PieChart className="w-8 h-8 text-[color:var(--color-text-40)]" />
           </div>
-          <p className="text-lg font-medium text-[color:var(--color-text)]/80 mb-2">
+          <p className="text-lg font-medium text-[color:var(--color-text-80)] mb-2">
             {t('finance.budget.empty', { defaultValue: 'No hay categorías de presupuesto' })}
           </p>
-          <p className="text-sm text-[color:var(--color-text)]/60 mb-6">
+          <p className="text-sm text-[color:var(--color-text-60)] mb-6">
             {t('finance.budget.emptyHint', { defaultValue: 'Crea categorías para organizar tu presupuesto de boda' })}
           </p>
           <Button
@@ -597,11 +685,22 @@ const distributeIncrease = (amounts, indices, delta) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {(budgetUsage || categories.map((cat) => ({ ...cat, spent: 0, percentage: 0 }))).map((category, index) => {
             const rawCategory = categories[index];
+            const categoryKey = normalizeBudgetCategoryKey(rawCategory?.name ?? category?.name ?? '');
             const assignedAmountRaw = Number(
               rawCategory?.amount ?? category.amount ?? 0
             );
             const assignedAmount = Number.isFinite(assignedAmountRaw) ? assignedAmountRaw : 0;
+            
+            if (index === 0) {
+              console.log('[BudgetManager] Primera categoría debug:');
+              console.log('  - rawCategory:', rawCategory);
+              console.log('  - rawCategory.amount:', rawCategory?.amount);
+              console.log('  - category.amount:', category.amount);
+              console.log('  - assignedAmountRaw:', assignedAmountRaw);
+              console.log('  - assignedAmount FINAL:', assignedAmount);
+            }
             const spentAmount = Number(category.spent) || 0;
+            const committedAmount = categoryKey ? Number(committedMap.get(categoryKey)) || 0 : 0;
             const percentageValue = Number(category.percentage);
             const usageBase = Number.isFinite(percentageValue)
               ? percentageValue
@@ -619,6 +718,7 @@ const distributeIncrease = (amounts, indices, delta) => {
                 index={index}
                 assignedAmount={assignedAmount}
                 spentAmount={spentAmount}
+                committedAmount={committedAmount}
                 usagePercent={usagePercent}
                 thresholds={thresholds}
                 onEdit={handleEditCategory}
@@ -641,14 +741,14 @@ const distributeIncrease = (amounts, indices, delta) => {
       >
         <div className="space-y-4">
           {(advisorLoading || localAdvisorLoading) && (
-            <div className="flex items-center justify-center py-6 text-[color:var(--color-text)]/70">
+            <div className="flex items-center justify-center py-6 text-[color:var(--color-text-70)]">
               <Loader2 className="animate-spin mr-2" size={18} />
               Calculando recomendaciones...
             </div>
           )}
 
           {!advisorLoading && !localAdvisorLoading && advisorError && (
-            <div className="rounded-md border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 p-4 text-sm text-[color:var(--color-danger)]">
+            <div className="rounded-md border border-[color:var(--color-danger-30)] bg-[var(--color-danger-10)] p-4 text-sm text-[color:var(--color-danger)]">
               {advisorError}
             </div>
           )}
@@ -657,7 +757,7 @@ const distributeIncrease = (amounts, indices, delta) => {
             !localAdvisorLoading &&
             !advisorError &&
             advisorScenarios.length === 0 && (
-              <div className="rounded-lg border border-dashed border-[color:var(--color-text)]/20 p-6 text-center text-sm text-[color:var(--color-text)]/70 space-y-3">
+              <div className="rounded-lg border border-dashed border-[color:var(--color-text-20)] p-6 text-center text-sm text-[color:var(--color-text-70)] space-y-3">
                 <p>No hay escenarios disponibles todavía.</p>
                 <Button
                   leftIcon={<Sparkles size={16} />}
@@ -683,22 +783,22 @@ const distributeIncrease = (amounts, indices, delta) => {
                 return (
                   <div
                     key={scenario.id || idx}
-                    className="rounded-lg border border-[color:var(--color-text)]/15 bg-white shadow-md"
+                    className="rounded-lg border border-soft bg-surface shadow-md"
                   >
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 px-4 py-3 border-b border-[color:var(--color-text)]/10">
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 px-4 py-3 border-b border-soft">
                       <div>
                         <div className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-text)]">
-                          <Sparkles className="text-[var(--color-primary)]" size={16} />
+                          <Sparkles className="text-[color:var(--color-primary)]" size={16} />
                           {scenario.label || `Escenario ${idx + 1}`}
                           {isApplied && (
-                            <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-success)]/10 text-[var(--color-success)]">
+                            <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-success-10)] text-[color:var(--color-success)]">
                               <CheckCircle size={12} />
                               Aplicado
                             </span>
                           )}
                         </div>
                         {scenario.summary && (
-                          <p className="text-sm text-[color:var(--color-text)]/70 mt-1">
+                          <p className="text-sm text-[color:var(--color-text-70)] mt-1">
                             {scenario.summary}
                           </p>
                         )}
@@ -707,7 +807,7 @@ const distributeIncrease = (amounts, indices, delta) => {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md border border-[var(--color-primary)]/40 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md border border-[color:var(--color-primary-40)] text-[color:var(--color-primary)] hover:bg-[var(--color-primary-10)] disabled:opacity-60 disabled:cursor-not-allowed"
                           onClick={() => handleApplyScenario(scenario.id)}
                           disabled={advisorLoading || localAdvisorLoading}
                         >
@@ -726,7 +826,7 @@ const distributeIncrease = (amounts, indices, delta) => {
                         <div className="overflow-x-auto">
                           <table className="min-w-full text-sm">
                             <thead>
-                              <tr className="text-left text-[color:var(--color-text)]/60 uppercase tracking-wide text-xs">
+                              <tr className="text-left text-[color:var(--color-text-60)] uppercase tracking-wide text-xs">
                                 <th className="py-2 pr-4">Categoría</th>
                                 <th className="py-2 pr-4">Distribución</th>
                                 <th className="py-2 pr-4">Notas</th>
@@ -749,15 +849,15 @@ const distributeIncrease = (amounts, indices, delta) => {
                                 return (
                                   <tr
                                     key={`${scenario.id || idx}-allocation-${entryIdx}`}
-                                    className="border-t border-[color:var(--color-text)]/10"
+                                    className="border-t border-[color:var(--color-text-10)]"
                                   >
                                     <td className="py-2 pr-4 font-medium text-[color:var(--color-text)]">
                                       {entry.category || 'Categoria'}
                                     </td>
-                                    <td className="py-2 pr-4 text-[color:var(--color-text)]/80">
+                                    <td className="py-2 pr-4 text-[color:var(--color-text-80)]">
                                       {distribution || '—'}
                                     </td>
-                                    <td className="py-2 pr-4 text-[color:var(--color-text)]/60">
+                                    <td className="py-2 pr-4 text-[color:var(--color-text-60)]">
                                       {entry.notes || 'Sin observaciones'}
                                     </td>
                                   </tr>
@@ -769,10 +869,10 @@ const distributeIncrease = (amounts, indices, delta) => {
                       )}
 
                       {Array.isArray(scenario.alerts) && scenario.alerts.length > 0 && (
-                        <div className="rounded-md border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 p-3 space-y-2 text-xs text-[color:var(--color-text)]/80">
+                        <div className="rounded-md border border-[color:var(--color-warning-30)] bg-[var(--color-warning-10)] p-3 space-y-2 text-xs text-[color:var(--color-text-80)]">
                           {scenario.alerts.map((alert, alertIdx) => (
                             <div key={alertIdx} className="flex items-start gap-2">
-                              <AlertTriangle size={12} className="mt-0.5 text-[var(--color-warning)]" />
+                              <AlertTriangle size={12} className="mt-0.5 text-[color:var(--color-warning)]" />
                               <span>{alert}</span>
                             </div>
                           ))}
@@ -793,7 +893,7 @@ const distributeIncrease = (amounts, indices, delta) => {
           setShowCategoryModal(false);
           setEditingCategory(null);
           setEditingCategoryIndex(-1);
-          setNewCategory({ name: '', amount: '' });
+          setNewCategory({ name: '', amount: '', categoryId: '' });
         }}
         title={
           editingCategory
@@ -803,19 +903,69 @@ const distributeIncrease = (amounts, indices, delta) => {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-              {t('finance.budget.modal.name', { defaultValue: 'Nombre de la categoría' })}
+            <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-2">
+              {t('finance.budget.modal.name', { defaultValue: 'Selecciona una categoría de proveedor' })}
             </label>
-            <input
-              type="text"
-              value={newCategory.name}
-              onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-              placeholder={t('finance.budget.modal.namePlaceholder', { defaultValue: 'e.g. Catering, Music, Flowers...' })}
-              className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
-            />
+            {!editingCategory ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-[400px] overflow-y-auto p-1">
+                {SUPPLIER_CATEGORIES.map((cat) => {
+                  const isSelected = newCategory.categoryId === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => {
+                        setNewCategory({ 
+                          ...newCategory, 
+                          categoryId: cat.id, 
+                          name: cat.name 
+                        });
+                      }}
+                      className={`
+                        flex items-center gap-2 p-3 rounded-lg border-2 transition-all text-left
+                        ${isSelected 
+                          ? 'border-purple-600 bg-purple-50 hover:bg-purple-100' 
+                          : 'border-gray-200 bg-white hover:bg-gray-50'
+                        }
+                      `}
+                    >
+                      <span className="text-lg">{cat.icon === 'camera' ? '📷' : 
+                        cat.icon === 'video' ? '🎥' :
+                        cat.icon === 'music' ? '🎵' :
+                        cat.icon === 'disc' ? '💿' :
+                        cat.icon === 'utensils' ? '🍽️' :
+                        cat.icon === 'home' ? '🏛️' :
+                        cat.icon === 'flower' ? '🌸' :
+                        cat.icon === 'palette' ? '🎨' :
+                        cat.icon === 'shirt' ? '👔' :
+                        cat.icon === 'sparkles' ? '✨' :
+                        cat.icon === 'gem' ? '💎' :
+                        cat.icon === 'cake' ? '🎂' :
+                        cat.icon === 'mail' ? '📧' :
+                        cat.icon === 'gift' ? '🎁' :
+                        cat.icon === 'car' ? '🚗' :
+                        cat.icon === 'party-popper' ? '🎉' :
+                        cat.icon === 'lightbulb' ? '💡' :
+                        '📋'
+                      }</span>
+                      <span className={`text-sm font-medium ${isSelected ? 'text-purple-900' : 'text-gray-900'}`}>
+                        {cat.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-sm font-medium text-gray-900">{newCategory.name}</p>
+                <p className="text-xs text-gray-600 mt-1">
+                  {t('finance.budget.modal.editingNote', { defaultValue: 'No puedes cambiar la categoría al editar. Crea una nueva si necesitas otra categoría.' })}
+                </p>
+              </div>
+            )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+            <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
               {t('finance.budget.modal.amountLabel', { defaultValue: 'Assigned budget (€)' })}
             </label>
             <input
@@ -825,7 +975,7 @@ const distributeIncrease = (amounts, indices, delta) => {
               value={newCategory.amount}
               onChange={(e) => setNewCategory({ ...newCategory, amount: e.target.value })}
               placeholder={t('finance.budget.modal.amountPlaceholder', { defaultValue: '0.00' })}
-              className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
+              className="w-full px-3 py-2 border border-[color:var(--color-text-20)] rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
             />
           </div>
           <div className="flex justify-end space-x-3 pt-4">
@@ -835,7 +985,7 @@ const distributeIncrease = (amounts, indices, delta) => {
                 setShowCategoryModal(false);
                 setEditingCategory(null);
                 setEditingCategoryIndex(-1);
-                setNewCategory({ name: '', amount: '' });
+                setNewCategory({ name: '', amount: '', categoryId: '' });
               }}
             >
               {t('app.cancel', { defaultValue: 'Cancelar' })}
@@ -849,6 +999,26 @@ const distributeIncrease = (amounts, indices, delta) => {
           </div>
         </div>
       </Modal>
+
+      {/* Budget Rebalance Modal */}
+      {showRebalanceModal && rebalanceData && (
+        <BudgetRebalanceModal
+          open={showRebalanceModal}
+          onClose={() => {
+            setShowRebalanceModal(false);
+            setRebalanceData(null);
+            setEditingCategory(null);
+            setEditingCategoryIndex(-1);
+          }}
+          categoryName={rebalanceData.categoryName}
+          oldAmount={rebalanceData.oldAmount}
+          newAmount={rebalanceData.newAmount}
+          categories={categories}
+          totalBudget={Number(budget?.total) || 0}
+          onApply={handleRebalanceApply}
+          t={t}
+        />
+      )}
     </div>
   );
 }

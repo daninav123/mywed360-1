@@ -40,10 +40,10 @@ export default function FinanceOverview({
 
   const getBudgetStatusColor = (percentage) => {
     if (percentage >= dangerThreshold)
-      return 'text-[color:var(--color-danger)] bg-[var(--color-danger)]/10';
+      return 'text-[color:var(--color-danger)] bg-[var(--color-danger-10)]';
     if (percentage >= warnThreshold)
-      return 'text-[color:var(--color-warning)] bg-[var(--color-warning)]/10';
-    return 'text-[color:var(--color-success)] bg-[var(--color-success)]/10';
+      return 'text-[color:var(--color-warning)] bg-[var(--color-warning-10)]';
+    return 'text-[color:var(--color-success)] bg-[var(--color-success-10)]';
   };
 
   const getBudgetIcon = (percentage) => {
@@ -80,7 +80,7 @@ export default function FinanceOverview({
 
       {/* Analítica Predictiva */}
       {predictiveInsights && (
-        <Card className="bg-[var(--color-surface)] rounded-xl shadow-md border border-[color:var(--color-text)]/10 p-6 md:p-8 space-y-6">
+        <Card className="p-6 md:p-8 space-y-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
               <h3 className="text-xl md:text-2xl font-bold text-body tracking-tight">
@@ -96,10 +96,10 @@ export default function FinanceOverview({
               <span
                 className={`text-xs px-2 py-1 rounded-full font-medium ${
                   predictiveInsights.netTrend.direction === 'up'
-                    ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]'
+                    ? 'bg-[var(--color-success-15)] text-[color:var(--color-success)]'
                     : predictiveInsights.netTrend.direction === 'down'
-                      ? 'bg-[var(--color-danger)]/15 text-[var(--color-danger)]'
-                      : 'bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]/70'
+                      ? 'bg-[var(--color-danger-15)] text-[color:var(--color-danger)]'
+                      : 'bg-[color:var(--color-text-10)] text-[color:var(--color-text-70)]'
                 }`}
               >
                 {predictiveInsights.netTrend.direction === 'up'
@@ -112,7 +112,7 @@ export default function FinanceOverview({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
-            <div className="p-5 rounded-xl bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30">
+            <div className="p-5 rounded-xl bg-[var(--color-danger-10)] border border-[color:var(--color-danger-30)]">
               <p className="text-xs text-[color:var(--color-danger)] font-bold uppercase tracking-wider mb-2">
                 {t('finance.overview.burnRate', { defaultValue: 'Burn rate mensual' })}
               </p>
@@ -125,7 +125,7 @@ export default function FinanceOverview({
                 })}
               </p>
             </div>
-            <div className="p-5 rounded-xl bg-[var(--color-warning)]/10 border border-[color:var(--color-warning)]/30">
+            <div className="p-5 rounded-xl bg-[var(--color-warning-10)] border border-[color:var(--color-warning-30)]">
               <p className="text-xs text-[color:var(--color-warning)] font-bold uppercase tracking-wider mb-2">
                 {t('finance.overview.monthsToZero', {
                   defaultValue: 'Meses hasta agotar presupuesto',
@@ -135,13 +135,13 @@ export default function FinanceOverview({
                 {formatMonths(predictiveInsights.monthsToZero)}
               </p>
               {predictiveInsights.projectedZeroDate && (
-                <p className="text-xs text-[color:var(--color-text)]/60">
+                <p className="text-xs text-[color:var(--color-text-60)]">
                   {t('finance.overview.estimatedDate', { defaultValue: 'Estimado:' })}{' '}
                   {predictiveInsights.projectedZeroDate}
                 </p>
               )}
             </div>
-            <div className="p-5 rounded-xl bg-[var(--color-success)]/10 border border-[color:var(--color-success)]/30">
+            <div className="p-5 rounded-xl bg-[var(--color-success-10)] border border-[color:var(--color-success-30)]">
               <p className="text-xs text-[color:var(--color-success)] font-bold uppercase tracking-wider mb-2">
                 {t('finance.overview.forecastSurplus', {
                   defaultValue: 'Saldo proyectado día de la boda',
@@ -151,7 +151,7 @@ export default function FinanceOverview({
                 {formatCurrency(predictiveInsights.forecastSurplus || 0)}
               </p>
             </div>
-            <div className="p-5 rounded-xl bg-[var(--color-primary)]/10 border border-[color:var(--color-primary)]/30">
+            <div className="p-5 rounded-xl bg-[var(--color-primary-10)] border border-[color:var(--color-primary-30)]">
               <p className="text-xs text-[color:var(--color-primary)] font-bold uppercase tracking-wider mb-2">
                 {t('finance.overview.recommendedSaving', {
                   defaultValue: 'Ahorro mensual recomendado',
@@ -175,7 +175,7 @@ export default function FinanceOverview({
                   {predictiveInsights.categoriesAtRisk.map((cat) => (
                     <span
                       key={cat.name}
-                      className="px-3 py-1 text-xs rounded-full bg-[var(--color-danger)]/10 text-[color:var(--color-danger)] border border-[color:var(--color-danger)]/30"
+                      className="px-3 py-1 text-xs rounded-full bg-[var(--color-danger-10)] text-[color:var(--color-danger)] border border-[color:var(--color-danger-30)]"
                     >
                       {cat.name} · {cat.percentage?.toFixed(1)}% ·{' '}
                       {formatCurrency(cat.remaining || 0)}
@@ -191,15 +191,15 @@ export default function FinanceOverview({
                     defaultValue: 'Pagos próximos',
                   })}
                 </h4>
-                <ul className="space-y-2 text-xs text-[color:var(--color-text)]/80">
+                <ul className="space-y-2 text-xs text-[color:var(--color-text-80)]">
                   {predictiveInsights.upcomingPayments.map((payment, idx) => (
                     <li
                       key={`${payment.concept}-${idx}`}
-                      className="flex items-center justify-between gap-2 border-b border-[color:var(--color-text)]/10 pb-1"
+                      className="flex items-center justify-between gap-2 border-b border-[color:var(--color-text-10)] pb-1"
                     >
                       <div className="truncate">
                         <p className="font-medium truncate">{payment.concept}</p>
-                        <p className="text-[color:var(--color-text)]/60">
+                        <p className="text-[color:var(--color-text-60)]">
                           {payment.dueDate} ·{' '}
                           {payment.provider ||
                             t('finance.overview.noProvider', {
@@ -220,7 +220,7 @@ export default function FinanceOverview({
       )}
 
       {/* 💰 PRESUPUESTO POR CATEGORÍAS - Vista compacta */}
-      <Card className="p-6 md:p-7 bg-[var(--color-primary)] from-[var(--color-surface)] to-[var(--color-surface)]/95 backdrop-blur-xl border-soft shadow-lg">
+      <Card className="p-6 md:p-7">
         <h3 className="text-xl md:text-2xl font-bold text-body tracking-tight mb-5">
           {t('finance.overview.categoryStatus', {
             defaultValue: 'Estado del Presupuesto por Categorías',
@@ -234,7 +234,7 @@ export default function FinanceOverview({
             return (
               <div
                 key={index}
-                className="group flex items-center justify-between rounded-xl px-4 py-3 hover:bg-[var(--color-primary)]/5 transition-all duration-200 cursor-pointer"
+                className="group flex items-center justify-between rounded-xl px-4 py-3 hover:bg-[var(--color-primary-5)] transition-all duration-200 cursor-pointer"
                 role="button"
                 tabIndex={0}
                 onClick={action}
@@ -249,14 +249,14 @@ export default function FinanceOverview({
                       {formatCurrency(category.spent)} / {formatCurrency(category.amount)}
                     </span>
                   </div>
-                  <div className="w-full rounded-full h-2.5 bg-[color:var(--color-text)]/10 overflow-hidden shadow-inner">
+                  <div className="w-full rounded-full h-2.5 bg-[color:var(--color-text-10)] overflow-hidden shadow-inner">
                     <div
                       className={`h-2.5 rounded-full transition-all duration-500 ${
                         percentage >= 100
-                          ? 'bg-[var(--color-primary)] from-[var(--color-danger)] to-red-600 shadow-lg'
+                          ? 'bg-[var(--color-danger)]'
                           : percentage >= warnThreshold
-                            ? 'bg-[var(--color-primary)] from-[var(--color-warning)] to-orange-500 shadow-md'
-                            : 'bg-[var(--color-primary)] from-[var(--color-success)] to-emerald-500 shadow-md'
+                            ? 'bg-[var(--color-warning)]'
+                            : 'bg-[var(--color-success)]'
                       }`}
                       style={{ width: `${Math.min(percentage, 100)}%` }}
                     />

@@ -6,7 +6,8 @@
     "utils/**/*.js",
     "db.js",
     "logger.js",
-    ".env"
+    ".env",
+    ".env.local"
   ],
   "ignore": [
     "node_modules/**",

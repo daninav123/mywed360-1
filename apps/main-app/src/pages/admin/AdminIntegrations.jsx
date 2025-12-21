@@ -25,7 +25,7 @@ const AdminIntegrations = () => {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
         Cargando integraciones...
       </div>
     );
@@ -35,7 +35,7 @@ const AdminIntegrations = () => {
     <div className="space-y-6">
       <header>
         <h1 className="text-xl font-semibold">Integraciones y salud</h1>
-        <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+        <p className="text-sm text-[color:var(--color-text-soft)]">
           Estado actual de servicios externos y registro de incidentes.
         </p>
       </header>
@@ -53,7 +53,7 @@ const AdminIntegrations = () => {
                 <span className="font-medium">{service.name}</span>
                 <span className={info.className}>{info.label}</span>
               </header>
-              <dl className="mt-4 text-xs text-[var(--color-text-soft,#6b7280)] space-y-1">
+              <dl className="mt-4 text-xs text-[color:var(--color-text-soft)] space-y-1">
                 <div className="flex justify-between">
                   <dt>Latencia media</dt>
                   <dd>{service.latency || '—'}</dd>
@@ -67,7 +67,7 @@ const AdminIntegrations = () => {
                 type="button"
                 data-testid="integration-retry-button"
                 onClick={() => setShowRetry(service.id || service.name)}
-                className="mt-4 text-xs font-medium text-[color:var(--color-primary,#6366f1)]"
+                className="mt-4 text-xs font-medium text-[color:var(--color-primary)]"
               >
                 Reintentar conexión
               </button>
@@ -82,7 +82,7 @@ const AdminIntegrations = () => {
         </header>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-soft text-sm" data-testid="integration-incidents-table">
-            <thead className="bg-[var(--color-bg-soft,#f3f4f6)] text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+            <thead className="bg-[var(--color-bg-soft)] text-xs uppercase text-[color:var(--color-text-soft)]">
               <tr>
                 <th className="px-4 py-3 text-left">Servicio</th>
                 <th className="px-4 py-3 text-left">Inicio</th>
@@ -105,7 +105,7 @@ const AdminIntegrations = () => {
               ))}
               {data.incidents.length === 0 && (
                 <tr>
-                  <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={6}>
+                  <td className="px-4 py-6 text-center text-sm text-[color:var(--color-text-soft)]" colSpan={6}>
                     Sin incidentes registrados.
                   </td>
                 </tr>
@@ -118,11 +118,11 @@ const AdminIntegrations = () => {
       {showRetry && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4" data-testid="integration-retry-confirm-modal">
           <div className="w-full max-w-sm rounded-xl bg-surface p-6 shadow-xl space-y-4">
-            <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+            <p className="text-sm text-[color:var(--color-text-soft)]">
               ¿Deseas reintentar la conexión del servicio seleccionado?
             </p>
             <div className="flex justify-end gap-3 text-sm">
-              <button type="button" onClick={() => setShowRetry('')} className="px-3 py-2 text-[var(--color-text-soft,#6b7280)]">
+              <button type="button" onClick={() => setShowRetry('')} className="px-3 py-2 text-[color:var(--color-text-soft)]">
                 Cancelar
               </button>
               <button
@@ -145,7 +145,7 @@ const AdminIntegrations = () => {
                     setShowRetry('');
                   }
                 }}
-                className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-3 py-2 text-[color:var(--color-on-primary,#ffffff)]"
+                className="rounded-md bg-[color:var(--color-primary)] px-3 py-2 text-[color:var(--color-on-primary)]"
               >
                 Reintentar
               </button>

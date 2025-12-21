@@ -7,19 +7,45 @@ import logger from '../utils/logger.js';
 
 const router = express.Router();
 
-const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
-const projectId = process.env.OPENAI_PROJECT_ID;
 let openai = null;
+let openAIConfig = { apiKeyPrefix: null, projectId: null };
 
-if (apiKey) {
-  openai = new OpenAI({ apiKey, project: projectId });
-  logger.info('[ai-website] Cliente OpenAI inicializado');
-} else {
-  logger.warn('[ai-website] OPENAI_API_KEY no definido. /api/ai-website/generate devolvera 503');
+function getOpenAIConfig() {
+  const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+  const projectId = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
+  return { apiKey, projectId };
+}
+
+function ensureOpenAI() {
+  const { apiKey, projectId } = getOpenAIConfig();
+  const apiKeyPrefix = apiKey ? apiKey.slice(0, 8) : null;
+
+  if (!apiKey) {
+    openai = null;
+    openAIConfig = { apiKeyPrefix: null, projectId: null };
+    return null;
+  }
+
+  if (openai && openAIConfig.apiKeyPrefix === apiKeyPrefix && openAIConfig.projectId === (projectId || null)) {
+    return openai;
+  }
+
+  openai = new OpenAI({
+    apiKey,
+    project: projectId || undefined,
+    timeout: 15000,
+    maxRetries: 2,
+  });
+  openAIConfig = { apiKeyPrefix, projectId: projectId || null };
+  logger.info('[ai-website] Cliente OpenAI inicializado/actualizado', {
+    projectId: projectId || null,
+  });
+  return openai;
 }
 
 router.post('/generate', async (req, res) => {
-  if (!openai) {
+  const client = ensureOpenAI();
+  if (!client) {
     return res.status(503).json({ error: 'openai_unavailable' });
   }
 
@@ -45,7 +71,7 @@ router.post('/generate', async (req, res) => {
     model || process.env.OPENAI_MODEL_WEBSITE || process.env.OPENAI_MODEL || 'gpt-4o';
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await client.chat.completions.create({
       model: finalModel,
       temperature: safeTemperature,
       messages: [

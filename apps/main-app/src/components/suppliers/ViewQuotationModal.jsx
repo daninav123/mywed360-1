@@ -155,7 +155,7 @@ export default function ViewQuotationModal({ isOpen, onClose, quotation, onRespo
 
         {/* Confirmación */}
         {showConfirm && (
-          <div className="p-4 rounded-lg bg-warning border-l-4 border-[var(--color-warning)]">
+          <div className="p-4 rounded-lg bg-warning border-l-4 border-[color:var(--color-warning)]">
             <p className="font-semibold text-body mb-2">
               {showConfirm === 'accept'
                 ? '¿Confirmas que deseas aceptar esta cotización?'

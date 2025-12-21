@@ -74,8 +74,8 @@ export const CraftFAQSection = ({
       ref={(ref) => connect(drag(ref))}
       className="py-16 px-4"
       style={{
-        backgroundColor: 'var(--color-fondo, #F9FAFB)',
-        color: 'var(--color-texto, #1F2937)',
+        backgroundColor: 'var(--color-fondo)',
+        color: 'var(--color-texto)',
       }}
     >
       <div className="max-w-4xl mx-auto">
@@ -84,7 +84,7 @@ export const CraftFAQSection = ({
           <h2
             className="text-4xl md:text-5xl font-bold mb-4"
             style={{
-              color: 'var(--color-primario, #9333EA)',
+              color: 'var(--color-primario)',
               fontFamily: 'var(--fuente-titulo, inherit)',
             }}
           >
@@ -114,14 +114,14 @@ export const CraftFAQSection = ({
                 >
                   <span
                     className="font-semibold text-lg flex-1"
-                    style={{ color: 'var(--color-secundario, #1F2937)' }}
+                    style={{ color: 'var(--color-secundario)' }}
                   >
                     {item.pregunta}
                   </span>
                   <span
                     className="text-2xl flex-shrink-0 transform transition-transform duration-300"
                     style={{
-                      color: 'var(--color-primario, #9333EA)',
+                      color: 'var(--color-primario)',
                       transform: preguntaAbierta === index ? 'rotate(180deg)' : 'rotate(0deg)',
                     }}
                   >

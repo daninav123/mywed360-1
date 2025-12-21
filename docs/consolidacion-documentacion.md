@@ -1,4 +1,4 @@
-﻿# Plan de Consolidación de Documentación - MaLoveApp
+# Plan de Consolidación de Documentación - MaLove.App
 
 ## 🎯 Objetivo
 Eliminar duplicación y crear estructura documental clara y mantenible.
@@ -10,7 +10,7 @@ Eliminar duplicación y crear estructura documental clara y mantenible.
 #### **Para Desarrolladores:**
 - ✅ `flujos-usuario.md` - Especificación técnica completa
 - ✅ `arquitectura-completa.md` - Diagrama y contextos
-- ✅ `roadmap-2025-v2.md` - Estado actual y prioridades
+- ✅ `archive/roadmap-2025-v2.md` - Snapshot histórico (estado y prioridades a 09/10/2025)
 - ✅ `estimacion-horas-lanzamiento.md` - Planificación desarrollo
 - ✅ `finance-refactor.md` - Documentación refactoring
 
@@ -52,7 +52,7 @@ docs/
 ├── README.md                           # Índice general
 ├── manual-usuario.md                   # Guía para usuarios finales
 ├── arquitectura-completa.md            # Arquitectura técnica
-├── roadmap-2025-v2.md                 # Estado y roadmap
+├── archive/roadmap-2025-v2.md         # Snapshot histórico (estado y roadmap)
 ├── estimacion-horas-lanzamiento.md    # Planificación
 ├── flujos-usuario.md                  # Especificación técnica general
 ├── flujos-especificos/                # Flujos detallados
@@ -99,5 +99,4 @@ La diferencia clave es:
 - **`flujos-usuario.md`** = Especificación técnica para desarrolladores
 
 Ambos son necesarios pero sirven audiencias diferentes.
-
 

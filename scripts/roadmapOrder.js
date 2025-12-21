@@ -8,8 +8,9 @@
  *   node scripts/roadmapOrder.js --check   # verifica orden; sale 0 si ok, 1 si no
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const ROADMAP_PATH = path.resolve(process.cwd(), 'roadmap.json');
 
@@ -132,7 +133,11 @@ function main() {
   }
 }
 
-if (require.main === module) {
-  try { main(); } catch (e) { console.error(e); process.exit(1); }
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  try {
+    main();
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
 }
-

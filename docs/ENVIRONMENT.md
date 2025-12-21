@@ -19,7 +19,7 @@ Consulta `.env.example` para el listado completo. A continuación se destacan la
 
 ## 🔧 Frontend (Vite)
 
-Obligatorio para `npm run dev` o `npm run build`:
+Obligatorio para `npm run dev`, `npm run dev:main` o `npm run build`:
 
 - `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_APP_ID`, etc.
 - `VITE_BACKEND_BASE_URL` → URL del backend Express (local o desplegado).
@@ -89,8 +89,8 @@ Evita dejar `VITE_MAILGUN_API_KEY` u otras claves sensibles activas en builds de
 
 1. Duplica `.env.example` → `.env` y completa cada sección anterior con valores válidos para tu entorno.
 2. Instala dependencias: `npm install`.
-3. Inicia backend Express (si aplica) con `npm run backend` (ver `package.json`).
-4. Levanta el frontend: `npm run dev` (Vite) o usa scripts específicos (`npm run dev:full` si existe).
+3. Inicia backend Express (si aplica) con `npm run backend` (o usa `npm run dev` para levantar backend + frontend).
+4. Levanta el frontend: `npm run dev:main` (o `cd apps/main-app && npm run dev`).
 5. (Opcional) Arranca emuladores Firebase (`firebase emulators:start`) si necesitas un entorno aislado.
 
 ## Buenas prácticas

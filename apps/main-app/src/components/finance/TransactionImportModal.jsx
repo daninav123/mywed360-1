@@ -306,8 +306,8 @@ export default function TransactionImportModal({
       className="max-w-4xl"
     >
       <div className="space-y-4">
-        <div className="border border-dashed border-[color:var(--color-primary)]/40 rounded-lg p-4">
-          <label className="flex flex-col items-center justify-center gap-3 cursor-pointer text-center text-sm text-[color:var(--color-text)]/70">
+        <div className="border border-dashed border-[color:var(--color-primary-40)] rounded-lg p-4">
+          <label className="flex flex-col items-center justify-center gap-3 cursor-pointer text-center text-sm text-[color:var(--color-text-70)]">
             <Upload className="w-6 h-6 text-[color:var(--color-primary)]" />
             <span>
               Selecciona un archivo CSV o Excel (.csv, .xls, .xlsx). La primera fila debe contener los encabezados.
@@ -320,7 +320,7 @@ export default function TransactionImportModal({
               className="hidden"
             />
             {fileMeta && (
-              <span className="text-xs text-[color:var(--color-text)]/50">
+              <span className="text-xs text-[color:var(--color-text-50)]">
                 {fileMeta.name} · {(fileMeta.size / 1024).toFixed(1)} KB
               </span>
             )}
@@ -328,14 +328,14 @@ export default function TransactionImportModal({
         </div>
 
         {(parsing || submitting) && (
-          <div className="flex items-center text-sm text-[color:var(--color-text)]/70 gap-2">
+          <div className="flex items-center text-sm text-[color:var(--color-text-70)] gap-2">
             <FileSpreadsheet className="w-4 h-4 animate-pulse" />
             {parsing ? 'Leyendo archivo…' : 'Procesando filas…'}
           </div>
         )}
 
         {error && (
-          <div className="flex items-start gap-2 p-3 text-sm text-[color:var(--color-danger)] bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30 rounded-md">
+          <div className="flex items-start gap-2 p-3 text-sm text-[color:var(--color-danger)] bg-[var(--color-danger-10)] border border-[color:var(--color-danger-30)] rounded-md">
             <XCircle className="w-4 h-4 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -346,12 +346,12 @@ export default function TransactionImportModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {FIELD_DEFS.map((field) => (
                 <div key={field.key} className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-[color:var(--color-text)]/80">
+                  <label className="text-sm font-medium text-[color:var(--color-text-80)]">
                     {field.label}
                     {field.required && <span className="text-[color:var(--color-danger)]">*</span>}
                   </label>
               <select
-                className="block w-full rounded-md border border-[color:var(--color-text)]/20 px-3 py-2 text-sm bg-white text-[color:var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/40"
+                className="block w-full rounded-md border border-[color:var(--color-text-20)] px-3 py-2 text-sm bg-white text-[color:var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-40)]"
                 value={fieldMap[field.key] || ''}
                 onChange={(event) =>
                   setFieldMap((prev) => ({
@@ -369,7 +369,7 @@ export default function TransactionImportModal({
                 ))}
               </select>
                   {!!field.examples?.length && (
-                    <p className="text-xs text-[color:var(--color-text)]/50">
+                    <p className="text-xs text-[color:var(--color-text-50)]">
                       Ejemplos: {field.examples.join(', ')}
                     </p>
                   )}
@@ -379,11 +379,11 @@ export default function TransactionImportModal({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-[color:var(--color-text)]/80">
+                <label className="text-sm font-medium text-[color:var(--color-text-80)]">
                   Tipo por defecto
                 </label>
                 <select
-                  className="block w-full rounded-md border border-[color:var(--color-text)]/20 px-3 py-2 text-sm bg-white text-[color:var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/40"
+                  className="block w-full rounded-md border border-[color:var(--color-text-20)] px-3 py-2 text-sm bg-white text-[color:var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-40)]"
                   value={options.defaultType}
                   onChange={(event) =>
                     setOptions((prev) => ({ ...prev, defaultType: event.target.value }))
@@ -394,11 +394,11 @@ export default function TransactionImportModal({
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium text-[color:var(--color-text)]/80">
+                <label className="text-sm font-medium text-[color:var(--color-text-80)]">
                   Estado por defecto (gastos)
                 </label>
                 <select
-                  className="block w-full rounded-md border border-[color:var(--color-text)]/20 px-3 py-2 text-sm bg-white text-[color:var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/40"
+                  className="block w-full rounded-md border border-[color:var(--color-text-20)] px-3 py-2 text-sm bg-white text-[color:var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-40)]"
                   value={options.defaultStatusExpense}
                   onChange={(event) =>
                     setOptions((prev) => ({
@@ -413,11 +413,11 @@ export default function TransactionImportModal({
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium text-[color:var(--color-text)]/80">
+                <label className="text-sm font-medium text-[color:var(--color-text-80)]">
                   Estado por defecto (ingresos)
                 </label>
                 <select
-                  className="block w-full rounded-md border border-[color:var(--color-text)]/20 px-3 py-2 text-sm bg-white text-[color:var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/40"
+                  className="block w-full rounded-md border border-[color:var(--color-text-20)] px-3 py-2 text-sm bg-white text-[color:var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-40)]"
                   value={options.defaultStatusIncome}
                   onChange={(event) =>
                     setOptions((prev) => ({
@@ -435,29 +435,29 @@ export default function TransactionImportModal({
         )}
 
         {mappedPreview.length > 0 && (
-          <div className="border rounded-lg border-[color:var(--color-text)]/10 overflow-hidden">
-            <div className="px-3 py-2 text-xs font-semibold bg-[color:var(--color-text)]/5 text-[color:var(--color-text)]/70">
+          <div className="border rounded-lg border-[color:var(--color-text-10)] overflow-hidden">
+            <div className="px-3 py-2 text-xs font-semibold bg-[color:var(--color-text-5)] text-[color:var(--color-text-70)]">
               Vista previa (primeras {mappedPreview.length} filas)
             </div>
             <div className="overflow-auto max-h-60 text-xs">
-              <table className="min-w-full divide-y divide-[color:var(--color-text)]/10">
-                <thead className="bg-[color:var(--color-surface)]/80">
+              <table className="min-w-full divide-y divide-[color:var(--color-text-10)]">
+                <thead className="bg-[color:var(--color-text-5)]">
                   <tr>
                     {Object.keys(mappedPreview[0]).map((col) => (
                       <th
                         key={col}
-                        className="px-3 py-2 text-left font-medium text-[color:var(--color-text)]/70"
+                        className="px-3 py-2 text-left font-medium text-[color:var(--color-text-70)]"
                       >
                         {col}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[color:var(--color-text)]/10">
+                <tbody className="divide-y divide-[color:var(--color-text-10)]">
                   {mappedPreview.map((row) => (
                     <tr key={row['#']}>
                       {Object.entries(row).map(([col, value]) => (
-                        <td key={col} className="px-3 py-2 whitespace-nowrap text-[color:var(--color-text)]/80">
+                        <td key={col} className="px-3 py-2 whitespace-nowrap text-[color:var(--color-text-80)]">
                           {value === undefined || value === null || value === ''
                             ? '—'
                             : String(value)}
@@ -472,7 +472,7 @@ export default function TransactionImportModal({
         )}
 
         <div className="flex justify-between items-center pt-2">
-          <p className="text-xs text-[color:var(--color-text)]/60">
+          <p className="text-xs text-[color:var(--color-text-60)]">
             Se importarán {rows.length} filas. Los campos obligatorios deben estar mapeados.
           </p>
           <div className="flex gap-2">

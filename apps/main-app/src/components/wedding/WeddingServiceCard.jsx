@@ -15,12 +15,18 @@ import {
   Unlink,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useFavorites } from '../../contexts/FavoritesContext';
+import useTranslations from '../../hooks/useTranslations';
 import { useWeddingServices } from '../../hooks/useWeddingServices';
+import { useServiceCategories } from '../../hooks/useServiceCategories';
+import { useWedding } from '../../context/WeddingContext';
+import { toast } from 'react-toastify';
+import SelectProviderModal from './SelectProviderModal';
+import { normalizePhoneForWhatsApp } from '../../utils/phoneUtils';
+import { useFavorites } from '../../contexts/FavoritesContext';
 import SelectFromFavoritesModal from '../suppliers/SelectFromFavoritesModal';
 import LinkServicesModal from './LinkServicesModal';
-import { toast } from 'react-toastify';
-import useTranslations from '../../hooks/useTranslations';
+import AddSupplierModal from './AddSupplierModal';
+import { Plus, Trash2, Star } from 'lucide-react';
 
 /**
  * Tarjeta de servicio de la boda
@@ -31,6 +37,7 @@ export default function WeddingServiceCard({
   serviceName, // Nombre para mostrar (ej: 'Fotografía')
   service, // Retrocompatibilidad
   confirmedProvider,
+  confirmedProviders = [], // NUEVO: Array de proveedores
   shortlistCount = 0,
   linkedServices = [], // Servicios vinculados a este
   allServices = [], // Todos los servicios para el modal de vincular
@@ -38,17 +45,23 @@ export default function WeddingServiceCard({
 }) {
   const navigate = useNavigate();
   const { favorites = [] } = useFavorites() || {}; // Guard contra undefined
-  const { assignSupplier, linkServices, unlinkServices } = useWeddingServices();
+  const { assignSupplier, linkServices, unlinkServices, removeSupplier, setPrimarySupplier } = useWeddingServices();
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
+  const [showAddSupplierModal, setShowAddSupplierModal] = useState(false);
   const { t, format } = useTranslations();
 
   // Usar serviceId si está disponible, sino usar service
   const categoryId = serviceId || service?.toLowerCase();
   const displayName = serviceName || service;
 
-  const hasConfirmed = !!confirmedProvider;
+  // Soportar tanto confirmedProvider (singular) como confirmedProviders (array)
+  const providers = confirmedProviders.length > 0 ? confirmedProviders : (confirmedProvider ? [confirmedProvider] : []);
+  const hasConfirmed = providers.length > 0;
   const hasShortlist = shortlistCount > 0;
+  
+  // Calcular total de todos los proveedores
+  const totalPrice = providers.reduce((sum, p) => sum + (p.price || 0), 0);
 
   // Filtrar favoritos por categoría del servicio (usar ID directo)
   const serviceFavorites = (favorites || []).filter((fav) => fav.supplier?.category === categoryId);
@@ -65,13 +78,35 @@ export default function WeddingServiceCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo ejecutar una vez al montar
 
-  // Función para asignar proveedor
-  const handleAssign = async (supplier) => {
+  // Función para asignar proveedor desde modal completo
+  const handleAddSupplier = async (supplier, price, notes, status, serviceDescription, deposit) => {
     try {
-      await assignSupplier(categoryId, supplier, null, '', 'contratado');
-      // No cerramos el modal aquí, lo hace SelectFromFavoritesModal
+      await assignSupplier(categoryId, supplier, price, notes, status, serviceDescription, deposit);
+      setShowAddSupplierModal(false);
+      toast.success(`${supplier.name} añadido correctamente`);
     } catch (error) {
-      throw error; // Re-lanzar para que lo maneje el modal
+      throw error;
+    }
+  };
+
+  // Función para eliminar proveedor
+  const handleRemoveSupplier = async (providerId, providerName) => {
+    if (!confirm(`¿Eliminar ${providerName} de este servicio?`)) return;
+    try {
+      await removeSupplier(categoryId, providerId);
+      toast.success('Proveedor eliminado');
+    } catch (error) {
+      toast.error(error.message || 'Error al eliminar');
+    }
+  };
+
+  // Función para marcar como primario
+  const handleSetPrimary = async (providerId, providerName) => {
+    try {
+      await setPrimarySupplier(categoryId, providerId);
+      toast.success(`${providerName} marcado como principal`);
+    } catch (error) {
+      toast.error(error.message || 'Error al marcar como principal');
     }
   };
 
@@ -163,75 +198,119 @@ export default function WeddingServiceCard({
 
       {/* Contenido */}
       {hasConfirmed ? (
-        // Proveedor confirmado
+        // Lista de proveedores confirmados
         <div className="space-y-3">
-          <div className="border-l-4 border-green-500 bg-[var(--color-primary)] p-4 rounded-lg">
-            <div className="flex items-start justify-between mb-2">
-              <p className="font-bold text-gray-900 text-lg">{confirmedProvider.name}</p>
-              <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full">
-                ✓ Contratado
-              </span>
-            </div>
-
-            {/* Precio */}
-            {confirmedProvider.price && (
-              <div className="mb-3 flex items-center gap-2">
-                <span className="text-2xl font-bold text-green-700">
-                  {confirmedProvider.price.toLocaleString('es-ES')}€
-                </span>
-                {confirmedProvider.quote?.terms?.deposit && (
-                  <span className="text-xs text-gray-600 bg-white/80 px-2 py-1 rounded">
-                    {confirmedProvider.quote.terms.deposit}% adelanto
-                  </span>
-                )}
-              </div>
-            )}
-
-            {confirmedProvider.contact && (
-              <p className="text-sm text-gray-600">
-                {t('wedding.serviceCard.confirmed.contactLabel', { defaultValue: 'Contacto:' })}{' '}
-                {confirmedProvider.contact}
-              </p>
-            )}
-
-            {confirmedProvider.rating > 0 && (
-              <div className="flex items-center gap-1 mt-2 text-sm">
-                <span className="text-yellow-500">⭐</span>
-                <span className="font-medium">{confirmedProvider.rating.toFixed(1)}</span>
-                {confirmedProvider.ratingCount > 0 && (
-                  <span className="text-gray-500">
-                    {t('wedding.serviceCard.confirmed.reviewsCount', {
-                      count: confirmedProvider.ratingCount,
-                      defaultValue: '({{count}} reseñas)',
-                    })}
-                  </span>
-                )}
-              </div>
-            )}
-
-            {/* Condiciones clave */}
-            {confirmedProvider.quote?.terms && (
-              <div className="mt-3 pt-3 border-t border-green-200 grid grid-cols-2 gap-2 text-xs">
-                {confirmedProvider.quote.terms.deliveryTime && (
-                  <div className="flex items-center gap-1 text-gray-700">
-                    <Clock size={12} />
-                    <span>Entrega: {confirmedProvider.quote.terms.deliveryTime}</span>
+          {providers.map((provider, index) => (
+            <div
+              key={provider.id || index}
+              className={`border-l-4 p-4 rounded-lg transition-all ${
+                provider.isPrimary
+                  ? 'border-green-500 bg-green-50'
+                  : 'border-blue-400 bg-blue-50'
+              }`}
+            >
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    {provider.isPrimary && (
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    )}
+                    <p className="font-bold text-gray-900 text-lg">{provider.name}</p>
                   </div>
-                )}
-                {confirmedProvider.quote.terms.paymentTerms && (
-                  <div className="flex items-center gap-1 text-gray-700">
-                    💳{' '}
-                    <span className="truncate">
-                      {confirmedProvider.quote.terms.paymentTerms.split(',')[0]}
+                  {provider.serviceDescription && (
+                    <p className="text-sm text-gray-600 italic">{provider.serviceDescription}</p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      provider.isPrimary
+                        ? 'bg-green-600 text-white'
+                        : 'bg-blue-600 text-white'
+                    }`}
+                  >
+                    {provider.isPrimary ? '★ Principal' : 'Adicional'}
+                  </span>
+                  <button
+                    onClick={() => handleRemoveSupplier(provider.id, provider.name)}
+                    className="p-1 hover:bg-red-100 rounded transition-colors"
+                    title="Eliminar proveedor"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Precio y adelanto */}
+              {provider.price && (
+                <div className="mb-2">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl font-bold text-green-700">
+                      {provider.price.toLocaleString('es-ES')}€
                     </span>
+                    {provider.deposit?.percentage && (
+                      <span className="text-xs bg-white px-2 py-1 rounded border border-gray-200">
+                        Adelanto: {provider.deposit.percentage}% ({provider.deposit.amount}€)
+                        {provider.deposit.dueDate && (
+                          <span className="ml-1 text-gray-500">
+                            hasta {new Date(provider.deposit.dueDate).toLocaleDateString('es-ES')}
+                          </span>
+                        )}
+                      </span>
+                    )}
                   </div>
-                )}
+                </div>
+              )}
+
+              {/* Contacto */}
+              {(provider.contact?.phone || provider.contact?.email) && (
+                <div className="text-xs text-gray-600 space-y-1">
+                  {provider.contact.phone && (
+                    <p>📞 {provider.contact.phone}</p>
+                  )}
+                  {provider.contact.email && (
+                    <p>✉️ {provider.contact.email}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Botón para marcar como principal */}
+              {!provider.isPrimary && (
+                <button
+                  onClick={() => handleSetPrimary(provider.id, provider.name)}
+                  className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  ⭐ Marcar como principal
+                </button>
+              )}
+            </div>
+          ))}
+
+          {/* Total */}
+          {providers.length > 1 && (
+            <div className="bg-gray-100 p-3 rounded-lg">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-gray-700">Total {displayName}:</span>
+                <span className="text-3xl font-bold text-green-700">
+                  {totalPrice.toLocaleString('es-ES')}€
+                </span>
               </div>
-            )}
-          </div>
+              <p className="text-xs text-gray-500 mt-1">
+                {providers.length} proveedor{providers.length > 1 ? 'es' : ''} confirmado{providers.length > 1 ? 's' : ''}
+              </p>
+            </div>
+          )}
 
           {/* Botones de acción */}
           <div className="flex gap-2 flex-wrap">
+            {/* Botón para añadir otro proveedor */}
+            <button
+              onClick={() => setShowAddSupplierModal(true)}
+              className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm flex items-center gap-1"
+            >
+              <Plus size={16} />
+              Añadir proveedor
+            </button>
             {linkedServices.length > 0 && (
               <button
                 onClick={handleUnlink}
@@ -256,7 +335,7 @@ export default function WeddingServiceCard({
               <button
                 onClick={() =>
                   window.open(
-                    `https://wa.me/${confirmedProvider.phone.replace(/\D/g, '')}`,
+                    `https://wa.me/${normalizePhoneForWhatsApp(confirmedProvider.phone)}`,
                     '_blank'
                   )
                 }
@@ -377,13 +456,14 @@ export default function WeddingServiceCard({
         </div>
       )}
 
-      {/* Modal de favoritos */}
-      <SelectFromFavoritesModal
-        open={showFavoritesModal}
-        onClose={() => setShowFavoritesModal(false)}
+      {/* Modal para añadir proveedor con info completa */}
+      <AddSupplierModal
+        open={showAddSupplierModal}
+        onClose={() => setShowAddSupplierModal(false)}
+        serviceId={categoryId}
         serviceName={displayName}
+        onAssign={handleAddSupplier}
         favorites={serviceFavorites}
-        onAssign={handleAssign}
       />
 
       {/* Modal de vincular servicios */}

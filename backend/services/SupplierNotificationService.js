@@ -107,7 +107,7 @@ class SupplierNotificationService {
     const emailHtml = this.generateRequestEmailHtml(request, supplier);
 
     const mailOptions = {
-      from: `"MaLove.App - Solicitudes" <solicitudes@${process.env.MAILGUN_DOMAIN || 'malove.app'}>`,
+      from: `"${request.client.name}" <${request.client.email}>`,
       to: supplier.email,
       replyTo: request.client.email,
       subject: `🎉 Nueva solicitud de ${request.client.name}`,

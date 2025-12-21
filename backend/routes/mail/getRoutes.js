@@ -1,6 +1,5 @@
 import express from 'express';
 import { db } from '../../db.js';
-import { requireMailAccess } from '../../middleware/authMiddleware.js';
 
 const router = express.Router();
 const DEFAULT_LIST_LIMIT = 200;
@@ -19,8 +18,10 @@ function collectProfileAddresses(profile) {
   const set = new Set();
   if (!profile) return set;
   const alias = sanitizeEmail(profile.myWed360Email);
+  const maLove = sanitizeEmail(profile.maLoveEmail);
   const login = sanitizeEmail(profile.email);
   if (alias) set.add(alias);
+  if (maLove) set.add(maLove);
   if (login) set.add(login);
   const legacy = legacyAlias(alias);
   if (legacy) set.add(legacy);
@@ -185,7 +186,14 @@ async function resolveUidByEmail(email) {
   if (!normalized) return null;
   if (userLookupCache.has(normalized)) return userLookupCache.get(normalized);
   try {
-    let snap = await db.collection('users').where('myWed360Email', '==', normalized).limit(1).get();
+    let snap = await db.collection('users').where('maLoveEmail', '==', normalized).limit(1).get();
+    if (!snap.empty) {
+      const uid = snap.docs[0].id;
+      userLookupCache.set(normalized, uid);
+      return uid;
+    }
+
+    snap = await db.collection('users').where('myWed360Email', '==', normalized).limit(1).get();
     if (!snap.empty) {
       const uid = snap.docs[0].id;
       userLookupCache.set(normalized, uid);
@@ -237,6 +245,7 @@ function filterMailsByAddresses(items, folderNormalized, addresses) {
 
 async function fetchFolderMails({ req, folder, userNorm, limit = DEFAULT_LIST_LIMIT, after }) {
   const normalizedFolder = folder.toLowerCase();
+  const authUid = req.user?.uid || null;
   const addresses = new Set([sanitizeEmail(userNorm)].filter(Boolean));
   const profileAddresses = collectProfileAddresses(req.userProfile);
   for (const addr of profileAddresses) addresses.add(addr);
@@ -247,6 +256,27 @@ async function fetchFolderMails({ req, folder, userNorm, limit = DEFAULT_LIST_LI
         ? new Date(after).toISOString()
         : null;
 
+  // 0) Preferir siempre el UID autenticado (evita depender de to==alias y de búsquedas por email)
+  if (authUid) {
+    try {
+      let userQuery = db.collection('users').doc(authUid).collection('mails').where('folder', '==', folder);
+      let docs = [];
+      try {
+        let q = userQuery.orderBy('date', 'desc');
+        if (afterIso) q = q.startAfter(afterIso);
+        const snap = await q.limit(limit).get();
+        docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      } catch (err) {
+        const snap = await userQuery.get();
+        docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        docs.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+        if (limit && Number.isFinite(limit)) docs = docs.slice(0, limit);
+      }
+      if (docs.length) return docs;
+    } catch (_) {}
+  }
+
+  // 1) Fallback: resolver UID por direcciones conocidas
   if (userNorm) {
     try {
       const uid = await resolveUidForAddresses(addresses);
@@ -265,6 +295,26 @@ async function fetchFolderMails({ req, folder, userNorm, limit = DEFAULT_LIST_LI
           if (limit && Number.isFinite(limit)) docs = docs.slice(0, limit);
         }
         if (docs.length) return docs;
+      }
+    } catch (_) {}
+  }
+
+  // 2) Si existe ownerUid (mails a buzones compartidos), intentar traerlos directamente
+  if (authUid) {
+    try {
+      let q = db.collection('mails').where('ownerUid', '==', authUid).where('folder', '==', folder);
+      try {
+        let q2 = q.orderBy('date', 'desc');
+        if (afterIso) q2 = q2.startAfter(afterIso);
+        const snap = await q2.limit(limit).get();
+        const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        if (items.length) return items;
+      } catch (_) {
+        const snap = await q.limit(limit * 4).get();
+        let items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        items.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+        if (limit && Number.isFinite(limit)) items = items.slice(0, limit);
+        if (items.length) return items;
       }
     } catch (_) {}
   }
@@ -328,6 +378,7 @@ async function fetchAllFolderMails({ req, userNorm, limit = DEFAULT_LIST_LIMIT }
 }
 
 export async function listMails(req, res) {
+  console.error('🔍🔍🔍 LISTMAILS EJECUTANDOSE 🔍🔍🔍');
   try {
     const { folder: folderParam, isAll } = adjustFolder(req.query.folder);
     const { user, userNorm } = resolveTargetUser(req, req.query.user);
@@ -335,12 +386,16 @@ export async function listMails(req, res) {
     const limit =
       !Number.isNaN(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 500) : DEFAULT_LIST_LIMIT;
 
+    console.error(`🔍 [MAIL] folder=${folderParam}, userNorm=${userNorm}, uid=${req.user?.uid}, email=${req.userProfile?.myWed360Email}`);
+
     if (isAll) {
       const items = await fetchAllFolderMails({ req, userNorm, limit });
+      console.log(`[MAIL-DEBUG] ALL folders - items found: ${items.length}`);
       return res.json(mapMailArray(items));
     }
 
     const items = await fetchFolderMails({ req, folder: folderParam, userNorm, limit });
+    console.log(`[MAIL-DEBUG] folder=${folderParam} - items found: ${items.length}`);
     return res.json(mapMailArray(items));
   } catch (err) {
     console.error('Error en GET /api/mail:', err);
@@ -405,8 +460,11 @@ export async function getMailDetail(req, res) {
       const isPrivileged = role === 'admin' || role === 'planner';
       const myAlias = sanitizeEmail(profile.myWed360Email);
       const myLogin = sanitizeEmail(profile.email);
+      const authUid = req.user?.uid || null;
       const ownerTarget = sanitizeEmail(data.folder === 'sent' ? data.from : data.to);
-      if (!isPrivileged && ownerTarget && !(ownerTarget === myAlias || ownerTarget === myLogin)) {
+      const ownerUid = typeof data.ownerUid === 'string' ? data.ownerUid.trim() : '';
+      const uidOk = authUid && ownerUid && ownerUid === authUid;
+      if (!isPrivileged && !uidOk && ownerTarget && !(ownerTarget === myAlias || ownerTarget === myLogin)) {
         return res.status(403).json({ error: 'forbidden' });
       }
     } catch (_) {}
@@ -434,9 +492,9 @@ export async function getMailDetail(req, res) {
   }
 }
 
-router.get('/', requireMailAccess, listMails);
-router.get('/page', requireMailAccess, listMailsPage);
-router.get('/:id', requireMailAccess, getMailDetail);
+router.get('/', listMails);
+router.get('/page', listMailsPage);
+router.get('/:id', getMailDetail);
 
 export default router;
 

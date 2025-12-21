@@ -1,9 +1,11 @@
-﻿import { Users, RefreshCw, Calculator } from 'lucide-react';
-import React, { useState } from 'react';
+﻿import { Calculator, Edit3 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
 import { Card, Button } from '../ui';
+import useGuests from '../../hooks/useGuests';
+import BalanceAdjustmentModal from './BalanceAdjustmentModal';
 
 /**
  * Configuración de aportaciones y regalos
@@ -15,8 +17,21 @@ export default function ContributionSettings({
   isLoading,
 }) {
   const { t } = useTranslations();
+  const { guests } = useGuests();
   const [localContributions, setLocalContributions] = useState(contributions);
   const [hasChanges, setHasChanges] = useState(false);
+  const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
+
+  // Actualizar automáticamente el número de invitados desde la lista de invitados
+  useEffect(() => {
+    if (guests && Array.isArray(guests)) {
+      const guestCount = guests.length;
+      setLocalContributions((prev) => ({
+        ...prev,
+        guestCount,
+      }));
+    }
+  }, [guests]);
 
   React.useEffect(() => {
     setLocalContributions(
@@ -28,6 +43,8 @@ export default function ContributionSettings({
         extras: 0,
         giftPerGuest: 0,
         guestCount: 0,
+        initialBalance: 0,
+        balanceAdjustments: [],
       }
     );
     setHasChanges(false);
@@ -49,6 +66,23 @@ export default function ContributionSettings({
     setHasChanges(false);
   };
 
+  const handleSaveAdjustment = (adjustment) => {
+    const updatedAdjustments = [...(localContributions.balanceAdjustments || []), adjustment];
+    const updated = {
+      ...localContributions,
+      balanceAdjustments: updatedAdjustments,
+    };
+    setLocalContributions(updated);
+    onUpdateContributions(updated);
+    setShowAdjustmentModal(false);
+  };
+
+  const currentBalance = localContributions.initialBalance || 0;
+  const totalAdjustments = (localContributions.balanceAdjustments || []).reduce(
+    (sum, adj) => sum + (Number(adj.amount) || 0),
+    0
+  );
+
   // Cálculos en tiempo real
   const monthlyTotal = localContributions.monthlyA + localContributions.monthlyB;
   const initialTotal = localContributions.initA + localContributions.initB;
@@ -59,38 +93,84 @@ export default function ContributionSettings({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
-            {t('finance.contributions.title', { defaultValue: 'Configuración de Aportaciones' })}
-          </h2>
-          <p className="text-sm text-[color:var(--color-text)]/70">
-            {t('finance.contributions.subtitle', {
-              defaultValue: 'Configura las aportaciones y estima los ingresos esperados',
-            })}
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          leftIcon={<RefreshCw size={16} />}
-          onClick={onLoadGuestCount}
-          disabled={isLoading}
-        >
-          {t('finance.contributions.updateGuests', { defaultValue: 'Actualizar Invitados' })}
-        </Button>
+      <div>
+        <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
+          {t('finance.contributions.title', { defaultValue: 'Configuración de Aportaciones' })}
+        </h2>
+        <p className="text-sm text-[color:var(--color-text-70)]">
+          {t('finance.contributions.subtitle', {
+            defaultValue: 'Configura las aportaciones y estima los ingresos esperados',
+          })}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Formulario de configuración */}
         <div className="space-y-6">
+          {/* Saldo Inicial */}
+          <Card className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-[color:var(--color-text)]">
+                {t('finance.contributions.balance.title', { defaultValue: 'Saldo Inicial' })}
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdjustmentModal(true)}
+                className="flex items-center gap-2"
+              >
+                <Edit3 size={16} />
+                {t('finance.contributions.balance.adjust', { defaultValue: 'Ajustar' })}
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
+                  {t('finance.contributions.balance.initial', { defaultValue: 'Dinero disponible ahora (€)' })}
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={localContributions.initialBalance}
+                  onChange={(e) => handleChange('initialBalance', e.target.value)}
+                  className="w-full px-3 py-2 border border-[color:var(--color-text-20)] rounded-md focus:ring-2 focus:border-transparent"
+                  placeholder="0.00"
+                />
+                <p className="mt-1 text-xs text-[color:var(--color-text-60)]">
+                  {t('finance.contributions.balance.help', {
+                    defaultValue: 'Introduce el dinero que tienes disponible ahora mismo en la cuenta de boda',
+                  })}
+                </p>
+              </div>
+
+              {/* Mostrar ajustes si existen */}
+              {totalAdjustments !== 0 && (
+                <div className="pt-3 border-t border-soft">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted">
+                      {t('finance.contributions.balance.adjustments', { defaultValue: 'Ajustes manuales' })}
+                    </span>
+                    <span className={`font-medium ${totalAdjustments >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>
+                      {totalAdjustments >= 0 ? '+' : ''}{formatCurrency(totalAdjustments)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted mt-1">
+                    {localContributions.balanceAdjustments?.length || 0} {t('finance.contributions.balance.adjustmentsCount', { defaultValue: 'ajustes realizados' })}
+                  </p>
+                </div>
+              )}
+            </div>
+          </Card>
+
           {/* Aportaciones iniciales */}
-          <Card className="p-6 bg-[var(--color-surface)] border-soft">
+          <Card className="p-6">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               {t('finance.contributions.initial.title', { defaultValue: 'Aportaciones Iniciales' })}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
                   {t('finance.contributions.initial.personA', { defaultValue: 'Persona A (€)' })}
                 </label>
                 <input
@@ -99,12 +179,12 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.initA}
                   onChange={(e) => handleChange('initA', e.target.value)}
-                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text-20)] rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
                   {t('finance.contributions.initial.personB', { defaultValue: 'Persona B (€)' })}
                 </label>
                 <input
@@ -113,12 +193,12 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.initB}
                   onChange={(e) => handleChange('initB', e.target.value)}
-                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text-20)] rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
-              <div className="pt-2 border-t border-[color:var(--color-text)]/10">
-                <p className="text-sm text-[color:var(--color-text)]/70">
+              <div className="pt-2 border-t border-[color:var(--color-text-10)]">
+                <p className="text-sm text-[color:var(--color-text-70)]">
                   {t('finance.contributions.initial.total', { defaultValue: 'Total inicial:' })}{' '}
                   <span className="font-medium text-[color:var(--color-text)]">
                     {formatCurrency(initialTotal)}
@@ -129,13 +209,13 @@ export default function ContributionSettings({
           </Card>
 
           {/* Aportaciones mensuales */}
-          <Card className="p-6 bg-[var(--color-surface)] border-soft">
+          <Card className="p-6">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               {t('finance.contributions.monthly.title', { defaultValue: 'Aportaciones Mensuales' })}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
                   {t('finance.contributions.monthly.personA', {
                     defaultValue: 'Persona A (€/mes)',
                   })}
@@ -146,12 +226,12 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.monthlyA}
                   onChange={(e) => handleChange('monthlyA', e.target.value)}
-                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text-20)] rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
                   {t('finance.contributions.monthly.personB', {
                     defaultValue: 'Persona B (€/mes)',
                   })}
@@ -162,12 +242,12 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.monthlyB}
                   onChange={(e) => handleChange('monthlyB', e.target.value)}
-                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text-20)] rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
-              <div className="pt-2 border-t border-[color:var(--color-text)]/10">
-                <p className="text-sm text-[color:var(--color-text)]/70">
+              <div className="pt-2 border-t border-[color:var(--color-text-10)]">
+                <p className="text-sm text-[color:var(--color-text-70)]">
                   {t('finance.contributions.monthly.total', { defaultValue: 'Total mensual:' })}{' '}
                   <span className="font-medium text-[color:var(--color-text)]">
                     {formatCurrency(monthlyTotal)}
@@ -178,13 +258,13 @@ export default function ContributionSettings({
           </Card>
 
           {/* Aportaciones extras */}
-          <Card className="p-6 bg-[var(--color-surface)] border-soft">
+          <Card className="p-6">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               {t('finance.contributions.extras.title', { defaultValue: 'Aportaciones Extras' })}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
                   {t('finance.contributions.extras.totalLabel', {
                     defaultValue: 'Total extras (familia, otros ingresos) (€)',
                   })}
@@ -195,10 +275,10 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.extras}
                   onChange={(e) => handleChange('extras', e.target.value)}
-                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text-20)] rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
-                <p className="mt-1 text-xs text-[color:var(--color-text)]/60">
+                <p className="mt-1 text-xs text-[color:var(--color-text-60)]">
                   {t('finance.contributions.extras.help', {
                     defaultValue: 'Incluye regalos familiares, aportaciones de padres, etc.',
                   })}
@@ -208,13 +288,13 @@ export default function ContributionSettings({
           </Card>
 
           {/* Estimación de regalos */}
-          <Card className="p-6 bg-[var(--color-surface)] border-soft">
+          <Card className="p-6">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               {t('finance.contributions.gifts.title', { defaultValue: 'Estimación de Regalos' })}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
                   {t('finance.contributions.gifts.giftPerGuest', {
                     defaultValue: 'Regalo estimado por invitado (€)',
                   })}
@@ -225,43 +305,22 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.giftPerGuest}
                   onChange={(e) => handleChange('giftPerGuest', e.target.value)}
-                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text-20)] rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
                   {t('finance.contributions.gifts.guestCount', {
                     defaultValue: 'Número de invitados',
                   })}
                 </label>
-                <div className="flex space-x-2">
-                  <input
-                    type="number"
-                    min="0"
-                    value={localContributions.guestCount}
-                    onChange={(e) => handleChange('guestCount', e.target.value)}
-                    className="flex-1 px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
-                    placeholder="0"
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={onLoadGuestCount}
-                    disabled={isLoading}
-                    className="px-3"
-                  >
-                    <Users size={16} />
-                  </Button>
+                <div className="w-full px-3 py-2 border border-[color:var(--color-text-20)] rounded-md bg-[color:var(--color-text-5)] flex items-center">
+                  <span className="text-[color:var(--color-text)]">{localContributions.guestCount}</span>
                 </div>
-                <p className="mt-1 text-xs text-[color:var(--color-text)]/60">
-                  {t('finance.contributions.gifts.loadHint', {
-                    defaultValue:
-                      'Haz clic en el icono para cargar automáticamente desde tu lista de invitados',
-                  })}
-                </p>
               </div>
-              <div className="pt-2 border-t border-[color:var(--color-text)]/10">
-                <p className="text-sm text-[color:var(--color-text)]/70">
+              <div className="pt-2 border-t border-[color:var(--color-text-10)]">
+                <p className="text-sm text-[color:var(--color-text-70)]">
                   {t('finance.contributions.gifts.total', {
                     defaultValue: 'Total estimado en regalos:',
                   })}{' '}
@@ -275,9 +334,9 @@ export default function ContributionSettings({
 
           {/* Botones de acción */}
           {hasChanges && (
-            <Card className="p-4 bg-[var(--color-primary)]/10 border-[var(--color-primary)]/30">
+            <Card className="p-4 bg-[var(--color-primary-10)] border-[color:var(--color-primary-30)]">
               <div className="flex justify-between items-center">
-                <p className="text-sm text-[var(--color-primary)]">
+                <p className="text-sm text-[color:var(--color-primary)]">
                   {t('finance.contributions.unsaved', {
                     defaultValue: 'Tienes cambios sin guardar',
                   })}
@@ -298,9 +357,9 @@ export default function ContributionSettings({
         {/* Resumen y proyecciones */}
         <div className="space-y-6">
           {/* Resumen de ingresos esperados */}
-          <Card className="p-6 bg-[var(--color-surface)] border-soft">
+          <Card className="p-6">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="flex items-center justify-center w-10 h-10 bg-[var(--color-success)]/15 rounded-full">
+              <div className="flex items-center justify-center w-10 h-10 bg-[var(--color-success-15)] rounded-full">
                 <Calculator className="w-5 h-5 text-[color:var(--color-success)]" />
               </div>
               <div>
@@ -309,7 +368,7 @@ export default function ContributionSettings({
                     defaultValue: 'Resumen de Ingresos Esperados',
                   })}
                 </h3>
-                <p className="text-sm text-[color:var(--color-text)]/70">
+                <p className="text-sm text-[color:var(--color-text-70)]">
                   {t('finance.contributions.summary.subtitle', {
                     defaultValue: 'Proyección total basada en tus configuraciones',
                   })}
@@ -318,8 +377,8 @@ export default function ContributionSettings({
             </div>
 
             <div className="space-y-4">
-              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
-                <span className="text-sm text-[color:var(--color-text)]/70">
+              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text-10)]">
+                <span className="text-sm text-[color:var(--color-text-70)]">
                   {t('finance.contributions.summary.initial', {
                     defaultValue: 'Aportaciones iniciales',
                   })}
@@ -328,8 +387,8 @@ export default function ContributionSettings({
                   {formatCurrency(initialTotal)}
                 </span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
-                <span className="text-sm text-[color:var(--color-text)]/70">
+              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text-10)]">
+                <span className="text-sm text-[color:var(--color-text-70)]">
                   {t('finance.contributions.summary.monthly', {
                     defaultValue: 'Aportaciones mensuales',
                   })}
@@ -338,8 +397,8 @@ export default function ContributionSettings({
                   {formatCurrency(monthlyTotal)}
                 </span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
-                <span className="text-sm text-[color:var(--color-text)]/70">
+              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text-10)]">
+                <span className="text-sm text-[color:var(--color-text-70)]">
                   {t('finance.contributions.summary.extras', {
                     defaultValue: 'Aportaciones extras',
                   })}
@@ -348,15 +407,15 @@ export default function ContributionSettings({
                   {formatCurrency(localContributions.extras)}
                 </span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
-                <span className="text-sm text-[color:var(--color-text)]/70">
+              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text-10)]">
+                <span className="text-sm text-[color:var(--color-text-70)]">
                   {t('finance.contributions.summary.gifts', { defaultValue: 'Regalos estimados' })}
                 </span>
                 <span className="font-medium text-[color:var(--color-text)]">
                   {formatCurrency(expectedGifts)}
                 </span>
               </div>
-              <div className="flex justify-between items-center py-3 bg-[var(--color-success)]/10 px-4 rounded-lg">
+              <div className="flex justify-between items-center py-3 bg-[var(--color-success-10)] px-4 rounded-lg">
                 <span className="font-medium text-[color:var(--color-success)]">
                   {t('finance.contributions.summary.total', { defaultValue: 'Total Esperado' })}
                 </span>
@@ -368,13 +427,13 @@ export default function ContributionSettings({
           </Card>
 
           {/* Consejos y recomendaciones */}
-          <Card className="p-6 bg-[var(--color-surface)] border-soft">
+          <Card className="p-6">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               {t('finance.contributions.tips.title', { defaultValue: 'Consejos Financieros' })}
             </h3>
-            <div className="space-y-3 text-sm text-[color:var(--color-text)]/70">
+            <div className="space-y-3 text-sm text-[color:var(--color-text-70)]">
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[var(--color-primary)] rounded-full mt-2"></div>
                 <p>
                   <strong>
                     {t('finance.contributions.tips.emergencyTitle', {
@@ -388,7 +447,7 @@ export default function ContributionSettings({
                 </p>
               </div>
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[var(--color-primary)] rounded-full mt-2"></div>
                 <p>
                   <strong>
                     {t('finance.contributions.tips.giftsTitle', {
@@ -401,7 +460,7 @@ export default function ContributionSettings({
                 </p>
               </div>
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[var(--color-primary)] rounded-full mt-2"></div>
                 <p>
                   <strong>
                     {t('finance.contributions.tips.reviewTitle', {
@@ -414,7 +473,7 @@ export default function ContributionSettings({
                 </p>
               </div>
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[var(--color-primary)] rounded-full mt-2"></div>
                 <p>
                   <strong>
                     {t('finance.contributions.tips.balanceTitle', {
@@ -431,6 +490,15 @@ export default function ContributionSettings({
           </Card>
         </div>
       </div>
+
+      {/* Modal de Ajuste de Saldo */}
+      <BalanceAdjustmentModal
+        isOpen={showAdjustmentModal}
+        onClose={() => setShowAdjustmentModal(false)}
+        onSave={handleSaveAdjustment}
+        currentBalance={currentBalance + totalAdjustments}
+        adjustments={localContributions.balanceAdjustments || []}
+      />
     </div>
   );
 }

@@ -11,7 +11,7 @@ export default function FinanceHeader() {
         <h1 className="text-2xl md:text-3xl font-bold text-[color:var(--color-text)]">
           {t('finance.overview.title', { defaultValue: 'Gestión Financiera' })}
         </h1>
-        <p className="text-[color:var(--color-text)]/70 mt-1">
+        <p className="text-[color:var(--color-text-70)] mt-1">
           {t('finance.overview.subtitle', {
             defaultValue: 'Control completo del presupuesto y gastos de tu boda',
           })}

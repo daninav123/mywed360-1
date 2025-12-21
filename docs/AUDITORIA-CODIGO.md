@@ -60,7 +60,7 @@
 **Archivos relacionados:**
 - `src/components/tasks/EventsCalendar.jsx` - Calendario de eventos (reutilizable)
 - `src/components/tasks/LongTermTasksGantt.jsx` - Gantt de tareas (reutilizable)
-- `src/data/tasks/masterTimelineTemplate.json` - Template maestro (¡EXISTE!)
+- `apps/main-app/src/data/tasks/masterTimelineTemplate.json` - Template maestro (¡EXISTE!)
 
 **Análisis:**
 - Template de timeline maestro ya existe
@@ -578,6 +578,8 @@
 ---
 
 ## 📊 Métricas de Código
+
+> Nota: este informe cuenta TODOs/FIXMEs en el código fuente (scope amplio) y puede no coincidir con `docs/AUDITORIA-PROYECTO.md`, que resume otros criterios y puede estar generado en otra fecha.
 
 | Métrica | Valor | Estado |
 |---------|-------|--------|

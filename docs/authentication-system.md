@@ -1,4 +1,4 @@
-﻿# Sistema de Autenticación (estado 2025-10-07)
+# Sistema de Autenticación (estado 2025-10-07)
 
 Este documento describe la autenticación real del proyecto tras la revisión manual de octubre de 2025.
 

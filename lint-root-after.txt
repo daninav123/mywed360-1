@@ -1,0 +1,20 @@
+
+> malove-app@0.1.0 lint
+> npm --prefix apps/main-app run lint && npm --prefix apps/admin-app run lint && npm --prefix apps/planners-app run lint && npm --prefix apps/suppliers-app run lint
+
+
+> @malove/main-app@2.0.0 lint
+> eslint src --max-warnings 0
+
+
+> @malove/admin-app@2.0.0 lint
+> eslint src --max-warnings 0
+
+
+> @malove/planners-app@2.0.0 lint
+> eslint src --max-warnings 0
+
+
+> @malove/suppliers-app@2.0.0 lint
+> eslint src --max-warnings 0
+

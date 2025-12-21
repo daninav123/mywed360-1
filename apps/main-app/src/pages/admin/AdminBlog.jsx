@@ -24,7 +24,7 @@ const STATUS_BADGE = {
   draft: 'bg-warning-soft text-warning',
   scheduled: 'bg-info-soft text-info',
   published: 'bg-success-soft text-success',
-  archived: 'bg-[color:var(--color-border)]/15 text-muted',
+  archived: 'bg-[color:var(--color-border)] text-muted',
   failed: 'bg-danger-soft text-danger',
 };
 
@@ -36,7 +36,7 @@ const PLAN_STATUS_LABELS = {
 };
 
 const PLAN_STATUS_BADGE = {
-  planned: 'bg-[color:var(--color-border)]/15 text-muted',
+  planned: 'bg-[color:var(--color-border)] text-muted',
   generating: 'bg-warning-soft text-warning',
   scheduled: 'bg-success-soft text-success',
   failed: 'bg-danger-soft text-danger',
@@ -439,7 +439,7 @@ const AdminBlog = () => {
             </label>
             <button
               type="submit"
-              className="ml-auto inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-[color:var(--color-on-primary,#ffffff)] transition hover:opacity-90 disabled:opacity-60"
+              className="ml-auto inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-[color:var(--color-on-primary)] transition hover:opacity-90 disabled:opacity-60"
               disabled={generating}
             >
               {generating ? 'Generando...' : 'Generar borrador'}
@@ -518,7 +518,7 @@ const AdminBlog = () => {
               type="button"
               onClick={handleTriggerAutomation}
               disabled={triggeringPlan}
-              className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-[color:var(--color-on-primary,#ffffff)] transition hover:opacity-90 disabled:opacity-60"
+              className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-[color:var(--color-on-primary)] transition hover:opacity-90 disabled:opacity-60"
             >
               {triggeringPlan ? 'Generando...' : 'Generar siguiente artículo ahora'}
             </button>
@@ -543,7 +543,7 @@ const AdminBlog = () => {
                 {planEntries.map((entry) => {
                   const status = entry.status || 'planned';
                   const badgeClass =
-                    PLAN_STATUS_BADGE[status] || 'bg-[color:var(--color-border)]/15 text-muted';
+                    PLAN_STATUS_BADGE[status] || 'bg-[color:var(--color-border)] text-muted';
                   const statusLabel = PLAN_STATUS_LABELS[status] || status;
                   return (
                     <tr key={entry.planDate} className="border-b last:border-b-0">
@@ -660,7 +660,7 @@ const AdminBlog = () => {
                       </td>
                       <td className="px-3 py-3">
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_BADGE[post.status] || 'bg-[color:var(--color-border)]/15 text-muted'}`}
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_BADGE[post.status] || 'bg-[color:var(--color-border)] text-muted'}`}
                         >
                           {STATUS_LABELS[post.status] || post.status}
                         </span>
@@ -862,7 +862,7 @@ const AdminBlog = () => {
               <div className="flex flex-wrap gap-3 pt-2">
                 <button
                   type="button"
-                  className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-[color:var(--color-on-primary,#ffffff)] transition hover:opacity-90 disabled:opacity-60"
+                  className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-[color:var(--color-on-primary)] transition hover:opacity-90 disabled:opacity-60"
                   onClick={handleSave}
                   disabled={saving}
                 >

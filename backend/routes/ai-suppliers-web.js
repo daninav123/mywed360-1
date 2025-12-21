@@ -11,6 +11,7 @@ const router = express.Router();
 
 // Cliente OpenAI para procesar y estructurar resultados
 let openai = null;
+let openAIConfig = { apiKeyPrefix: null, projectId: null };
 const resolveOpenAIKey = () => process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
 const resolveProjectId = () =>
   process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
@@ -18,17 +19,37 @@ const resolveProjectId = () =>
 const ensureOpenAIClient = () => {
   const apiKey = resolveOpenAIKey().trim();
   const projectId = resolveProjectId().trim();
-  if (!apiKey || openai) return !!openai;
+  const apiKeyPrefix = apiKey ? apiKey.slice(0, 8) : null;
+
+  if (!apiKey) {
+    openai = null;
+    openAIConfig = { apiKeyPrefix: null, projectId: null };
+    return false;
+  }
+
+  if (openai && openAIConfig.apiKeyPrefix === apiKeyPrefix && openAIConfig.projectId === (projectId || null)) {
+    return true;
+  }
 
   try {
-    openai = new OpenAI({ apiKey, project: projectId || undefined });
+    openai = new OpenAI({
+      apiKey,
+      project: projectId || undefined,
+      timeout: 15000,
+      maxRetries: 2,
+    });
+    openAIConfig = { apiKeyPrefix, projectId: projectId || null };
     return true;
   } catch {
+    openai = null;
+    openAIConfig = { apiKeyPrefix: null, projectId: null };
     return false;
   }
 };
 
-ensureOpenAIClient();
+if (process.env.NODE_ENV !== 'test') {
+  ensureOpenAIClient();
+}
 
 /**
  * Búsqueda web real usando Tavily API

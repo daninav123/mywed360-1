@@ -294,12 +294,12 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h3 className="text-sm font-semibold">Comisiones</h3>
-          <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+          <p className="text-xs text-[color:var(--color-text-soft)]">
             Define porcentajes y bonus por periodo. Si lo dejas vacio, el enlace no mostrara comision.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <label className="text-xs font-medium text-[var(--color-text-soft,#6b7280)]">
+          <label className="text-xs font-medium text-[color:var(--color-text-soft)]">
             Moneda
           </label>
           <input
@@ -319,7 +319,7 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[var(--color-text-soft,#6b7280)]">
+                  <label className="block text-xs font-medium text-[color:var(--color-text-soft)]">
                     Nombre
                   </label>
                   <input
@@ -332,7 +332,7 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[var(--color-text-soft,#6b7280)]">
+                  <label className="block text-xs font-medium text-[color:var(--color-text-soft)]">
                     Mes inicio
                   </label>
                   <input
@@ -345,7 +345,7 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[var(--color-text-soft,#6b7280)]">
+                  <label className="block text-xs font-medium text-[color:var(--color-text-soft)]">
                     Mes fin
                   </label>
                   <input
@@ -363,7 +363,7 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
                 type="button"
                 onClick={() => handleRemovePeriod(period.id)}
                 disabled={disabled}
-                className="text-xs text-[var(--color-text-soft,#6b7280)] hover:text-red-500"
+                className="text-xs text-[color:var(--color-text-soft)] hover:text-red-500"
               >
                 Eliminar periodo
               </button>
@@ -453,7 +453,7 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
                           type="button"
                           onClick={() => handleRemoveTier(period.id, tier.id)}
                           disabled={disabled}
-                          className="text-xs text-[var(--color-text-soft,#6b7280)] hover:text-red-500"
+                          className="text-xs text-[color:var(--color-text-soft)] hover:text-red-500"
                         >
                           Eliminar
                         </button>
@@ -469,7 +469,7 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
                 type="button"
                 onClick={() => handleAddTier(period.id)}
                 disabled={disabled}
-                className="text-xs font-medium text-[color:var(--color-primary,#6366f1)] hover:underline"
+                className="text-xs font-medium text-[color:var(--color-primary)] hover:underline"
               >
                 Anadir tramo
               </button>
@@ -481,14 +481,14 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
           type="button"
           onClick={handleAddPeriod}
           disabled={disabled}
-          className="text-xs font-medium text-[color:var(--color-primary,#6366f1)] hover:underline"
+          className="text-xs font-medium text-[color:var(--color-primary)] hover:underline"
         >
           Anadir periodo
         </button>
       </div>
 
       {!config.periods?.length && (
-        <p className="mt-3 text-xs text-[var(--color-text-soft,#6b7280)]">
+        <p className="mt-3 text-xs text-[color:var(--color-text-soft)]">
           Agrega al menos un periodo para calcular comisiones. Los tramos aplican sobre la facturacion del periodo.
         </p>
       )}
@@ -1340,7 +1340,7 @@ const AdminDiscounts = () => {
       <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-xl font-semibold">Descuentos y enlaces comerciales</h1>
-          <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+          <p className="text-sm text-[color:var(--color-text-soft)]">
             Seguimiento de enlaces de descuento, asignaciones y facturación asociada.
           </p>
         </div>
@@ -1371,7 +1371,7 @@ const AdminDiscounts = () => {
                 resetCommercialForm();
                 setShowCreateCommercialModal(true);
               }}
-              className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-3 py-2 text-sm font-medium text-[color:var(--color-primary,#6366f1)] hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-3 py-2 text-sm font-medium text-[color:var(--color-primary)] hover:bg-[var(--color-bg-soft)]"
             >
               <Plus className="h-4 w-4" />
               Crear comercial
@@ -1382,7 +1382,7 @@ const AdminDiscounts = () => {
                 resetManagerForm();
                 setShowCreateManagerModal(true);
               }}
-              className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-3 py-2 text-sm font-medium text-[color:var(--color-primary,#6366f1)] hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-3 py-2 text-sm font-medium text-[color:var(--color-primary)] hover:bg-[var(--color-bg-soft)]"
             >
               <Plus className="h-4 w-4" />
               Crear jefe
@@ -1393,7 +1393,7 @@ const AdminDiscounts = () => {
                 resetForm();
                 setShowCreateModal(true);
               }}
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark)]"
             >
               <Plus className="h-4 w-4" />
               Crear código
@@ -1403,7 +1403,7 @@ const AdminDiscounts = () => {
       </header>
 
       {loading ? (
-        <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+        <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
           Cargando enlaces comerciales...
         </div>
       ) : error ? (
@@ -1412,25 +1412,25 @@ const AdminDiscounts = () => {
         <>
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
-              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Enlaces totales</p>
+              <p className="text-xs uppercase text-[color:var(--color-text-soft)]">Enlaces totales</p>
               <p className="mt-2 text-2xl font-semibold">{summary.totalLinks}</p>
             </article>
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
-              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Usos acumulados</p>
+              <p className="text-xs uppercase text-[color:var(--color-text-soft)]">Usos acumulados</p>
               <p className="mt-2 text-2xl font-semibold">{summary.totalUses}</p>
             </article>
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
-              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Facturación asociada</p>
+              <p className="text-xs uppercase text-[color:var(--color-text-soft)]">Facturación asociada</p>
               <p className="mt-2 text-2xl font-semibold">
                 {formatCurrency(summary.totalRevenue, summary.currency)}
               </p>
             </article>
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
-              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Comisiones estimadas</p>
+              <p className="text-xs uppercase text-[color:var(--color-text-soft)]">Comisiones estimadas</p>
               <p className="mt-2 text-2xl font-semibold">
                 {formatCurrency(commissionSummary.total, commissionSummary.currency)}
               </p>
-              <div className="mt-3 space-y-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+              <div className="mt-3 space-y-1 text-xs text-[color:var(--color-text-soft)]">
                 <div className="flex items-center justify-between">
                   <span>Media por enlace</span>
                   <span className="font-semibold text-gray-700">
@@ -1444,9 +1444,9 @@ const AdminDiscounts = () => {
               </div>
             </article>
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
-              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Jefes comerciales</p>
+              <p className="text-xs uppercase text-[color:var(--color-text-soft)]">Jefes comerciales</p>
               <p className="mt-2 text-2xl font-semibold">{summary.totalManagers ?? 0}</p>
-              <p className="mt-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+              <p className="mt-1 text-xs text-[color:var(--color-text-soft)]">
                 Con al menos un enlace activo asignado.
               </p>
             </article>
@@ -1455,7 +1455,7 @@ const AdminDiscounts = () => {
           <section className="rounded-xl border border-soft bg-surface shadow-sm">
             <header className="border-b border-soft px-4 py-3">
               <h2 className="text-sm font-semibold">Jefes de comerciales</h2>
-              <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+              <p className="text-xs text-[color:var(--color-text-soft)]">
                 Visibilidad de quién coordina a cada comercial y sus indicadores principales.
               </p>
             </header>
@@ -1468,41 +1468,41 @@ const AdminDiscounts = () => {
                         <p className="text-sm font-semibold">
                           {entry.manager.name || entry.manager.email || 'Jefe sin nombre'}
                         </p>
-                        <div className="text-xs text-[var(--color-text-soft,#6b7280)] space-x-2">
+                        <div className="text-xs text-[color:var(--color-text-soft)] space-x-2">
                           {entry.manager.email && <span>{entry.manager.email}</span>}
                           {entry.manager.phone && <span>{entry.manager.phone}</span>}
                         </div>
                       </div>
-                      <div className="text-xs text-[var(--color-text-soft,#6b7280)] space-y-1 text-right">
+                      <div className="text-xs text-[color:var(--color-text-soft)] space-y-1 text-right">
                         <div>
-                          <span className="font-semibold text-[var(--color-text,#111827)]">{entry.totalLinks}</span> enlaces
+                          <span className="font-semibold text-[color:var(--color-text)]">{entry.totalLinks}</span> enlaces
                         </div>
                         <div>
-                          <span className="font-semibold text-[var(--color-text,#111827)]">
+                          <span className="font-semibold text-[color:var(--color-text)]">
                             {formatCurrency(entry.totalRevenue, summary.currency)}
                           </span>{' '}
                           facturación
                         </div>
                         <div>
-                          <span className="font-semibold text-[var(--color-text,#111827)]">{entry.totalUses}</span> usos
+                          <span className="font-semibold text-[color:var(--color-text)]">{entry.totalUses}</span> usos
                         </div>
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+                      <p className="text-xs uppercase text-[color:var(--color-text-soft)]">
                         Comerciales a cargo ({entry.commercials.length})
                       </p>
                       <div className="mt-2 space-y-2">
                         {entry.commercials.map((commercial) => (
                           <div
                             key={commercial.id}
-                            className="rounded-lg border border-soft bg-[var(--color-bg-soft,#f3f4f6)] px-3 py-2"
+                            className="rounded-lg border border-soft bg-[var(--color-bg-soft)] px-3 py-2"
                           >
                             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                               <div className="text-sm font-medium">
                                 {commercial.contact.name || commercial.contact.email || 'Comercial sin asignar'}
                               </div>
-                              <div className="text-xs text-[var(--color-text-soft,#6b7280)] sm:text-right">
+                              <div className="text-xs text-[color:var(--color-text-soft)] sm:text-right">
                                 {formatCurrency(commercial.totalRevenue, summary.currency)} · {commercial.totalUses} usos
                               </div>
                             </div>
@@ -1510,9 +1510,9 @@ const AdminDiscounts = () => {
                               {commercial.links.map((link) => (
                                 <span
                                   key={link.id || link.code}
-                                  className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-medium text-[var(--color-text-soft,#6b7280)] shadow-sm"
+                                  className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-medium text-[color:var(--color-text-soft)] shadow-sm"
                                 >
-                                  <span className="font-semibold text-[var(--color-text,#111827)]">{link.code}</span>
+                                  <span className="font-semibold text-[color:var(--color-text)]">{link.code}</span>
                                   <span>{link.uses} usos</span>
                                   <span>{formatCurrency(link.revenue, summary.currency)}</span>
                                 </span>
@@ -1526,7 +1526,7 @@ const AdminDiscounts = () => {
                 ))}
               </div>
             ) : (
-              <p className="px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+              <p className="px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
                 Aún no hay jefes de comerciales asignados a los enlaces. Puedes agregarlos al crear o editar un enlace.
               </p>
             )}
@@ -1536,11 +1536,11 @@ const AdminDiscounts = () => {
             <header className="flex flex-col gap-1 border-b border-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-sm font-semibold">Catálogo de comerciales</h2>
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                <p className="text-xs text-[color:var(--color-text-soft)]">
                   Registro de contactos disponibles para asignar a nuevos enlaces.
                 </p>
               </div>
-              <span className="text-xs text-[var(--color-text-soft,#6b7280)]">
+              <span className="text-xs text-[color:var(--color-text-soft)]">
                 Total: {commercialCatalog.length}
               </span>
             </header>
@@ -1559,20 +1559,20 @@ const AdminDiscounts = () => {
                           <p className="text-sm font-semibold">
                             {commercial.name || commercial.email || 'Comercial sin nombre'}
                           </p>
-                          <div className="text-xs text-[var(--color-text-soft,#6b7280)] space-x-2">
+                          <div className="text-xs text-[color:var(--color-text-soft)] space-x-2">
                             {commercial.email && <span>{commercial.email}</span>}
                             {commercial.phone && <span>{commercial.phone}</span>}
                           </div>
                           {commercial.notes && (
-                            <p className="mt-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+                            <p className="mt-1 text-xs text-[color:var(--color-text-soft)]">
                               {commercial.notes}
                             </p>
                           )}
                         </div>
-                        <div className="text-xs text-[var(--color-text-soft,#6b7280)] sm:text-right">
+                        <div className="text-xs text-[color:var(--color-text-soft)] sm:text-right">
                           {manager ? (
                             <>
-                              <span className="font-semibold text-[var(--color-text,#111827)]">
+                              <span className="font-semibold text-[color:var(--color-text)]">
                                 {manager.name || manager.email || 'Jefe sin nombre'}
                               </span>
                               {manager.email && <span> · {manager.email}</span>}
@@ -1583,7 +1583,7 @@ const AdminDiscounts = () => {
                         </div>
                       </div>
                       {Array.isArray(commercial.assignedLinks) && commercial.assignedLinks.length > 0 && (
-                        <div className="mt-2 text-xs text-[var(--color-text-soft,#6b7280)]">
+                        <div className="mt-2 text-xs text-[color:var(--color-text-soft)]">
                           Enlaces asignados: {commercial.assignedLinks.join(', ')}
                         </div>
                       )}
@@ -1592,7 +1592,7 @@ const AdminDiscounts = () => {
                 })}
               </div>
             ) : (
-              <p className="px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+              <p className="px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
                 Todavía no hay comerciales registrados manualmente. Usa el botón “Crear comercial” para añadirlos al catálogo.
               </p>
             )}
@@ -1604,7 +1604,7 @@ const AdminDiscounts = () => {
             </header>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-soft text-sm" data-testid="admin-discounts-table">
-                <thead className="bg-[var(--color-bg-soft,#f3f4f6)] text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+                <thead className="bg-[var(--color-bg-soft)] text-xs uppercase text-[color:var(--color-text-soft)]">
                   <tr>
                     <th className="px-4 py-3 text-left">Código</th>
                     <th className="px-4 py-3 text-left">Tipo</th>
@@ -1637,13 +1637,13 @@ const AdminDiscounts = () => {
                                 {link.assignedTo.name || link.assignedTo.email}
                               </p>
                               {link.assignedTo.name && link.assignedTo.email && (
-                                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                                <p className="text-xs text-[color:var(--color-text-soft)]">
                                   {link.assignedTo.email}
                                 </p>
                               )}
                             </div>
                           ) : (
-                            <span className="text-xs text-[var(--color-text-soft,#6b7280)]">No asignado</span>
+                            <span className="text-xs text-[color:var(--color-text-soft)]">No asignado</span>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -1652,13 +1652,13 @@ const AdminDiscounts = () => {
                               <p className="text-sm font-medium">
                                 {link.salesManager.name || link.salesManager.email || '—'}
                               </p>
-                              <div className="text-xs text-[var(--color-text-soft,#6b7280)] space-x-2">
+                              <div className="text-xs text-[color:var(--color-text-soft)] space-x-2">
                                 {link.salesManager.email && <span>{link.salesManager.email}</span>}
                                 {link.salesManager.phone && <span>{link.salesManager.phone}</span>}
                               </div>
                             </div>
                           ) : (
-                            <span className="text-xs text-[var(--color-text-soft,#6b7280)]">Sin jefe</span>
+                            <span className="text-xs text-[color:var(--color-text-soft)]">Sin jefe</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">{link.uses || 0}</td>
@@ -1673,7 +1673,7 @@ const AdminDiscounts = () => {
                             className={
                               commissionInfo.hasRules
                                 ? 'inline-flex rounded-md bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-700'
-                                : 'text-xs text-[var(--color-text-soft,#6b7280)]'
+                                : 'text-xs text-[color:var(--color-text-soft)]'
                             }
                           >
                             {commissionInfo.label}
@@ -1717,7 +1717,7 @@ const AdminDiscounts = () => {
                   })}
                   {filtered.length === 0 && (
                     <tr>
-                      <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={11}>
+                      <td className="px-4 py-6 text-center text-sm text-[color:var(--color-text-soft)]" colSpan={11}>
                         No se encontraron enlaces con los filtros aplicados.
                       </td>
                     </tr>
@@ -1734,7 +1734,7 @@ const AdminDiscounts = () => {
           <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-md">
             <header className="mb-4">
               <h2 className="text-lg font-semibold">Crear comercial</h2>
-              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+              <p className="text-sm text-[color:var(--color-text-soft)]">
                 Registra un nuevo comercial para poder asignarlo a enlaces de descuento.
               </p>
             </header>
@@ -1807,14 +1807,14 @@ const AdminDiscounts = () => {
                     setShowCreateCommercialModal(false);
                     resetCommercialForm();
                   }}
-                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft)]"
                   disabled={creatingCommercial}
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                  className="rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark)] disabled:opacity-50"
                   disabled={creatingCommercial}
                 >
                   {creatingCommercial ? 'Guardando...' : 'Crear comercial'}
@@ -1830,7 +1830,7 @@ const AdminDiscounts = () => {
           <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-md">
             <header className="mb-4">
               <h2 className="text-lg font-semibold">Crear jefe de comerciales</h2>
-              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+              <p className="text-sm text-[color:var(--color-text-soft)]">
                 Añade un nuevo responsable para coordinar comerciales y dar seguimiento.
               </p>
             </header>
@@ -1887,14 +1887,14 @@ const AdminDiscounts = () => {
                     setShowCreateManagerModal(false);
                     resetManagerForm();
                   }}
-                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft)]"
                   disabled={creatingManager}
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                  className="rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark)] disabled:opacity-50"
                   disabled={creatingManager}
                 >
                   {creatingManager ? 'Guardando...' : 'Crear jefe'}
@@ -1911,7 +1911,7 @@ const AdminDiscounts = () => {
           <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-md">
             <header className="mb-4">
               <h2 className="text-lg font-semibold">Crear c�digo de descuento</h2>
-              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+              <p className="text-sm text-[color:var(--color-text-soft)]">
                 Genera un nuevo c�digo promocional o enlace comercial
               </p>
             </header>
@@ -2118,14 +2118,14 @@ const AdminDiscounts = () => {
                     resetForm();
                   }}
                   disabled={creating}
-                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft)]"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={creating || !formData.code.trim()}
-                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                  className="rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark)] disabled:opacity-50"
                 >
                   {creating ? 'Creando...' : 'Crear c�digo'}
                 </button>
@@ -2141,7 +2141,7 @@ const AdminDiscounts = () => {
           <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-md">
             <header className="mb-4">
               <h2 className="text-lg font-semibold">Editar c�digo: {editingDiscount.code}</h2>
-              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+              <p className="text-sm text-[color:var(--color-text-soft)]">
                 Modifica los detalles del c�digo promocional
               </p>
             </header>
@@ -2155,7 +2155,7 @@ const AdminDiscounts = () => {
                   disabled
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm bg-gray-50 cursor-not-allowed"
                 />
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)] mt-1">El código no se puede modificar</p>
+                <p className="text-xs text-[color:var(--color-text-soft)] mt-1">El código no se puede modificar</p>
               </div>
 
               <div>
@@ -2311,14 +2311,14 @@ const AdminDiscounts = () => {
                     resetForm();
                   }}
                   disabled={updating}
-                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft)]"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={updating}
-                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                  className="rounded-md bg-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark)] disabled:opacity-50"
                 >
                   {updating ? 'Actualizando...' : 'Guardar cambios'}
                 </button>

@@ -1,6 +1,8 @@
 # 📚 Índice de Documentación - MaLove.APP
 
-> **Última actualización:** Diciembre 2024
+> **Última actualización:** Diciembre 2024 (snapshot)
+
+⚠️ Este índice es histórico. Para estado/prioridades actuales usa `docs/README.md`, `docs/FLUJOS-INDICE.md` y `docs/ROADMAP.md`.
 
 ## 🚀 Documentos Principales (Raíz)
 
@@ -138,7 +140,7 @@ Documentación histórica y obsoleta:
 
 ### Core Documentation (carpeta `/docs`)
 
-- **⭐ WORKFLOW-USUARIO.md** - Flujo completo del usuario organizando su boda (DOCUMENTO MAESTRO)
+- **⭐ WORKFLOW-USUARIO.md** - Visión del flujo completo del usuario (documento narrativo). El estado real vive en `docs/FLUJOS-INDICE.md` y `docs/ROADMAP.md`.
 - **ARCHITECTURE.md** - Arquitectura del sistema
 - **ENVIRONMENT.md** - Variables de entorno
 - **ONBOARDING.md** - Guía de onboarding para nuevos desarrolladores

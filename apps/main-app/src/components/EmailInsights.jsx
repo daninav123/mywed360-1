@@ -16,6 +16,7 @@ export default function EmailInsights({ mailId, userId, email }) {
   const [applying, setApplying] = useState(false);
   // Para evitar despachar varias veces la misma Reunión
   const dispatchedRef = useRef(false);
+  const autoAnalyzeRef = useRef(false);
 
   useEffect(() => {
     if (!mailId) return;
@@ -43,9 +44,10 @@ export default function EmailInsights({ mailId, userId, email }) {
     try {
       if (!mailId) return;
       if (insights && Object.keys(insights).length > 0) return;
-      const hasKey = !!import.meta.env.VITE_OPENAI_API_KEY;
-      if (!hasKey) return;
       // Evita bucle: lanzar una sola vez
+      if (autoAnalyzeRef.current) return;
+      if (!authUser?.uid) return;
+      autoAnalyzeRef.current = true;
       if (!analyzing) analyzeNow();
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps

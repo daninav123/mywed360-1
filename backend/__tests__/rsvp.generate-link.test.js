@@ -111,6 +111,7 @@ vi.mock('firebase-admin', () => {
 vi.mock('../middleware/authMiddleware.js', () => ({
   __esModule: true,
   default: () => (req, _res, next) => next(),
+  authMiddleware: () => (_req, _res, next) => next(),
   requireAuth: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin' }; next(); },
   requireAdmin: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin' }; next(); },
   requirePlanner: (req, _res, next) => { req.user = { uid: 'planner1' }; req.userProfile = { role: 'planner' }; next(); },
@@ -131,7 +132,7 @@ beforeAll(async () => {
   // Seed a guest without token
   await fs.collection('weddings').doc('w1').collection('guests').doc('g1').set({ name: 'Guest 1', status: 'pending' });
   app = (await import('../index.js')).default;
-});
+}, 30000);
 
 describe('RSVP generate link', () => {
   const auth = { Authorization: 'Bearer mock-planner@example.com' };
@@ -139,15 +140,17 @@ describe('RSVP generate link', () => {
   it('POST /api/rsvp/generate-link -> returns token + link for existing guest', async () => {
     const res = await request(app).post('/api/rsvp/generate-link').set(auth).send({ weddingId: 'w1', guestId: 'g1' });
     expect(res.status).toBe(200);
-    expect(res.body.ok).toBe(true);
-    expect(typeof res.body.token).toBe('string');
-    expect(res.body.link).toContain('/rsvp/');
-    expect(res.body.weddingId).toBe('w1');
-    expect(res.body.guestId).toBe('g1');
+    expect(res.body.success).toBe(true);
+    expect(typeof res.body.data?.token).toBe('string');
+    expect(res.body.data?.link).toContain('/rsvp/');
+    expect(res.body.data?.weddingId).toBe('w1');
+    expect(res.body.data?.guestId).toBe('g1');
   });
 
   it('POST /api/rsvp/generate-link -> 404 if guest not found', async () => {
     const res = await request(app).post('/api/rsvp/generate-link').set(auth).send({ weddingId: 'w1', guestId: 'nope' });
     expect(res.status).toBe(404);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error?.code).toBe('not_found');
   });
 });

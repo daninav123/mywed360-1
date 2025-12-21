@@ -8,10 +8,13 @@ const __dirname = path.dirname(__filename);
 
 // Cargar .env desde backend/.env
 const envPath = path.join(__dirname, '..', '..', '.env');
-try {
-  console.log('Intentando cargar configuración de Mailgun desde:', envPath);
-  dotenv.config({ path: envPath });
-} catch {}
+const isTest = process.env.NODE_ENV === 'test';
+if (!isTest) {
+  try {
+    console.log('Intentando cargar configuración de Mailgun desde:', envPath);
+    dotenv.config({ path: envPath });
+  } catch {}
+}
 
 export function createMailgunClients() {
   const MAILGUN_API_KEY = process.env.VITE_MAILGUN_API_KEY || process.env.MAILGUN_API_KEY;
@@ -39,10 +42,20 @@ export function createMailgunClients() {
     const mailgunAlt = MAILGUN_SENDING_DOMAIN
       ? mailgunJs({ apiKey: MAILGUN_API_KEY, domain: MAILGUN_SENDING_DOMAIN, ...commonHostCfg })
       : null;
-    return { mailgun, mailgunAlt };
+    
+    // También retornar formato compatible con quoteRequestEmailService
+    const mgClient = mailgunAlt || mailgun;
+    const domainName = MAILGUN_SENDING_DOMAIN || MAILGUN_DOMAIN;
+    
+    return { 
+      mailgun, 
+      mailgunAlt,
+      mgClient, // Para quoteRequestEmailService
+      domainName // Para quoteRequestEmailService
+    };
   } catch (e) {
     console.error('No se pudieron crear los clientes de Mailgun:', e.message);
-    return { mailgun: null, mailgunAlt: null };
+    return { mailgun: null, mailgunAlt: null, mgClient: null, domainName: null };
   }
 }
 

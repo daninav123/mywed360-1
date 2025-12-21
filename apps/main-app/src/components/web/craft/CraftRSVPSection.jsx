@@ -39,13 +39,13 @@ export const CraftRSVPSection = ({
       ref={(ref) => connect(drag(ref))}
       className="py-16 px-4"
       style={{
-        backgroundColor: 'var(--color-fondo, #FFFFFF)',
-        color: 'var(--color-texto, #1F2937)',
+        backgroundColor: 'var(--color-fondo)',
+        color: 'var(--color-texto)',
       }}
     >
       <div className="max-w-2xl mx-auto text-center">
         {/* Título */}
-        <h2 className="text-4xl font-bold mb-4" style={{ color: 'var(--color-primario, #9333EA)' }}>
+        <h2 className="text-4xl font-bold mb-4" style={{ color: 'var(--color-primario)' }}>
           {titulo}
         </h2>
 
@@ -66,7 +66,7 @@ export const CraftRSVPSection = ({
               />
               <button
                 disabled
-                className="px-6 py-3 bg-[var(--color-primary)]/100 text-white rounded-lg font-semibold hover:shadow-lg transition-all w-full sm:w-auto opacity-50"
+                className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg font-semibold hover:shadow-lg transition-all w-full sm:w-auto opacity-50"
               >
                 Continuar
               </button>
@@ -76,7 +76,7 @@ export const CraftRSVPSection = ({
             <div className="text-center">
               <a
                 href={rsvpUrl}
-                className="inline-block px-8 py-4 bg-[var(--color-primary)]/100 text-white rounded-lg font-bold text-lg hover:shadow-xl transition-all transform hover:scale-105"
+                className="inline-block px-8 py-4 bg-[var(--color-primary)] text-white rounded-lg font-bold text-lg hover:shadow-xl transition-all transform hover:scale-105"
               >
                 ✨ Confirmar Asistencia
               </a>

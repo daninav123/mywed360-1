@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
 import { scheduleEmailSend } from '../../services/emailAutomationService';
-import * as EmailService from '../../services/EmailService';
+import * as EmailService from '../../services/emailService';
 import { safeRender } from '../../utils/promiseSafeRenderer';
 import Button from '../Button';
 import Card from '../ui/Card';

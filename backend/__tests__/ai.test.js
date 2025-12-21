@@ -6,7 +6,13 @@ import request from 'supertest';
 vi.mock('helmet', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
 vi.mock('cors', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
 vi.mock('express-rate-limit', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
-vi.mock('multer', () => ({ __esModule: true, default: () => ({ any: () => (req, _res, next) => next() }) }));
+vi.mock('multer', () => {
+  const middleware = (_req, _res, next) => next();
+  const instance = { any: () => middleware, single: () => middleware, array: () => middleware, fields: () => middleware };
+  const fn = () => instance;
+  fn.memoryStorage = () => ({});
+  return { __esModule: true, default: fn };
+});
 // OpenAI mock to avoid real network and timeouts
 vi.mock('openai', () => ({
   __esModule: true,
@@ -18,10 +24,13 @@ vi.mock('openai', () => ({
 // Auth mocks
 vi.mock('../middleware/authMiddleware.js', () => ({
   __esModule: true,
-  requireAuth: () => (req, _res, next) => { req.user = { uid: 'test' }; req.userProfile = { email: 'test@example.com' }; next(); },
-  requireMailAccess: () => (req, _res, next) => { req.user = { uid: 'test' }; req.userProfile = { email: 'test@example.com' }; next(); },
-  requirePlanner: () => (req, _res, next) => { req.user = { uid: 'test' }; req.userProfile = { email: 'test@example.com', role: 'planner' }; next(); },
-  optionalAuth: () => (_req, _res, next) => next(),
+  default: () => (_req, _res, next) => next(),
+  authMiddleware: () => (_req, _res, next) => next(),
+  requireAuth: (req, _res, next) => { req.user = { uid: 'test' }; req.userProfile = { email: 'test@example.com' }; next(); },
+  requireMailAccess: (req, _res, next) => { req.user = { uid: 'test' }; req.userProfile = { email: 'test@example.com' }; next(); },
+  requirePlanner: (req, _res, next) => { req.user = { uid: 'test' }; req.userProfile = { email: 'test@example.com', role: 'planner' }; next(); },
+  requireAdmin: (req, _res, next) => { req.user = { uid: 'test' }; req.userProfile = { email: 'test@example.com', role: 'admin' }; next(); },
+  optionalAuth: (_req, _res, next) => next(),
 }));
 
 // Firebase admin + Firestore mocks

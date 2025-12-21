@@ -93,7 +93,7 @@ export default function ResetPassword() {
           ref={emailInputRef}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? ERROR_ID : undefined}
-          className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+          className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
           data-testid="reset-email"
         />
         {status ? (

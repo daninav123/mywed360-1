@@ -938,7 +938,9 @@ function createSlugFromProvider(name, city) {
   return `${namePart}-${cityPart}`;
 }
 
-ensureOpenAIClient();
+if (process.env.NODE_ENV !== 'test') {
+  ensureOpenAIClient();
+}
 
 router.post('/', async (req, res) => {
   const hasOpenAI = ensureOpenAIClient();

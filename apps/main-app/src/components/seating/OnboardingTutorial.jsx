@@ -181,13 +181,13 @@ export default function OnboardingTutorial({ onComplete, onSkip }) {
             zIndex: 101,
             pointerEvents: 'none',
           }}
-          className="rounded-lg bg-[var(--color-primary)]md shadow-indigo-500/50"
+          className="rounded-lg ring-2 ring-[color:var(--color-primary)] shadow-lg"
         >
           {/* Pulso animado */}
           <motion.div
             animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.8, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="absolute inset-0 bg-[var(--color-primary)]/20 rounded-lg"
+            className="absolute inset-0 bg-[var(--color-primary-20)] rounded-lg"
           />
         </motion.div>
       )}

@@ -7,9 +7,27 @@ import { db } from '../db.js';
 import logger from '../utils/logger.js';
 import { getProductById, getProductByPriceId } from '../config/stripe-products.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-12-18.acacia',
-});
+const STRIPE_API_VERSION = '2024-12-18.acacia';
+
+export let stripe = null;
+let stripeKey = null;
+
+export function getStripeClient({ allowDummy = false } = {}) {
+  const envKey = process.env.STRIPE_SECRET_KEY;
+  const key = envKey || (allowDummy ? 'sk_test_dummy' : null);
+  if (!key) return null;
+
+  if (stripe && stripeKey === key) return stripe;
+
+  stripe = new Stripe(key, {
+    apiVersion: STRIPE_API_VERSION,
+  });
+  stripeKey = key;
+  return stripe;
+}
+
+// Asegurar cliente disponible para verificación de webhooks incluso sin STRIPE_SECRET_KEY
+getStripeClient({ allowDummy: true });
 
 /**
  * Crear sesión de checkout para un producto
@@ -23,6 +41,11 @@ export async function createCheckoutSession({
   cancelUrl,
 }) {
   try {
+    const stripeClient = getStripeClient();
+    if (!stripeClient) {
+      throw new Error('STRIPE_SECRET_KEY not configured');
+    }
+
     const product = getProductById(productId);
 
     if (!product) {
@@ -67,7 +90,7 @@ export async function createCheckoutSession({
           : undefined,
     };
 
-    const session = await stripe.checkout.sessions.create(sessionConfig);
+    const session = await stripeClient.checkout.sessions.create(sessionConfig);
 
     logger.info('[stripe] Checkout session created', {
       sessionId: session.id,
@@ -90,7 +113,12 @@ export async function createCheckoutSession({
  */
 export async function createCustomerPortalSession({ customerId, returnUrl }) {
   try {
-    const session = await stripe.billingPortal.sessions.create({
+    const stripeClient = getStripeClient();
+    if (!stripeClient) {
+      throw new Error('STRIPE_SECRET_KEY not configured');
+    }
+
+    const session = await stripeClient.billingPortal.sessions.create({
       customer: customerId,
       return_url: returnUrl,
     });
@@ -339,7 +367,12 @@ export async function getUserSubscription(userId) {
  */
 export async function cancelSubscription(subscriptionId) {
   try {
-    const subscription = await stripe.subscriptions.update(subscriptionId, {
+    const stripeClient = getStripeClient();
+    if (!stripeClient) {
+      throw new Error('STRIPE_SECRET_KEY not configured');
+    }
+
+    const subscription = await stripeClient.subscriptions.update(subscriptionId, {
       cancel_at_period_end: true,
     });
 
@@ -354,4 +387,4 @@ export async function cancelSubscription(subscriptionId) {
   }
 }
 
-export { stripe };
+// stripe se exporta como binding live arriba

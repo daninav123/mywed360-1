@@ -1289,7 +1289,8 @@
         "category": "Category",
         "type": "Type",
         "status": "Status",
-        "amount": "Amount"
+        "amount": "Amount",
+        "actions": "Actions"
       },
       "noConcept": "No Concept",
       "dueOn": "Due On"
@@ -1315,6 +1316,14 @@
       "used": "Used",
       "title": "Title",
       "subtitle": "Subtitle",
+      "lastSync": "Last sync",
+      "synced": "Synced",
+      "offline": "Offline",
+      "totalBudget": "Total budget",
+      "totalSpent": "Total spent",
+      "ofBudget": "of budget",
+      "currentBalance": "Current balance",
+      "expectedIncome": "Expected income",
       "predictiveTitle": "Predictive Title",
       "predictiveSubtitle": "Predictive Subtitle",
       "trendUp": "Trend Up",
@@ -1332,6 +1341,8 @@
       "categoryStatus": "Category Status"
     },
     "charts": {
+      "title": "Charts",
+      "subtitle": "Summary",
       "totalTransactions": "Total Transactions",
       "activeCategories": "Active Categories",
       "budgetEfficiency": "Budget Efficiency",

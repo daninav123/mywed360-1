@@ -317,10 +317,10 @@ const Access = ({ defaultMode = 'login' }) => {
           {t('marketingAccess.backLink', { defaultValue: 'Back to home' })}
         </Link>
 
-        <section className="overflow-hidden rounded-3xl border border-soft bg-white/95 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="overflow-hidden rounded-3xl border border-soft bg-white/95 shadow-lg">
           <div className="grid gap-10 p-8 lg:grid-cols-[1fr,0.85fr] lg:items-start lg:p-12">
             <div className="space-y-5">
-              <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+              <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
                 {heroBadge}
               </span>
               <h1 className="text-4xl font-semibold leading-snug text-body md:text-5xl">{heroTitle}</h1>
@@ -336,10 +336,10 @@ const Access = ({ defaultMode = 'login' }) => {
               ) : null}
             </div>
 
-            <div className="rounded-3xl border border-soft bg-white p-6 shadow-lg shadow-[var(--color-primary)]/20">
+            <div className="rounded-3xl border border-soft bg-white p-6 shadow-lg">
               {alreadyLoggedIn ? (
                 <div className="space-y-6 text-center">
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-[color:var(--color-primary)]">
                     <CheckCircle2 className="h-6 w-6" />
                   </div>
                   <div>
@@ -363,7 +363,7 @@ const Access = ({ defaultMode = 'login' }) => {
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-4 py-2.5 text-sm font-semibold text-body transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                      className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-4 py-2.5 text-sm font-semibold text-body transition hover:border-[color:var(--color-primary)] hover:text-[color:var(--color-primary)]"
                     >
                       <LogOut className="h-4 w-4" />
                       {t('marketingAccess.loggedIn.secondaryCta', { defaultValue: 'Sign out' })}
@@ -372,7 +372,7 @@ const Access = ({ defaultMode = 'login' }) => {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <div className="rounded-full bg-primary-soft/70 p-1 text-sm font-semibold text-muted">
+                  <div className="rounded-full bg-primary-soft p-1 text-sm font-semibold text-muted">
                     <div className="flex">
                       <button
                         type="button"
@@ -413,7 +413,7 @@ const Access = ({ defaultMode = 'login' }) => {
                           onChange={(event) => setLoginEmail(event.target.value)}
                           autoComplete="email"
                           placeholder={t('marketingAccess.loginForm.emailPlaceholder', { defaultValue: 'your@email.com' })}
-                          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                           aria-invalid={loginError ? 'true' : 'false'}
                         />
                       </div>
@@ -430,7 +430,7 @@ const Access = ({ defaultMode = 'login' }) => {
                           onChange={(event) => setLoginPassword(event.target.value)}
                           autoComplete="current-password"
                           placeholder={t('marketingAccess.loginForm.passwordPlaceholder', { defaultValue: 'Your password' })}
-                          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                           aria-invalid={loginError ? 'true' : 'false'}
                         />
                       </div>
@@ -439,24 +439,24 @@ const Access = ({ defaultMode = 'login' }) => {
                         <label className="inline-flex items-center gap-2">
                           <input
                             type="checkbox"
-                            className="h-4 w-4 rounded border-soft text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                            className="h-4 w-4 rounded border-soft text-[color:var(--color-primary)] focus:ring-[color:var(--color-primary)]"
                             checked={rememberLogin}
                             onChange={(event) => setRememberLogin(event.target.checked)}
                           />
                           {t('marketingAccess.loginForm.rememberMe', { defaultValue: 'Remember me' })}
                         </label>
-                        <Link to="/reset-password" className="text-[var(--color-primary)] hover:brightness-110">
+                        <Link to="/reset-password" className="text-[color:var(--color-primary)] hover:brightness-110">
                           {t('marketingAccess.loginForm.forgotPassword', { defaultValue: 'Forgot password?' })}
                         </Link>
                       </div>
 
                       {loginError ? (
-                        <p role="alert" className="text-sm text-[var(--color-primary)]">
+                        <p role="alert" className="text-sm text-[color:var(--color-primary)]">
                           {loginError}
                         </p>
                       ) : null}
                       {loginInfo ? (
-                        <p role="status" className="text-sm text-[var(--color-primary)]">
+                        <p role="status" className="text-sm text-[color:var(--color-primary)]">
                           {loginInfo}
                         </p>
                       ) : null}
@@ -488,7 +488,7 @@ const Access = ({ defaultMode = 'login' }) => {
                         errorId="marketing-signup-error"
                       />
                       {signupInfo ? (
-                        <p role="status" className="text-sm text-[var(--color-primary)]">
+                        <p role="status" className="text-sm text-[color:var(--color-primary)]">
                           {signupInfo}
                         </p>
                       ) : null}
@@ -509,7 +509,7 @@ const Access = ({ defaultMode = 'login' }) => {
                           {t('marketingAccess.switch.noAccount', { defaultValue: 'Do not have an account?' })}{' '}
                           <button
                             type="button"
-                            className="font-semibold text-[var(--color-primary)] hover:brightness-110"
+                            className="font-semibold text-[color:var(--color-primary)] hover:brightness-110"
                             onClick={() => handleModeChange('signup')}
                           >
                             {t('marketingAccess.switch.registerLink', { defaultValue: 'Create one' })}
@@ -520,7 +520,7 @@ const Access = ({ defaultMode = 'login' }) => {
                           {t('marketingAccess.switch.alreadyHaveAccount', { defaultValue: 'Already have an account?' })}{' '}
                           <button
                             type="button"
-                            className="font-semibold text-[var(--color-primary)] hover:brightness-110"
+                            className="font-semibold text-[color:var(--color-primary)] hover:brightness-110"
                             onClick={() => handleModeChange('login')}
                           >
                             {t('marketingAccess.switch.loginLink', { defaultValue: 'Sign in' })}

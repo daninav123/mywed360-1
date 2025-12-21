@@ -5,25 +5,25 @@ import express from 'express';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
 import admin from 'firebase-admin';
-import dotenv from 'dotenv';
-import path from 'path';
 import { requireAuth, optionalAuth } from '../middleware/authMiddleware.js';
 import spotifyService from '../services/spotifyService.js';
 
-dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
-
 const router = express.Router();
 
-const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID || '';
-const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET || '';
-const SPOTIFY_REDIRECT_URI =
-  process.env.SPOTIFY_REDIRECT_URI ||
-  `${process.env.BACKEND_BASE_URL || 'http://localhost:4004'}/api/spotify/callback`;
-const FRONTEND_URL =
-  process.env.FRONTEND_URL ||
-  (process.env.ALLOWED_ORIGIN ? process.env.ALLOWED_ORIGIN.split(',')[0] : 'http://localhost:5173');
+function getSpotifyConfig() {
+  const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID || '';
+  const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET || '';
+  const SPOTIFY_REDIRECT_URI =
+    process.env.SPOTIFY_REDIRECT_URI ||
+    `${process.env.BACKEND_BASE_URL || 'http://localhost:4004'}/api/spotify/callback`;
+  const FRONTEND_URL =
+    process.env.FRONTEND_URL ||
+    (process.env.ALLOWED_ORIGIN ? process.env.ALLOWED_ORIGIN.split(',')[0] : 'http://localhost:5173');
+  return { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI, FRONTEND_URL };
+}
 
 function ensureConfig(res) {
+  const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI } = getSpotifyConfig();
   if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET || !SPOTIFY_REDIRECT_URI) {
     res.status(503).json({ ok: false, error: 'Spotify no configurado en el servidor' });
     return false;

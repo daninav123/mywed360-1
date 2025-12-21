@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 
+import { Card } from '../ui';
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
 
@@ -90,8 +91,8 @@ const FinanceCashflowTimeline = ({
   const monthsToZero = predictiveInsights?.monthsToZero || null;
 
   return (
-    <div className="rounded-xl border border-[color:var(--color-text)]/10 bg-[var(--color-surface)] shadow-md overflow-hidden">
-      <header className="border-b border-soft px-6 py-5 flex flex-wrap items-center justify-between gap-4 bg-[var(--color-primary)]/5">
+    <Card className="p-0 overflow-hidden">
+      <header className="border-b border-soft px-6 py-5 flex flex-wrap items-center justify-between gap-4 bg-[var(--color-primary-5)]">
         <div className="space-y-1.5">
           <h2 className="text-lg md:text-xl font-bold text-body tracking-tight">
             {t('finance.cashflow.title', { defaultValue: 'Cronograma de caja' })}
@@ -103,7 +104,7 @@ const FinanceCashflowTimeline = ({
           </p>
         </div>
         <div className="text-xs space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-success)]/10 border border-[color:var(--color-success)]/30">
+          <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-success-10)] border border-[color:var(--color-success-30)]">
             <span className="text-muted font-medium">
               {t('finance.cashflow.remaining', { defaultValue: 'Presupuesto restante' })}:
             </span>
@@ -112,7 +113,7 @@ const FinanceCashflowTimeline = ({
             </span>
           </div>
           {burnRate > 0 && monthsToZero != null && (
-            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30">
+            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-danger-10)] border border-[color:var(--color-danger-30)]">
               <span className="text-muted font-medium">
                 {t('finance.cashflow.burnRate', { defaultValue: 'Burn rate' })}:
               </span>
@@ -140,7 +141,7 @@ const FinanceCashflowTimeline = ({
             </h3>
           </div>
           {upcomingWithinWindow.length === 0 ? (
-            <div className="flex items-center justify-center p-8 rounded-xl bg-[var(--color-success)]/5 border border-dashed border-[color:var(--color-success)]/30">
+            <div className="flex items-center justify-center p-8 rounded-xl bg-[var(--color-success-5)] border border-dashed border-[color:var(--color-success-30)]">
               <p className="text-sm text-muted font-medium">
                 {t('finance.cashflow.noUpcoming', {
                   defaultValue: 'Sin pagos pendientes en las próximas semanas.',
@@ -152,7 +153,7 @@ const FinanceCashflowTimeline = ({
               {upcomingWithinWindow.map((payment, index) => (
                 <li
                   key={`${payment.concept}-${payment.dueDate}-${index}`}
-                  className="group flex items-center justify-between rounded-xl border border-soft bg-[var(--color-primary)] hover:bg-[var(--color-danger)]/5 px-4 py-3 text-sm shadow-sm hover:shadow-md transition-all duration-200"
+                  className="group flex items-center justify-between rounded-xl border border-soft bg-surface hover:bg-[var(--color-primary-5)] px-4 py-3 text-sm shadow-sm hover:shadow-md transition-all duration-200"
                 >
                   <div className="flex-1">
                     <p className="font-semibold text-body group-hover:text-[color:var(--color-danger)] transition-colors duration-200">
@@ -172,7 +173,7 @@ const FinanceCashflowTimeline = ({
                       {payment.provider ? ` · ${payment.provider}` : ''}
                     </p>
                   </div>
-                  <span className="text-base font-bold text-[var(--color-danger)] px-3 py-1.5 rounded-lg bg-[var(--color-danger)]/10">
+                  <span className="text-base font-bold text-[color:var(--color-danger)] px-3 py-1.5 rounded-lg bg-[var(--color-danger-10)]">
                     {formatCurrency(payment.outstanding)}
                   </span>
                 </li>
@@ -191,13 +192,13 @@ const FinanceCashflowTimeline = ({
                 })}
               </h3>
             </div>
-            <span className="text-xs text-muted font-semibold px-2 py-1 rounded bg-[var(--color-text)]/5">
+            <span className="text-xs text-muted font-semibold px-2 py-1 rounded bg-[var(--color-text-5)]">
               {t('finance.cashflow.legend', { defaultValue: 'Ingreso - Gasto' })}
             </span>
           </div>
           <div className="space-y-4">
             {monthlyBars.length === 0 ? (
-              <div className="flex items-center justify-center p-8 rounded-xl bg-[var(--color-info)]/5 border border-dashed border-[color:var(--color-info)]/30">
+              <div className="flex items-center justify-center p-8 rounded-xl bg-[var(--color-info-5)] border border-dashed border-[color:var(--color-info-30)]">
                 <p className="text-sm text-muted font-medium">
                   {t('finance.cashflow.noHistory', {
                     defaultValue: 'Necesitamos más historial para calcular la tendencia.',
@@ -208,7 +209,7 @@ const FinanceCashflowTimeline = ({
               monthlyBars.map((bar) => (
                 <div
                   key={bar.label}
-                  className="space-y-2 p-3 rounded-lg hover:bg-[var(--color-primary)]/5 transition-colors duration-200"
+                  className="space-y-2 p-3 rounded-lg hover:bg-[var(--color-primary-5)] transition-colors duration-200"
                 >
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted font-semibold uppercase tracking-wide">
@@ -217,14 +218,14 @@ const FinanceCashflowTimeline = ({
                     <span
                       className={`font-bold px-2 py-1 rounded ${
                         bar.positive
-                          ? 'text-[color:var(--color-success)] bg-[var(--color-success)]/10'
-                          : 'text-[color:var(--color-danger)] bg-[var(--color-danger)]/10'
+                          ? 'text-[color:var(--color-success)] bg-[var(--color-success-10)]'
+                          : 'text-[color:var(--color-danger)] bg-[var(--color-danger-10)]'
                       }`}
                     >
                       {formatCurrency(bar.net)}
                     </span>
                   </div>
-                  <div className="h-3 rounded-full bg-[color:var(--color-text)]/10 overflow-hidden shadow-inner">
+                  <div className="h-3 rounded-full bg-[color:var(--color-text-10)] overflow-hidden shadow-inner">
                     <div
                       className={`h-3 rounded-full transition-all duration-500 shadow-md ${
                         bar.positive
@@ -253,7 +254,7 @@ const FinanceCashflowTimeline = ({
 
       {/* 📊 PROYECCIÓN FINANCIERA INTEGRADA */}
       {projection?.summary && (
-        <div className="border-t border-soft px-6 py-6 bg-[var(--color-primary)]/5">
+        <div className="border-t border-soft px-6 py-6 bg-[var(--color-primary-5)]">
           <div className="mb-4">
             <h3 className="text-lg md:text-xl font-bold text-body tracking-tight mb-1">
               {t('finance.overview.projectionTitle', { defaultValue: 'Proyección financiera' })}
@@ -266,7 +267,7 @@ const FinanceCashflowTimeline = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-            <div className="group bg-[var(--color-success)]/15 border border-[color:var(--color-success)]/30 rounded-xl p-4 shadow-md hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+            <div className="group bg-[var(--color-success-15)] border border-[color:var(--color-success-30)] rounded-xl p-4 shadow-md hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
               <p className="text-xs uppercase tracking-wider text-[color:var(--color-success)] font-bold mb-2">
                 {t('finance.overview.projectedAtWedding', {
                   defaultValue: 'Balance el día de la boda',
@@ -279,7 +280,7 @@ const FinanceCashflowTimeline = ({
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 

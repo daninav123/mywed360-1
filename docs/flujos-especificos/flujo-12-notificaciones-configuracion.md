@@ -1,4 +1,4 @@
-﻿# 12. Notificaciones y Configuración (estado 2025-10-07)
+# 12. Notificaciones y Configuración (estado 2025-10-07)
 
 > Implementado: `Notificaciones.jsx`, `NotificationPreferences.jsx`, `NotificationWatcher.jsx`, `NotificationCenter.jsx` (scaffold), servicios `notificationService.js`, `notificationPreferencesService.js`, rutas backend `/api/notification-preferences`.
 > Pendiente: automatizaciones avanzadas (AutomationRules UI), notificaciones push/SMS completas y centro de notificaciones final.

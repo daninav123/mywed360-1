@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { getMails, initEmailService } from '../services/EmailService';
+import { getMails, initEmailService } from '../services/emailService';
 import { loadData } from '../services/SyncService';
 
 /**

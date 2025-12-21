@@ -31,35 +31,35 @@ const STATUS_CONFIG = {
     icon: Circle,
     color: 'var(--color-info)',
     bg: 'bg-blue-50 dark:bg-blue-900/20',
-    textClass: 'text-[var(--color-info)]',
+    textClass: 'text-[color:var(--color-info)]',
   },
   contacted: {
     label: 'Contactadas',
     icon: Phone,
     color: 'var(--color-warning)',
     bg: 'bg-yellow-50 dark:bg-yellow-900/20',
-    textClass: 'text-[var(--color-warning)]',
+    textClass: 'text-[color:var(--color-warning)]',
   },
   quoted: {
     label: 'Cotizadas',
     icon: Eye,
     color: 'var(--color-accent)',
     bg: 'bg-purple-50 dark:bg-purple-900/20',
-    textClass: 'text-[var(--color-accent)]',
+    textClass: 'text-[color:var(--color-accent)]',
   },
   accepted: {
     label: 'Aceptadas',
     icon: CheckCircle,
     color: 'var(--color-success)',
     bg: 'bg-green-50 dark:bg-green-900/20',
-    textClass: 'text-[var(--color-success)]',
+    textClass: 'text-[color:var(--color-success)]',
   },
   rejected: {
     label: 'Rechazadas',
     icon: AlertCircle,
     color: 'var(--color-danger)',
     bg: 'bg-red-50 dark:bg-red-900/20',
-    textClass: 'text-[var(--color-danger)]',
+    textClass: 'text-[color:var(--color-danger)]',
   },
 };
 
@@ -372,7 +372,7 @@ export default function SupplierRequestsNew() {
 
             {/* Mensaje */}
             {request.message && (
-              <div className="p-3 rounded-md bg-app border-l-4 border-[var(--color-primary)]">
+              <div className="p-3 rounded-md bg-app border-l-4 border-[color:var(--color-primary)]">
                 <p className="text-xs text-muted font-semibold mb-1">💬 Mensaje</p>
                 <p className="text-sm text-body">{request.message}</p>
               </div>
@@ -517,7 +517,7 @@ export default function SupplierRequestsNew() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-app">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)] mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[color:var(--color-primary)] mx-auto mb-4" />
           <p className="text-muted">Cargando solicitudes...</p>
         </div>
       </div>
@@ -558,7 +558,7 @@ export default function SupplierRequestsNew() {
               className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
                 activeTab === 'active'
                   ? 'bg-[var(--color-primary)] text-white shadow-md'
-                  : 'bg-app text-muted hover:bg-[var(--color-primary)]/10'
+                  : 'bg-app text-muted hover:bg-[var(--color-primary-10)]'
               }`}
             >
               <div className="flex items-center justify-center gap-2">
@@ -572,7 +572,7 @@ export default function SupplierRequestsNew() {
               className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
                 activeTab === 'archived'
                   ? 'bg-[var(--color-primary)] text-white shadow-md'
-                  : 'bg-app text-muted hover:bg-[var(--color-primary)]/10'
+                  : 'bg-app text-muted hover:bg-[var(--color-primary-10)]'
               }`}
             >
               <div className="flex items-center justify-center gap-2">

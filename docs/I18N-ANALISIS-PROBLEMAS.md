@@ -20,17 +20,17 @@ npm run test -- i18nNoMojibake
 ```
 
 **Archivos afectados:**
-- `src/i18n/locales/es/common.json` - Caracteres como "�" en lugar de "á", "é", "ñ"
+- `src/i18n/locales/es/common.json` - Caracteres como "" en lugar de "á", "é", "ñ"
 - Todos los archivos `.json` en `src/i18n/locales/`
 
 **Ejemplo del problema:**
 ```json
 {
   "app": {
-    "success": "�xito",      // ❌ Debería ser "Éxito"
-    "add": "A�adir",         // ❌ Debería ser "Añadir"
-    "yes": "S�",             // ❌ Debería ser "Sí"
-    "email": "Correo electr�nico"  // ❌ Debería ser "electrónico"
+    "success": "xito",      // ❌ Debería ser "Éxito"
+    "add": "Añadir",         // ❌ Debería ser "Añadir"
+    "yes": "S",             // ❌ Debería ser "Sí"
+    "email": "Correo electránico"  // ❌ Debería ser "electrónico"
   }
 }
 ```
@@ -40,7 +40,7 @@ npm run test -- i18nNoMojibake
 - Deberían ser UTF-8
 
 **Impacto:**
-- 🔴 **ALTO** - Los usuarios ven "�" en lugar de caracteres correctos
+- 🔴 **ALTO** - Los usuarios ven "" en lugar de caracteres correctos
 - Afecta a TODOS los idiomas
 - Destruye la experiencia de usuario
 

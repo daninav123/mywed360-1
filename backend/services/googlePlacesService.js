@@ -74,7 +74,7 @@ function mapServiceToPlaceType(service) {
 /**
  * Busca proveedores en Google Places API
  */
-async function searchGooglePlaces(service, location, maxResults = 20) {
+async function searchGooglePlaces(service, location, maxResults = 60) {
   if (!GOOGLE_PLACES_API_KEY) {
     console.warn('⚠️ [GOOGLE PLACES] API Key no configurada');
     return [];
@@ -171,6 +171,7 @@ async function getPlaceDetails(placeId) {
       'formatted_phone_number',
       'international_phone_number',
       'website',
+      'url', // URL de Google Maps
       'rating',
       'user_ratings_total',
       'formatted_address',
@@ -180,6 +181,7 @@ async function getPlaceDetails(placeId) {
       'opening_hours',
       'types',
       'price_level',
+      'business_status',
     ].join(',')
   );
   detailsUrl.searchParams.append('language', 'es');
@@ -223,8 +225,13 @@ async function getPlaceDetails(placeId) {
       phone: phone,
       email: null, // Google Places no proporciona email
       website: place.website || null,
+      websiteUri: place.website || null, // Alias
+      url: place.url || null, // URL de Google Maps
       address: place.formatted_address || null,
     },
+    // Campos adicionales en raíz para compatibilidad
+    website: place.website || null,
+    url: place.url || null,
     location: {
       city: city,
       province: province,

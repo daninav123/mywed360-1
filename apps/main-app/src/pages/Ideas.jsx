@@ -337,8 +337,8 @@ export default function Ideas() {
                 }}
                 className={`px-2 py-1 rounded-full text-sm transition ${
                   currentFolder === folder
-                    ? 'border border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
-                    : 'border border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'
+                    ? 'border border-[color:var(--color-primary)] bg-[var(--color-primary-10)] text-[color:var(--color-primary)]'
+                    : 'border border-soft bg-surface text-[color:var(--color-text-80)] hover:bg-[var(--color-accent-10)]'
                 }`}
               >
                 {folder}
@@ -402,7 +402,7 @@ export default function Ideas() {
                             {...dragProvided.dragHandleProps}
                             className={`border rounded-md p-3 bg-white shadow-sm transition ${
                               snapshot.isDragging
-                                ? 'shadow-lg ring-2 ring-[var(--color-primary)]'
+                                ? 'shadow-lg ring-2 ring-[color:var(--color-primary)]'
                                 : ''
                             }`}
                           >
@@ -695,7 +695,7 @@ function IdeasBlogSection() {
                   key={post.id}
                   className={`border rounded-md p-3 text-sm cursor-pointer transition ${
                     post.id === selectedPostId
-                      ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] text-[var(--color-primary)]'
+                      ? 'bg-[var(--color-primary-10)] border-[color:var(--color-primary)] text-[color:var(--color-primary)]'
                       : 'bg-white hover:bg-gray-50'
                   }`}
                   onClick={() => handleSelectPost(post.id)}

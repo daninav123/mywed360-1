@@ -1,4 +1,4 @@
-﻿# 1. Registro y Autenticaci?n (estado 2025-10-08)
+# 1. Registro y Autenticación (estado 2025-10-08)
 
 
 
@@ -45,28 +45,28 @@
 
    - Botón principal `Registrarse` invoca `useAuth().register(email, password, role)` (alias `authSignup`) y redirige a `/home` tras el alta exitosa.
 
-   - Validaciones: HTML5 + control m?nimo de 8 caracteres, indicador de fuerza y recomendaciones contextuales.
+   - Validaciones: HTML5 + control mínimo de 8 caracteres, indicador de fuerza y recomendaciones contextuales.
 
-   - Errores: se guardan en estado local y se renderizan dentro del formulario, manteniendo los requisitos de accesibilidad (ARN) para lectores de pantalla.
+   - Errores: se guardan en estado local y se renderizan dentro del formulario, manteniendo los requisitos de accesibilidad (ARIA) para lectores de pantalla.
 
    - Roles: el valor seleccionado se persiste en el perfil generado por `useAuth` (`userProfile.role`), lo que habilita flujos diferenciados (planner vs owner) tras el login.
 
-   - Telemetr?a activa: `signup_view`, `signup_submit`, `signup_completed`, `signup_failed` con propiedades (`role`, `source`, `error_code`) registradas en `PerformanceMonitor`.
+   - Telemetría activa: `signup_view`, `signup_submit`, `signup_completed`, `signup_failed` con propiedades (`role`, `source`, `error_code`) registradas en `PerformanceMonitor`.
 
 2. **Login.jsx**
 
    - Layout espejo de Signup con panel informativo y formulario principal.
 
-   - Campo de email (`username`) precargado con `localStorage.maloveapp_login_email` cuando el usuario marc? ?Recu?rdame?.
+   - Campo de email (`username`) precargado con `localStorage.maloveapp_login_email` cuando el usuario marcó “Recuérdame”.
 
    - Checkbox `remember` controla la persistencia del correo; al desactivarlo elimina la clave en `localStorage`.
 
    - `handleSubmit` invoca `useAuth().login(username, password, remember)` y gestiona estados de error locales.
-   - Telemetr?a activa: `login_view`, `login_submit`, `login_success`, `login_failed` con props `remember_me` y `redirect_to`.
+	   - Telemetría activa: `login_view`, `login_submit`, `login_success`, `login_failed` con props `remember_me` y `redirect_to`.
 
-   - Redirecci?n post-login: utiliza `location.state.from` y evita bucles (`/login` o `/`) redirigiendo a `/home`.
+	   - Redirección post-login: utiliza `location.state.from` y evita bucles (`/login` o `/`) redirigiendo a `/home`.
 
-   - Errores de Firebase se traducen v?a `mapAuthErrorMessage` (ej. `auth/wrong-password`, `auth/too-many-requests`).
+	   - Errores de Firebase se traducen vía `mapAuthErrorMessage` (ej. `auth/wrong-password`, `auth/too-many-requests`).
 
    - Social login: botones renderizados por `SocialLoginButtons.jsx` para Google, Facebook y Apple, con fallback a `signInWithRedirect` cuando el popup se bloquea.
 
@@ -90,7 +90,7 @@
 
 5. **SessionManager y rutas protegidas**
 
-   - `SessionManager.jsx` se monta dentro de `AuthProvider` y gestiona sesiones expiradas, reautenticaciones y notificaciones (`toast`). Expone modales con iconograf?a `lucide-react`.
+	   - `SessionManager.jsx` se monta dentro de `AuthProvider` y gestiona sesiones expiradas, reautenticaciones y notificaciones (`toast`). Expone modales con iconografía `lucide-react`.
 
    - `ProtectedRoute` (en `App.jsx`) usa `useAuth()` para bloquear acceso mientras `isLoading` o `!isAuthenticated`, mostrando `Loader` mientras se resuelve el estado.
 
@@ -118,27 +118,27 @@
 
 ## 5. Reglas de negocio
 
-- Contrase?a m?nima de 8 caracteres; email ?nico por entorno. El medidor recomienda longitud ?12, caracteres mixtos y s?mbolos, pero la validaci?n dura recae en Firebase (`auth/weak-password`).
+- Contraseña mínima de 8 caracteres; email único por entorno. El medidor recomienda longitud ≥ 12, caracteres mixtos y símbolos, pero la validación dura recae en Firebase (`auth/weak-password`).
 
-- Invitaciones a colaboradores v?lidas una sola vez; el consumo del token actualiza `weddings/{weddingId}/invitations/{code}.status`.
+- Invitaciones a colaboradores válidas una sola vez; el consumo del token actualiza `weddings/{weddingId}/invitations/{code}.status`.
 
 - Usuarios sin `emailVerified` restringidos en vistas sensibles (control en hooks y rutas protegidas).
 
-- `role` por defecto `particular`; planners o assistants se asignan s?lo cuando el selector lo indica o cuando se acepta una invitaci?n.
+- `role` por defecto `particular`; planners o assistants se asignan sólo cuando el selector lo indica o cuando se acepta una invitación.
 
-- El perfil persistido incluye `providerData` para soportar v?nculos multi-proveedor y auditor?a de accesos.
+- El perfil persistido incluye `providerData` para soportar vínculos multi-proveedor y auditoría de accesos.
 
 
 
 ## 6. Estados especiales y errores
 
-- `VerifyEmail` muestra instrucciones si ya est? verificado y permite reenv?o.
+- `VerifyEmail` muestra instrucciones si ya está verificado y permite reenvío.
 
-- Errores comunes (`auth/email-already-in-use`, `auth/wrong-password`, `auth/invalid-action-code`) se traducen a mensajes amigables. `auth/account-exists-with-different-credential` consulta m?todos previos para sugerir el proveedor correcto.
+- Errores comunes (`auth/email-already-in-use`, `auth/wrong-password`, `auth/invalid-action-code`) se traducen a mensajes amigables. `auth/account-exists-with-different-credential` consulta métodos previos para sugerir el proveedor correcto.
 
-- Se gestionan casos `auth/too-many-requests`, `auth/popup-blocked`, `auth/popup-closed-by-user`, `auth/network-request-failed` con mensajes espec?ficos.
+- Se gestionan casos `auth/too-many-requests`, `auth/popup-blocked`, `auth/popup-closed-by-user`, `auth/network-request-failed` con mensajes específicos.
 
-- `SessionManager` detecta desconexi?n (`navigator.onLine`) y muestra `WifiOff`; fuerza reautenticaci?n cuando Firebase expira el token.
+- `SessionManager` detecta desconexión (`navigator.onLine`) y muestra `WifiOff`; fuerza reautenticación cuando Firebase expira el token.
 
 
 
@@ -200,11 +200,11 @@
 
 **Unitarias / integración**
 
-- Hook `useAuth`: happy path de `signupWithEmail`, `loginWithEmail`, `signupWithProvider`, reintentos, propagaci?n de errores de Firebase.
+- Hook `useAuth`: happy path de `signupWithEmail`, `loginWithEmail`, `signupWithProvider`, reintentos, propagación de errores de Firebase.
 
 - `SessionManager`: persistencia y limpieza de tokens en `localStorage`/`sessionStorage`.
 
-- Utilidades de validaci?n (`validateEmail`, `evaluatePasswordStrength`).
+- Utilidades de validación (`validateEmail`, `evaluatePasswordStrength`).
 
 - Guards de rutas protegidas (`RequireAuth`, `RequireVerifiedEmail`).
 
@@ -237,13 +237,12 @@
 
 ## 11. Roadmap / pendientes
 
-- Instrumentar m?tricas (`signup_submit`, `social_signup`, `login_failed`, etc.) y revisar dashboards.
+- Instrumentar métricas (`signup_submit`, `social_signup`, `login_failed`, etc.) y revisar dashboards.
 
-- Completar auditor?a de accesibilidad y focus management en formularios y botones sociales.
+- Completar auditoría de accesibilidad y focus management en formularios y botones sociales.
 
 - Retirar formularios legacy (`RegisterForm`/`SocialLogin` antiguos) y limpiar dependencias en rutas no utilizadas.
 
-- ? 2025-10-08: `VerifyEmail`, `ResetPassword`, `CreateWeddingAI` y `GamificationPanel` usan el hook unificado (`useAuth`) y este expone `sendPasswordReset`.
+- 2025-10-08: `VerifyEmail`, `ResetPassword`, `CreateWeddingAI` y `GamificationPanel` usan el hook unificado (`useAuth`) y este expone `sendPasswordReset`.
 
-- Homogeneizar manejo de errores Firebase ? UI (mapa centralizado en `authErrorMapper`).
-
+- Homogeneizar manejo de errores Firebase → UI (mapa centralizado en `authErrorMapper`).

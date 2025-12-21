@@ -9,7 +9,8 @@ Bienvenido al repositorio de documentación interna del proyecto. Este índice r
 - [`manual-usuario.md`](./manual-usuario.md) · Guía para usuarios finales.
 - [`arquitectura-completa.md`](./arquitectura-completa.md) · Visión técnica y diagramas.
 - [`flujos-usuario.md`](./flujos-usuario.md) · Descripción general de todos los flujos funcionales.
-- [`ROADMAP.md`](./ROADMAP.md) · Fuente canónica de estado, prioridades y métricas.
+- [`FLUJOS-INDICE.md`](./FLUJOS-INDICE.md) · Fuente canónica de numeración y estado por flujo.
+- [`ROADMAP.md`](./ROADMAP.md) · Prioridades, entregables y métricas (sincronizado con el índice).
 - [`TODO.md`](./TODO.md) · Backlog operativo (se actualiza junto al roadmap).
 - [`estimacion-horas-lanzamiento.md`](./estimacion-horas-lanzamiento.md) · Estimaciones (ver notas de vigencia).
 - [`flujos-especificos/`](./flujos-especificos) · 40 documentos con detalle por flujo.
@@ -18,7 +19,11 @@ Bienvenido al repositorio de documentación interna del proyecto. Este índice r
 - [`scripts/aggregateRoadmap.md`](./scripts/aggregateRoadmap.md) · Procedimiento para sincronizar ROADMAP/TODO y cobertura E2E.
 - [`archive/`](./archive) · Históricos que se mantienen como referencia.
 
-> `docs/roadmap-2025-v2.md` queda como snapshot (09/10/2025). Usa `docs/ROADMAP.md` para decisiones actuales.
+> `docs/archive/roadmap-2025-v2.md` queda como snapshot (09/10/2025). Usa `docs/ROADMAP.md` para decisiones actuales.
+
+## 🧭 Convención de rutas (monorepo)
+
+- Muchos documentos históricos usan `src/...` (estructura antigua). En el monorepo actual, la app principal vive en `apps/main-app/src/...`.
 
 ## 🎯 Estado del proyecto (resumen)
 
@@ -36,7 +41,7 @@ Las cifras de `docs/estimacion-horas-lanzamiento.md` (agosto 2025) calculan 80�
 ## 📊 Métricas útiles
 
 - **Documentos en `docs/`**: 120+ (40 flujos, 6 guías de monitorización, 4 incidentes, etc.). Usa `rg --files docs` para listar.
-- **Hooks clave**: `src/hooks/useFinance.js`, `src/hooks/useSeatingPlan.js`, `src/hooks/useGuests.js`, `src/hooks/useTranslations.js`.
+- **Hooks clave**: `apps/main-app/src/hooks/useFinance.js`, `apps/main-app/src/hooks/useSeatingPlan.js`, `apps/main-app/src/hooks/useGuests.js`, `apps/main-app/src/hooks/useTranslations.js`.
 - **Consolidación pendiente**: `docs/consolidacion-documentacion.md` detalla los restos del sistema de emails y otros duplicados todavía por limpiar.
 
 ## 🗂️ Árbol base
@@ -53,7 +58,7 @@ docs/
 ├── manual-usuario.md
 ├── monitoring/
 ├── refactoring/
-├── roadmap-2025-v2.md            # Snapshot histórico (09/10/2025)
+├── archive/roadmap-2025-v2.md    # Snapshot histórico (09/10/2025)
 └── archive/
 ```
 
@@ -68,4 +73,4 @@ docs/
 ---
 
 **Última actualización**: 13 de octubre de 2025  
-**Contacto**: Equipo de Desarrollo MaLove.APP
+**Contacto**: Equipo de Desarrollo MaLove.App

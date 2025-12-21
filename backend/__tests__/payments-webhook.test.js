@@ -11,18 +11,19 @@ beforeEach(() => {
 
 // Mock Stripe to bypass signature verification
 vi.mock('stripe', () => {
-  return {
-    __esModule: true,
-    default: (key) => ({
-      webhooks: {
-        constructEvent: (body, sig, secret) => {
-          // body is Buffer; parse
-          const json = JSON.parse(Buffer.isBuffer(body) ? body.toString('utf8') : String(body || '{}'));
-          return json; // already shaped as { type, data: { object } }
-        }
-      }
-    })
-  };
+  class StripeMock {
+    constructor() {
+      this.webhooks = {
+        constructEvent: (body) => {
+          const json = JSON.parse(
+            Buffer.isBuffer(body) ? body.toString('utf8') : String(body || '{}')
+          );
+          return json;
+        },
+      };
+    }
+  }
+  return { __esModule: true, default: StripeMock };
 });
 
 // In-memory Firestore
@@ -53,6 +54,7 @@ vi.mock('firebase-admin', () => {
 vi.mock('../middleware/authMiddleware.js', () => ({
   __esModule: true,
   default: () => (req, _res, next) => next(),
+  authMiddleware: () => (_req, _res, next) => next(),
   requireAuth: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin' }; next(); },
   requireAdmin: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin' }; next(); },
   requirePlanner: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'planner' }; next(); },

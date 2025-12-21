@@ -118,6 +118,15 @@ export function FavoritesProvider({ children }) {
 
   // Añadir a favoritos
   const addFavorite = async (supplier, notes = '') => {
+    console.log('💙 [FavoritesContext] Añadiendo favorito:', {
+      supplierId: supplier.id,
+      supplierName: supplier.name,
+      category: supplier.category,
+      hasId: !!supplier.id,
+      hasCategory: !!supplier.category,
+      weddingId: activeWedding
+    });
+
     if (!user) {
       throw new Error(t('suppliers.favorites.errors.loginRequired'));
     }
@@ -140,18 +149,31 @@ export function FavoritesProvider({ children }) {
         'x-wedding-id': weddingId, // Usar el ID directamente
       };
 
+      console.log('💙 [FavoritesContext] Enviando a API:', {
+        url: `${API_URL}/api/favorites`,
+        supplier: supplier,
+        notes
+      });
+
       const response = await axios.post(
         `${API_URL}/api/favorites`,
         { supplier, notes },
         { headers }
       );
 
+      console.log('✅ [FavoritesContext] Favorito añadido exitosamente:', response.data);
+
       // Actualizar estado local
       setFavorites((prev) => [response.data.favorite, ...prev]);
 
       return response.data.favorite;
     } catch (err) {
-      // console.error('[FavoritesContext] Error añadiendo favorito:', err);
+      console.error('💥 [FavoritesContext] Error añadiendo favorito:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+        fullError: err
+      });
 
       if (err.response?.status === 409) {
         throw new Error(t('suppliers.favorites.errors.alreadyExists'));

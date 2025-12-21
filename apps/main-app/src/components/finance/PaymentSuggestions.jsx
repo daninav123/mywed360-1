@@ -123,15 +123,15 @@ export default function PaymentSuggestions({
   };
 
   return (
-    <Card className="p-4 border-soft bg-[var(--color-surface)]/80">
+    <Card className="p-4">
       <div className="flex items-center justify-between mb-3">
         <div>
           <h3 className="text-lg font-medium">Sugerencias de pago desde emails</h3>
-          <p className="text-xs text-[color:var(--color-text)]/70">
+          <p className="text-xs text-[color:var(--color-text-70)]">
             Estas sugerencias solo crean registros contables en la app; no envían pagos reales ni
             transfieren dinero.
           </p>
-          <p className="text-xs text-[color:var(--color-text)]/60 mt-1">
+          <p className="text-xs text-[color:var(--color-text-60)] mt-1">
             Siempre puedes registrar pagos o ingresos manuales con el botón «Nueva transacción».
           </p>
         </div>
@@ -148,21 +148,21 @@ export default function PaymentSuggestions({
         <>
           {error && <div className="text-sm text-red-600 mb-2">{error}</div>}
           {loading ? (
-            <div className="text-sm text-gray-600">Cargando…</div>
+            <div className="text-sm text-muted">Cargando…</div>
           ) : items.length === 0 ? (
-            <div className="text-sm text-gray-600">Sin sugerencias disponibles</div>
+            <div className="text-sm text-muted">Sin sugerencias disponibles</div>
           ) : (
             <div className="space-y-2">
               {items.slice(0, 6).map((s, i) => (
                 <div
                   key={`${s.mailId}_${i}`}
-                  className="flex items-center justify-between border rounded p-2 text-sm bg-white/60"
+                  className="flex items-center justify-between border border-soft rounded p-2 text-sm bg-[var(--color-surface-60)]"
                 >
                   <div className="min-w-0">
                     <div className="font-medium truncate" title={s.subject}>
                       {s.subject || '(Sin asunto)'}
                     </div>
-                    <div className="text-[color:var(--color-text)]/70">
+                    <div className="text-[color:var(--color-text-70)]">
                       {s.rawAmount || s.amount} {s.currency || ''} ·{' '}
                       {new Date(s.date).toLocaleDateString()} ·{' '}
                       {s.direction === 'incoming' ? 'Ingreso' : 'Gasto'}
@@ -179,12 +179,12 @@ export default function PaymentSuggestions({
           )}
         </>
       ) : (
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-muted">
           Las sugerencias de email quedan inactivas con la banca conectada.
         </div>
       )}
       {!enabled && (
-        <div className="mt-3 text-sm text-[color:var(--color-text)]/70 bg-[var(--color-surface)] border border-dashed border-[color:var(--color-text)]/20 rounded-md px-3 py-2">
+        <div className="mt-3 text-sm text-[color:var(--color-text-70)] bg-surface border border-dashed border-soft rounded-md px-3 py-2">
           {disabledMessage}
         </div>
       )}

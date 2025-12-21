@@ -55,7 +55,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
       {columns.map((col) => (
         <div
           key={col.key}
-          className="rounded-2xl border border-dashed border-[color:var(--color-text)]/15 bg-white/75  flex flex-col shadow-sm"
+          className="rounded-2xl border border-dashed border-[color:var(--color-text-15)] bg-white/75  flex flex-col shadow-sm"
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleDrop(e, col.key)}
         >
@@ -75,7 +75,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                   } catch {}
                 }}
                 onClick={() => onClick?.(prov)}
-                className="rounded-2xl border border-[color:var(--color-text)]/12 bg-white/85 p-3 shadow-sm hover:shadow-md transition cursor-pointer"
+                className="rounded-2xl border border-[color:var(--color-text-12)] bg-white/85 p-3 shadow-sm hover:shadow-md transition cursor-pointer"
               >
                 <header className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
