@@ -1,7 +1,6 @@
 {
-  "email": {
-    "title": "Correo electrónico",
-    "inbox": "Bandeja de entrada",
+  "title": "Email",
+  "inbox": "Inbox",
     "compose": {
       "header": {
         "title": "New email"
@@ -868,6 +867,4 @@
         "close": "Close"
       }
     }
-  },
-  "_note": "Translate from es/email.json"
-}
+  }

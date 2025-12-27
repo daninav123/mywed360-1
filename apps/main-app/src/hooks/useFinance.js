@@ -211,14 +211,9 @@ const autoCategorizeTransaction = (concept = '', provider = '', amount = 0, type
   return '';
 };
 
-const loadXLSXModule = async () => {
-  const mod = await import('xlsx/xlsx.mjs');
-  const cpexcel = await import('xlsx/dist/cpexcel.full.mjs');
-  const XLSX = mod.default || mod;
-  if (typeof XLSX.set_cptable === 'function') {
-    XLSX.set_cptable(cpexcel.default || cpexcel);
-  }
-  return XLSX;
+const loadExcelJS = async () => {
+  const ExcelJS = await import('exceljs');
+  return ExcelJS.default || ExcelJS;
 };
 
 // Hook centralizado para gestión de finanzas
@@ -2021,10 +2016,12 @@ export default function useFinance() {
 
   const exportFinanceReport = useCallback(async () => {
     try {
-      const XLSX = await loadXLSXModule();
-      const workbook = XLSX.utils.book_new();
+      const ExcelJS = await loadExcelJS();
+      const workbook = new ExcelJS.Workbook();
 
-      const summarySheet = XLSX.utils.aoa_to_sheet([
+      // Resumen
+      const summarySheet = workbook.addWorksheet('Resumen');
+      summarySheet.addRows([
         ['Total presupuesto', stats.totalBudget || 0],
         ['Gasto total', stats.totalSpent || 0],
         ['Ingresos totales', stats.totalIncome || 0],
@@ -2034,60 +2031,79 @@ export default function useFinance() {
         ['Burn rate mensual', predictiveInsights?.burnRate || 0],
         ['Meses hasta agotar presupuesto', predictiveInsights?.monthsToZero ?? 'N/A'],
       ]);
-      XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
 
-      const transactionRows = (transactions || []).map((tx) => ({
-        Fecha: tx.date || '',
-        Tipo: tx.type,
-        Estado: tx.status,
-        Concepto: tx.concept || '',
-        Descripción: tx.description || '',
-        Categoría: tx.category || '',
-        Proveedor: tx.provider || '',
-        Importe: Number(tx.amount) || 0,
-        Pagado: tx.paidAmount != null ? Number(tx.paidAmount) : '',
-        'Fecha venc.': tx.dueDate || '',
-        'Método de pago': tx.paymentMethod || '',
-        Fuente: tx.source || tx.meta?.source || '',
-      }));
-      XLSX.utils.book_append_sheet(
-        workbook,
-        XLSX.utils.json_to_sheet(transactionRows.length ? transactionRows : [{}], {
-          skipHeader: transactionRows.length === 0,
-        }),
-        'Transacciones'
-      );
+      // Transacciones
+      const transSheet = workbook.addWorksheet('Transacciones');
+      transSheet.columns = [
+        { header: 'Fecha', key: 'date', width: 12 },
+        { header: 'Tipo', key: 'type', width: 10 },
+        { header: 'Estado', key: 'status', width: 10 },
+        { header: 'Concepto', key: 'concept', width: 20 },
+        { header: 'Descripción', key: 'description', width: 30 },
+        { header: 'Categoría', key: 'category', width: 15 },
+        { header: 'Proveedor', key: 'provider', width: 20 },
+        { header: 'Importe', key: 'amount', width: 12 },
+        { header: 'Pagado', key: 'paid', width: 12 },
+        { header: 'Fecha venc.', key: 'dueDate', width: 12 },
+        { header: 'Método de pago', key: 'paymentMethod', width: 15 },
+        { header: 'Fuente', key: 'source', width: 15 },
+      ];
+      (transactions || []).forEach((tx) => {
+        transSheet.addRow({
+          date: tx.date || '',
+          type: tx.type,
+          status: tx.status,
+          concept: tx.concept || '',
+          description: tx.description || '',
+          category: tx.category || '',
+          provider: tx.provider || '',
+          amount: Number(tx.amount) || 0,
+          paid: tx.paidAmount != null ? Number(tx.paidAmount) : '',
+          dueDate: tx.dueDate || '',
+          paymentMethod: tx.paymentMethod || '',
+          source: tx.source || tx.meta?.source || '',
+        });
+      });
 
-      const categoryRows = (budgetUsage || []).map((cat) => ({
-        Categoría: cat.name,
-        Presupuesto: cat.amount,
-        Gastado: cat.spent,
-        Restante: cat.remaining,
-        '% uso': Number(cat.percentage || 0),
-      }));
-      XLSX.utils.book_append_sheet(
-        workbook,
-        XLSX.utils.json_to_sheet(categoryRows.length ? categoryRows : [{}], {
-          skipHeader: categoryRows.length === 0,
-        }),
-        'Categorías'
-      );
+      // Categorías
+      const catSheet = workbook.addWorksheet('Categorías');
+      catSheet.columns = [
+        { header: 'Categoría', key: 'name', width: 20 },
+        { header: 'Presupuesto', key: 'amount', width: 15 },
+        { header: 'Gastado', key: 'spent', width: 15 },
+        { header: 'Restante', key: 'remaining', width: 15 },
+        { header: '% uso', key: 'percentage', width: 10 },
+      ];
+      (budgetUsage || []).forEach((cat) => {
+        catSheet.addRow({
+          name: cat.name,
+          amount: cat.amount,
+          spent: cat.spent,
+          remaining: cat.remaining,
+          percentage: Number(cat.percentage || 0),
+        });
+      });
 
-      const monthlyRows = monthlySeries.months.map((month, idx) => ({
-        Mes: month,
-        Ingresos: monthlySeries.income[idx],
-        Gastos: monthlySeries.expense[idx],
-        Neto: monthlySeries.net[idx],
-      }));
-      XLSX.utils.book_append_sheet(
-        workbook,
-        XLSX.utils.json_to_sheet(monthlyRows.length ? monthlyRows : [{}], {
-          skipHeader: monthlyRows.length === 0,
-        }),
-        'Mensual'
-      );
+      // Mensual
+      const monthSheet = workbook.addWorksheet('Mensual');
+      monthSheet.columns = [
+        { header: 'Mes', key: 'month', width: 15 },
+        { header: 'Ingresos', key: 'income', width: 15 },
+        { header: 'Gastos', key: 'expense', width: 15 },
+        { header: 'Neto', key: 'net', width: 15 },
+      ];
+      monthlySeries.months.forEach((month, idx) => {
+        monthSheet.addRow({
+          month,
+          income: monthlySeries.income[idx],
+          expense: monthlySeries.expense[idx],
+          net: monthlySeries.net[idx],
+        });
+      });
 
+      // Analítica
       if (predictiveInsights) {
+        const insightsSheet = workbook.addWorksheet('Analítica');
         const insightsRows = [
           ['Promedio neto mensual', predictiveInsights.avgNet],
           ['Promedio ingresos mensual', predictiveInsights.avgIncome],
@@ -2114,11 +2130,10 @@ export default function useFinance() {
             insightsRows.push([pay.concept, pay.dueDate, pay.outstanding, pay.provider]);
           });
         }
-        const insightsSheet = XLSX.utils.aoa_to_sheet(insightsRows);
-        XLSX.utils.book_append_sheet(workbook, insightsSheet, 'Analítica');
+        insightsSheet.addRows(insightsRows);
       }
 
-      const buffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
+      const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });

@@ -42,12 +42,14 @@
     "reception": "Reception"
   },
   "form": {
-    "title": "Título",
-    "description": "Descripción",
-    "assignee": "Asignado a",
-    "dueDate": "Fecha límite",
-    "category": "Categoría",
-    "tags": "Etiquetas"
+    "title": "Title",
+    "description": "Description",
+    "assignee": "Assigned to",
+    "dueDate": "Due date",
+    "category": "Category",
+    "tags": "Tags",
+    "status": "Status",
+    "priority": "Priority"
   },
   "messages": {
     "created": "Task created successfully",
@@ -59,7 +61,10 @@
     "overdue": "Task overdue",
     "dueToday": "Due today",
     "dueTomorrow": "Due tomorrow",
-    "noDueDate": "No due date"
+    "noDueDate": "No due date",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "saved": "Saved successfully"
   },
   "filters": {
     "all": "All",
@@ -68,7 +73,9 @@
     "overdue": "Overdue",
     "today": "Today",
     "thisWeek": "This week",
-    "thisMonth": "This month"
+    "thisMonth": "This month",
+    "categoryAll": "All categories",
+    "assigneeAll": "All"
   },
   "calendar": {
     "month": "Month",
@@ -364,7 +371,11 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
-    "add": "Add"
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next"
   },
   "tasks": {
     "page": {

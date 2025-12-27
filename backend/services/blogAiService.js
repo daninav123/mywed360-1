@@ -14,10 +14,10 @@ function getOpenAIConfig() {
 }
 const FALLBACK_COVER_PROMPT =
   'Editorial wedding photography, elegant pastel palette, minimal styling, soft natural light';
-const DEFAULT_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
+const DEFAULT_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'dall-e-3';
 const DEFAULT_TRANSLATION_MODEL =
   process.env.OPENAI_MODEL_TRANSLATION || process.env.OPENAI_MODEL || 'gpt-4o-mini';
-const SUPPORTED_TRANSLATION_LANGUAGES = (process.env.BLOG_SUPPORTED_LANGUAGES || 'es,en,fr')
+const SUPPORTED_TRANSLATION_LANGUAGES = (process.env.BLOG_SUPPORTED_LANGUAGES || 'es,en,fr,pt,it,de')
   .split(',')
   .map((code) => code.trim().toLowerCase())
   .filter(Boolean);
@@ -641,10 +641,7 @@ export async function generateCoverImageFromPrompt(prompt, options = {}) {
   }
 
   const size = options.size || '1024x1024';
-  let quality = options.quality || 'high';
-  if (quality === 'hd') {
-    quality = 'high';
-  }
+  const quality = options.quality === 'hd' ? 'hd' : 'standard';
 
   try {
     await ensureOpenAI();

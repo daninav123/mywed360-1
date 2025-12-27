@@ -1,20 +1,102 @@
 import { Search, Music, X, Loader2, Play, ExternalLink, Sparkles } from 'lucide-react';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { Button } from '../ui';
 import { getSongSuggestions } from '../../utils/popularWeddingSongs';
+import { generateSuggestionsFromDescription, enrichWithSpotify } from '../../services/simpleSuggestionsService';
 
 /**
  * CleanSongPicker - Modal ultra-limpio para buscar canciones
  * Búsqueda directa en Spotify con reproducción completa
  */
-const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentType = '' }) => {
+const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentType = '', blockType = '', userDescription = '', onDescriptionChange }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  
+  // Descripción editable localmente
+  const [localDescription, setLocalDescription] = useState(userDescription);
+  
+  // Sugerencias basadas en descripción del usuario
+  const [aiSuggestions, setAiSuggestions] = useState([]);
+  const [loadingAI, setLoadingAI] = useState(false);
+  const [canLoadMore, setCanLoadMore] = useState(true);
+
+  // Sincronizar descripción cuando abre el modal
+  useEffect(() => {
+    if (isOpen) {
+      setLocalDescription(userDescription);
+    }
+  }, [isOpen, userDescription]);
+
+  // Limpiar sugerencias al cambiar descripción
+  useEffect(() => {
+    if (isOpen && localDescription !== userDescription) {
+      setAiSuggestions([]);
+      setCanLoadMore(true);
+    }
+  }, [isOpen, localDescription, userDescription]);
+
+  const generateAISuggestions = async (reset = false) => {
+    setLoadingAI(true);
+    try {
+      const result = await generateSuggestionsFromDescription({
+        momentTitle,
+        momentType,
+        blockType,
+        userDescription: localDescription,
+        count: 8,
+      });
+
+      if (result.success && result.suggestions.length > 0) {
+        const enriched = await enrichWithSpotify(result.suggestions);
+        
+        if (reset) {
+          // Primera carga o cambio de descripción: reemplazar
+          setAiSuggestions(enriched);
+          setCanLoadMore(true);
+        } else {
+          // Cargar más: añadir sin duplicados
+          setAiSuggestions(prev => {
+            const existingTitles = new Set(prev.map(s => `${s.title}-${s.artist}`.toLowerCase()));
+            const newSuggestions = enriched.filter(
+              s => !existingTitles.has(`${s.title}-${s.artist}`.toLowerCase())
+            );
+            return [...prev, ...newSuggestions];
+          });
+          
+          // Si no hay nuevas sugerencias únicas, deshabilitar "Ver más"
+          if (enriched.length === 0) {
+            setCanLoadMore(false);
+          }
+        }
+      } else {
+        setCanLoadMore(false);
+      }
+    } catch (error) {
+      console.error('Error generating AI suggestions:', error);
+      setCanLoadMore(false);
+    } finally {
+      setLoadingAI(false);
+    }
+  };
+
+  const handleLoadMoreSuggestions = () => {
+    if (!loadingAI && canLoadMore) {
+      generateAISuggestions(false);
+    }
+  };
+
+  const handleDescriptionChange = (newDescription) => {
+    setLocalDescription(newDescription);
+    // Guardar en el momento si hay callback
+    if (onDescriptionChange) {
+      onDescriptionChange(newDescription);
+    }
+  };
 
   // Obtener sugerencias populares según el tipo de momento
   const suggestions = useMemo(() => {
@@ -70,6 +152,12 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
   };
 
   const handleSelectSuggestion = async (suggestion) => {
+    // Si la sugerencia ya tiene datos de Spotify (enriquecida), seleccionarla directamente
+    if (suggestion.fromAI && suggestion.trackUrl) {
+      handleSelectSong(suggestion);
+      return;
+    }
+    
     // Buscar automáticamente la sugerencia en Spotify
     setSearchQuery(`${suggestion.title} ${suggestion.artist}`);
     setShowSuggestions(false);
@@ -99,52 +187,94 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
     }
   };
 
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
       <div className="bg-white rounded-xl shadow-md max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Buscar canción</h2>
-            {momentTitle && <p className="text-sm text-gray-600 mt-0.5">Para: {momentTitle}</p>}
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h2 className="text-xl font-semibold text-gray-900">Buscar canción</h2>
+              {momentTitle && <p className="text-sm text-gray-600 mt-0.5">Para: {momentTitle}</p>}
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+            >
+              <X size={20} className="text-gray-600" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X size={20} className="text-gray-600" />
-          </button>
         </div>
 
-        {/* Búsqueda */}
+        {/* Búsqueda y Descripción IA */}
         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Busca por canción, artista o álbum..."
-                className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-                autoFocus
-              />
-              <Search
-                size={20}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-              />
+          {/* Descripción para IA */}
+          <div className="mb-3">
+            <label className="block text-xs font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <Sparkles size={14} className="text-purple-600" />
+              🤖 Describe lo que buscas para obtener sugerencias de IA
+            </label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <textarea
+                  value={localDescription}
+                  onChange={(e) => handleDescriptionChange(e.target.value)}
+                  placeholder="Ej: algo energético, con letra en español que suene a electrónica..."
+                  rows={2}
+                  className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm resize-none"
+                />
+              </div>
+              <Button
+                onClick={() => generateAISuggestions(true)}
+                disabled={!localDescription.trim() || loadingAI}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 self-start"
+              >
+                {loadingAI ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles size={18} className="mr-2" />
+                    Buscar con IA
+                  </>
+                )}
+              </Button>
             </div>
-            <Button
-              onClick={handleSearch}
-              disabled={!searchQuery.trim() || isSearching}
-              variant="primary"
-              className="px-6"
-            >
-              {isSearching ? <Loader2 size={18} className="animate-spin" /> : 'Buscar'}
-            </Button>
+          </div>
+          
+          {/* Búsqueda manual */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <Search size={14} className="text-blue-600" />
+              O busca manualmente en Spotify
+            </label>
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Busca por canción, artista o álbum..."
+                  className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <Search
+                  size={18}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+              </div>
+              <Button
+                onClick={handleSearch}
+                disabled={!searchQuery.trim() || isSearching}
+                variant="primary"
+                className="px-6"
+              >
+                {isSearching ? <Loader2 size={18} className="animate-spin" /> : 'Buscar'}
+              </Button>
+            </div>
           </div>
 
           {/* Info de Spotify */}
@@ -167,6 +297,71 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
               {error}
             </div>
           )}
+
+          {/* Sugerencias de IA basadas en descripción */}
+          {localDescription && aiSuggestions.length > 0 && !searchQuery && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={18} className="text-purple-600" />
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    ✨ Sugerencias de IA para tu descripción
+                  </h3>
+                </div>
+                {loadingAI && (
+                  <Loader2 size={14} className="text-purple-600 animate-spin" />
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {aiSuggestions.map((suggestion) => (
+                  <button
+                    key={suggestion.id}
+                    onClick={() => handleSelectSuggestion(suggestion)}
+                    className="text-left p-3 bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg hover:border-purple-400 hover:shadow-lg transition-all group"
+                  >
+                    <div className="flex items-start gap-2">
+                      <Sparkles size={14} className="text-purple-600 flex-shrink-0 mt-1" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-purple-700">
+                          {suggestion.title}
+                        </p>
+                        <p className="text-xs text-gray-600 truncate">{suggestion.artist}</p>
+                        {suggestion.reason && (
+                          <p className="text-xs text-purple-700 mt-1 font-medium line-clamp-2">
+                            {suggestion.reason}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              
+              {/* Botón para cargar más */}
+              {canLoadMore && aiSuggestions.length >= 8 && (
+                <div className="mt-4 text-center">
+                  <Button
+                    onClick={handleLoadMoreSuggestions}
+                    disabled={loadingAI}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                  >
+                    {loadingAI ? (
+                      <>
+                        <Loader2 size={16} className="mr-2 animate-spin" />
+                        Generando...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles size={16} className="mr-2" />
+                        Ver más sugerencias
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
 
           {/* Sugerencias populares */}
           {showSuggestions && suggestions.length > 0 && !searchQuery && (
@@ -241,16 +436,22 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
 
           {!isSearching && results.length > 0 && (
             <div className="space-y-3">
-              <p className="text-sm text-gray-600 mb-3">{results.length} resultados encontrados</p>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-gray-900">
+                  🎵 {results.length} resultado{results.length !== 1 ? 's' : ''} encontrado{results.length !== 1 ? 's' : ''}
+                </p>
+                <p className="text-xs text-gray-500">Click para seleccionar</p>
+              </div>
               {results.map((song) => (
                 <div
                   key={song.id}
-                  className="border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-md transition-all group"
+                  className="bg-white border-2 border-gray-200 rounded-xl p-3 hover:border-blue-400 hover:shadow-lg transition-all group cursor-pointer"
+                  onClick={() => handleSelectSong(song)}
                 >
-                  <div className="flex items-center gap-4">
-                    {/* Artwork */}
+                  <div className="flex items-start gap-3">
+                    {/* Artwork - Más grande y prominente */}
                     <div className="flex-shrink-0">
-                      <div className="w-20 h-20 bg-[var(--color-primary)] rounded-lg overflow-hidden shadow-sm">
+                      <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg overflow-hidden shadow-md group-hover:shadow-xl transition-shadow">
                         {song.artwork ? (
                           <img
                             src={song.artwork}
@@ -259,21 +460,49 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Music className="text-gray-400" size={28} />
+                            <Music className="text-gray-400" size={32} />
                           </div>
                         )}
                       </div>
                     </div>
 
-                    {/* Info */}
+                    {/* Info - Mejorada con más detalles */}
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-gray-900 truncate mb-0.5">
-                        {song.title}
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-base text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+                            {song.title}
+                          </h4>
+                          <p className="text-sm text-gray-700 truncate mt-1 font-medium">{song.artist}</p>
+                        </div>
+                        <div className="flex-shrink-0">
+                          <div className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                            <Music size={12} />
+                            Spotify
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-600 truncate mb-1">{song.artist}</div>
+                      
                       {song.album && (
-                        <div className="text-xs text-gray-500 truncate">{song.album}</div>
+                        <p className="text-xs text-gray-600 truncate mt-1 flex items-center gap-1">
+                          <span className="inline-block w-1 h-1 bg-gray-400 rounded-full"></span>
+                          {song.album}
+                        </p>
                       )}
+                      
+                      {/* Preview info */}
+                      <div className="flex items-center gap-3 mt-2">
+                        {song.duration && (
+                          <span className="text-xs text-gray-500 flex items-center gap-1">
+                            🕒 {Math.floor(song.duration / 60000)}:{String(Math.floor((song.duration % 60000) / 1000)).padStart(2, '0')}
+                          </span>
+                        )}
+                        {song.popularity && (
+                          <span className="text-xs text-gray-500 flex items-center gap-1">
+                            🔥 {song.popularity}% popularidad
+                          </span>
+                        )}
+                      </div>
 
                       {/* Preview player */}
                       {song.previewUrl && (
@@ -340,6 +569,9 @@ CleanSongPicker.propTypes = {
   onSelect: PropTypes.func.isRequired,
   momentTitle: PropTypes.string,
   momentType: PropTypes.string,
+  blockType: PropTypes.string,
+  userDescription: PropTypes.string,
+  onDescriptionChange: PropTypes.func,
 };
 
 export default CleanSongPicker;

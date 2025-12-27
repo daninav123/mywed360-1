@@ -42,18 +42,18 @@
   - `Signup.jsx`, `Login.jsx`, `ResetPassword.jsx`, `VerifyEmail.jsx`, `useAuth.jsx`, `SessionManager.jsx`, `src/context/UserContext.jsx`, componentes `SocialLoginButtons.jsx`, `RegisterForm.jsx`, `PasswordStrengthMeter.jsx`.
 - **[pendiente (doc)]**
   - refactor de formularios legacy fuera de uso y auditoría de accesibilidad manual sobre flows secundarios.
-- **[E2E specs]** 0/5 presentes
-  - [faltante] cypress/e2e/auth/flow1-signup.cy.js
+- **[E2E specs]** 3/5 presentes
+  - [ok] cypress/e2e/auth/flow1-signup.cy.js
   - [faltante] cypress/e2e/auth/flow1-social-login.cy.js
-  - [faltante] cypress/e2e/auth/flow1-password-reset.cy.js
+  - [ok] cypress/e2e/auth/flow1-password-reset.cy.js
   - [faltante] cypress/e2e/auth/flow1-verify-email.cy.js
-  - [faltante] cypress/e2e/auth/auth-flow.cy.js
+  - [ok] cypress/e2e/auth/auth-flow.cy.js
 - **[verificacion de archivos implementados]**
   - `Signup.jsx` -> apps/main-app/src/pages/Signup.jsx
   - `Login.jsx` -> apps/main-app/src/pages/Login.jsx
   - `ResetPassword.jsx` -> apps/main-app/src/pages/ResetPassword.jsx
   - `VerifyEmail.jsx` -> apps/main-app/src/pages/VerifyEmail.jsx
-  - `useAuth.jsx` -> apps/main-app/src/hooks/useAuth.jsx
+  - `useAuth.jsx` -> apps/admin-app/src/hooks/useAuth.jsx, apps/main-app/src/hooks/useAuth.jsx
   - `SessionManager.jsx` -> apps/main-app/src/components/auth/SessionManager.jsx
   - `src/context/UserContext.jsx` -> apps/main-app/src/contexts/UserContext.jsx, apps/main-app/src/context/UserContext.jsx
   - `SocialLoginButtons.jsx` -> apps/main-app/src/components/auth/SocialLoginButtons.jsx
@@ -217,8 +217,8 @@
   - `NotificationPreferences.jsx` -> apps/main-app/src/pages/NotificationPreferences.jsx
   - `NotificationWatcher.jsx` -> apps/main-app/src/components/notifications/NotificationWatcher.jsx
   - `NotificationCenter.jsx` -> apps/main-app/src/components/NotificationCenter.jsx, apps/main-app/src/components/notifications/NotificationCenter.jsx
-  - `notificationService.js` -> backend/services/notificationService.js, apps/main-app/src/services/notificationService.js
-  - `notificationPreferencesService.js` -> apps/main-app/src/services/notificationPreferencesService.js
+  - `notificationService.js` -> backend/services/notificationService.js, apps/admin-app/src/services/notificationService.js, apps/main-app/src/services/notificationService.js
+  - `notificationPreferencesService.js` -> apps/admin-app/src/services/notificationPreferencesService.js, apps/main-app/src/services/notificationPreferencesService.js
   - `/api/notification-preferences` -> backend/routes/notification-preferences.js
 - **[roadmap/pending (doc)]**
   - - Centro de notificaciones completo (agrupaciones, búsqueda).
@@ -244,7 +244,7 @@
   - `Checklist.jsx` -> apps/main-app/src/pages/Checklist.jsx, apps/main-app/src/pages/protocolo/Checklist.jsx
   - `Tasks.jsx` -> apps/main-app/src/pages/Tasks.css, apps/main-app/src/pages/Tasks.jsx, apps/main-app/src/i18n/locales/tr/tasks.json, apps/main-app/src/i18n/locales/sv/tasks.json, apps/main-app/src/i18n/locales/sl/tasks.json, apps/main-app/src/i18n/locales/sk/tasks.json, apps/main-app/src/i18n/locales/ru/tasks.json, apps/main-app/src/i18n/locales/ro/tasks.json, apps/main-app/src/i18n/locales/pt/tasks.json, apps/main-app/src/i18n/locales/pl/tasks.json, apps/main-app/src/i18n/locales/no/tasks.json, apps/main-app/src/i18n/locales/nl/tasks.json, apps/main-app/src/i18n/locales/mt/tasks.json, apps/main-app/src/i18n/locales/lv/tasks.json, apps/main-app/src/i18n/locales/lt/tasks.json, apps/main-app/src/i18n/locales/it/tasks.json, apps/main-app/src/i18n/locales/is/tasks.json, apps/main-app/src/i18n/locales/hu/tasks.json, apps/main-app/src/i18n/locales/hr/tasks.json, apps/main-app/src/i18n/locales/fr-CA/tasks.json, apps/main-app/src/i18n/locales/fr/tasks.json, apps/main-app/src/i18n/locales/fi/tasks.json, apps/main-app/src/i18n/locales/eu/tasks.json, apps/main-app/src/i18n/locales/et/tasks.json, apps/main-app/src/i18n/locales/es-MX/tasks.json, apps/main-app/src/i18n/locales/es-AR/tasks.json, apps/main-app/src/i18n/locales/es/tasks.json, apps/main-app/src/i18n/locales/en/tasks.json, apps/main-app/src/i18n/locales/el/tasks.json, apps/main-app/src/i18n/locales/de/tasks.json, apps/main-app/src/i18n/locales/da/tasks.json, apps/main-app/src/i18n/locales/cs/tasks.json, apps/main-app/src/i18n/locales/ca/tasks.json, apps/main-app/src/i18n/locales/bg/tasks.json, apps/main-app/src/i18n/locales/ar/tasks.json
   - `TaskSidePanel.jsx` -> apps/main-app/src/components/tasks/TaskSidePanel.jsx
-  - `useWeddingTasksHierarchy` -> apps/main-app/src/hooks/useWeddingTasksHierarchy.js
+  - `useWeddingTasksHierarchy` -> apps/admin-app/src/hooks/useWeddingTasksHierarchy.js, apps/main-app/src/hooks/useWeddingTasksHierarchy.js
   - `automationService.js` -> backend/services/automationService.js
 - **[roadmap/pending (doc)]**
   - - Motor de recomendaciones IA que genere checklist dinamico segun perfil de boda.
@@ -271,10 +271,10 @@
 - **[verificacion de archivos implementados]**
   - `Contratos.jsx` -> apps/main-app/src/pages/Contratos.jsx
   - `contractTemplates.js` -> apps/main-app/src/data/templates/contractTemplates.js
-  - `SignatureService.js` -> backend/services/signatureService.js, apps/main-app/src/services/SignatureService.js
-  - `storageUploadService.js` -> apps/main-app/src/services/storageUploadService.js
-  - `useFirestoreCollection` -> apps/main-app/src/hooks/useFirestoreCollection.js
-  - `useProveedores` -> apps/main-app/src/hooks/useProveedores.jsx
+  - `SignatureService.js` -> backend/services/signatureService.js, apps/admin-app/src/services/SignatureService.js, apps/main-app/src/services/SignatureService.js
+  - `storageUploadService.js` -> apps/admin-app/src/services/storageUploadService.js, apps/main-app/src/services/storageUploadService.js
+  - `useFirestoreCollection` -> apps/admin-app/src/hooks/useFirestoreCollection.js, apps/main-app/src/hooks/useFirestoreCollection.js
+  - `useProveedores` -> apps/admin-app/src/hooks/useProveedores.jsx, apps/main-app/src/hooks/useProveedores.jsx
 - **[roadmap/pending (doc)]**
   - - Integracion completa con proveedores de firma digital y verificacion de identidad.
   - - Analitica de clausulas (riesgos, montos, vencimientos) con IA.
@@ -363,7 +363,7 @@
   - `VectorEditor.jsx` -> apps/main-app/src/pages/disenos/VectorEditor.jsx, apps/main-app/src/components/VectorEditor.jsx
   - `MenuCatering.jsx` -> apps/main-app/src/pages/disenos/MenuCatering.jsx
   - `PapelesNombres.jsx` -> apps/main-app/src/pages/disenos/PapelesNombres.jsx
-  - `pdfExport.js` -> apps/main-app/src/utils/pdfExport.js
+  - `pdfExport.js` -> apps/admin-app/src/utils/pdfExport.js, apps/main-app/src/utils/pdfExport.js
 - **[roadmap/pending (doc)]**
   - - Editor colaborativo con comentarios y versionado.
   - - Generacion IA de propuestas a partir del perfil de la boda.
@@ -385,15 +385,15 @@
   - `src/pages/CreateWeddingAI.jsx` (wizard dos pasos), `src/pages/AyudaCeremonia.jsx` (copy dinámico), `src/pages/BodaDetalle.jsx` (perfil de evento), `src/context/WeddingContext.jsx`, servicios en `src/services/WeddingService.js` (createWedding, seedDefaultTasksForWedding), catálogo `src/config/eventStyles.js`.
 - **[pendiente (doc)]**
   - habilitar opt-in a planner desde Perfil, paneles/alertas para la telemetría del funnel, refactor de rutas `/bodas`→`/eventos`, integración IA contextual y despliegue del flujo multi-evento para planners.
-- **[E2E specs]** 0/2 presentes
-  - [faltante] cypress/e2e/onboarding/create-event-flow.cy.js
+- **[E2E specs]** 1/2 presentes
+  - [ok] cypress/e2e/onboarding/create-event-flow.cy.js
   - [faltante] cypress/e2e/onboarding/create-event-cta.cy.js
 - **[verificacion de archivos implementados]**
   - `src/pages/CreateWeddingAI.jsx` -> apps/main-app/src/pages/CreateWeddingAI.jsx
   - `src/pages/AyudaCeremonia.jsx` -> apps/main-app/src/pages/AyudaCeremonia.jsx, apps/main-app/src/pages/protocolo/AyudaCeremonia.jsx
   - `src/pages/BodaDetalle.jsx` -> apps/main-app/src/pages/BodaDetalle.jsx
   - `src/context/WeddingContext.jsx` -> apps/main-app/src/context/WeddingContext.jsx
-  - `src/services/WeddingService.js` -> apps/main-app/src/services/WeddingService.js
+  - `src/services/WeddingService.js` -> apps/admin-app/src/services/WeddingService.js, apps/main-app/src/services/WeddingService.js
   - `src/config/eventStyles.js` -> apps/main-app/src/config/eventStyles.js
 - **[roadmap/pending (doc)]**
   - - Implementar opt-in a planner/assistant desde Perfil con flujo dedicado.
@@ -473,7 +473,7 @@
   - `PublicWedding.jsx` -> apps/main-app/src/pages/PublicWedding.jsx
   - `SeatingPlanPost.jsx` -> apps/main-app/src/pages/disenos/SeatingPlanPost.jsx
   - `MomentosEspecialesSimple.jsx` -> apps/main-app/src/pages/protocolo/MomentosEspecialesSimple.jsx
-  - `websiteService` -> apps/main-app/src/services/websiteService.js
+  - `websiteService` -> apps/admin-app/src/services/websiteService.js, apps/main-app/src/services/websiteService.js
 - **[roadmap/pending (doc)]**
   - - Editor dedicado en panel con vista previa y control de secciones.
   - - Dominios personalizados y configuracion automatica de SSL.
@@ -518,12 +518,12 @@
 
 - **[archivo]** docs/flujos-especificos/flujo-23-metricas-proyecto.md
 - **[conclusion]** desconocido
-- **[E2E specs]** 0/5 presentes
+- **[E2E specs]** 1/5 presentes
   - [faltante] cypress/e2e/performance/email-performance.cy.js
   - [faltante] cypress/e2e/finance/finance-analytics.cy.js
   - [faltante] cypress/e2e/gamification/gamification-history.cy.js
   - [faltante] cypress/e2e/budget_flow.cy.js
-  - [faltante] cypress/e2e/finance/finance-flow-full.cy.js
+  - [ok] cypress/e2e/finance/finance-flow-full.cy.js
 - **[checklist despliegue]**
   - - Backend: exponer `/api/project-metrics` (GET agregados, POST ingest) protegido por roles (owner, planner, admin, soporte) y habilitar `metricAggregatorWorker` en cron. Ver plan detallado en `docs/panel-admin/metricAggregatorWorker-plan.md`.
   - - Configurar `VITE_METRICS_ENDPOINT` y variables adicionales (`VITE_ENABLE_EMAIL_ANALYZE`, `VITE_ENABLE_FINANCE_ALERTS`, `MAILGUN_*`, `VITE_BANK_API_*`) para garantizar fuentes completas.
@@ -635,8 +635,8 @@
   - `PlannerDashboard.jsx` -> apps/main-app/src/components/PlannerDashboard.jsx
   - `PlannerDashboard.jsx` -> apps/main-app/src/components/PlannerDashboard.jsx
   - `WeddingContext.jsx` -> apps/main-app/src/context/WeddingContext.jsx
-  - `useFirestoreCollection.js` -> apps/main-app/src/hooks/useFirestoreCollection.js
-  - `useWeddingCollection.js` -> apps/main-app/src/hooks/useWeddingCollection.js
+  - `useFirestoreCollection.js` -> apps/admin-app/src/hooks/useFirestoreCollection.js, apps/main-app/src/hooks/useFirestoreCollection.js
+  - `useWeddingCollection.js` -> apps/admin-app/src/hooks/useWeddingCollection.js, apps/main-app/src/hooks/useWeddingCollection.js
   - `Nav.jsx` -> apps/main-app/src/components/Nav.jsx
   - `Bodas.jsx` -> apps/main-app/src/pages/Bodas.jsx
 
@@ -652,15 +652,15 @@
   - [faltante] cypress/e2e/account/role-upgrade-flow.cy.js
 - **[verificacion de archivos implementados]**
   - `src/components/auth/RegisterForm.jsx:56` -> apps/main-app/src/components/auth/RegisterForm.jsx
-  - `useAuth` -> apps/main-app/src/hooks/useAuth.jsx
-  - `src/hooks/useAuth.jsx:180` -> apps/main-app/src/hooks/useAuth.jsx
-  - `src/hooks/useAuth.jsx:593` -> apps/main-app/src/hooks/useAuth.jsx
+  - `useAuth` -> apps/admin-app/src/hooks/useAuth.jsx, apps/main-app/src/hooks/useAuth.jsx
+  - `src/hooks/useAuth.jsx:180` -> apps/admin-app/src/hooks/useAuth.jsx, apps/main-app/src/hooks/useAuth.jsx
+  - `src/hooks/useAuth.jsx:593` -> apps/admin-app/src/hooks/useAuth.jsx, apps/main-app/src/hooks/useAuth.jsx
   - `src/components/Nav.jsx:29` -> apps/main-app/src/components/Nav.jsx
   - `src/components/HomePage.jsx:77` -> apps/main-app/src/components/HomePage.jsx
-  - `WeddingService` -> apps/main-app/src/services/WeddingService.js
-  - `src/services/WeddingService.js:144` -> apps/main-app/src/services/WeddingService.js
-  - `src/services/WeddingService.js:487` -> apps/main-app/src/services/WeddingService.js
-  - `src/services/WeddingService.js:510` -> apps/main-app/src/services/WeddingService.js
+  - `WeddingService` -> apps/admin-app/src/services/WeddingService.js, apps/main-app/src/services/WeddingService.js
+  - `src/services/WeddingService.js:144` -> apps/admin-app/src/services/WeddingService.js, apps/main-app/src/services/WeddingService.js
+  - `src/services/WeddingService.js:487` -> apps/admin-app/src/services/WeddingService.js, apps/main-app/src/services/WeddingService.js
+  - `src/services/WeddingService.js:510` -> apps/admin-app/src/services/WeddingService.js, apps/main-app/src/services/WeddingService.js
   - `WeddingAccountLink.jsx:59` -> apps/main-app/src/components/settings/WeddingAccountLink.jsx
   - `WeddingAccountLink.jsx:79` -> apps/main-app/src/components/settings/WeddingAccountLink.jsx
 
@@ -681,7 +681,7 @@
   - `src/pages/CreateWeddingAssistant.jsx` -> apps/main-app/src/pages/CreateWeddingAssistant.jsx
   - `src/context/WeddingContext.jsx` -> apps/main-app/src/context/WeddingContext.jsx
   - `src/config/eventStyles.js` -> apps/main-app/src/config/eventStyles.js
-  - `src/services/WeddingService.js` -> apps/main-app/src/services/WeddingService.js
+  - `src/services/WeddingService.js` -> apps/admin-app/src/services/WeddingService.js, apps/main-app/src/services/WeddingService.js
 - **[roadmap/pending (doc)]**
   - - Instrumentar eventos para comparar funnels (wizard vs. asistente).
   - - Añadir capa IA:
@@ -732,12 +732,12 @@
   - `WhatsAppSender` -> apps/main-app/src/components/whatsapp/WhatsAppSender.jsx
   - `SaveTheDateModal` -> apps/main-app/src/components/whatsapp/SaveTheDateModal.jsx
   - `InviteTemplateModal` -> apps/main-app/src/components/whatsapp/InviteTemplateModal.jsx
-  - `useGuests` -> apps/main-app/src/hooks/useGuests.js
-  - `SyncService` -> apps/main-app/src/services/SyncService.js
-  - `MessageTemplateService` -> apps/main-app/src/services/MessageTemplateService.js
-  - `whatsappService` -> backend/services/whatsappService.js, apps/main-app/src/services/whatsappService.js
-  - `WhatsAppBatchService` -> apps/main-app/src/services/WhatsAppBatchService.js
-  - `useGuests.js` -> apps/main-app/src/hooks/useGuests.js
+  - `useGuests` -> apps/admin-app/src/hooks/useGuests.js, apps/main-app/src/hooks/useGuests.js
+  - `SyncService` -> apps/admin-app/src/services/SyncService.js, apps/main-app/src/services/SyncService.js
+  - `MessageTemplateService` -> apps/admin-app/src/services/MessageTemplateService.js, apps/main-app/src/services/MessageTemplateService.js
+  - `whatsappService` -> backend/services/whatsappService.js, apps/admin-app/src/services/whatsappService.js, apps/main-app/src/services/whatsappService.js
+  - `WhatsAppBatchService` -> apps/admin-app/src/services/WhatsAppBatchService.js, apps/main-app/src/services/WhatsAppBatchService.js
+  - `useGuests.js` -> apps/admin-app/src/hooks/useGuests.js, apps/main-app/src/hooks/useGuests.js
 - **[roadmap/pending (doc)]**
   - ### 🔍 ESTADO REAL VERIFICADO (2025-10-24)
   - **Implementación: ✅ 95%** | **Cobertura E2E: 🟡 65%**
@@ -845,9 +845,9 @@
   - `src/components/HomePage.jsx` -> apps/main-app/src/components/HomePage.jsx
   - `Nav.jsx` -> apps/main-app/src/components/Nav.jsx
   - `ProviderSearchModal.jsx` -> apps/main-app/src/components/ProviderSearchModal.jsx
-  - `useFinance` -> apps/main-app/src/hooks/useFinance.js
-  - `src/services/blogService.js` -> apps/main-app/src/services/blogService.js
-  - `src/services/wallService.js` -> apps/main-app/src/services/wallService.js
+  - `useFinance` -> apps/admin-app/src/hooks/useFinance.js, apps/main-app/src/hooks/useFinance.js
+  - `src/services/blogService.js` -> apps/admin-app/src/services/blogService.js, apps/main-app/src/services/blogService.js
+  - `src/services/wallService.js` -> apps/admin-app/src/services/wallService.js, apps/main-app/src/services/wallService.js
 - **[roadmap/pending (doc)]**
   - - Reemplazar fuentes `localStorage` por datos sincronizados (Firestore/REST) y estados compartidos vía contextos.
   - - Unificar Home con `Dashboard.jsx` (Flujo 22) y permitir configuración de widgets.
@@ -920,7 +920,7 @@
   - `TaskEventBridge.jsx` -> apps/main-app/src/components/tasks/TaskEventBridge.js, apps/main-app/src/components/tasks/TaskEventBridge.jsx
   - `TaskNotificationWatcher.jsx` -> apps/main-app/src/components/tasks/TaskNotificationWatcher.js, apps/main-app/src/components/tasks/TaskNotificationWatcher.jsx
   - `TasksRefactored.jsx` -> apps/main-app/src/components/tasks/TasksRefactored.jsx
-  - `useWeddingTasksHierarchy.js` -> apps/main-app/src/hooks/useWeddingTasksHierarchy.js
+  - `useWeddingTasksHierarchy.js` -> apps/admin-app/src/hooks/useWeddingTasksHierarchy.js, apps/main-app/src/hooks/useWeddingTasksHierarchy.js
   - `CalendarComponents.jsx` -> apps/main-app/src/components/tasks/CalendarComponents.jsx
   - `apps/main-app/src/data/tasks/masterTimelineTemplate.json` -> apps/main-app/src/data/tasks/masterTimelineTemplate.json
   - `TaskSidePanel.jsx` -> apps/main-app/src/components/tasks/TaskSidePanel.jsx
@@ -945,9 +945,9 @@
   - `src/pages/Finance.jsx`, componentes `src/components/finance/BudgetManager.jsx`, `FinanceOverview.jsx`, `FinanceCharts.jsx`, `PaymentSuggestions.jsx`, `TransactionManager.jsx`, hooks `useFinance`, `useSupplierBudgets`, servicios `EmailInsightsService`, `bankService`, `SyncService`.
 - **[pendiente (doc)]**
   - importación CSV/Excel con mapeo, analítica predictiva con IA, ampliación de aportaciones colaborativas, reportes exportables y automatización de alertas avanzadas.
-- **[E2E specs]** 0/8 presentes
+- **[E2E specs]** 1/8 presentes
   - [faltante] cypress/e2e/finance/finance-flow.cy.js
-  - [faltante] cypress/e2e/finance/finance-flow-full.cy.js
+  - [ok] cypress/e2e/finance/finance-flow-full.cy.js
   - [faltante] cypress/e2e/finance/finance-budget.cy.js
   - [faltante] cypress/e2e/finance/finance-transactions.cy.js
   - [faltante] cypress/e2e/finance/finance-contributions.cy.js
@@ -961,11 +961,11 @@
   - `FinanceCharts.jsx` -> apps/main-app/src/components/finance/FinanceCharts.jsx
   - `PaymentSuggestions.jsx` -> apps/main-app/src/components/finance/PaymentSuggestions.jsx
   - `TransactionManager.jsx` -> apps/main-app/src/components/finance/TransactionManager.jsx
-  - `useFinance` -> apps/main-app/src/hooks/useFinance.js
-  - `useSupplierBudgets` -> apps/main-app/src/hooks/useSupplierBudgets.js
-  - `EmailInsightsService` -> apps/main-app/src/services/EmailInsightsService.js
-  - `bankService` -> apps/main-app/src/services/bankService.js
-  - `SyncService` -> apps/main-app/src/services/SyncService.js
+  - `useFinance` -> apps/admin-app/src/hooks/useFinance.js, apps/main-app/src/hooks/useFinance.js
+  - `useSupplierBudgets` -> apps/admin-app/src/hooks/useSupplierBudgets.js, apps/main-app/src/hooks/useSupplierBudgets.js
+  - `EmailInsightsService` -> apps/admin-app/src/services/EmailInsightsService.js, apps/main-app/src/services/EmailInsightsService.js
+  - `bankService` -> apps/admin-app/src/services/bankService.js, apps/main-app/src/services/bankService.js
+  - `SyncService` -> apps/admin-app/src/services/SyncService.js, apps/main-app/src/services/SyncService.js
 - **[roadmap/pending (doc)]**
   - - Integracion Open Banking: UI de autenticacion, refresco de tokens, categorizacion inteligente, reconciliacion automatica.
   - - Importacion CSV/Excel con preview y mapeo de columnas (validaciones server-side).
@@ -1119,9 +1119,9 @@
   - `RSVPConfirm.jsx` -> apps/main-app/src/pages/RSVPConfirm.jsx
   - `AcceptInvitation.jsx` -> apps/main-app/src/pages/AcceptInvitation.jsx
   - `RSVPDashboard.jsx` -> apps/main-app/src/pages/RSVPDashboard.jsx
-  - `useGuests` -> apps/main-app/src/hooks/useGuests.js
-  - `rsvpService.js` -> apps/main-app/src/services/rsvpService.js
-  - `emailAutomationService.js` -> apps/main-app/src/services/emailAutomationService.js
+  - `useGuests` -> apps/admin-app/src/hooks/useGuests.js, apps/main-app/src/hooks/useGuests.js
+  - `rsvpService.js` -> apps/admin-app/src/services/rsvpService.js, apps/main-app/src/services/rsvpService.js
+  - `emailAutomationService.js` -> apps/admin-app/src/services/emailAutomationService.js, apps/main-app/src/services/emailAutomationService.js
 - **[roadmap/pending (doc)]**
   - - Confirmaciones grupales mas flexibles (familias, corporate) con panel dedicado.
   - - Recordatorios multi-canal automáticos y programacion inteligente por segmentos.

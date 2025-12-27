@@ -10,6 +10,7 @@ import {
   Plus,
   Star,
   AlertTriangle,
+  Trash2,
 } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
@@ -31,6 +32,8 @@ const SimpleMomentCard = ({
   onTimeChange,
   onSongTimingChange,
   onUpdateMoment,
+  onConfigureSpecial,
+  onRemoveMoment,
   selectedSong = null,
   allCandidates = [],
   showAdvanced = false,
@@ -121,21 +124,36 @@ const SimpleMomentCard = ({
                   <span className="truncate">
                     {selectedSong.title}
                     {moment.isDefinitive && ' ⭐'}
+                    {selectedSong.isSpecial && ' 🔥'}
                   </span>
                 </>
               )}
             </div>
           </div>
         </div>
-        <button
-          className="text-gray-400 hover:text-gray-600 transition-colors ml-2 flex-shrink-0"
-          onClick={(e) => {
-            e.stopPropagation();
-            setExpanded(!expanded);
-          }}
-        >
-          {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-        </button>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {onRemoveMoment && (
+            <button
+              className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemoveMoment();
+              }}
+              title="Eliminar momento"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+          <button
+            className="text-gray-400 hover:text-gray-600 transition-colors ml-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded(!expanded);
+            }}
+          >
+            {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </button>
+        </div>
       </div>
 
       {/* Contenido expandible */}
@@ -294,7 +312,24 @@ const SimpleMomentCard = ({
                           {selectedSong.title}
                         </div>
                         <div className="text-xs text-gray-600 truncate">{selectedSong.artist}</div>
-                        <div className="flex gap-2 mt-1">
+                        {/* Badge de canción especial */}
+                        {selectedSong.isSpecial && (
+                          <div className="mb-2 px-2 py-1 bg-gradient-to-r from-orange-100 to-red-100 border border-orange-300 rounded-lg flex items-center gap-2">
+                            <span className="text-lg">🔥</span>
+                            <div className="flex-1">
+                              <p className="text-xs font-bold text-orange-900">
+                                Canción Especial - {selectedSong.specialType === 'remix' ? 'Remix' : selectedSong.specialType === 'edit' ? 'Edit' : selectedSong.specialType === 'mashup' ? 'Mashup' : selectedSong.specialType === 'live' ? 'En vivo' : 'Custom'}
+                              </p>
+                              {selectedSong.djInstructions && (
+                                <p className="text-xs text-orange-700 mt-0.5 line-clamp-1">
+                                  {selectedSong.djInstructions}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap gap-2 mt-1">
                           {moment.isDefinitive ? (
                             <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-semibold text-gray-800">
                               <Star size={14} fill="currentColor" />
@@ -319,6 +354,21 @@ const SimpleMomentCard = ({
                             <Plus size={14} className="mr-1" />
                             Agregar opción
                           </Button>
+                          {onConfigureSpecial && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => onConfigureSpecial(selectedSong)}
+                              className={`text-xs ${
+                                selectedSong.isSpecial
+                                  ? 'border-orange-400 text-orange-700 hover:bg-orange-50'
+                                  : 'border-gray-300'
+                              }`}
+                            >
+                              <Settings size={14} className="mr-1" />
+                              {selectedSong.isSpecial ? 'Editar especial' : 'Marcar especial'}
+                            </Button>
+                          )}
                           {allCandidates.length > 1 && (
                             <Button
                               size="sm"
@@ -495,17 +545,16 @@ const SimpleMomentCard = ({
             </>
           )}
 
-          {/* Hora del momento - Siempre visible */}
+          {/* Hora del momento */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Clock size={16} className="inline mr-1" />
-              Hora
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              🕒 Hora aproximada
             </label>
             <input
               type="time"
               value={moment.time || ''}
-              onChange={(e) => onTimeChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onChange={onTimeChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             />
           </div>
         </div>

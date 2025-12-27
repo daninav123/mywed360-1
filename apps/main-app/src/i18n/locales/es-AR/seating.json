@@ -176,5 +176,368 @@
       }
     }
   },
-  "_note": "Translate from es/seating.json"
+  "_note": "Translate from es/seating.json",
+  "title": "Distribución de Mesas",
+  "newTable": "Nueva mesa",
+  "editTable": "Editar mesa",
+  "deleteTable": "Eliminar mesa",
+  "assignGuests": "Asignar invitados",
+  "autoAssign": "Asignación automática",
+  "noTables": "No hay mesas configuradas",
+  "createFirst": "Crear primera mesa",
+  "form": {
+    "tableName": "Nombre de la mesa",
+    "capacity": "Capacidad",
+    "shape": "Forma",
+    "notes": "Notas"
+  },
+  "shapes": {
+    "round": "Redonda",
+    "rectangular": "Rectangular",
+    "square": "Cuadrada"
+  },
+  "messages": {
+    "created": "Table created successfully",
+    "updated": "Table updated successfully",
+    "deleted": "Table deleted successfully",
+    "assigned": "Guests assigned successfully",
+    "error": "Error processing table",
+    "saved": "Saved",
+    "loading": "Loading...",
+    "noGuests": "No guests",
+    "selectTable": "Select table",
+    "unassigned": "Unassigned",
+    "ceremony": "Ceremony",
+    "banquet": "Banquet",
+    "total": "Total",
+    "assigned_one": "{{count}} assigned",
+    "assigned_other": "{{count}} assigned",
+    "capacity_full": "Full",
+    "capacity_available": "{{available}} available",
+    "dragHint": "Drag guests here",
+    "autoAssignSuccess": "Auto-assignment completed",
+    "conflictDetected": "Conflict detected",
+    "validationError": "Validation error"
+  },
+  "toolbar": {
+    "save": "Save",
+    "undo": "Undo",
+    "redo": "Redo",
+    "zoom": "Zoom",
+    "export": "Export",
+    "print": "Print",
+    "settings": "Settings",
+    "align": "Align",
+    "alignMenu": "Alignment options",
+    "alignLeft": "Align left",
+    "alignCenterX": "Center horizontally",
+    "alignRight": "Align right",
+    "alignTop": "Align top",
+    "alignCenterY": "Center vertically",
+    "alignBottom": "Align bottom",
+    "autoAssign": "Auto-assign",
+    "autoAssignShort": "Auto",
+    "background": "Background",
+    "backgroundConfig": "Configure background",
+    "banquet": "Banquet",
+    "banquetConfig": "Configure banquet",
+    "capacityShort": "Capacity",
+    "capacityTooltip": "Global seating capacity",
+    "ceremony": "Ceremony",
+    "ceremonyConfig": "Configure ceremony",
+    "clear": "Clear plan",
+    "clearBanquet": "Clear banquet",
+    "disableSnap": "Disable snapping",
+    "disableValidations": "Disable validations",
+    "distribute": "Distribute",
+    "distributeHorizontal": "Distribute horizontally",
+    "distributeVertical": "Distribute vertically",
+    "enableSnap": "Enable snapping",
+    "enableValidations": "Enable validations",
+    "hideRulers": "Hide rulers",
+    "hideSeatNumbers": "Hide seat numbers",
+    "hideTables": "Hide tables",
+    "redoTooltip": "Redo (Ctrl+Y)",
+    "rulers": "Rulers",
+    "seatNumbers": "Seat numbers",
+    "showRulers": "Show rulers",
+    "showSeatNumbers": "Show seat numbers",
+    "showTables": "Show tables",
+    "snap": "Snap",
+    "snapEnabled": "Snap enabled",
+    "space": "Space",
+    "spaceConfig": "Configure space",
+    "templates": "Templates",
+    "undoTooltip": "Undo (Ctrl+Z)",
+    "validations": "Validations"
+  },
+  "planModern": {
+    "header": {
+      "userFallback": "User"
+    },
+    "defaults": {
+      "tableName": "Table {{number}}"
+    },
+    "toasts": {
+      "fullAssignment": "🎉 100% of guests assigned! Congratulations!",
+      "autoAssignSuccess": "Automatic assignment completed",
+      "autoAssignError": "We couldn't finish the automatic assignment. Please try again.",
+      "addTableSuccess": "Table added successfully",
+      "addTableError": "We couldn't add the table{{message}}",
+      "capacityUpdated": "Capacity updated to {{value}}",
+      "duplicateTable": "Table duplicated",
+      "rotateTable": "Table rotated",
+      "deleteTable": "Table deleted",
+      "removeGuest": "Guest removed from the table"
+    },
+    "errors": {
+      "addTableUnavailable": "This action is temporarily unavailable. Reload and try again."
+    },
+    "guestSidebar": {
+      "header": {
+        "title": "Guest Sidebar",
+        "subtitle": "Track pending items, recommendations, and team activity."
+      },
+      "tabs": {
+        "summary": "Summary",
+        "recommendations": "Recommendations",
+        "conflicts": "Conflicts",
+        "staff": "Staff",
+        "history": "History"
+      },
+      "summary": {
+        "metrics": {
+          "totalGuests": "Total guests",
+          "assigned": "Assigned",
+          "pending": "Pending",
+          "vipPending": "VIP pending",
+          "tablesNearlyFull": "Tables nearly full",
+          "companionSeats": "Companion seats",
+          "conflicts": "Conflicts",
+          "snapshots": "Saved snapshots"
+        },
+        "viewPending": "View pending details"
+      },
+      "recommendations": {
+        "emptyTitle": "No recommendations",
+        "emptyDescription": "All pending guests already have suggestions applied.",
+        "guestFallback": "Guest",
+        "clusters": {
+          "vip": "VIP pending",
+          "familia": "Close family",
+          "pending": "Pending"
+        },
+        "score": "Score {{value}}",
+        "suggestedTable": "Suggested table:",
+        "capacityAvailable_one": "Capacity available: {{count}} seat",
+        "capacityAvailable_other": "Capacity available: {{count}} seats",
+        "capacityUnknown": "Capacity available: — seat(s)"
+      },
+      "conflicts": {
+        "emptyTitle": "No conflicts",
+        "emptyDescription": "No table issues detected.",
+        "tableFallback": "Table",
+        "messageFallback": "Conflict detected on the table.",
+        "severityHigh": "Critical",
+        "severityMedium": "Attention",
+        "actions": {
+          "reassign": "Reassign {{guest}}",
+          "fixPosition": "Adjust table",
+          "generic": "Suggested action"
+        }
+      },
+      "staff": {
+        "emptyTitle": "No staff registered",
+        "emptyDescription": "Add tags or roles to quickly identify staff and vendors.",
+        "memberFallback": "Staff member",
+        "assigned": "Assigned",
+        "noTable": "No table",
+        "pending": "Pending assignment",
+        "tableLabel": "Table: {{table}}"
+      },
+      "history": {
+        "emptyTitle": "No snapshots saved",
+        "emptyDescription": "Save a snapshot from the toolbar to build a history of progress.",
+        "load": "Load",
+        "delete": "Delete"
+      },
+      "actions": {
+        "viewTable": "View table",
+        "assign": "Assign"
+      }
+    }
+  },
+  "configureCeremony": "Configurar Ceremonia",
+  "ceremony": {
+    "rows": "Filas",
+    "seatsPerRow": "Sillas por fila",
+    "spacing": "Espacio entre sillas (cm)",
+    "aisleAfter": "Pasillo despus de col",
+    "vipReservations": "Reservas VIP",
+    "reservedRows": "Filas reservadas (ej. 1,2)",
+    "reservedLabel": "Etiqueta para asientos reservados",
+    "lockVipSeats": "Bloquear asientos VIP hasta asignarlos manualmente",
+    "notesPlaceholder": "Ej. Reservar para padrinos y padres",
+    "totalSeats": "Total de sillas",
+    "saveConfiguration": "Guardar configuración"
+  },
+  "configureBanquet": "Configurar Banquete",
+  "banquet": {
+    "tableRows": "Filas de mesas",
+    "tableCols": "Columnas de mesas",
+    "seatsPerTable": "Asientos por mesa",
+    "spacingX": "Espacio X",
+    "spacingY": "Espacio Y",
+    "generate": "Generar"
+  },
+  "space": {
+    "dimensions": "Dimensiones del Saln",
+    "width": "Ancho (cm)",
+    "height": "Alto (cm)"
+  },
+  "footer": {
+    "stats": {
+      "assignedValue": "{{value}}%",
+      "assigned": "assigned ({{assigned}}/{{total}})",
+      "tables": "tables",
+      "conflicts": "conflicts",
+      "trendIncrease": "+{{value}}%"
+    },
+    "buttons": {
+      "export": "Export",
+      "autoAssign": "Auto-assign",
+      "autoAssignLoading": "Assigning..."
+    }
+  },
+  "guestId": "Guest ID",
+  "guestName": "Guest name",
+  "guestEmail": "Guest email",
+  "tableId": "Table ID",
+  "seatNumber": "Seat number",
+  "export": {
+    "presets": "Export presets",
+    "pdf": "PDF",
+    "png": "PNG",
+    "csv": "CSV",
+    "advanced": "Advanced export"
+  },
+  "collaborators": {
+    "title": "Active collaborators ({{count}})",
+    "synced": "Synced in real time",
+    "unknown": "Guest"
+  },
+  "hints": {
+    "boundary": "Draw the hall perimeter by clicking each corner. Press Tab to enter exact lengths.",
+    "obstacle": "Mark columns or obstacles so tables avoid them.",
+    "door": "Place doors and entrances to keep aisles clear.",
+    "aisle": "Drag to create aisles or gaps between tables."
+  },
+  "tools": {
+    "pan": "Pan",
+    "moveTables": "Move tables",
+    "boundary": "Perimeter",
+    "doors": "Doors",
+    "obstacles": "Obstacles",
+    "aisles": "Aisles",
+    "erase": "Erase"
+  },
+  "summary": {
+    "sectionLabel": "Overview",
+    "assignedTitle": "{{count}} guests seated",
+    "assignedSubtitle": "{{assigned}} of {{total}} guests and companions seated",
+    "noGuests": "No guests loaded yet",
+    "metrics": {
+      "pending": "Pending",
+      "tables": "Active tables",
+      "capacity": "Available capacity",
+      "capacitySuffix": "pax"
+    },
+    "actions": {
+      "generateLayout": "Generate auto layout",
+      "regenerateLayout": "Regenerate layout",
+      "reviewPending": "Review pending guests"
+    },
+    "map": {
+      "title": "Space map",
+      "separator": "•"
+    },
+    "progress": {
+      "ceremony": "Ceremony ready",
+      "banquet": "Banquet assigned",
+      "occupancy": "Capacity used"
+    }
+  },
+  "sidebar": {
+    "tools": "Tools",
+    "pending": "Pending ({{count}})",
+    "showGuests": "Show guests",
+    "hideGuests": "Hide guests",
+    "searchGuests": "Search guests...",
+    "noResults": "No results",
+    "allAssigned": "All guests are already assigned.",
+    "conflictsTitle": "Conflicts",
+    "conflictPerimeter": "Outside the perimeter",
+    "conflictObstacle": "Collides with obstacle",
+    "conflictAisles": "Blocks aisles",
+    "conflictOverbooking": "Over capacity",
+    "noConflicts": "No conflicts",
+    "focusTable": "Focus table",
+    "goTo": "Go to table",
+    "fix": "Resolve",
+    "noSuggestions": "No suggestions",
+    "assignGuestButton": "Assign",
+    "weightsTitle": "Priorities",
+    "weightFit": "Capacity fit",
+    "weightSide": "Balance sides",
+    "weightTogether": "Keep together",
+    "weightAvoid": "Avoid conflicts",
+    "tableDefault": "Table {{id}}",
+    "configureTable": "Configure table",
+    "scope": "Area",
+    "tableType": "Table type",
+    "capacity": "Capacity",
+    "guests": "guests",
+    "assignedCount": "Assigned: {{count}}",
+    "autoCapacity": "Auto ({{count}})",
+    "manualCapacity": "Manual ({{count}})",
+    "capacityExceeded": "Over by {{count}}",
+    "capacityRemaining": "{{count}} seats available",
+    "assignedGuests": "Assigned guests ({{count}})",
+    "removeGuest": "Remove guest",
+    "noAssigned": "No guests assigned to this table.",
+    "usePanelToAssign": "Use this panel to assign guests to the selected table.",
+    "duplicateTable": "Duplicate table",
+    "deleteTable": "Delete table"
+  },
+  "snapshots": {
+    "button": "Snapshots",
+    "title": "Saved snapshots",
+    "manage": "Manage snapshots",
+    "saveCurrent": "Save current view",
+    "load": "Load",
+    "delete": "Delete",
+    "empty": "No snapshots saved yet.",
+    "nameLabel": "Snapshot name",
+    "namePlaceholder": "E.g. Vendor layout",
+    "nameRequired": "Enter a name"
+  },
+  "hotkeys": {
+    "title": "Keyboard shortcuts",
+    "items": {
+      "undoRedo": "Undo / Redo",
+      "tools": "Tools (pan, move, perimeter, doors, obstacles, aisles)",
+      "zoomFit": "Zoom in/out or fit",
+      "selectAll": "Select all",
+      "escape": "Clear selection or close menus",
+      "rotate": "Rotate -5/+5 degrees (Shift: ±15)",
+      "align": "Align to start/end",
+      "distribute": "Distribute on X/Y",
+      "tabs": "Switch tab (Ceremony/Banquet)",
+      "toggles": "Toggle rulers, numbers, validations",
+      "panels": "Open templates or space settings",
+      "drawFinalizeCancel": "Finish or cancel drawing",
+      "backspaceDelete": "Undo point or delete table",
+      "tabExactLength": "Enter exact segment length"
+    }
+  }
 }

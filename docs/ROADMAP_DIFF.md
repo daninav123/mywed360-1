@@ -1,21 +1,19 @@
 # Roadmap: cross-check docs vs tasks
 
-- Fecha: 2025-12-17T03:42:03.693Z
+- Fecha: 2025-12-27T00:34:38.406Z
 - Módulos (docs): 40
 - Tareas (roadmap.json): 26
 - Specs en docs: 97
 - Specs en tareas: 0
+- Specs en disco: 16
 
 ## Specs duplicados en tareas
 - Ninguno
 
 ## Specs faltantes según docs (E2E no encontrado)
 - 0. Administración Global (estado 2025-10-14): cypress/e2e/admin/admin-flow.cy.js
-- 1. Registro y Autenticación (estado 2025-10-08): cypress/e2e/auth/flow1-signup.cy.js
 - 1. Registro y Autenticación (estado 2025-10-08): cypress/e2e/auth/flow1-social-login.cy.js
-- 1. Registro y Autenticación (estado 2025-10-08): cypress/e2e/auth/flow1-password-reset.cy.js
 - 1. Registro y Autenticación (estado 2025-10-08): cypress/e2e/auth/flow1-verify-email.cy.js
-- 1. Registro y Autenticación (estado 2025-10-08): cypress/e2e/auth/auth-flow.cy.js
 - 10. Gestión de Bodas Múltiples (estado 2025-10-16): cypress/e2e/weddings/multi-weddings-flow.cy.js
 - 10. Gestión de Bodas Múltiples (estado 2025-10-16): cypress/e2e/weddings/wedding-team-flow.cy.js
 - 11. Protocolo y Ceremonias (visión global): cypress/e2e/protocolo/ceremony-tabs-flow.cy.js
@@ -38,7 +36,6 @@
 - 18. Generador de Documentos Legales (estado 2025-10-07): cypress/e2e/protocolo/legal-docs-validation.cy.js
 - 18. Generador de Documentos Legales (estado 2025-10-07): cypress/e2e/protocolo/legal-docs-versioning.cy.js
 - 19. Diseno de Invitaciones (estado 2025-10-07): cypress/e2e/invitaciones_rsvp.cy.js
-- 2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08: cypress/e2e/onboarding/create-event-flow.cy.js
 - 2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08: cypress/e2e/onboarding/create-event-cta.cy.js
 - 2. Descubrimiento Personalizado de la Boda: cypress/e2e/onboarding/discovery-personalized.cy.js
 - 2. Descubrimiento Personalizado de la Boda: cypress/e2e/onboarding/onboarding-mode-selector.cy.js
@@ -56,7 +53,6 @@
 - 23. Metricas del Proyecto (estado 2025-10-14): cypress/e2e/finance/finance-analytics.cy.js
 - 23. Metricas del Proyecto (estado 2025-10-14): cypress/e2e/gamification/gamification-history.cy.js
 - 23. Metricas del Proyecto (estado 2025-10-14): cypress/e2e/budget_flow.cy.js
-- 23. Metricas del Proyecto (estado 2025-10-14): cypress/e2e/finance/finance-flow-full.cy.js
 - 24. Inspiracion Visual Unificada (estado 2025-10-12): cypress/e2e/inspiration/inspiration-gallery.cy.js
 - 24. Inspiracion Visual Unificada (estado 2025-10-12): cypress/e2e/inspiration/inspiration-home-gallery.cy.js
 - 24. Inspiracion Visual Unificada (estado 2025-10-12): cypress/e2e/inspiration/inspiration-save-board.cy.js
@@ -80,7 +76,6 @@
 - 31. Estilo Global (estado 2025-10-13): cypress/e2e/style/style-global.cy.js
 - 5b. Timeline y Tareas (estado 2025-10-07): cypress/e2e/tasks/all_subtasks_modal.cy.js
 - 6. Gestion de Presupuesto (estado 2025-10-08): cypress/e2e/finance/finance-flow.cy.js
-- 6. Gestion de Presupuesto (estado 2025-10-08): cypress/e2e/finance/finance-flow-full.cy.js
 - 6. Gestion de Presupuesto (estado 2025-10-08): cypress/e2e/finance/finance-budget.cy.js
 - 6. Gestion de Presupuesto (estado 2025-10-08): cypress/e2e/finance/finance-transactions.cy.js
 - 6. Gestion de Presupuesto (estado 2025-10-08): cypress/e2e/finance/finance-contributions.cy.js
@@ -174,4 +169,19 @@
 - Ninguno
 
 ## Specs huérfanos (en disco, sin tarea)
-- Ninguno
+- cypress/e2e/accept-quote-flow.cy.js
+- cypress/e2e/auth/auth-flow.cy.js
+- cypress/e2e/auth/flow1-password-reset.cy.js
+- cypress/e2e/auth/flow1-signup.cy.js
+- cypress/e2e/budget/budget-flow.cy.js
+- cypress/e2e/finance/finance-flow-full.cy.js
+- cypress/e2e/invitados/invitados-flow.cy.js
+- cypress/e2e/momentos/momentos-export-spotify.cy.js
+- cypress/e2e/momentos/momentos-special-songs.cy.js
+- cypress/e2e/onboarding/create-event-flow.cy.js
+- cypress/e2e/tasks/tasks-flow.cy.js
+- cypress/e2e/wedding-info/info-boda-form-fields.cy.js
+- cypress/e2e/wedding-info/info-boda-iban-validation.cy.js
+- cypress/e2e/wedding-info/info-boda-navigation.cy.js
+- cypress/e2e/wedding-info/info-boda-save-functionality.cy.js
+- cypress/e2e/wedding-info/info-boda-special-features.cy.js

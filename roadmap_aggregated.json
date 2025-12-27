@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-17T03:42:03.513Z",
+  "generatedAt": "2025-12-27T00:34:38.210Z",
   "modules": [
     {
       "filePath": "docs/flujos-especificos/flujo-0-administracion-global.md",
@@ -35,7 +35,7 @@
       "e2eChecks": [
         {
           "spec": "cypress/e2e/auth/flow1-signup.cy.js",
-          "exists": false
+          "exists": true
         },
         {
           "spec": "cypress/e2e/auth/flow1-social-login.cy.js",
@@ -43,7 +43,7 @@
         },
         {
           "spec": "cypress/e2e/auth/flow1-password-reset.cy.js",
-          "exists": false
+          "exists": true
         },
         {
           "spec": "cypress/e2e/auth/flow1-verify-email.cy.js",
@@ -51,7 +51,7 @@
         },
         {
           "spec": "cypress/e2e/auth/auth-flow.cy.js",
-          "exists": false
+          "exists": true
         }
       ],
       "implChecks": [
@@ -87,6 +87,7 @@
           "ref": "useAuth.jsx",
           "basename": "useAuth.jsx",
           "matches": [
+            "apps/admin-app/src/hooks/useAuth.jsx",
             "apps/main-app/src/hooks/useAuth.jsx"
           ]
         },
@@ -325,6 +326,7 @@
           "basename": "notificationService.js",
           "matches": [
             "backend/services/notificationService.js",
+            "apps/admin-app/src/services/notificationService.js",
             "apps/main-app/src/services/notificationService.js"
           ]
         },
@@ -332,6 +334,7 @@
           "ref": "notificationPreferencesService.js",
           "basename": "notificationPreferencesService.js",
           "matches": [
+            "apps/admin-app/src/services/notificationPreferencesService.js",
             "apps/main-app/src/services/notificationPreferencesService.js"
           ]
         },
@@ -424,6 +427,7 @@
           "ref": "useWeddingTasksHierarchy",
           "basename": "useWeddingTasksHierarchy",
           "matches": [
+            "apps/admin-app/src/hooks/useWeddingTasksHierarchy.js",
             "apps/main-app/src/hooks/useWeddingTasksHierarchy.js"
           ]
         },
@@ -475,6 +479,7 @@
           "basename": "SignatureService.js",
           "matches": [
             "backend/services/signatureService.js",
+            "apps/admin-app/src/services/SignatureService.js",
             "apps/main-app/src/services/SignatureService.js"
           ]
         },
@@ -482,6 +487,7 @@
           "ref": "storageUploadService.js",
           "basename": "storageUploadService.js",
           "matches": [
+            "apps/admin-app/src/services/storageUploadService.js",
             "apps/main-app/src/services/storageUploadService.js"
           ]
         },
@@ -489,6 +495,7 @@
           "ref": "useFirestoreCollection",
           "basename": "useFirestoreCollection",
           "matches": [
+            "apps/admin-app/src/hooks/useFirestoreCollection.js",
             "apps/main-app/src/hooks/useFirestoreCollection.js"
           ]
         },
@@ -496,6 +503,7 @@
           "ref": "useProveedores",
           "basename": "useProveedores",
           "matches": [
+            "apps/admin-app/src/hooks/useProveedores.jsx",
             "apps/main-app/src/hooks/useProveedores.jsx"
           ]
         }
@@ -651,6 +659,7 @@
           "ref": "pdfExport.js",
           "basename": "pdfExport.js",
           "matches": [
+            "apps/admin-app/src/utils/pdfExport.js",
             "apps/main-app/src/utils/pdfExport.js"
           ]
         }
@@ -672,7 +681,7 @@
       "e2eChecks": [
         {
           "spec": "cypress/e2e/onboarding/create-event-flow.cy.js",
-          "exists": false
+          "exists": true
         },
         {
           "spec": "cypress/e2e/onboarding/create-event-cta.cy.js",
@@ -713,6 +722,7 @@
           "ref": "src/services/WeddingService.js",
           "basename": "WeddingService.js",
           "matches": [
+            "apps/admin-app/src/services/WeddingService.js",
             "apps/main-app/src/services/WeddingService.js"
           ]
         },
@@ -895,6 +905,7 @@
           "ref": "websiteService",
           "basename": "websiteService",
           "matches": [
+            "apps/admin-app/src/services/websiteService.js",
             "apps/main-app/src/services/websiteService.js"
           ]
         }
@@ -995,7 +1006,7 @@
         },
         {
           "spec": "cypress/e2e/finance/finance-flow-full.cy.js",
-          "exists": false
+          "exists": true
         }
       ],
       "implChecks": [],
@@ -1153,6 +1164,7 @@
           "ref": "useFirestoreCollection.js",
           "basename": "useFirestoreCollection.js",
           "matches": [
+            "apps/admin-app/src/hooks/useFirestoreCollection.js",
             "apps/main-app/src/hooks/useFirestoreCollection.js"
           ]
         },
@@ -1160,6 +1172,7 @@
           "ref": "useWeddingCollection.js",
           "basename": "useWeddingCollection.js",
           "matches": [
+            "apps/admin-app/src/hooks/useWeddingCollection.js",
             "apps/main-app/src/hooks/useWeddingCollection.js"
           ]
         },
@@ -1210,6 +1223,7 @@
           "ref": "useAuth",
           "basename": "useAuth",
           "matches": [
+            "apps/admin-app/src/hooks/useAuth.jsx",
             "apps/main-app/src/hooks/useAuth.jsx"
           ]
         },
@@ -1217,6 +1231,7 @@
           "ref": "src/hooks/useAuth.jsx:180",
           "basename": "useAuth.jsx:180",
           "matches": [
+            "apps/admin-app/src/hooks/useAuth.jsx",
             "apps/main-app/src/hooks/useAuth.jsx"
           ]
         },
@@ -1224,6 +1239,7 @@
           "ref": "src/hooks/useAuth.jsx:593",
           "basename": "useAuth.jsx:593",
           "matches": [
+            "apps/admin-app/src/hooks/useAuth.jsx",
             "apps/main-app/src/hooks/useAuth.jsx"
           ]
         },
@@ -1245,6 +1261,7 @@
           "ref": "WeddingService",
           "basename": "WeddingService",
           "matches": [
+            "apps/admin-app/src/services/WeddingService.js",
             "apps/main-app/src/services/WeddingService.js"
           ]
         },
@@ -1252,6 +1269,7 @@
           "ref": "src/services/WeddingService.js:144",
           "basename": "WeddingService.js:144",
           "matches": [
+            "apps/admin-app/src/services/WeddingService.js",
             "apps/main-app/src/services/WeddingService.js"
           ]
         },
@@ -1259,6 +1277,7 @@
           "ref": "src/services/WeddingService.js:487",
           "basename": "WeddingService.js:487",
           "matches": [
+            "apps/admin-app/src/services/WeddingService.js",
             "apps/main-app/src/services/WeddingService.js"
           ]
         },
@@ -1266,6 +1285,7 @@
           "ref": "src/services/WeddingService.js:510",
           "basename": "WeddingService.js:510",
           "matches": [
+            "apps/admin-app/src/services/WeddingService.js",
             "apps/main-app/src/services/WeddingService.js"
           ]
         },
@@ -1342,6 +1362,7 @@
           "ref": "src/services/WeddingService.js",
           "basename": "WeddingService.js",
           "matches": [
+            "apps/admin-app/src/services/WeddingService.js",
             "apps/main-app/src/services/WeddingService.js"
           ]
         }
@@ -1495,6 +1516,7 @@
           "ref": "useGuests",
           "basename": "useGuests",
           "matches": [
+            "apps/admin-app/src/hooks/useGuests.js",
             "apps/main-app/src/hooks/useGuests.js"
           ]
         },
@@ -1502,6 +1524,7 @@
           "ref": "SyncService",
           "basename": "SyncService",
           "matches": [
+            "apps/admin-app/src/services/SyncService.js",
             "apps/main-app/src/services/SyncService.js"
           ]
         },
@@ -1509,6 +1532,7 @@
           "ref": "MessageTemplateService",
           "basename": "MessageTemplateService",
           "matches": [
+            "apps/admin-app/src/services/MessageTemplateService.js",
             "apps/main-app/src/services/MessageTemplateService.js"
           ]
         },
@@ -1517,6 +1541,7 @@
           "basename": "whatsappService",
           "matches": [
             "backend/services/whatsappService.js",
+            "apps/admin-app/src/services/whatsappService.js",
             "apps/main-app/src/services/whatsappService.js"
           ]
         },
@@ -1524,6 +1549,7 @@
           "ref": "WhatsAppBatchService",
           "basename": "WhatsAppBatchService",
           "matches": [
+            "apps/admin-app/src/services/WhatsAppBatchService.js",
             "apps/main-app/src/services/WhatsAppBatchService.js"
           ]
         },
@@ -1531,6 +1557,7 @@
           "ref": "useGuests.js",
           "basename": "useGuests.js",
           "matches": [
+            "apps/admin-app/src/hooks/useGuests.js",
             "apps/main-app/src/hooks/useGuests.js"
           ]
         }
@@ -1588,6 +1615,7 @@
           "ref": "useFinance",
           "basename": "useFinance",
           "matches": [
+            "apps/admin-app/src/hooks/useFinance.js",
             "apps/main-app/src/hooks/useFinance.js"
           ]
         },
@@ -1595,6 +1623,7 @@
           "ref": "src/services/blogService.js",
           "basename": "blogService.js",
           "matches": [
+            "apps/admin-app/src/services/blogService.js",
             "apps/main-app/src/services/blogService.js"
           ]
         },
@@ -1602,6 +1631,7 @@
           "ref": "src/services/wallService.js",
           "basename": "wallService.js",
           "matches": [
+            "apps/admin-app/src/services/wallService.js",
             "apps/main-app/src/services/wallService.js"
           ]
         }
@@ -1771,6 +1801,7 @@
           "ref": "useWeddingTasksHierarchy.js",
           "basename": "useWeddingTasksHierarchy.js",
           "matches": [
+            "apps/admin-app/src/hooks/useWeddingTasksHierarchy.js",
             "apps/main-app/src/hooks/useWeddingTasksHierarchy.js"
           ]
         },
@@ -1817,7 +1848,7 @@
         },
         {
           "spec": "cypress/e2e/finance/finance-flow-full.cy.js",
-          "exists": false
+          "exists": true
         },
         {
           "spec": "cypress/e2e/finance/finance-budget.cy.js",
@@ -1925,6 +1956,7 @@
           "ref": "useFinance",
           "basename": "useFinance",
           "matches": [
+            "apps/admin-app/src/hooks/useFinance.js",
             "apps/main-app/src/hooks/useFinance.js"
           ]
         },
@@ -1932,6 +1964,7 @@
           "ref": "useSupplierBudgets",
           "basename": "useSupplierBudgets",
           "matches": [
+            "apps/admin-app/src/hooks/useSupplierBudgets.js",
             "apps/main-app/src/hooks/useSupplierBudgets.js"
           ]
         },
@@ -1939,6 +1972,7 @@
           "ref": "EmailInsightsService",
           "basename": "EmailInsightsService",
           "matches": [
+            "apps/admin-app/src/services/EmailInsightsService.js",
             "apps/main-app/src/services/EmailInsightsService.js"
           ]
         },
@@ -1946,6 +1980,7 @@
           "ref": "bankService",
           "basename": "bankService",
           "matches": [
+            "apps/admin-app/src/services/bankService.js",
             "apps/main-app/src/services/bankService.js"
           ]
         },
@@ -1953,6 +1988,7 @@
           "ref": "SyncService",
           "basename": "SyncService",
           "matches": [
+            "apps/admin-app/src/services/SyncService.js",
             "apps/main-app/src/services/SyncService.js"
           ]
         }
@@ -2113,6 +2149,7 @@
           "ref": "useGuests",
           "basename": "useGuests",
           "matches": [
+            "apps/admin-app/src/hooks/useGuests.js",
             "apps/main-app/src/hooks/useGuests.js"
           ]
         },
@@ -2120,6 +2157,7 @@
           "ref": "rsvpService.js",
           "basename": "rsvpService.js",
           "matches": [
+            "apps/admin-app/src/services/rsvpService.js",
             "apps/main-app/src/services/rsvpService.js"
           ]
         },
@@ -2127,6 +2165,7 @@
           "ref": "emailAutomationService.js",
           "basename": "emailAutomationService.js",
           "matches": [
+            "apps/admin-app/src/services/emailAutomationService.js",
             "apps/main-app/src/services/emailAutomationService.js"
           ]
         }

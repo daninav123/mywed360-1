@@ -125,7 +125,7 @@ ENFOQUE:
 - Define presupuesto orientativo
 - Documenta preferencias claras
 
-${getCategory SpecificPrompt(currentCategory)}
+${getCategorySpecificPrompt(currentCategory)}
 `;
   }
 

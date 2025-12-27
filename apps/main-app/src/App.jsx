@@ -18,97 +18,98 @@ import { UserPreferencesProvider } from './contexts/UserContext';
 import { useAuth, AuthProvider } from './hooks/useAuth';
 import useSupplierSpecs from './hooks/useSupplierSpecs';
 import AcceptInvitation from './pages/AcceptInvitation';
-import BankConnect from './pages/BankConnect.jsx';
-import BodaDetalle from './pages/BodaDetalle.jsx';
-import Bodas from './pages/Bodas';
-import DevEnsureFinance from './pages/DevEnsureFinance';
-import DevSeedGuests from './pages/DevSeedGuests';
-import Finance from './pages/Finance';
 import Home from './pages/Home';
-import HomeUser from './pages/HomeUser.jsx';
-import Invitaciones from './pages/Invitaciones';
-import More from './pages/More';
-import Perfil from './pages/Perfil';
-import InfoBoda from './pages/InfoBoda';
-import GestionProveedores from './pages/GestionProveedores.jsx';
-import SavedSuppliers from './pages/SavedSuppliers.jsx';
-import SupplierCompare from './pages/SupplierCompare.jsx';
-import QuoteResponsesPage from './pages/QuoteResponsesPage.jsx';
-import ResetPassword from './pages/ResetPassword.jsx';
-import PublicWedding from './pages/PublicWedding';
-import PublicQuoteResponse from './pages/PublicQuoteResponse';
-import RSVPConfirm from './pages/RSVPConfirm';
-import RSVPDashboard from './pages/RSVPDashboard';
-import SupplierPortal from './pages/SupplierPortal';
-import SupplierRegistration from './pages/SupplierRegistration';
-import SupplierLogin from './pages/suppliers/SupplierLogin';
-import SupplierSetPassword from './pages/suppliers/SupplierSetPassword';
-import SupplierRegister from './pages/suppliers/SupplierRegister';
-import SupplierDashboard from './pages/suppliers/SupplierDashboard';
-import SupplierRequestDetail from './pages/suppliers/SupplierRequestDetail';
-import SupplierRequests from './pages/suppliers/SupplierRequestsNew';
-import SupplierPlans from './pages/suppliers/SupplierPlans';
-import SupplierPortfolio from './pages/suppliers/SupplierPortfolio';
-import SupplierProducts from './pages/suppliers/SupplierProducts';
-import SupplierReviews from './pages/suppliers/SupplierReviews';
-import SupplierAnalytics from './pages/suppliers/SupplierAnalytics';
-import SupplierMessages from './pages/suppliers/SupplierMessages';
-import SupplierAvailability from './pages/suppliers/SupplierAvailability';
-import SupplierPayments from './pages/suppliers/SupplierPayments';
-import SupplierDebug from './pages/suppliers/SupplierDebug';
-import SupplierPublicPage from './pages/SupplierPublicPage';
-import Tasks from './pages/Tasks';
-import Checklist from './pages/Checklist';
-import PhotoShotListPage from './pages/PhotoShotListPage';
-import PruebasEnsayos from './pages/PruebasEnsayos';
-import DesignWizard from './pages/DesignWizard';
-import TransporteLogistica from './pages/TransporteLogistica';
-import GestionNinos from './pages/GestionNinos';
-import WeddingTeam from './pages/WeddingTeam';
-import EventosRelacionados from './pages/EventosRelacionados';
-import TramitesLegales from './pages/TramitesLegales';
-import InvitadosEspeciales from './pages/InvitadosEspeciales';
-import DiaDeBoda from './pages/DiaDeBoda';
-import PostBoda from './pages/PostBoda';
-import VerifyEmail from './pages/VerifyEmail.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
-import AdminLogin from './pages/admin/AdminLogin.jsx';
-import AdminLayout from './pages/admin/AdminLayout.jsx';
-import AdminDashboard from './pages/admin/AdminDashboard.jsx';
-import AdminMetrics from './pages/admin/AdminMetricsComplete.jsx';
-import AdminPortfolio from './pages/admin/AdminPortfolio.jsx';
-import AdminUsers from './pages/admin/AdminUsers.jsx';
-import AdminSpecsManager from './pages/admin/AdminSpecsManager.jsx';
-import AdminIntegrations from './pages/admin/AdminIntegrations.jsx';
-import AdminSettings from './pages/admin/AdminSettings.jsx';
-import AdminAlerts from './pages/admin/AdminAlerts.jsx';
-import AdminBroadcast from './pages/admin/AdminBroadcast.jsx';
-import AdminAutomations from './pages/admin/AdminAutomations.jsx';
-import AdminDiscounts from './pages/admin/AdminDiscounts.jsx';
-import AdminReports from './pages/admin/AdminReports.jsx';
-import AdminSupport from './pages/admin/AdminSupport.jsx';
-import AdminSuppliers from './pages/admin/AdminSuppliers.jsx';
-import AdminTaskTemplates from './pages/admin/AdminTaskTemplates.jsx';
-import AdminBlog from './pages/admin/AdminBlog.jsx';
-import AdminDebugPayments from './pages/admin/AdminDebugPayments.jsx';
-import AdminRevolut from './pages/admin/AdminRevolut.jsx';
-import AdminPayouts from './pages/admin/AdminPayouts.jsx';
-import PartnerStats from './pages/PartnerStats.jsx';
-import WebEditor from './pages/WebEditor';
-import WeddingSite from './pages/WeddingSite';
-import PublicWeb from './pages/PublicWeb';
-import PublicRSVP from './pages/PublicRSVP';
+const BankConnect = React.lazy(() => import('./pages/BankConnect.jsx'));
+const BodaDetalle = React.lazy(() => import('./pages/BodaDetalle.jsx'));
+const Bodas = React.lazy(() => import('./pages/Bodas'));
+const DevEnsureFinance = React.lazy(() => import('./pages/DevEnsureFinance'));
+const DevSeedGuests = React.lazy(() => import('./pages/DevSeedGuests'));
+const Finance = React.lazy(() => import('./pages/Finance'));
+const HomeUser = React.lazy(() => import('./pages/HomeUser.jsx'));
+const Invitaciones = React.lazy(() => import('./pages/Invitaciones'));
+const More = React.lazy(() => import('./pages/More'));
+const Perfil = React.lazy(() => import('./pages/Perfil'));
+const InfoBoda = React.lazy(() => import('./pages/InfoBoda'));
+const GestionProveedores = React.lazy(() => import('./pages/GestionProveedores.jsx'));
+const SavedSuppliers = React.lazy(() => import('./pages/SavedSuppliers.jsx'));
+const SupplierCompare = React.lazy(() => import('./pages/SupplierCompare.jsx'));
+const QuoteResponsesPage = React.lazy(() => import('./pages/QuoteResponsesPage.jsx'));
+const ResetPassword = React.lazy(() => import('./pages/ResetPassword.jsx'));
+const PublicWedding = React.lazy(() => import('./pages/PublicWedding'));
+const PublicQuoteResponse = React.lazy(() => import('./pages/PublicQuoteResponse'));
+const RSVPConfirm = React.lazy(() => import('./pages/RSVPConfirm'));
+const RSVPDashboard = React.lazy(() => import('./pages/RSVPDashboard'));
+const SupplierPortal = React.lazy(() => import('./pages/SupplierPortal'));
+const SupplierRegistration = React.lazy(() => import('./pages/SupplierRegistration'));
+const SupplierLogin = React.lazy(() => import('./pages/suppliers/SupplierLogin'));
+const SupplierSetPassword = React.lazy(() => import('./pages/suppliers/SupplierSetPassword'));
+const SupplierRegister = React.lazy(() => import('./pages/suppliers/SupplierRegister'));
+const SupplierDashboard = React.lazy(() => import('./pages/suppliers/SupplierDashboard'));
+const SupplierRequestDetail = React.lazy(() => import('./pages/suppliers/SupplierRequestDetail'));
+const SupplierRequests = React.lazy(() => import('./pages/suppliers/SupplierRequestsNew'));
+const SupplierPlans = React.lazy(() => import('./pages/suppliers/SupplierPlans'));
+const SupplierPortfolio = React.lazy(() => import('./pages/suppliers/SupplierPortfolio'));
+const SupplierProducts = React.lazy(() => import('./pages/suppliers/SupplierProducts'));
+const SupplierReviews = React.lazy(() => import('./pages/suppliers/SupplierReviews'));
+const SupplierAnalytics = React.lazy(() => import('./pages/suppliers/SupplierAnalytics'));
+const SupplierMessages = React.lazy(() => import('./pages/suppliers/SupplierMessages'));
+const SupplierAvailability = React.lazy(() => import('./pages/suppliers/SupplierAvailability'));
+const SupplierPayments = React.lazy(() => import('./pages/suppliers/SupplierPayments'));
+const SupplierDebug = React.lazy(() => import('./pages/suppliers/SupplierDebug'));
+const SupplierPublicPage = React.lazy(() => import('./pages/SupplierPublicPage'));
+const Tasks = React.lazy(() => import('./pages/Tasks'));
+const Checklist = React.lazy(() => import('./pages/Checklist'));
+const PhotoShotListPage = React.lazy(() => import('./pages/PhotoShotListPage'));
+const PruebasEnsayos = React.lazy(() => import('./pages/PruebasEnsayos'));
+const DesignWizard = React.lazy(() => import('./pages/DesignWizard'));
+const TransporteLogistica = React.lazy(() => import('./pages/TransporteLogistica'));
+const GestionNinos = React.lazy(() => import('./pages/GestionNinos'));
+const WeddingTeam = React.lazy(() => import('./pages/WeddingTeam'));
+const EventosRelacionados = React.lazy(() => import('./pages/EventosRelacionados'));
+const TramitesLegales = React.lazy(() => import('./pages/TramitesLegales'));
+const InvitadosEspeciales = React.lazy(() => import('./pages/InvitadosEspeciales'));
+const DiaDeBoda = React.lazy(() => import('./pages/DiaDeBoda'));
+const PostBoda = React.lazy(() => import('./pages/PostBoda'));
+const VerifyEmail = React.lazy(() => import('./pages/VerifyEmail.jsx'));
+const AdminLogin = React.lazy(() => import('./pages/admin/AdminLogin.jsx'));
+const AdminLayout = React.lazy(() => import('./pages/admin/AdminLayout.jsx'));
+const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard.jsx'));
+const AdminMetrics = React.lazy(() => import('./pages/admin/AdminMetricsComplete.jsx'));
+const AdminPortfolio = React.lazy(() => import('./pages/admin/AdminPortfolio.jsx'));
+const AdminUsers = React.lazy(() => import('./pages/admin/AdminUsers.jsx'));
+const AdminSpecsManager = React.lazy(() => import('./pages/admin/AdminSpecsManager.jsx'));
+const AdminIntegrations = React.lazy(() => import('./pages/admin/AdminIntegrations.jsx'));
+const AdminSettings = React.lazy(() => import('./pages/admin/AdminSettings.jsx'));
+const AdminAlerts = React.lazy(() => import('./pages/admin/AdminAlerts.jsx'));
+const AdminBroadcast = React.lazy(() => import('./pages/admin/AdminBroadcast.jsx'));
+const AdminAutomations = React.lazy(() => import('./pages/admin/AdminAutomations.jsx'));
+const AdminDiscounts = React.lazy(() => import('./pages/admin/AdminDiscounts.jsx'));
+const AdminReports = React.lazy(() => import('./pages/admin/AdminReports.jsx'));
+const AdminSupport = React.lazy(() => import('./pages/admin/AdminSupport.jsx'));
+const AdminSuppliers = React.lazy(() => import('./pages/admin/AdminSuppliers.jsx'));
+const AdminTaskTemplates = React.lazy(() => import('./pages/admin/AdminTaskTemplates.jsx'));
+const AdminBlog = React.lazy(() => import('./pages/admin/AdminBlog.jsx'));
+const AdminDebugPayments = React.lazy(() => import('./pages/admin/AdminDebugPayments.jsx'));
+const AdminRevolut = React.lazy(() => import('./pages/admin/AdminRevolut.jsx'));
+const AdminPayouts = React.lazy(() => import('./pages/admin/AdminPayouts.jsx'));
+const PartnerStats = React.lazy(() => import('./pages/PartnerStats.jsx'));
+const WebEditor = React.lazy(() => import('./pages/WebEditor'));
+const WeddingSite = React.lazy(() => import('./pages/WeddingSite'));
+const PublicWeb = React.lazy(() => import('./pages/PublicWeb'));
+const PublicRSVP = React.lazy(() => import('./pages/PublicRSVP'));
+const DJDownloadsPage = React.lazy(() => import('./pages/DJDownloadsPage'));
 import RequireAdmin from './routes/RequireAdmin.jsx';
-import MarketingAppOverview from './pages/marketing/AppOverview.jsx';
-import MarketingPricing from './pages/marketing/Pricing.jsx';
-import MarketingAccess from './pages/marketing/Access.jsx';
-import ForSuppliers from './pages/marketing/ForSuppliers.jsx';
-import ForPlanners from './pages/marketing/ForPlanners.jsx';
-import Partners from './pages/marketing/Partners.jsx';
-import PaymentSuccess from './pages/payment/PaymentSuccess.jsx';
-import PaymentCancel from './pages/payment/PaymentCancel.jsx';
-import SubscriptionDashboard from './pages/SubscriptionDashboard.jsx';
+const MarketingAppOverview = React.lazy(() => import('./pages/marketing/AppOverview.jsx'));
+const MarketingPricing = React.lazy(() => import('./pages/marketing/Pricing.jsx'));
+const MarketingAccess = React.lazy(() => import('./pages/marketing/Access.jsx'));
+const ForSuppliers = React.lazy(() => import('./pages/marketing/ForSuppliers.jsx'));
+const ForPlanners = React.lazy(() => import('./pages/marketing/ForPlanners.jsx'));
+const Partners = React.lazy(() => import('./pages/marketing/Partners.jsx'));
+const PaymentSuccess = React.lazy(() => import('./pages/payment/PaymentSuccess.jsx'));
+const PaymentCancel = React.lazy(() => import('./pages/payment/PaymentCancel.jsx'));
+const SubscriptionDashboard = React.lazy(() => import('./pages/SubscriptionDashboard.jsx'));
 // Nota: especificamos la extensi€)n .jsx para asegurar la resoluci€)n en entornos Linux/CI
 const Invitados = React.lazy(() => import('./pages/Invitados'));
 // Lazy load de páginas pesadas para reducir bundle inicial
@@ -160,32 +161,16 @@ const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost.jsx'));
 const BlogAuthor = React.lazy(() => import('./pages/BlogAuthor.jsx'));
-import ProveedoresCompareTest from './pages/test/ProveedoresCompareTest.jsx';
-import ProveedoresSmoke from './pages/test/ProveedoresSmoke.jsx';
-import ProveedoresFlowHarness from './pages/test/ProveedoresFlowHarness.jsx';
+const ProveedoresCompareTest = React.lazy(() => import('./pages/test/ProveedoresCompareTest.jsx'));
+const ProveedoresSmoke = React.lazy(() => import('./pages/test/ProveedoresSmoke.jsx'));
+const ProveedoresFlowHarness = React.lazy(() => import('./pages/test/ProveedoresFlowHarness.jsx'));
 const BudgetApprovalHarness = React.lazy(() => import('./pages/test/BudgetApprovalHarness.jsx'));
-// Importar componentes de test directamente para evitar problemas de lazy loading
-import RoleUpgradeHarnessComponent from './pages/test/RoleUpgradeHarness.jsx';
-import WeddingTeamHarnessComponent from './pages/test/WeddingTeamHarness.jsx';
-
-// En modo test, usar componentes directos; en producción usar lazy
-const isTestMode =
-  import.meta.env.VITE_TEST_MODE === 'true' || (typeof window !== 'undefined' && window.Cypress);
-
-const WeddingTeamHarness = isTestMode
-  ? WeddingTeamHarnessComponent
-  : React.lazy(() => import('./pages/test/WeddingTeamHarness.jsx'));
-
-const RoleUpgradeHarness = isTestMode
-  ? RoleUpgradeHarnessComponent
-  : React.lazy(() => import('./pages/test/RoleUpgradeHarness.jsx'));
+const WeddingTeamHarness = React.lazy(() => import('./pages/test/WeddingTeamHarness.jsx'));
+const RoleUpgradeHarness = React.lazy(() => import('./pages/test/RoleUpgradeHarness.jsx'));
 const CreateWeddingAI = React.lazy(() => import('./pages/CreateWeddingAI.jsx'));
 const CreateWeddingAssistant = React.lazy(() => import('./pages/CreateWeddingAssistant.jsx'));
-
 const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
-// (dedupe) rutas públicas ya importadas arriba
 
-import './utils/consoleCommands';
 import UserProvider from './context/UserContext';
 
 function ProtectedRoute() {
@@ -407,6 +392,7 @@ function App() {
                           <Route path="p/:slug" element={<PublicWedding />} />
                           <Route path="web/:slug" element={<PublicWeb />} />
                           <Route path="rsvp/:slug" element={<PublicRSVP />} />
+                          <Route path="dj-downloads/:weddingId/:token" element={<DJDownloadsPage />} />
 
                           {/* Respuesta pública de presupuestos (proveedores responden por email) */}
                           <Route

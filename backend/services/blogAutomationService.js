@@ -65,7 +65,7 @@ export async function generateBlogAssets(input) {
     try {
       coverGeneration = await generateCoverImageFromPrompt(aiArticle.coverPrompt, {
         size: process.env.BLOG_COVER_IMAGE_SIZE || '1792x1024',
-        quality: process.env.BLOG_COVER_IMAGE_QUALITY || 'high',
+        quality: process.env.BLOG_COVER_IMAGE_QUALITY || 'standard',
       });
     } catch (coverError) {
       logger.error(
@@ -190,7 +190,7 @@ export async function saveGeneratedBlogPost({
     generatedAt: now,
     updatedAt: now,
     scheduledAt: scheduledAt ? admin.firestore.Timestamp.fromDate(new Date(scheduledAt)) : null,
-    publishedAt: null,
+    publishedAt: status === 'published' ? now : null,
     excerpt: ensureExcerpt(aiArticle.markdown, aiArticle.excerpt),
     content: {
       markdown: aiArticle.markdown,
@@ -416,6 +416,29 @@ async function finalizePlanFailure(docRef, error) {
   );
 }
 
+function generateRandomTopic(language = 'es') {
+  const topics = [
+    'Tendencias actuales en decoración de bodas',
+    'Cómo elegir el vestido de novia perfecto',
+    'Ideas innovadoras para ceremonias civiles',
+    'Guía completa para contratar proveedores de boda',
+    'Inspiración para bodas íntimas y pequeñas',
+    'Consejos para organizar una boda con presupuesto ajustado',
+    'Las mejores localizaciones para bodas en España',
+    'Tendencias en fotografía de bodas',
+    'Cómo planificar el banquete perfecto',
+    'Ideas únicas para invitaciones de boda',
+    'Música y entretenimiento para bodas modernas',
+    'Consejos para reducir el estrés en la planificación',
+    'Tendencias en moda nupcial para esta temporada',
+    'Cómo personalizar tu ceremonia de boda',
+    'Ideas sostenibles para bodas ecológicas',
+  ];
+  
+  const randomIndex = Math.floor(Math.random() * topics.length);
+  return topics[randomIndex];
+}
+
 export async function runBlogAutomationCycle({
   now = new Date(),
   planDays = DEFAULT_PLAN_WINDOW_DAYS,
@@ -423,43 +446,25 @@ export async function runBlogAutomationCycle({
   language = 'es',
   focus = 'bodas',
   publishHour = DEFAULT_PUBLISH_HOUR,
-  postStatus = 'scheduled',
+  postStatus = 'published',
 } = {}) {
-  const ensureResult = await ensurePlanWindow({
-    startDate: now,
-    days: planDays,
-    language,
-    focus,
-  }).catch((error) => {
-    logger.error('[blogAutomation] ensurePlanWindow failed:', error?.message || error);
-    return { created: 0, source: null, error: error?.message };
-  });
-
-  const claimed = await claimPlanEntry({ startDate: now, lookaheadDays });
-  if (!claimed) {
-    return {
-      ensured: ensureResult?.created || 0,
-      processed: 0,
-      reason: 'no-plan-entry',
-    };
-  }
-
-  const { docRef, data } = claimed;
   try {
+    const topic = generateRandomTopic(language);
+    
     const generationInput = {
-      topic: data.topic,
-      tone: data.tone || 'inspirador',
-      language: data.language || language,
+      topic,
+      tone: 'inspirador',
+      language,
       length: 'medio',
-      keywords: Array.isArray(data.keywords) ? data.keywords : [],
-      audience: data.audience || undefined,
+      keywords: ['bodas', 'lovenda', 'planificación'],
+      audience: 'parejas',
       includeTips: true,
       includeCTA: true,
     };
 
+    logger.info('[blogAutomation] Generando artículo con tema: %s', topic);
+
     const assets = await generateBlogAssets(generationInput);
-    const scheduledIso =
-      postStatus === 'scheduled' ? computeScheduledIso(docRef.id, publishHour) : null;
 
     const saved = await saveGeneratedBlogPost({
       input: { ...generationInput, authorId: assets.authorProfile?.id },
@@ -471,38 +476,23 @@ export async function runBlogAutomationCycle({
       authorProfile: assets.authorProfile,
       authorPrompt: assets.authorPrompt,
       status: postStatus,
-      scheduledAt: scheduledIso,
-      createdBy: 'automation:worker',
+      scheduledAt: null,
+      createdBy: 'automation:on-demand',
       automationMeta: {
-        planDate: docRef.id,
-        planSource: data.source || 'auto',
+        generatedOnDemand: true,
         authorId: assets.authorProfile?.id || null,
       },
     });
 
-    await finalizePlanSuccess(docRef, {
-      postId: saved.id,
-      scheduledAtIso: scheduledIso,
-      assets,
-    });
-
     return {
-      ensured: ensureResult?.created || 0,
       processed: 1,
-      planDate: docRef.id,
       postId: saved.id,
+      topic,
     };
   } catch (error) {
-    logger.error(
-      '[blogAutomation] Failed to generate article for %s: %s',
-      docRef.id,
-      error?.message || error
-    );
-    await finalizePlanFailure(docRef, error);
+    logger.error('[blogAutomation] Failed to generate article: %s', error?.message || error);
     return {
-      ensured: ensureResult?.created || 0,
       processed: 0,
-      planDate: docRef.id,
       error: error?.message || 'unknown-error',
     };
   }

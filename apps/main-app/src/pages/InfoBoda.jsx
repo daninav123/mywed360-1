@@ -13,6 +13,7 @@ import SupplierRequirementsSection from '../components/wedding/SupplierRequireme
 import WeddingDesignChat from '../components/wedding/WeddingDesignChat';
 import { initializeWeddingDesign } from '../utils/weddingDesignTemplate';
 import { initializeSupplierRequirements } from '../utils/supplierRequirementsTemplate';
+import { validateIBAN, formatIBAN, getIBANCountry, getIBANErrorMessage } from '../utils/ibanValidator';
 
 function InfoBoda() {
   const { t } = useTranslation();
@@ -41,11 +42,18 @@ function InfoBoda() {
     additionalInfo: '',
     faqs: '',
     // VISIÓN Y EXPECTATIVAS
+    howWeMet: '',
     weddingConcept: '',
     mostImportant: '',
     mustHave: '',
     mustNotHave: '',
     remember10Years: '',
+    // COORDENADAS GPS
+    ceremonyGPS: '',
+    banquetGPS: '',
+    // REDES SOCIALES
+    weddingHashtag: '',
+    instagramHandle: '',
     // CEREMONIA DETALLADA
     ceremonyType: '',
     ceremonyRite: '',
@@ -84,6 +92,10 @@ function InfoBoda() {
   const [supplierRequirements, setSupplierRequirements] = useState(initializeSupplierRequirements());
   const [showChatModal, setShowChatModal] = useState(false);
   const [chatContext, setChatContext] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [autoSaveTimer, setAutoSaveTimer] = useState(null);
+  const [ibanError, setIbanError] = useState('');
+  const [ibanCountry, setIbanCountry] = useState('');
 
   const { userProfile, user: authUser } = useAuth();
   const fallbackUid = authUser?.uid || auth.currentUser?.uid || null;
@@ -130,8 +142,33 @@ function InfoBoda() {
     return () => window.removeEventListener('maloveapp-guests', updateGuestCount);
   }, []);
 
-  const handleWeddingChange = (e) =>
-    setWeddingInfo((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleWeddingChange = (e) => {
+    const { name, value } = e.target;
+    setWeddingInfo((prev) => ({ ...prev, [name]: value }));
+    setHasUnsavedChanges(true);
+    
+    // Validar IBAN en tiempo real
+    if (name === 'giftAccount') {
+      handleIBANChange(value);
+    }
+  };
+
+  const handleIBANChange = (value) => {
+    if (!value || value.trim() === '') {
+      setIbanError('');
+      setIbanCountry('');
+      return;
+    }
+    
+    const error = getIBANErrorMessage(value);
+    setIbanError(error);
+    
+    if (!error && value.length >= 2) {
+      setIbanCountry(getIBANCountry(value));
+    } else {
+      setIbanCountry('');
+    }
+  };
 
   // Generar slug desde el nombre de la pareja
   const generateSlug = () => {
@@ -158,6 +195,27 @@ function InfoBoda() {
     const url = `${window.location.origin}/web/${webSlug}`;
     navigator.clipboard.writeText(url);
     toast.success('¡URL copiada al portapapeles!');
+  };
+
+  // Generar QR Code
+  const generateQRCode = () => {
+    if (!webSlug) {
+      toast.error('Primero genera un slug para la web');
+      return;
+    }
+    const url = `${window.location.origin}/web/${webSlug}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+    window.open(qrUrl, '_blank');
+    toast.success('QR generado en nueva pestaña');
+  };
+
+  // Preview de la web
+  const previewWeb = () => {
+    if (!webSlug) {
+      toast.error('Primero genera un slug para la web');
+      return;
+    }
+    window.open(`/web/${webSlug}`, '_blank');
   };
 
   const handleChatOpen = (context) => {
@@ -299,12 +357,14 @@ function InfoBoda() {
     },
   ];
 
-  const saveWeddingInfo = async () => {
+  const saveWeddingInfo = async (showToast = true) => {
     const uid = fallbackUid;
     if (!uid) {
-      toast.error(
-        t('profile.errors.userNotFound', { defaultValue: 'No se pudo determinar tu usuario' })
-      );
+      if (showToast) {
+        toast.error(
+          t('profile.errors.userNotFound', { defaultValue: 'No se pudo determinar tu usuario' })
+        );
+      }
       return;
     }
     // Validaciones rápidas
@@ -334,7 +394,10 @@ function InfoBoda() {
           updatedAt: serverTimestamp(),
         });
         setLastSavedAt(new Date());
-        toast.success(t('app.savedSuccessfully', { defaultValue: 'Guardado exitosamente' }));
+        setHasUnsavedChanges(false);
+        if (showToast) {
+          toast.success(t('app.savedSuccessfully', { defaultValue: 'Guardado exitosamente' }));
+        }
       } else {
         toast.error(
           t('profile.errors.weddingNotFound', { defaultValue: 'No se encontró tu boda' })
@@ -345,6 +408,19 @@ function InfoBoda() {
       toast.error(t('profile.errors.savingProfile', { defaultValue: 'Error al guardar' }));
     }
   };
+
+  // Auto-guardado cada 30 segundos si hay cambios
+  useEffect(() => {
+    if (!hasUnsavedChanges || !weddingId) return;
+    
+    const timer = setTimeout(() => {
+      saveWeddingInfo();
+      setHasUnsavedChanges(false);
+    }, 30000);
+    
+    setAutoSaveTimer(timer);
+    return () => clearTimeout(timer);
+  }, [hasUnsavedChanges, weddingInfo]);
 
   useEffect(() => {
     const loadWeddingInfo = async () => {
@@ -410,6 +486,13 @@ function InfoBoda() {
               // LOGÍSTICA AVANZADA
               pets: wi.pets || false,
               soundRestrictions: wi.soundRestrictions || '',
+              // COORDENADAS GPS
+              ceremonyGPS: wi.ceremonyGPS || '',
+              banquetGPS: wi.banquetGPS || '',
+              // REDES SOCIALES
+              howWeMet: wi.howWeMet || '',
+              weddingHashtag: wi.weddingHashtag || '',
+              instagramHandle: wi.instagramHandle || '',
             });
             if (wi.importantInfo) setImportantInfo(wi.importantInfo);
 
@@ -434,15 +517,48 @@ function InfoBoda() {
   return (
     <div className="p-4 max-w-6xl mx-auto space-y-6">
       <div className="page-header">
-        <h1 className="page-title">
-          {t('navigation.weddingInfo', { defaultValue: 'Información de la Boda' })}
-        </h1>
-        {lastSavedAt && (
-          <div className="text-sm text-muted">
-            {t('profile.lastSaved', { defaultValue: 'Último guardado:' })}{' '}
-            {new Date(lastSavedAt).toLocaleString()}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="page-title">
+              {t('navigation.weddingInfo', { defaultValue: 'Información de la Boda' })}
+            </h1>
+            <div className="flex items-center gap-3 mt-2">
+              {lastSavedAt && (
+                <div className="text-sm text-muted">
+                  {t('profile.lastSaved', { defaultValue: 'Último guardado:' })}{' '}
+                  {new Date(lastSavedAt).toLocaleString()}
+                </div>
+              )}
+              {hasUnsavedChanges && (
+                <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
+                  ⚠️ Cambios sin guardar
+                </span>
+              )}
+            </div>
           </div>
-        )}
+          {webSlug && (
+            <div className="flex gap-2">
+              <Button 
+                onClick={previewWeb}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                👁️ Preview Web
+              </Button>
+              <Button 
+                onClick={generateQRCode}
+                className="bg-purple-500 hover:bg-purple-600 text-white"
+              >
+                📱 Generar QR
+              </Button>
+              <Button 
+                onClick={copyPublicUrl}
+                className="bg-green-500 hover:bg-green-600 text-white"
+              >
+                🔗 Copiar URL
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Tabs de navegación */}
@@ -895,6 +1011,13 @@ function InfoBoda() {
               onChange={handleWeddingChange}
               placeholder="Calle Mayor, 1"
             />
+            <Input
+              label="📍 Coordenadas GPS ceremonia (opcional)"
+              name="ceremonyGPS"
+              value={weddingInfo.ceremonyGPS ?? ''}
+              onChange={handleWeddingChange}
+              placeholder="40.4168, -3.7038 o enlace Google Maps"
+            />
           </div>
         </div>
       </Card>
@@ -923,6 +1046,13 @@ function InfoBoda() {
               value={weddingInfo.receptionAddress ?? ''}
               onChange={handleWeddingChange}
               placeholder="Carretera M-40, km 23"
+            />
+            <Input
+              label="📍 Coordenadas GPS banquete (opcional)"
+              name="banquetGPS"
+              value={weddingInfo.banquetGPS ?? ''}
+              onChange={handleWeddingChange}
+              placeholder="40.4168, -3.7038 o enlace Google Maps"
             />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de espacio</label>
@@ -1282,13 +1412,72 @@ function InfoBoda() {
             />
           </div>
           <div>
-            <Input
-              label="Cuenta de regalos"
-              name="giftAccount"
-              value={weddingInfo.giftAccount ?? ''}
-              onChange={handleWeddingChange}
-              placeholder="ES12 3456 7890 1234 5678 90"
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              💳 Cuenta de regalos (IBAN)
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                name="giftAccount"
+                value={weddingInfo.giftAccount ?? ''}
+                onChange={handleWeddingChange}
+                placeholder="ES12 3456 7890 1234 5678 90"
+                maxLength="34"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none ${
+                  ibanError
+                    ? 'border-red-500 focus:ring-red-500 bg-red-50'
+                    : weddingInfo.giftAccount && !ibanError
+                    ? 'border-green-500 focus:ring-green-500 bg-green-50'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
+              />
+              {weddingInfo.giftAccount && (
+                <div className="absolute right-3 top-2.5">
+                  {ibanError ? (
+                    <span className="text-red-500 text-xl">❌</span>
+                  ) : (
+                    <span className="text-green-500 text-xl">✅</span>
+                  )}
+                </div>
+              )}
+            </div>
+            {ibanError && (
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <span>⚠️</span>
+                {ibanError}
+              </p>
+            )}
+            {!ibanError && ibanCountry && weddingInfo.giftAccount && (
+              <p className="mt-1 text-sm text-green-600 flex items-center gap-1">
+                <span>✓</span>
+                IBAN válido - {ibanCountry}
+              </p>
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              Este IBAN aparecerá en las invitaciones y en la web para que los invitados puedan enviar regalos
+            </p>
+          </div>
+          <div className="border-t pt-4 mt-4">
+            <h3 className="text-md font-semibold text-gray-900 mb-3">📱 Redes Sociales</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="#️⃣ Hashtag de la boda"
+                name="weddingHashtag"
+                value={weddingInfo.weddingHashtag ?? ''}
+                onChange={handleWeddingChange}
+                placeholder="#MariaYJuan2026"
+              />
+              <Input
+                label="📸 Instagram (opcional)"
+                name="instagramHandle"
+                value={weddingInfo.instagramHandle ?? ''}
+                onChange={handleWeddingChange}
+                placeholder="@bodademariajuan"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              💡 Invita a tus invitados a compartir fotos con vuestro hashtag
+            </p>
           </div>
         </div>
       </Card>

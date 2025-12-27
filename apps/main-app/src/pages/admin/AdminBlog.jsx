@@ -3,12 +3,10 @@ import { toast } from 'react-toastify';
 
 import {
   archiveAdminBlogPost,
-  generateAdminBlogPost,
   listAdminBlogPosts,
   publishAdminBlogPost,
   scheduleAdminBlogPost,
   updateAdminBlogPost,
-  listAdminBlogPlan,
   triggerAdminBlogPlanGeneration,
 } from '../../services/adminBlogService';
 
@@ -28,29 +26,6 @@ const STATUS_BADGE = {
   failed: 'bg-danger-soft text-danger',
 };
 
-const PLAN_STATUS_LABELS = {
-  planned: 'Pendiente',
-  generating: 'Generando',
-  scheduled: 'Programado',
-  failed: 'Fallido',
-};
-
-const PLAN_STATUS_BADGE = {
-  planned: 'bg-[color:var(--color-border)] text-muted',
-  generating: 'bg-warning-soft text-warning',
-  scheduled: 'bg-success-soft text-success',
-  failed: 'bg-danger-soft text-danger',
-};
-
-const defaultGenerateForm = {
-  topic: '',
-  language: 'es',
-  tone: 'inspirador',
-  length: 'medio',
-  keywords: '',
-  includeTips: true,
-  includeCTA: true,
-};
 
 const emptyEditorState = {
   id: null,
@@ -59,7 +34,6 @@ const emptyEditorState = {
   markdown: '',
   tagsInput: '',
   status: 'draft',
-  scheduledAt: '',
 };
 
 function formatDate(value) {
@@ -85,55 +59,19 @@ function parseTags(input) {
 const AdminBlog = () => {
   const [posts, setPosts] = useState([]);
   const [loadingList, setLoadingList] = useState(false);
-  const [listStatusFilter, setListStatusFilter] = useState('all');
+  const [listStatusFilter, setListStatusFilter] = useState('published');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedId, setSelectedId] = useState(null);
   const [editor, setEditor] = useState(emptyEditorState);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const [generateForm, setGenerateForm] = useState(defaultGenerateForm);
-  const [scheduledPosts, setScheduledPosts] = useState([]);
-  const [loadingScheduled, setLoadingScheduled] = useState(false);
-  const [planEntries, setPlanEntries] = useState([]);
-  const [loadingPlan, setLoadingPlan] = useState(false);
-  const [triggeringPlan, setTriggeringPlan] = useState(false);
 
   const selectedPost = useMemo(
     () => posts.find((post) => post.id === selectedId) || null,
     [posts, selectedId]
   );
 
-  const loadScheduled = useCallback(async () => {
-    setLoadingScheduled(true);
-    try {
-      const { posts: scheduled } = await listAdminBlogPosts({
-        status: 'scheduled',
-        limit: 50,
-      });
-      setScheduledPosts(scheduled || []);
-    } catch (error) {
-      // console.error('[AdminBlog] loadScheduled failed', error);
-      toast.error('No se pudieron cargar las noticias programadas.');
-    } finally {
-      setLoadingScheduled(false);
-    }
-  }, []);
-
-  const loadPlan = useCallback(async () => {
-    setLoadingPlan(true);
-    try {
-      const { entries } = await listAdminBlogPlan({
-        limit: 90,
-      });
-      setPlanEntries(entries || []);
-    } catch (error) {
-      // console.error('[AdminBlog] loadPlan failed', error);
-      toast.error('No se pudo cargar el plan editorial.');
-    } finally {
-      setLoadingPlan(false);
-    }
-  }, []);
 
   const loadPosts = async (status = listStatusFilter) => {
     setLoadingList(true);
@@ -151,30 +89,27 @@ const AdminBlog = () => {
     }
   };
 
-  const handleTriggerAutomation = async () => {
-    setTriggeringPlan(true);
+  const handleGenerateNew = async () => {
+    setGenerating(true);
     try {
       const { result } = await triggerAdminBlogPlanGeneration();
       if (result?.processed) {
-        toast.success('Se generó un artículo del plan editorial.');
+        toast.success('✅ Artículo generado con IA en 6 idiomas');
       } else if (result?.reason === 'no-plan-entry') {
-        toast.info('No hay entradas pendientes en el plan para generar.');
+        toast.info('No hay temas pendientes en el plan automático.');
       } else {
-        toast.success('Se ejecutó la automatización del plan editorial.');
+        toast.success('Generación iniciada.');
       }
-      await Promise.all([loadPlan(), loadScheduled(), loadPosts(listStatusFilter)]);
+      await loadPosts(listStatusFilter);
     } catch (error) {
-      // console.error('[AdminBlog] trigger automation failed', error);
-      toast.error('No se pudo ejecutar la automatización del plan.');
+      toast.error('Error al generar el artículo.');
     } finally {
-      setTriggeringPlan(false);
+      setGenerating(false);
     }
   };
 
   useEffect(() => {
-    loadPosts('all');
-    loadScheduled();
-    loadPlan();
+    loadPosts('published');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -190,40 +125,8 @@ const AdminBlog = () => {
       markdown: selectedPost.content?.markdown || '',
       tagsInput: (selectedPost.tags || []).join(', '),
       status: selectedPost.status || 'draft',
-      scheduledAt: selectedPost.scheduledAt ? selectedPost.scheduledAt.slice(0, 16) : '',
     });
   }, [selectedPost]);
-
-  const handleGenerateChange = (field, value) => {
-    setGenerateForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleGenerate = async (event) => {
-    event.preventDefault();
-    if (!generateForm.topic.trim()) {
-      toast.warning('Introduce un tema para generar el artículo.');
-      return;
-    }
-    setGenerating(true);
-    try {
-      const payload = {
-        ...generateForm,
-        keywords: parseTags(generateForm.keywords),
-      };
-      const { post } = await generateAdminBlogPost(payload);
-      toast.success('Artículo generado correctamente.');
-      setPosts((prev) => [post, ...prev]);
-      setSelectedId(post.id);
-      setListStatusFilter('all');
-      setGenerateForm(defaultGenerateForm);
-      loadScheduled();
-    } catch (error) {
-      // console.error('[AdminBlog] generate failed', error);
-      toast.error('No se pudo generar el artículo. Revisa el log de servidor.');
-    } finally {
-      setGenerating(false);
-    }
-  };
 
   const updatePostInState = (updatedPost) => {
     setPosts((prev) => prev.map((post) => (post.id === updatedPost.id ? updatedPost : post)));
@@ -340,256 +243,70 @@ const AdminBlog = () => {
     });
   }, [posts, listStatusFilter, searchTerm]);
 
+  const latestPost = useMemo(() => {
+    return posts
+      .filter((p) => p.status === 'scheduled' || p.status === 'published')
+      .sort((a, b) => {
+        const dateA = new Date(a.generatedAt || a.createdAt || 0).getTime();
+        const dateB = new Date(b.generatedAt || b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })[0];
+  }, [posts]);
+
   return (
-    <div className="layout-container-wide space-y-8 pb-16 pt-6">
-      <section className="rounded-xl border border-soft bg-surface p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+    <div className="layout-container-wide space-y-6 pb-16 pt-6">
+      {/* Header + Botón Principal */}
+      <section className="rounded-xl border border-soft bg-surface p-8 shadow-sm">
+        <div className="text-center space-y-4">
           <div>
-            <h1 className="text-xl font-semibold">Blog Lovenda · Generación IA</h1>
-            <p className="text-sm text-muted">
-              Genera y publica artículos diarios con control editorial humano.
+            <h1 className="text-2xl font-bold">Blog Lovenda</h1>
+            <p className="text-sm text-muted mt-1">
+              La IA genera artículos automáticamente en 6 idiomas
             </p>
           </div>
+
           <button
             type="button"
-            onClick={() => loadPosts(listStatusFilter)}
-            className="px-3 py-2 text-sm rounded-md border border-soft bg-surface text-body transition hover:bg-surface-muted"
+            onClick={handleGenerateNew}
+            disabled={generating}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-base font-semibold text-[color:var(--color-on-primary)] transition hover:opacity-90 disabled:opacity-60"
           >
-            {loadingList ? 'Actualizando...' : 'Actualizar lista'}
+            <span className="text-xl">🤖</span>
+            {generating ? 'Generando artículo...' : 'Generar artículo ahora'}
           </button>
-        </div>
 
-        <form className="grid gap-4 md:grid-cols-6" onSubmit={handleGenerate}>
-          <div className="md:col-span-3">
-            <label className="text-xs font-semibold text-muted uppercase block mb-1">
-              Tema o enfoque *
-            </label>
-            <input
-              type="text"
-              value={generateForm.topic}
-              onChange={(event) => handleGenerateChange('topic', event.target.value)}
-              placeholder="Ej: Tendencias de decoración para bodas 2025"
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-muted uppercase block mb-1">Idioma</label>
-            <select
-              value={generateForm.language}
-              onChange={(event) => handleGenerateChange('language', event.target.value)}
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm"
-            >
-              <option value="es">Español</option>
-              <option value="en">Inglés</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-muted uppercase block mb-1">
-              Longitud
-            </label>
-            <select
-              value={generateForm.length}
-              onChange={(event) => handleGenerateChange('length', event.target.value)}
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm"
-            >
-              <option value="corto">Corto (≈600 palabras)</option>
-              <option value="medio">Medio (≈800 palabras)</option>
-              <option value="largo">Largo (≈1100 palabras)</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-muted uppercase block mb-1">Tono</label>
-            <input
-              type="text"
-              value={generateForm.tone}
-              onChange={(event) => handleGenerateChange('tone', event.target.value)}
-              placeholder="inspirador, práctico, elegante…"
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label className="text-xs font-semibold text-muted uppercase block mb-1">
-              Palabras clave (separadas por coma)
-            </label>
-            <input
-              type="text"
-              value={generateForm.keywords}
-              onChange={(event) => handleGenerateChange('keywords', event.target.value)}
-              placeholder="decoración, boda civil, flores"
-              className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm"
-            />
-          </div>
-          <div className="flex items-center gap-4 md:col-span-6">
-            <label className="flex items-center gap-2 text-sm text-body">
-              <input
-                type="checkbox"
-                checked={generateForm.includeTips}
-                onChange={(event) => handleGenerateChange('includeTips', event.target.checked)}
-              />
-              Incluir sección de consejos
-            </label>
-            <label className="flex items-center gap-2 text-sm text-body">
-              <input
-                type="checkbox"
-                checked={generateForm.includeCTA}
-                onChange={(event) => handleGenerateChange('includeCTA', event.target.checked)}
-              />
-              Añadir CTA final
-            </label>
-            <button
-              type="submit"
-              className="ml-auto inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-[color:var(--color-on-primary)] transition hover:opacity-90 disabled:opacity-60"
-              disabled={generating}
-            >
-              {generating ? 'Generando...' : 'Generar borrador'}
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <section className="rounded-xl border border-soft bg-surface p-5 shadow-sm space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold">Noticias programadas</h2>
-            <p className="text-sm text-muted">Artículos con publicación pendiente.</p>
-          </div>
-          <button
-            type="button"
-            onClick={loadScheduled}
-            className="px-3 py-2 text-sm rounded-md border border-soft bg-surface text-body transition hover:bg-surface-muted"
-          >
-            {loadingScheduled ? 'Actualizando...' : 'Actualizar'}
-          </button>
-        </div>
-        {loadingScheduled ? (
-          <p className="text-sm text-muted">Cargando noticias programadas...</p>
-        ) : scheduledPosts.length === 0 ? (
-          <p className="text-sm text-muted">No hay publicaciones programadas actualmente.</p>
-        ) : (
-          <ul className="space-y-2">
-            {scheduledPosts
-              .slice()
-              .sort((a, b) => {
-                const dateA = new Date(a.scheduledAt).getTime();
-                const dateB = new Date(b.scheduledAt).getTime();
-                return dateA - dateB;
-              })
-              .map((post) => (
-                <li
-                  key={post.id}
-                  className="flex items-start justify-between gap-3 rounded-md border border-soft bg-surface px-4 py-3 hover:bg-surface-muted transition cursor-pointer"
-                  onClick={() => setSelectedId(post.id)}
+          {latestPost && (
+            <div className="mt-6 pt-6 border-t border-soft">
+              <p className="text-xs uppercase text-muted mb-2">Último artículo generado:</p>
+              <div className="text-left max-w-2xl mx-auto">
+                <button
+                  type="button"
+                  onClick={() => setSelectedId(latestPost.id)}
+                  className="w-full text-left rounded-lg border border-soft bg-surface-muted p-4 hover:bg-surface transition"
                 >
-                  <div>
-                    <p className="text-sm font-semibold text-body">{post.title}</p>
-                    <p className="text-xs text-muted">
-                      {post.scheduledAt
-                        ? `Programado para ${formatDate(post.scheduledAt)}`
-                        : 'Sin fecha programada'}
-                    </p>
+                  <p className="font-semibold text-body">{latestPost.title}</p>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-muted">
+                    <span>
+                      Estado: <span className="font-semibold">{STATUS_LABELS[latestPost.status]}</span>
+                    </span>
+                    {latestPost.scheduledAt && (
+                      <span>• {formatDate(latestPost.scheduledAt)}</span>
+                    )}
+                    {latestPost.availableLanguages && (
+                      <span>• Idiomas: {latestPost.availableLanguages.length}</span>
+                    )}
                   </div>
-                  <span className="inline-flex items-center rounded-full bg-info-soft px-2 py-0.5 text-xs font-semibold text-info">
-                    {(post.language || 'es').toUpperCase()}
-                  </span>
-                </li>
-              ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="rounded-xl border border-soft bg-surface p-5 shadow-sm space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold">Plan editorial</h2>
-            <p className="text-sm text-muted">
-              Próximas entradas generadas automáticamente. Revisa estado y fecha prevista.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={loadPlan}
-              className="px-3 py-2 text-sm rounded-md border border-soft bg-surface text-body transition hover:bg-surface-muted"
-            >
-              {loadingPlan ? 'Actualizando...' : 'Actualizar'}
-            </button>
-            <button
-              type="button"
-              onClick={handleTriggerAutomation}
-              disabled={triggeringPlan}
-              className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-[color:var(--color-on-primary)] transition hover:opacity-90 disabled:opacity-60"
-            >
-              {triggeringPlan ? 'Generando...' : 'Generar siguiente artículo ahora'}
-            </button>
-          </div>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-        {loadingPlan ? (
-          <p className="text-sm text-muted">Cargando plan editorial...</p>
-        ) : planEntries.length === 0 ? (
-          <p className="text-sm text-muted">Aún no hay días planificados.</p>
-        ) : (
-          <div className="overflow-x-auto rounded-xl border border-soft">
-            <table className="min-w-full text-sm">
-              <thead className="bg-surface-muted text-xs uppercase text-muted">
-                <tr>
-                  <th className="px-3 py-2 text-left">Fecha</th>
-                  <th className="px-3 py-2 text-left">Estado</th>
-                  <th className="px-3 py-2 text-left">Tema</th>
-                  <th className="px-3 py-2 text-left">Post</th>
-                </tr>
-              </thead>
-              <tbody>
-                {planEntries.map((entry) => {
-                  const status = entry.status || 'planned';
-                  const badgeClass =
-                    PLAN_STATUS_BADGE[status] || 'bg-[color:var(--color-border)] text-muted';
-                  const statusLabel = PLAN_STATUS_LABELS[status] || status;
-                  return (
-                    <tr key={entry.planDate} className="border-b last:border-b-0">
-                      <td className="px-3 py-3 text-sm text-body">
-                        {formatDate(entry.date || entry.planDate)}
-                      </td>
-                      <td className="px-3 py-3">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${badgeClass}`}
-                        >
-                          {statusLabel}
-                        </span>
-                        {entry.error ? (
-                          <p className="mt-1 text-xs text-danger">{entry.error}</p>
-                        ) : null}
-                      </td>
-                      <td className="px-3 py-3 text-sm text-body">
-                        <p className="font-medium text-body">{entry.topic}</p>
-                        {entry.angle ? <p className="text-xs text-muted">{entry.angle}</p> : null}
-                      </td>
-                      <td className="px-3 py-3 text-xs text-muted">
-                        {entry.postId ? (
-                          <button
-                            type="button"
-                            className="text-primary hover:underline"
-                            onClick={() => setSelectedId(entry.postId)}
-                          >
-                            Ver post
-                          </button>
-                        ) : (
-                          <span>—</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
       </section>
 
       <section className="grid gap-6 lg:grid-cols-5">
         <div className="space-y-4 lg:col-span-2">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <h2 className="text-lg font-semibold">Artículos</h2>
+            <h2 className="text-lg font-semibold">Artículos Publicados</h2>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
               <div className="relative">
                 <label htmlFor="admin-blog-search" className="sr-only">
@@ -604,22 +321,6 @@ const AdminBlog = () => {
                   className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary sm:min-w-[220px]"
                 />
               </div>
-              <select
-                value={listStatusFilter}
-                onChange={(event) => {
-                  const status = event.target.value;
-                  setListStatusFilter(status);
-                  loadPosts(status);
-                }}
-                className="rounded-md border border-soft bg-surface px-2 py-2 text-sm"
-              >
-                <option value="all">Todos los estados</option>
-                <option value="draft">Borradores</option>
-                <option value="scheduled">Programados</option>
-                <option value="published">Publicados</option>
-                <option value="archived">Archivados</option>
-                <option value="failed">Fallidos</option>
-              </select>
             </div>
           </div>
 
@@ -629,7 +330,7 @@ const AdminBlog = () => {
                 <tr>
                   <th className="px-3 py-2 text-left">Título</th>
                   <th className="px-3 py-2 text-left">Estado</th>
-                  <th className="px-3 py-2 text-left">Publicado</th>
+                  <th className="px-3 py-2 text-left">Generado</th>
                 </tr>
               </thead>
               <tbody>
@@ -666,7 +367,7 @@ const AdminBlog = () => {
                         </span>
                       </td>
                       <td className="px-3 py-3 text-sm text-body">
-                        {formatDate(post.publishedAt)}
+                        {formatDate(post.generatedAt)}
                       </td>
                     </tr>
                   );

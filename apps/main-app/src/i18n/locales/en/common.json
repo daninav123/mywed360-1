@@ -1205,7 +1205,10 @@
         "amountLabel": "Amount Label",
         "amountPlaceholder": "Amount Placeholder"
       },
-      "category": "Category"
+      "category": "Category",
+      "advisorShort": "AI",
+      "muteShort": "Mute",
+      "perGuestHint": "≈ {{value}} / guest ({{count}} events)"
     },
     "transactions": {
       "csv": {
@@ -1470,6 +1473,14 @@
       "budget": "Budget",
       "contributions": "Contributions",
       "analytics": "Analytics"
+    },
+    "benchmarks": {
+      "title": "Budget suggestions based on similar weddings",
+      "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}} · Confidence: {{confidence}}.",
+      "loading": "Calculating budget suggestions…",
+      "applyMedian": "Apply median (p50)",
+      "applyP75": "Apply 75th percentile",
+      "saveSnapshot": "Save budget"
     }
   },
   "seating": {
@@ -2175,7 +2186,10 @@
     "reminderSimulationError": "Error simulating reminders",
     "reminderSendError": "Error sending reminders",
     "linkCopied": "RSVP link copied",
-    "linkCopyError": "Could not generate/copy link"
+    "linkCopyError": "Could not generate/copy link",
+    "budget": {
+      "perGuestHint": "≈ {{value}} / guest ({{count}} events)"
+    }
   },
   "common": {
     "add": "Add",
@@ -3074,6 +3088,47 @@
         "phoneEmpty": "Not specified",
         "websiteEmpty": "Not specified",
         "instagramEmpty": "Not specified"
+      },
+      "portfolio": {
+        "categories": {
+          "all": "All",
+          "bodas": "Weddings",
+          "decoracion": "Decoration",
+          "flores": "Flowers",
+          "ceremonia": "Ceremony",
+          "recepcion": "Reception",
+          "otros": "Others"
+        },
+        "dashboard": {
+          "title": "My Portfolio",
+          "photoCount": "{{count}} photos",
+          "coverPhoto": {
+            "untitled": "Untitled"
+          },
+          "zeroState": {
+            "title": "You haven't uploaded photos yet",
+            "description": "Showcase your work by adding images of your best events",
+            "cta": "Upload first photo"
+          },
+          "actions": {
+            "addPhoto": "Add photo"
+          },
+          "filters": {
+            "label": "Filter by category"
+          },
+          "viewModes": {
+            "grid": "Grid",
+            "list": "List"
+          },
+          "loading": "Loading portfolio..."
+        },
+        "toasts": {
+          "loadError": "Error loading photos",
+          "uploadSuccess": "Photo uploaded successfully",
+          "uploadError": "Error uploading photo",
+          "deleteSuccess": "Photo deleted",
+          "deleteError": "Error deleting photo"
+        }
       },
       "login": {
         "title": "Authentication error",
@@ -6133,6 +6188,14 @@
       }
     },
     "toasts": {
+      "fullAssignment": "🎉 All guests have been assigned!",
+      "capacityUpdated": "Capacity updated: {{value}} seats",
+      "tableAdded": "Table added successfully",
+      "tableDeleted": "Table deleted",
+      "guestMoved": "Guest moved to table {{tableNumber}}",
+      "layoutGenerated": "Layout generated: {{count}} tables created",
+      "autoAssignmentComplete": "Auto-assignment completed: {{assigned}} guests assigned",
+      "error": "An error occurred. Please try again",
       "autoAssignSuccess": "Auto Assign Success",
       "autoAssignError": "Auto Assign Error",
       "addTableSuccess": "Add Table Success",

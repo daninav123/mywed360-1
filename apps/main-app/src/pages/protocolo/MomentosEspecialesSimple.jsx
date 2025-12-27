@@ -1,4 +1,4 @@
-import { ChevronRight, Check, Music } from 'lucide-react';
+import { ChevronRight, Check, Music, Plus, Trash2, Radio } from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
 import { toast } from 'react-toastify';
 
@@ -8,6 +8,9 @@ import useSpecialMoments from '../../hooks/useSpecialMoments';
 import useTranslations from '../../hooks/useTranslations';
 import SimpleMomentCard from '../../components/momentos/SimpleMomentCard';
 import CleanSongPicker from '../../components/momentos/CleanSongPicker';
+import ExportActionsBar from '../../components/momentos/ExportActionsBar';
+import SpecialSongModal from '../../components/momentos/SpecialSongModal';
+import BackgroundPlaylistConfig from '../../components/momentos/BackgroundPlaylistConfig';
 
 /**
  * MomentosEspecialesSimple - Versión ultra-limpia y minimalista
@@ -18,12 +21,17 @@ const MomentosEspecialesSimple = () => {
   const {
     moments,
     blocks,
+    addMoment,
+    removeMoment,
     updateMoment,
     addSongCandidate,
     removeSongCandidate,
     selectSong,
     markSongAsDefinitive,
     getSelectedSong,
+    updateSongSpecialStatus,
+    getExportStats,
+    updateBlock,
   } = useSpecialMoments();
 
   const [activeBlockId, setActiveBlockId] = useState('banquete');
@@ -31,6 +39,18 @@ const MomentosEspecialesSimple = () => {
     isOpen: false,
     momentId: null,
     momentTitle: '',
+  });
+
+  const [specialSongModal, setSpecialSongModal] = useState({
+    isOpen: false,
+    song: null,
+    momentId: null,
+    blockId: null,
+  });
+
+  const [backgroundPlaylistModal, setBackgroundPlaylistModal] = useState({
+    isOpen: false,
+    block: null,
   });
 
   // Obtener momentos del bloque activo
@@ -77,6 +97,7 @@ const MomentosEspecialesSimple = () => {
       momentId: moment.id,
       momentTitle: moment.title || 'Momento',
       momentType: moment.type || 'otro',
+      userDescription: moment.musicDescription || '',
     });
   }, []);
 
@@ -86,8 +107,21 @@ const MomentosEspecialesSimple = () => {
       momentId: null,
       momentTitle: '',
       momentType: '',
+      userDescription: '',
     });
   }, []);
+
+  const handleDescriptionChange = useCallback(
+    (newDescription) => {
+      if (!songPickerState.momentId) return;
+      
+      // Actualizar descripción en el momento
+      updateMoment(activeBlockId, songPickerState.momentId, {
+        musicDescription: newDescription,
+      });
+    },
+    [activeBlockId, songPickerState.momentId, updateMoment]
+  );
 
   const handleSongSelect = useCallback(
     (song) => {
@@ -133,9 +167,95 @@ const MomentosEspecialesSimple = () => {
     [activeMoments, activeBlockId, updateMoment]
   );
 
+  const handleOpenSpecialSongModal = useCallback((moment, song) => {
+    setSpecialSongModal({
+      isOpen: true,
+      song,
+      momentId: moment.id,
+      blockId: activeBlockId,
+    });
+  }, [activeBlockId]);
+
+  const handleSaveSpecialSong = useCallback(
+    (specialData) => {
+      if (!specialSongModal.song || !specialSongModal.momentId) return;
+
+      updateSongSpecialStatus(
+        specialSongModal.blockId,
+        specialSongModal.momentId,
+        specialSongModal.song.id,
+        specialData
+      );
+
+      toast.success(
+        specialData.isSpecial
+          ? 'Canción marcada como especial'
+          : 'Configuración actualizada',
+        { position: 'bottom-right', autoClose: 2000 }
+      );
+
+      setSpecialSongModal({ isOpen: false, song: null, momentId: null, blockId: null });
+    },
+    [specialSongModal, updateSongSpecialStatus]
+  );
+
+  const handleAddMoment = useCallback(() => {
+    const blockMoments = moments[activeBlockId] || [];
+    const nextOrder = blockMoments.length + 1;
+
+    addMoment(activeBlockId, {
+      order: nextOrder,
+      title: `Nuevo momento ${nextOrder}`,
+      type: 'otro',
+      time: '',
+      duration: '',
+    });
+
+    toast.success('➕ Momento añadido', { position: 'bottom-right', autoClose: 2000 });
+  }, [activeBlockId, moments, addMoment]);
+
+  const handleRemoveMoment = useCallback(
+    (momentId, momentTitle) => {
+      if (window.confirm(`¿Eliminar "${momentTitle}"?`)) {
+        removeMoment(activeBlockId, momentId);
+        toast.success('🗑️ Momento eliminado', { position: 'bottom-right', autoClose: 2000 });
+      }
+    },
+    [activeBlockId, removeMoment]
+  );
+
+  const handleOpenBackgroundPlaylist = useCallback(() => {
+    const block = blocks.find(b => b.id === activeBlockId);
+    if (block) {
+      setBackgroundPlaylistModal({ isOpen: true, block });
+    }
+  }, [activeBlockId, blocks]);
+
+  const handleSaveBackgroundPlaylist = useCallback(
+    (config) => {
+      updateBlock(activeBlockId, { backgroundPlaylist: config });
+      setBackgroundPlaylistModal({ isOpen: false, block: null });
+      
+      if (config.enabled) {
+        toast.success('🎵 Playlist de ambiente configurada', { position: 'bottom-right', autoClose: 2000 });
+      } else {
+        toast.success('🚫 Playlist de ambiente desactivada', { position: 'bottom-right', autoClose: 2000 });
+      }
+    },
+    [activeBlockId, updateBlock]
+  );
+
   return (
     <PageWrapper title="Música para tu Boda">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Barra de exportación */}
+        <ExportActionsBar
+          blocks={blocks}
+          moments={moments}
+          getSelectedSong={getSelectedSong}
+          getExportStats={getExportStats}
+          weddingInfo={{}}
+        />
         {/* Header compacto */}
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
@@ -247,13 +367,28 @@ const MomentosEspecialesSimple = () => {
         {activeBlock && (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">{activeBlock.name}</h2>
+              <div className="flex-1">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-2xl font-bold text-gray-900">{activeBlock.name}</h2>
+                  {activeBlock.backgroundPlaylist?.enabled && (
+                    <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
+                      <Radio size={12} />
+                      Ambiente activo
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-gray-600 mt-1">
-                  {currentProgress?.completed || 0} de {currentProgress?.total || 0} momentos
-                  configurados
+                  {currentProgress?.completed || 0} de {currentProgress?.total || 0} momentos configurados
                 </p>
               </div>
+              
+              <Button
+                onClick={handleOpenBackgroundPlaylist}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Radio size={18} className="mr-2" />
+                {activeBlock.backgroundPlaylist?.enabled ? 'Editar Ambiente' : 'Añadir Ambiente'}
+              </Button>
 
               {currentProgress && currentProgress.percentage > 0 && (
                 <div className="text-right">
@@ -292,12 +427,25 @@ const MomentosEspecialesSimple = () => {
                     onUpdateMoment={(updatedMoment) =>
                       updateMoment(activeBlockId, moment.id, updatedMoment)
                     }
+                    onConfigureSpecial={(song) => handleOpenSpecialSongModal(moment, song)}
+                    onRemoveMoment={() => handleRemoveMoment(moment.id, moment.title)}
                     showAdvanced={false}
                     allMoments={moments}
                     currentBlockId={activeBlockId}
                   />
                 ))
               )}
+
+              {/* Botón para añadir nuevo momento */}
+              <div className="col-span-full mt-4 flex justify-center">
+                <Button
+                  onClick={handleAddMoment}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md"
+                >
+                  <Plus size={18} className="mr-2" />
+                  Añadir nuevo momento
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -310,7 +458,28 @@ const MomentosEspecialesSimple = () => {
         onSelect={handleSongSelect}
         momentTitle={songPickerState.momentTitle}
         momentType={songPickerState.momentType}
+        blockType={activeBlockId}
+        userDescription={songPickerState.userDescription}
+        onDescriptionChange={handleDescriptionChange}
       />
+
+      {/* Modal de configuración de canción especial */}
+      <SpecialSongModal
+        isOpen={specialSongModal.isOpen}
+        onClose={() => setSpecialSongModal({ isOpen: false, song: null, momentId: null, blockId: null })}
+        song={specialSongModal.song}
+        momentId={specialSongModal.momentId}
+        onSave={handleSaveSpecialSong}
+      />
+
+      {/* Modal de configuración de playlist de ambiente */}
+      {backgroundPlaylistModal.isOpen && backgroundPlaylistModal.block && (
+        <BackgroundPlaylistConfig
+          block={backgroundPlaylistModal.block}
+          onSave={handleSaveBackgroundPlaylist}
+          onClose={() => setBackgroundPlaylistModal({ isOpen: false, block: null })}
+        />
+      )}
     </PageWrapper>
   );
 };

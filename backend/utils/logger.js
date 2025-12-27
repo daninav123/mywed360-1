@@ -53,6 +53,8 @@ const logger = winston.createLogger({
     // Consola con colores, para ver en tiempo real en CMD/PowerShell
     new winston.transports.Console({
       format: combine(colorize(), humanFormat),
+      handleExceptions: true,
+      handleRejections: true,
     }),
     // Archivo para errores con rotación diaria y límite de tamaño
     new DailyRotateFile({
@@ -63,6 +65,8 @@ const logger = winston.createLogger({
       maxSize: '100m', // Rotación automática cuando alcance 100MB
       maxFiles: '14d', // Mantener logs de los últimos 14 días
       zippedArchive: true, // Comprimir logs antiguos
+      handleExceptions: true,
+      handleRejections: true,
     }),
     // Archivo para todos los logs con rotación
     new DailyRotateFile({
@@ -74,6 +78,26 @@ const logger = winston.createLogger({
       zippedArchive: true,
     }),
   ],
+  exitOnError: false,
+});
+
+// Manejar errores EPIPE y otros errores de transporte
+logger.on('error', (error) => {
+  if (error.code === 'EPIPE' || error.syscall === 'write') {
+    // Silenciar errores EPIPE que no son críticos
+    return;
+  }
+  console.error('Logger error:', error);
+});
+
+// Prevenir que errores del logger causen crashes
+process.on('uncaughtException', (error) => {
+  if (error.code === 'EPIPE' && error.syscall === 'write') {
+    // Ignorar EPIPE errors del logger
+    return;
+  }
+  // Re-lanzar otros errores
+  throw error;
 });
 
 export default logger;

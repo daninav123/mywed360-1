@@ -19,13 +19,20 @@ export const SONG_CANDIDATES_LIMIT = 10; // Máximo de canciones candidatas por 
 
 // Bloques por defecto (alineados con pginas existentes)
 const DEFAULT_BLOCKS = [
-  { id: 'ceremonia', name: 'Ceremonia' },
+  { id: 'ceremonia', name: 'Ceremonia', order: 1, backgroundPlaylist: null },
   // Nota: en Momentos Especiales histricamente se usa "coctail" mientras en Timing aparece "coctel".
   // Conservamos la clave "coctail" por compatibilidad y normalizamos en los componentes cuando sea necesario.
-  { id: 'coctail', name: 'Cctel' },
-  { id: 'banquete', name: 'Banquete' },
-  { id: 'disco', name: 'Disco' },
+  { id: 'coctail', name: 'Cóctel', order: 2, backgroundPlaylist: null },
+  { id: 'banquete', name: 'Banquete', order: 3, backgroundPlaylist: null },
+  { id: 'disco', name: 'Disco', order: 4, backgroundPlaylist: null },
 ];
+
+// Modelo de playlist de ambiente
+// backgroundPlaylist: {
+//   url: 'https://open.spotify.com/playlist/...',  // URL de playlist de Spotify
+//   name: 'Música Cena Romántica',
+//   enabled: true,  // Si está activa
+// }
 
 export const MAX_MOMENTS_PER_BLOCK = 200;
 
@@ -36,6 +43,8 @@ const withRecipientDefaults = (list = []) =>
     recipientId: item.recipientId ?? '',
     recipientName: item.recipientName ?? '',
     recipientRole: item.recipientRole ?? '',
+    // Descripción de lo que buscan para este momento (para IA)
+    musicDescription: item.musicDescription ?? '',
     // Sistema de canciones candidatas
     songCandidates: Array.isArray(item.songCandidates) ? item.songCandidates : [],
     selectedSongId: item.selectedSongId ?? null,
@@ -514,6 +523,7 @@ export default function useSpecialMoments() {
             recipientId: '',
             recipientName: '',
             recipientRole: '',
+            musicDescription: '',
             ...moment,
           },
         ];
@@ -658,9 +668,13 @@ export default function useSpecialMoments() {
     setMoments((prev) => ({ ...prev, [id]: [] }));
   }, []);
 
-  const renameBlock = useCallback((id, newName) => {
-    setBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, name: newName } : b)));
+  const updateBlock = useCallback((blockId, updates) => {
+    setBlocks((prev) => prev.map((b) => (b.id === blockId ? { ...b, ...updates } : b)));
   }, []);
+
+  const renameBlock = useCallback((blockId, newName) => {
+    updateBlock(blockId, { name: newName });
+  }, [updateBlock]);
 
   const removeBlock = useCallback((id) => {
     setBlocks((prev) => prev.filter((b) => b.id !== id));
@@ -819,6 +833,13 @@ export default function useSpecialMoments() {
           artwork: song.artwork || '',
           source: song.source || 'search', // search | suggestion | ai | manual | spotify
           addedAt: new Date().toISOString(),
+          // Soporte para canciones especiales/custom
+          isSpecial: song.isSpecial || false,
+          specialType: song.specialType || null, // remix | edit | mashup | live | version_especial | custom
+          djInstructions: song.djInstructions || '', // Instrucciones detalladas para el DJ
+          referenceUrl: song.referenceUrl || '', // YouTube, SoundCloud, etc.
+          duration: song.duration || null, // Duración en segundos
+          audioFile: song.audioFile || null, // { downloadURL, storagePath, fileName, fileSize, uploadedAt }
         };
 
         candidates.push(newCandidate);
@@ -906,6 +927,68 @@ export default function useSpecialMoments() {
     return moment.songCandidates.find((c) => c.id === moment.selectedSongId) || null;
   }, []);
 
+  // Marcar/desmarcar canción como especial y actualizar datos
+  const updateSongSpecialStatus = useCallback((blockId, momentId, songId, specialData) => {
+    setMoments((prev) => {
+      const next = { ...prev };
+      next[blockId] = (prev[blockId] || []).map((m) => {
+        if (m.id !== momentId) return m;
+        
+        const updatedCandidates = (m.songCandidates || []).map((c) => {
+          if (c.id !== songId) return c;
+          
+          return {
+            ...c,
+            isSpecial: specialData.isSpecial || false,
+            specialType: specialData.specialType || null,
+            djInstructions: specialData.djInstructions || '',
+            referenceUrl: specialData.referenceUrl || '',
+            duration: specialData.duration || c.duration || null,
+            audioFile: specialData.audioFile || c.audioFile || null,
+          };
+        });
+        
+        return {
+          ...m,
+          songCandidates: updatedCandidates,
+        };
+      });
+      return next;
+    });
+  }, []);
+
+  // Obtener estadísticas de exportación
+  const getExportStats = useCallback(() => {
+    let totalSongs = 0;
+    let spotifySongs = 0;
+    let specialSongs = 0;
+    let definitiveCount = 0;
+    
+    Object.entries(moments).forEach(([blockId, blockMoments]) => {
+      blockMoments.forEach((moment) => {
+        const song = getSelectedSong(moment);
+        if (song) {
+          totalSongs++;
+          if (moment.isDefinitive) definitiveCount++;
+          if (song.isSpecial) {
+            specialSongs++;
+          } else if (song.trackUrl) {
+            spotifySongs++;
+          }
+        }
+      });
+    });
+    
+    return {
+      totalSongs,
+      spotifySongs,
+      specialSongs,
+      definitiveCount,
+      canExportToSpotify: spotifySongs > 0,
+      needsDJDocument: specialSongs > 0 || totalSongs > 0,
+    };
+  }, [moments, getSelectedSong]);
+
   return {
     // datos
     blocks,
@@ -920,6 +1003,7 @@ export default function useSpecialMoments() {
     duplicateMoment,
     // bloques
     addBlock,
+    updateBlock,
     renameBlock,
     removeBlock,
     reorderBlocks,
@@ -934,5 +1018,8 @@ export default function useSpecialMoments() {
     markSongAsDefinitive,
     getSelectedSong,
     songCandidatesLimit: SONG_CANDIDATES_LIMIT,
+    // canciones especiales
+    updateSongSpecialStatus,
+    getExportStats,
   };
 }

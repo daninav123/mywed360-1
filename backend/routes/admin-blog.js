@@ -176,7 +176,7 @@ router.post('/plan/generate', async (req, res) => {
     const params = planGenerateSchema.parse(req.body || {});
     const result = await runBlogAutomationCycle({
       publishHour: typeof params.publishHour === 'number' ? params.publishHour : undefined,
-      postStatus: params.postStatus || 'scheduled',
+      postStatus: params.postStatus || 'published',
       lookaheadDays: typeof params.lookaheadDays === 'number' ? params.lookaheadDays : undefined,
     });
     res.json({ result });

@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2025-12-17T03:42:03.693Z",
+  "generatedAt": "2025-12-27T00:34:38.406Z",
   "counts": {
     "modules": 40,
     "tasks": 26,
     "docSpecs": 97,
     "taskSpecs": 0,
-    "actualSpecs": null
+    "actualSpecs": 16
   },
   "dupSpecTasks": [],
   "aggregatedMissingSpecs": [
@@ -15,23 +15,11 @@
     },
     {
       "module": "1. Registro y Autenticación (estado 2025-10-08)",
-      "spec": "cypress/e2e/auth/flow1-signup.cy.js"
-    },
-    {
-      "module": "1. Registro y Autenticación (estado 2025-10-08)",
       "spec": "cypress/e2e/auth/flow1-social-login.cy.js"
     },
     {
       "module": "1. Registro y Autenticación (estado 2025-10-08)",
-      "spec": "cypress/e2e/auth/flow1-password-reset.cy.js"
-    },
-    {
-      "module": "1. Registro y Autenticación (estado 2025-10-08)",
       "spec": "cypress/e2e/auth/flow1-verify-email.cy.js"
-    },
-    {
-      "module": "1. Registro y Autenticación (estado 2025-10-08)",
-      "spec": "cypress/e2e/auth/auth-flow.cy.js"
     },
     {
       "module": "10. Gestión de Bodas Múltiples (estado 2025-10-16)",
@@ -123,10 +111,6 @@
     },
     {
       "module": "2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08",
-      "spec": "cypress/e2e/onboarding/create-event-flow.cy.js"
-    },
-    {
-      "module": "2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08",
       "spec": "cypress/e2e/onboarding/create-event-cta.cy.js"
     },
     {
@@ -192,10 +176,6 @@
     {
       "module": "23. Metricas del Proyecto (estado 2025-10-14)",
       "spec": "cypress/e2e/budget_flow.cy.js"
-    },
-    {
-      "module": "23. Metricas del Proyecto (estado 2025-10-14)",
-      "spec": "cypress/e2e/finance/finance-flow-full.cy.js"
     },
     {
       "module": "24. Inspiracion Visual Unificada (estado 2025-10-12)",
@@ -288,10 +268,6 @@
     {
       "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
       "spec": "cypress/e2e/finance/finance-flow.cy.js"
-    },
-    {
-      "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
-      "spec": "cypress/e2e/finance/finance-flow-full.cy.js"
     },
     {
       "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
@@ -784,5 +760,22 @@
   ],
   "tasksSpecNotInDocs": [],
   "tasksWithMissingSpecOnDisk": [],
-  "orphanSpecs": []
+  "orphanSpecs": [
+    "cypress/e2e/accept-quote-flow.cy.js",
+    "cypress/e2e/auth/auth-flow.cy.js",
+    "cypress/e2e/auth/flow1-password-reset.cy.js",
+    "cypress/e2e/auth/flow1-signup.cy.js",
+    "cypress/e2e/budget/budget-flow.cy.js",
+    "cypress/e2e/finance/finance-flow-full.cy.js",
+    "cypress/e2e/invitados/invitados-flow.cy.js",
+    "cypress/e2e/momentos/momentos-export-spotify.cy.js",
+    "cypress/e2e/momentos/momentos-special-songs.cy.js",
+    "cypress/e2e/onboarding/create-event-flow.cy.js",
+    "cypress/e2e/tasks/tasks-flow.cy.js",
+    "cypress/e2e/wedding-info/info-boda-form-fields.cy.js",
+    "cypress/e2e/wedding-info/info-boda-iban-validation.cy.js",
+    "cypress/e2e/wedding-info/info-boda-navigation.cy.js",
+    "cypress/e2e/wedding-info/info-boda-save-functionality.cy.js",
+    "cypress/e2e/wedding-info/info-boda-special-features.cy.js"
+  ]
 }
