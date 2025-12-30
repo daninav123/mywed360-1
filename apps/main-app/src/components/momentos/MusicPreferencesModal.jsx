@@ -3,7 +3,11 @@ import { X, Music, Heart, Calendar, Globe, Sparkles, Save, Loader2 } from 'lucid
 import { toast } from 'react-toastify';
 import { Button } from '../ui';
 import { useWedding } from '../../context/WeddingContext';
-import { getMusicPreferences, saveMusicPreferences, DEFAULT_MUSIC_PREFERENCES } from '../../services/musicPreferencesService';
+import {
+  getMusicPreferences,
+  saveMusicPreferences,
+  DEFAULT_MUSIC_PREFERENCES,
+} from '../../services/musicPreferencesService';
 
 /**
  * Modal para configurar preferencias musicales del usuario
@@ -36,7 +40,7 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleGenreChange = (genre, value) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       favoriteGenres: {
         ...prev.favoriteGenres,
@@ -46,7 +50,7 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleDecadeToggle = (decade) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       favoriteDecades: {
         ...prev.favoriteDecades,
@@ -56,7 +60,7 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleMoodToggle = (mood) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       preferredMoods: {
         ...prev.preferredMoods,
@@ -66,7 +70,7 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleLanguageToggle = (language) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       languages: {
         ...prev.languages,
@@ -78,7 +82,7 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
   const handleAddArtist = () => {
     const artist = artistInput.trim();
     if (artist && !preferences.favoriteArtists.includes(artist)) {
-      setPreferences(prev => ({
+      setPreferences((prev) => ({
         ...prev,
         favoriteArtists: [...prev.favoriteArtists, artist],
       }));
@@ -87,9 +91,9 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleRemoveArtist = (artist) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
-      favoriteArtists: prev.favoriteArtists.filter(a => a !== artist),
+      favoriteArtists: prev.favoriteArtists.filter((a) => a !== artist),
     }));
   };
 
@@ -105,7 +109,7 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
         ...preferences,
         setupCompleted: true,
       });
-      
+
       toast.success('✨ Preferencias guardadas. Las sugerencias serán más personalizadas', {
         autoClose: 3000,
       });
@@ -113,7 +117,7 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
       if (onSave) {
         onSave(preferences);
       }
-      
+
       onClose();
     } catch (error) {
       console.error('Error saving preferences:', error);
@@ -201,7 +205,10 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
                   placeholder="Ej: Ed Sheeran, Coldplay..."
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
-                <Button onClick={handleAddArtist} className="bg-purple-600 hover:bg-purple-700 text-white">
+                <Button
+                  onClick={handleAddArtist}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
                   Añadir
                 </Button>
               </div>
@@ -289,10 +296,15 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    {language === 'spanish' ? 'Español' :
-                     language === 'english' ? 'Inglés' :
-                     language === 'italian' ? 'Italiano' :
-                     language === 'french' ? 'Francés' : 'Otro'}
+                    {language === 'spanish'
+                      ? 'Español'
+                      : language === 'english'
+                        ? 'Inglés'
+                        : language === 'italian'
+                          ? 'Italiano'
+                          : language === 'french'
+                            ? 'Francés'
+                            : 'Otro'}
                   </button>
                 ))}
               </div>
@@ -304,7 +316,9 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
                 <input
                   type="checkbox"
                   checked={preferences.avoidExplicit}
-                  onChange={(e) => setPreferences(prev => ({ ...prev, avoidExplicit: e.target.checked }))}
+                  onChange={(e) =>
+                    setPreferences((prev) => ({ ...prev, avoidExplicit: e.target.checked }))
+                  }
                   className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
                 />
                 <span className="text-sm font-medium text-gray-700">
@@ -315,7 +329,9 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
                 <input
                   type="checkbox"
                   checked={preferences.preferLive}
-                  onChange={(e) => setPreferences(prev => ({ ...prev, preferLive: e.target.checked }))}
+                  onChange={(e) =>
+                    setPreferences((prev) => ({ ...prev, preferLive: e.target.checked }))
+                  }
                   className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
                 />
                 <span className="text-sm font-medium text-gray-700">
@@ -326,7 +342,9 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
                 <input
                   type="checkbox"
                   checked={preferences.preferRemixes}
-                  onChange={(e) => setPreferences(prev => ({ ...prev, preferRemixes: e.target.checked }))}
+                  onChange={(e) =>
+                    setPreferences((prev) => ({ ...prev, preferRemixes: e.target.checked }))
+                  }
                   className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
                 />
                 <span className="text-sm font-medium text-gray-700">
@@ -343,11 +361,7 @@ const MusicPreferencesModal = ({ isOpen, onClose, onSave }) => {
             💡 Estas preferencias mejorarán las sugerencias de canciones
           </p>
           <div className="flex gap-3">
-            <Button
-              onClick={onClose}
-              variant="outline"
-              disabled={saving}
-            >
+            <Button onClick={onClose} variant="outline" disabled={saving}>
               Cancelar
             </Button>
             <Button

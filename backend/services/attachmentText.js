@@ -34,21 +34,27 @@ async function extractDocx(buf) {
 }
 
 async function extractXlsx(buf) {
-  const mod = await tryImport('xlsx');
+  const mod = await tryImport('exceljs');
   if (!mod) return '';
-  const XLSX = (mod.default || mod);
+  const ExcelJS = (mod.default || mod);
   try {
-    const wb = XLSX.read(buf, { type: 'buffer' });
-    const sheets = wb.SheetNames || [];
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buf);
+    const sheets = workbook.worksheets || [];
     let out = [];
-    for (const name of sheets.slice(0, 3)) { // up to 3 sheets
-      const ws = wb.Sheets[name];
+    for (const ws of sheets.slice(0, 3)) { // up to 3 sheets
       if (!ws) continue;
-      const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-      out.push(`# ${name}`);
-      for (const r of rows.slice(0, 50)) { // limit rows
-        out.push((r || []).map((c) => (c == null ? '' : String(c))).join(' \t '));
-      }
+      out.push(`# ${ws.name}`);
+      let rowCount = 0;
+      ws.eachRow((row, rowNumber) => {
+        if (rowCount >= 50) return; // limit rows
+        const rowData = [];
+        row.eachCell({ includeEmpty: true }, (cell) => {
+          rowData.push(cell.value == null ? '' : String(cell.value));
+        });
+        out.push(rowData.join(' \t '));
+        rowCount++;
+      });
     }
     return out.join('\n');
   } catch { return ''; }

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../../components/PageWrapper';
 import { Card } from '../../components/ui';
@@ -277,7 +278,7 @@ const AyudaCeremonia = () => {
                   value={readingForm.title}
                   onChange={(e) => setReadingForm((prev) => ({ ...prev, title: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Ej. Primera lectura - Carta a los Corintios"
+                  placeholder={t('protocol.ceremony.searchPlaceholder')}
                   required
                   disabled={!canEdit}
                 />
@@ -291,7 +292,7 @@ const AyudaCeremonia = () => {
                   value={readingForm.content}
                   onChange={(e) => handleReadingContentChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 font-serif"
-                  placeholder="Escribe aquí el texto completo de la lectura…"
+                  placeholder={t('protocol.ceremony.customTitlePlaceholder')}
                   required
                   disabled={!canEdit}
                 />
@@ -341,7 +342,7 @@ const AyudaCeremonia = () => {
                   type="text"
                   name="recipient"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Ej. Madre de la novia"
+                  placeholder={t('protocol.ceremony.presentationNotesPlaceholder')}
                   required
                 />
               </div>

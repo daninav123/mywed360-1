@@ -1,19 +1,19 @@
 const ADMIN_NAVIGATION = [
   {
-    id: 'panel',
-    title: 'Panel',
+    id: 'overview',
+    title: '📊 Resumen',
     items: [
       {
         id: 'dashboard',
-        label: 'Resumen',
+        label: 'Dashboard',
         path: '/admin/dashboard',
         description: 'Métricas clave, salud de servicios y tareas operativas.',
       },
     ],
   },
   {
-    id: 'operations',
-    title: 'Operaciones',
+    id: 'daily-management',
+    title: '🏢 Gestión Diaria',
     items: [
       {
         id: 'portfolio',
@@ -33,29 +33,35 @@ const ADMIN_NAVIGATION = [
         path: '/admin/suppliers',
         description: 'Catálogo, verificaciones y analítica del ecosistema de proveedores.',
       },
+    ],
+  },
+  {
+    id: 'revenue',
+    title: '💰 Ingresos',
+    items: [
       {
         id: 'commerce',
         label: 'Comerciales',
         path: '/admin/commerce',
         description: 'Enlaces de descuento, responsables y facturación generada.',
       },
-    ],
-  },
-  {
-    id: 'content',
-    title: 'Contenido',
-    items: [
       {
-        id: 'blog',
-        label: 'Blog',
-        path: '/admin/blog',
-        description: 'Gestión editorial y publicaciones generadas por IA.',
+        id: 'payouts',
+        label: 'Pagos comerciales',
+        path: '/admin/finance/payouts',
+        description: 'Liquidaciones de comisiones y pagos automáticos programados.',
+      },
+      {
+        id: 'revolut',
+        label: 'Revolut',
+        path: '/admin/finance/revolut',
+        description: 'Saldo, movimientos y webhooks de la cuenta Revolut del proyecto.',
       },
     ],
   },
   {
     id: 'analytics',
-    title: 'Analítica',
+    title: '📈 Análisis',
     items: [
       {
         id: 'metrics',
@@ -72,9 +78,39 @@ const ADMIN_NAVIGATION = [
     ],
   },
   {
-    id: 'infrastructure',
-    title: 'Infraestructura',
+    id: 'catalog',
+    title: '🎨 Contenido & Catálogo',
     items: [
+      {
+        id: 'blog',
+        label: 'Blog',
+        path: '/admin/blog',
+        description: 'Gestión editorial y publicaciones generadas por IA.',
+      },
+      {
+        id: 'supplier-catalog',
+        label: 'Catálogo Proveedores',
+        path: '/admin/supplier-catalog',
+        description: 'Especificaciones base y sugerencias de usuarios (crowdsourcing).',
+      },
+      {
+        id: 'task-templates',
+        label: 'Plantillas tareas',
+        path: '/admin/task-templates',
+        description: 'Seed maestro de tareas padre/subtareas y versionado del checklist.',
+      },
+    ],
+  },
+  {
+    id: 'system',
+    title: '⚙️ Sistema',
+    items: [
+      {
+        id: 'automations',
+        label: 'Automatizaciones',
+        path: '/admin/automations',
+        description: 'Mensajería programada (WhatsApp aniversario) y reglas globales.',
+      },
       {
         id: 'alerts',
         label: 'Alertas',
@@ -87,30 +123,6 @@ const ADMIN_NAVIGATION = [
         path: '/admin/broadcast',
         description: 'Comunicaciones masivas y avisos críticos controlados.',
       },
-    ],
-  },
-  {
-    id: 'settings',
-    title: 'Configuración',
-    items: [
-      {
-        id: 'specs',
-        label: 'Especificaciones',
-        path: '/admin/specs',
-        description: 'Gestión dinámica de campos de especificaciones de proveedores.',
-      },
-      {
-        id: 'task-templates',
-        label: 'Plantillas tareas',
-        path: '/admin/task-templates',
-        description: 'Seed maestro de tareas padre/subtareas y versionado del checklist.',
-      },
-      {
-        id: 'automations',
-        label: 'Automatizaciones',
-        path: '/admin/automations',
-        description: 'Mensajería programada (WhatsApp aniversario) y reglas globales.',
-      },
       {
         id: 'support',
         label: 'Soporte',
@@ -120,26 +132,8 @@ const ADMIN_NAVIGATION = [
     ],
   },
   {
-    id: 'finance',
-    title: 'Finanzas',
-    items: [
-      {
-        id: 'payouts',
-        label: 'Pagos comerciales',
-        path: '/admin/finance/payouts',
-        description: 'Liquidaciones de comisiones y pagos automáticos programados.',
-      },
-      {
-        id: 'revolut',
-        label: 'Revolut',
-        path: '/admin/finance/revolut',
-        description: 'Saldo, movimientos y webhooks de la cuenta Revolut del proyecto.',
-      },
-    ],
-  },
-  {
     id: 'development',
-    title: 'Desarrollo',
+    title: '🔧 Desarrollo',
     items: [
       {
         id: 'ai-training',

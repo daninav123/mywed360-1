@@ -22,6 +22,7 @@ const MarketingLayout = ({ children }) => {
     () => [
       { to: '/', label: safeT('nav.home', 'Inicio') },
       { to: '/app', label: safeT('nav.app', 'La App') },
+      { to: '/blog', label: safeT('nav.blog', 'Blog') },
       { to: '/para-planners', label: safeT('nav.forPlanners', 'Para planners') },
       { to: '/para-proveedores', label: safeT('nav.forSuppliers', 'Para proveedores') },
       { to: '/partners', label: safeT('nav.partners', 'Programa de partners') },
@@ -33,6 +34,7 @@ const MarketingLayout = ({ children }) => {
   const footerLinks = React.useMemo(
     () => [
       { to: '/precios', label: safeT('nav.plans', 'Planes') },
+      { to: '/blog', label: safeT('nav.blog', 'Blog') },
       { to: '/para-planners', label: safeT('nav.forPlanners', 'Para planners') },
       { to: '/para-proveedores', label: safeT('nav.forSuppliers', 'Para proveedores') },
       { to: '/partners', label: safeT('nav.partners', 'Programa de partners') },

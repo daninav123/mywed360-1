@@ -781,6 +781,8 @@ app.use('/api/spotify', spotifyRouter);
 app.use('/api/web-vitals', (await import('./routes/web-vitals.js')).default);
 app.use('/api/weddings', (await import('./routes/wedding-metrics.js')).default);
 app.use('/api/blog', blogRouter);
+// Supplier options (crowdsourcing system)
+app.use('/api/supplier-options', (await import('./routes/supplier-options.js')).default);
 // Rutas de autenticación de administración (login/MFA/logout)
 app.use('/api/admin', adminAuthRouter);
 app.use(

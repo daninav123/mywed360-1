@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import PageWrapper from '../components/PageWrapper';
@@ -220,6 +221,33 @@ function Blog() {
     <PageWrapper title={t('blog.title')} className="max-w-5xl mx-auto">
       <p className="text-sm text-gray-600 mb-6">{t('blog.lead')}</p>
 
+      <div className="mb-6 rounded-2xl border border-[color:var(--color-primary-20)] bg-[var(--color-primary-5)] p-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex-1">
+            <h2 className="text-lg font-semibold text-[color:var(--color-primary)] mb-2">
+              ¿Listo para organizar tu boda perfecta?
+            </h2>
+            <p className="text-sm text-gray-700">
+              Únete a miles de parejas que ya están disfrutando de una planificación sin estrés con Lovenda.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href="/signup"
+              className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-95"
+            >
+              🎉 Registrarse Gratis
+            </a>
+            <a
+              href="/precios"
+              className="inline-flex items-center justify-center rounded-md border border-[color:var(--color-primary)] px-4 py-2 text-sm font-semibold text-[color:var(--color-primary)] transition hover:bg-[var(--color-primary-10)]"
+            >
+              Ver Planes
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div className="mb-6">
         <label htmlFor="blog-search" className="sr-only">
           {t('blog.search.label')}
@@ -229,7 +257,7 @@ function Blog() {
           type="search"
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
-          placeholder={t('blog.search.placeholder')}
+          placeholder={t('blog.searchPlaceholder', { placeholder: 'Buscar en el blog...' })}
           className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
         />
         {isFiltering ? (
@@ -271,6 +299,46 @@ function Blog() {
           aria-label={t('blog.loadingAria')}
         >
           <Spinner />
+        </div>
+      ) : null}
+
+      {!loading && visiblePosts.length > 0 ? (
+        <div className="mt-12 rounded-2xl border border-gray-200 bg-gradient-to-br from-rose-50 to-purple-50 p-8 text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            ✨ Descubre Lovenda
+          </h3>
+          <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
+            La plataforma completa para organizar bodas. Gestiona invitados, proveedores, presupuesto y más en un solo lugar.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <a
+              href="/signup"
+              className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-6 py-3 text-base font-semibold text-white shadow-md transition hover:brightness-95"
+            >
+              🚀 Empezar Gratis
+            </a>
+            <a
+              href="/para-planners"
+              className="inline-flex items-center justify-center rounded-md border-2 border-[color:var(--color-primary)] bg-white px-6 py-3 text-base font-semibold text-[color:var(--color-primary)] transition hover:bg-[var(--color-primary-5)]"
+            >
+              Para Wedding Planners
+            </a>
+            <a
+              href="/para-proveedores"
+              className="inline-flex items-center justify-center rounded-md border-2 border-gray-300 bg-white px-6 py-3 text-base font-semibold text-gray-700 transition hover:bg-gray-50"
+            >
+              Para Proveedores
+            </a>
+          </div>
+          <div className="mt-6 pt-6 border-t border-gray-300">
+            <p className="text-xs text-gray-600 mb-2">Enlaces útiles:</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <a href="/" className="text-sm text-[color:var(--color-primary)] hover:underline">Inicio</a>
+              <a href="/precios" className="text-sm text-[color:var(--color-primary)] hover:underline">Precios</a>
+              <a href="/app" className="text-sm text-[color:var(--color-primary)] hover:underline">Acceder</a>
+              <a href="/partners" className="text-sm text-[color:var(--color-primary)] hover:underline">Partners</a>
+            </div>
+          </div>
         </div>
       ) : null}
     </PageWrapper>

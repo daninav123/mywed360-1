@@ -300,23 +300,6 @@ service cloud.firestore {
     }
     match /metrics/{docId} {
       allow read, write: if false;
-    }
-    match /serviceStatus/{docId} {
-      allow read, write: if false;
-    }
-    match /alerts/{docId} {
-      allow read, write: if false;
-    }
-    match /tasks/{docId} {
-      allow read, write: if false;
-    }
-    match /incidents/{docId} {
-      allow read, write: if false;
-    }
-    match /featureFlags/{docId} {
-      allow read, write: if false;
-    }
-    match /secrets/{docId} {
       allow read, write: if false;
     }
     match /templates/{docId} {
@@ -451,6 +434,22 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == userId;
       // Solo backend puede escribir (Admin SDK)
       allow write: if false;
+    }
+
+    // ---- Supplier Option Suggestions (Crowdsourcing System) ----
+    match /supplier_option_suggestions/{suggestionId} {
+      allow read: if _isSignedIn();
+      allow create: if _isSignedIn() &&
+        request.resource.data.suggestedBy.userId == request.auth.uid;
+      allow update: if _isSignedIn() &&
+        (resource.data.suggestedBy.userId == request.auth.uid ||
+         request.auth.token.admin == true);
+      allow delete: if request.auth.token.admin == true;
+    }
+
+    match /supplier_dynamic_specs/{category} {
+      allow read: if true;
+      allow write: if request.auth.token.admin == true;
     }
   }
 }

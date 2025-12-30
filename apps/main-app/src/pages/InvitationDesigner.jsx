@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import InvitationCanvas from '../components/invitations/InvitationCanvas';
 import LayerPanel from '../components/invitations/LayerPanel';
@@ -59,7 +60,7 @@ function InvitationDesigner() {
     return (
       <div className="p-6 max-w-6xl mx-auto">
         <h1 className="text-2xl font-semibold mb-4">Selecciona una plantilla</h1>
-        <TemplateGallery onSelect={setTemplate} />
+        <TemplateGallery placeholder={t('invitationDesigner.datePlaceholder')} onSelect={setTemplate} />
       </div>
     );
   }
@@ -81,14 +82,14 @@ function InvitationDesigner() {
         />
         <LayerPanel />
         <PropertyPanel
-          element={elements.find((el) => el.id === selectedId)}
+          placeholder={t('invitationDesigner.messagePlaceholder')} element={elements.find((el) => el.id === selectedId)}
           updateElement={(mutator) =>
             setElements((prev) =>
               prev.map((el) =>
                 el.id === selectedId
                   ? typeof mutator === 'function'
                     ? mutator(el)
-                    : { ...el, ...mutator }
+                    : { ...el, placeholder: t('invitationDesigner.titlePlaceholder'), ...mutator }
                   : el
               )
             )

@@ -10,6 +10,7 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { db } from '../firebaseConfig';
 // No exigimos autenticación explícita aquí; la ruta es de desarrollo

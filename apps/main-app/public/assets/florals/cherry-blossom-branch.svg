@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+  <!-- Rama de cerezo con flores -->
+  
+  <!-- Rama -->
+  <path d="M 20 100 Q 100 90 180 85 Q 220 83 260 80" 
+        stroke="#5D4037" stroke-width="3" fill="none"/>
+  
+  <!-- Ramitas -->
+  <path d="M 80 90 Q 75 70 70 50" stroke="#5D4037" stroke-width="2" fill="none"/>
+  <path d="M 140 87 Q 145 65 150 45" stroke="#5D4037" stroke-width="2" fill="none"/>
+  <path d="M 200 84 Q 210 70 220 55" stroke="#5D4037" stroke-width="2" fill="none"/>
+  
+  <!-- Flores de cerezo -->
+  <g id="sakura">
+    <!-- Flor 1 -->
+    <g transform="translate(70, 50)">
+      <circle cx="0" cy="0" r="4" fill="#FFB7C5"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(0 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(72 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(144 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(216 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(288 0 0)"/>
+      <circle cx="0" cy="0" r="2" fill="#FF69B4"/>
+    </g>
+    
+    <!-- Flor 2 -->
+    <g transform="translate(95, 85)">
+      <circle cx="0" cy="0" r="4" fill="#FFB7C5"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(0 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(72 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(144 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(216 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(288 0 0)"/>
+      <circle cx="0" cy="0" r="2" fill="#FF69B4"/>
+    </g>
+    
+    <!-- Flor 3 -->
+    <g transform="translate(150, 45)">
+      <circle cx="0" cy="0" r="4" fill="#FFB7C5"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(0 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(72 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(144 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(216 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(288 0 0)"/>
+      <circle cx="0" cy="0" r="2" fill="#FF69B4"/>
+    </g>
+    
+    <!-- Flor 4 -->
+    <g transform="translate(170, 82)">
+      <circle cx="0" cy="0" r="4" fill="#FFB7C5"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(0 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(72 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(144 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(216 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(288 0 0)"/>
+      <circle cx="0" cy="0" r="2" fill="#FF69B4"/>
+    </g>
+    
+    <!-- Flor 5 -->
+    <g transform="translate(220, 55)">
+      <circle cx="0" cy="0" r="4" fill="#FFB7C5"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(0 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(72 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(144 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(216 0 0)"/>
+      <ellipse cx="0" cy="-6" rx="3" ry="5" fill="#FFC0CB" transform="rotate(288 0 0)"/>
+      <circle cx="0" cy="0" r="2" fill="#FF69B4"/>
+    </g>
+    
+    <!-- Capullos -->
+    <ellipse cx="60" cy="65" rx="2" ry="4" fill="#FFE4E1" transform="rotate(-30 60 65)"/>
+    <ellipse cx="130" cy="70" rx="2" ry="4" fill="#FFE4E1" transform="rotate(20 130 70)"/>
+    <ellipse cx="240" cy="75" rx="2" ry="4" fill="#FFE4E1" transform="rotate(-10 240 75)"/>
+  </g>
+</svg>

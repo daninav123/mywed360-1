@@ -1,5 +1,6 @@
 import { Plus, Download, Eye, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../components/PageWrapper';
 import Toast from '../components/Toast';
@@ -13,6 +14,7 @@ import { useProveedores } from '../hooks/useProveedores';
 import { uploadEmailAttachments as uploadFiles } from '../services/storageUploadService';
 
 export default function Contratos() {
+  const { t } = useTranslation('pages');
   const { currentUser } = useAuth();
   const uid = currentUser?.uid || 'guest';
   const sampleContracts = [
@@ -405,7 +407,7 @@ export default function Contratos() {
             <form onSubmit={handleAddContract} className="space-y-3">
               <input
                 type="text"
-                placeholder="Proveedor"
+                placeholder={t('contracts.providerPlaceholder')}
                 value={newContract.provider}
                 onChange={(e) => setNewContract({ ...newContract, provider: e.target.value })}
                 className="w-full border rounded px-2 py-1"
@@ -413,7 +415,7 @@ export default function Contratos() {
               />
               <input
                 type="text"
-                placeholder="Tipo de contrato"
+                placeholder={t('contracts.contractTypePlaceholder')}
                 value={newContract.type}
                 onChange={(e) => setNewContract({ ...newContract, type: e.target.value })}
                 className="w-full border rounded px-2 py-1"
@@ -490,7 +492,7 @@ export default function Contratos() {
             >
               <input
                 type="text"
-                placeholder="Proveedor"
+                placeholder={t('contracts.providerNamePlaceholder')}
                 value={editContract.provider}
                 onChange={(e) => setEditContract({ ...editContract, provider: e.target.value })}
                 className="w-full border rounded px-2 py-1"
@@ -498,7 +500,7 @@ export default function Contratos() {
               />
               <input
                 type="text"
-                placeholder="Tipo de contrato"
+                placeholder={t('contracts.searchPlaceholder')}
                 value={editContract.type}
                 onChange={(e) => setEditContract({ ...editContract, type: e.target.value })}
                 className="w-full border rounded px-2 py-1"
@@ -559,7 +561,7 @@ export default function Contratos() {
                     value={genericForm.type}
                     onChange={(e) => setGenericForm({ ...genericForm, type: e.target.value })}
                     className="w-full border rounded px-2 py-1"
-                    placeholder="Genҩrico / Catering / Foto..."
+                    placeholder={t('contracts.genericTypePlaceholder')}
                   />
                 </div>
                 <div>

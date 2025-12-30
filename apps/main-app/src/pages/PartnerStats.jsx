@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { TrendingUp, Users, CreditCard, Calendar, ExternalLink, DollarSign, Link2, Copy } from 'lucide-react';
 import { db } from '../firebaseConfig';

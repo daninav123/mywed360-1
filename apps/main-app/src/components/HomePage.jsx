@@ -76,9 +76,9 @@ const safeParseLocalStorage = (key, fallback) => {
 };
 
 const readGuestsFromLocalStorage = (weddingId) => {
-  const namespaced = weddingId ? safeParseLocalStorage(`maloveapp_${weddingId}_guests`, []) : [];
+  const namespaced = weddingId ? safeParseLocalStorage(`planivia_${weddingId}_guests`, []) : [];
   if (Array.isArray(namespaced) && namespaced.length) return namespaced;
-  const legacy = safeParseLocalStorage('mywed360Guests', []);
+  const legacy = safeParseLocalStorage('mywed360Guests', []) || safeParseLocalStorage('maloveapp_guests', []);
   return Array.isArray(legacy) ? legacy : [];
 };
 
@@ -121,7 +121,7 @@ const isGuestConfirmed = (guest) => {
 };
 
 const readTasksCompletedFromLocalStorage = (weddingId) => {
-  const namespacedKey = weddingId ? `maloveapp_${weddingId}_tasksCompleted` : '';
+  const namespacedKey = weddingId ? `planivia_${weddingId}_tasksCompleted` : '';
   const namespaced = namespacedKey ? safeParseLocalStorage(namespacedKey, []) : [];
   let collection = [];
   if (Array.isArray(namespaced) && namespaced.length) {
@@ -502,7 +502,7 @@ export default function HomePage() {
     if (!resolvedWeddingName) return;
     if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem('maloveapp_active_wedding_name', resolvedWeddingName);
+      localStorage.setItem('planivia_active_wedding_name', resolvedWeddingName);
     } catch {
       /* ignore storage errors */
     }
@@ -518,8 +518,8 @@ export default function HomePage() {
             if (!first) return null;
             const { slug, label } = INSPIRATION_CATEGORIES[index];
             return {
-              src: first.url || first.thumb,
-              alt: label,
+              url: first.url || first.thumb,
+              name: label,
               slug,
             };
           })
@@ -527,7 +527,7 @@ export default function HomePage() {
         setCategoryImages(imgs);
       })
       .catch((error) => {
-        // console.error('[HomePage] No se pudo precargar la galería de inspiración:', error);
+        console.error('[HomePage] Error cargando galería de inspiración:', error);
       });
   }, []);
 
@@ -600,7 +600,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (typeof window === 'undefined' || !activeWedding) return undefined;
-    const eventName = `mywed360-${activeWedding}-guests`;
+    const eventName = `planivia-${activeWedding}-guests`;
     const handler = () => setLocalGuestsVersion((value) => value + 1);
     window.addEventListener(eventName, handler);
     return () => {
@@ -619,7 +619,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (typeof window === 'undefined' || !activeWedding) return undefined;
-    const eventName = `mywed360-${activeWedding}-tasksCompleted`;
+    const eventName = `planivia-${activeWedding}-tasksCompleted`;
     const handler = () => setLocalTasksVersion((value) => value + 1);
     window.addEventListener(eventName, handler);
     return () => {
@@ -871,7 +871,7 @@ export default function HomePage() {
   const handleQuickAddProvider = useCallback(
     (provider) => {
       try {
-        const existing = JSON.parse(localStorage.getItem('lovendaProviders') || '[]');
+        const existing = JSON.parse(localStorage.getItem('planivia_providers') || localStorage.getItem('lovendaProviders') || '[]');
         const normalized = {
           id: provider.id || Date.now(),
           name: provider.title || provider.name || t('home.providers.fallbackName'),
@@ -883,8 +883,8 @@ export default function HomePage() {
           createdAt: Date.now(),
         };
         const updated = [normalized, ...existing].slice(0, 25);
-        localStorage.setItem('lovendaProviders', JSON.stringify(updated));
-        window.dispatchEvent(new Event('maloveapp-providers'));
+        localStorage.setItem('planivia_providers', JSON.stringify(updated));
+        window.dispatchEvent(new Event('planivia-providers'));
         toast.success(t('home.providers.addSuccess'));
       } catch (error) {
         // console.warn('[HomePage] No se pudo guardar el proveedor seleccionado', error);
@@ -1055,10 +1055,15 @@ export default function HomePage() {
         {/* Blog Section */}
         <section className="z-10 p-6 pb-2">
           <div className="flex justify-between items-center mb-4">
-            <Link to="/blog">
-              <button className="text-xl font-bold text-[color:var(--color-text)] hover:text-[color:var(--color-primary)]">
-                {t('home.blog.title')}
-              </button>
+            <h2 className="text-xl font-bold text-[color:var(--color-text)]">
+              {t('home.blog.title')}
+            </h2>
+            <Link 
+              to="/blog"
+              className="text-sm font-semibold text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)] transition-colors flex items-center gap-1"
+            >
+              {t('home.blog.viewAll', { defaultValue: 'Ver todos' })}
+              <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
           {newsPosts.length > 0 && (
@@ -1077,7 +1082,7 @@ export default function HomePage() {
                         return published.toDateString();
                       }
                     })()
-                  : 'Lovenda';
+                  : 'Planivia';
                 return (
                   <Card
                     key={post.id}
@@ -1102,7 +1107,7 @@ export default function HomePage() {
                         {post.excerpt || ''}
                       </p>
                       <div className="pt-2 text-xs text-[color:var(--color-text-60)] border-t border-[color:var(--color-text-10)] flex items-center justify-between">
-                        <span>{t('home.blog.source')} Lovenda</span>
+                        <span>{t('home.blog.source')} Planivia</span>
                         <span>{publishedLabel}</span>
                       </div>
                     </div>
@@ -1213,7 +1218,7 @@ export default function HomePage() {
                       };
 
                       try {
-                        const legacy = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
+                        const legacy = JSON.parse(localStorage.getItem('planivia_guests') || localStorage.getItem('mywed360Guests') || '[]');
                         legacy.push({
                           id: newGuest.id,
                           name: newGuest.name,
@@ -1224,7 +1229,7 @@ export default function HomePage() {
                           phone: newGuest.phone || '',
                           notes: newGuest.notes || '',
                         });
-                        localStorage.setItem('mywed360Guests', JSON.stringify(legacy));
+                        localStorage.setItem('planivia_guests', JSON.stringify(legacy));
                       } catch {}
 
                       try {
@@ -1347,9 +1352,9 @@ export default function HomePage() {
               </button>
               <button
                 onClick={() => {
-                  const notes = JSON.parse(localStorage.getItem('lovendaNotes') || '[]');
+                  const notes = JSON.parse(localStorage.getItem('planivia_notes') || localStorage.getItem('lovendaNotes') || '[]');
                   notes.push({ text: noteText, id: Date.now() });
-                  localStorage.setItem('lovendaNotes', JSON.stringify(notes));
+                  localStorage.setItem('planivia_notes', JSON.stringify(notes));
                   setNoteText('');
                   setActiveModal(null);
                   toast.success(t('home.modals.note.success'));

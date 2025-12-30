@@ -22,6 +22,8 @@
   Plus,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import CeremonyChecklist from '../../components/protocolo/CeremonyChecklist';
@@ -454,7 +456,7 @@ export default function Checklist() {
                 <div className="mt-3 space-y-3 text-sm">
                   <textarea
                     className="w-full rounded-md border p-2 text-sm"
-                    placeholder={t('protocol.checklist.labels.notesPlaceholder')}
+                    placeholder={t('checklist.notesPlaceholder')}
                     value={item.notes || ''}
                     onChange={(e) => setItemNotes(item.id, e.target.value)}
                     rows={3}

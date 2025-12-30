@@ -370,6 +370,50 @@ export default function SupplierRequestsNew() {
               )}
             </div>
 
+            {/* Requisitos Específicos del Cliente (desde Info Boda) */}
+            {request.categoryRequirements && (
+              <div className="p-3 rounded-md bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400">
+                <p className="text-xs text-yellow-800 dark:text-yellow-400 font-semibold mb-2">
+                  ⭐ Requisitos Específicos
+                </p>
+                <div className="space-y-1">
+                  {request.categoryRequirements.customOptions?.map((option, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-sm">
+                      <span className="text-green-600 dark:text-green-400 mt-0.5">✓</span>
+                      <span className="text-yellow-900 dark:text-yellow-200 font-medium">
+                        {option}
+                      </span>
+                    </div>
+                  ))}
+                  {request.categoryRequirements.specs &&
+                    Object.entries(request.categoryRequirements.specs)
+                      .filter(([_, value]) => value === true)
+                      .map(([key, _]) => (
+                        <div key={key} className="flex items-start gap-2 text-sm">
+                          <span className="text-green-600 dark:text-green-400 mt-0.5">✓</span>
+                          <span className="text-yellow-900 dark:text-yellow-200 font-medium">
+                            {key
+                              .replace(/([A-Z])/g, ' $1')
+                              .replace(/^./, (str) => str.toUpperCase())
+                              .replace(/_/g, ' ')
+                              .trim()}
+                          </span>
+                        </div>
+                      ))}
+                  {request.categoryRequirements.notes && (
+                    <div className="mt-2 pt-2 border-t border-yellow-200 dark:border-yellow-700">
+                      <p className="text-xs text-yellow-700 dark:text-yellow-400 font-semibold mb-1">
+                        📝 Notas adicionales:
+                      </p>
+                      <p className="text-sm text-yellow-900 dark:text-yellow-100">
+                        {request.categoryRequirements.notes}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Mensaje */}
             {request.message && (
               <div className="p-3 rounded-md bg-app border-l-4 border-[color:var(--color-primary)]">
@@ -632,10 +676,10 @@ export default function SupplierRequestsNew() {
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="px-4 py-2 rounded-md border border-soft bg-surface text-body focus:ring-2 ring-primary"
                 >
-                  <option value="all">Todos los estados</option>
-                  <option value="pending">Pendientes</option>
-                  <option value="contacted">Contactadas</option>
-                  <option value="quoted">Cotizadas</option>
+                  <option value="all">{t('supplier.requests.allStatuses')}</option>
+                  <option value="pending">{t('supplier.requests.statuses.pending')}</option>
+                  <option value="contacted">{t('supplier.requests.statuses.contacted')}</option>
+                  <option value="quoted">{t('supplier.requests.statuses.quoted')}</option>
                 </select>
               </div>
             )}

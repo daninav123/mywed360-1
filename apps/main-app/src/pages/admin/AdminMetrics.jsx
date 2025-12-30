@@ -96,7 +96,7 @@ const AdminMetrics = () => {
 
       {loading ? (
         <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
-          Cargando métricas...
+          {t('admin.metrics.searchPlaceholder')}
         </div>
       ) : (
         <>

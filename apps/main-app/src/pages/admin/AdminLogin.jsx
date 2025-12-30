@@ -236,6 +236,7 @@ const AdminLogin = () => {
               type="email"
               required
               autoComplete="username"
+              placeholder={t('admin.login.emailPlaceholder')}
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               disabled={isSubmitting}

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="80" fill="none" stroke="#C9A959" stroke-width="3"/>
+  <circle cx="100" cy="100" r="75" fill="none" stroke="#C9A959" stroke-width="1" opacity="0.5"/>
+  <circle cx="100" cy="100" r="70" fill="none" stroke="#C9A959" stroke-width="1" opacity="0.3"/>
+  <circle cx="100" cy="20" r="3" fill="#C9A959"/>
+  <circle cx="180" cy="100" r="3" fill="#C9A959"/>
+  <circle cx="100" cy="180" r="3" fill="#C9A959"/>
+  <circle cx="20" cy="100" r="3" fill="#C9A959"/>
+  <circle cx="141" cy="41" r="2" fill="#C9A959" opacity="0.7"/>
+  <circle cx="159" cy="59" r="2" fill="#C9A959" opacity="0.7"/>
+  <circle cx="159" cy="141" r="2" fill="#C9A959" opacity="0.7"/>
+  <circle cx="141" cy="159" r="2" fill="#C9A959" opacity="0.7"/>
+  <circle cx="59" cy="159" r="2" fill="#C9A959" opacity="0.7"/>
+  <circle cx="41" cy="141" r="2" fill="#C9A959" opacity="0.7"/>
+  <circle cx="41" cy="59" r="2" fill="#C9A959" opacity="0.7"/>
+  <circle cx="59" cy="41" r="2" fill="#C9A959" opacity="0.7"/>
+</svg>

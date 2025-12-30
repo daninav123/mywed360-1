@@ -277,19 +277,19 @@ export default function useFinance() {
     if (!activeWedding || !db) return;
 
     const financeRef = doc(db, 'weddings', activeWedding, 'finance', 'main');
-    
+
     const unsubscribe = onSnapshot(
       financeRef,
       (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data();
-          
+
           // Sincronizar budget
           if (data.budget) {
             setBudget((prev) => ({
               total: Number(data.budget.total) || prev.total,
-              categories: Array.isArray(data.budget.categories) 
-                ? data.budget.categories.map(cat => ({
+              categories: Array.isArray(data.budget.categories)
+                ? data.budget.categories.map((cat) => ({
                     name: cat.name || '',
                     amount: Number(cat.amount) || 0,
                     muted: cat.muted || false,
@@ -297,7 +297,7 @@ export default function useFinance() {
                 : prev.categories,
             }));
           }
-          
+
           // Sincronizar contributions
           if (data.contributions) {
             setContributions((prev) => ({
@@ -305,7 +305,7 @@ export default function useFinance() {
               ...data.contributions,
             }));
           }
-          
+
           // Sincronizar settings
           if (data.settings) {
             setSettings((prev) => ({
@@ -313,7 +313,7 @@ export default function useFinance() {
               ...data.settings,
             }));
           }
-          
+
           // Sincronizar advisor
           if (data.aiAdvisor) {
             setAdvisor(normalizeAdvisor(data.aiAdvisor));
@@ -508,11 +508,19 @@ export default function useFinance() {
 
   const totalAdjustments = useMemo(() => {
     if (!Array.isArray(contributions.balanceAdjustments)) return 0;
-    return contributions.balanceAdjustments.reduce((sum, adj) => sum + (Number(adj.amount) || 0), 0);
+    return contributions.balanceAdjustments.reduce(
+      (sum, adj) => sum + (Number(adj.amount) || 0),
+      0
+    );
   }, [contributions.balanceAdjustments]);
 
   const currentBalance = useMemo(
-    () => (contributions.initialBalance || 0) + totalIncome - totalSpent + expectedIncome + totalAdjustments,
+    () =>
+      (contributions.initialBalance || 0) +
+      totalIncome -
+      totalSpent +
+      expectedIncome +
+      totalAdjustments,
     [contributions.initialBalance, totalIncome, totalSpent, expectedIncome, totalAdjustments]
   );
 
@@ -1133,12 +1141,12 @@ export default function useFinance() {
   const setBudgetCategories = useCallback(
     (nextCategories) => {
       console.log('[setBudgetCategories] Recibidas:', nextCategories);
-      
+
       if (!Array.isArray(nextCategories)) {
         console.warn('[setBudgetCategories] nextCategories no es un array');
         return;
       }
-      
+
       const sanitized = nextCategories.map((cat) => {
         const parsedAmount = parseMoneyValue(cat?.amount, 0);
         console.log(`[setBudgetCategories] ${cat?.name}: ${cat?.amount} → ${parsedAmount}`);
@@ -1147,10 +1155,10 @@ export default function useFinance() {
           amount: parsedAmount,
         };
       });
-      
+
       console.log('[setBudgetCategories] Categorías sanitizadas:', sanitized);
       console.log('[setBudgetCategories] Total a guardar:', budget.total);
-      
+
       setBudget((prev) => ({ ...prev, categories: sanitized }));
       persistFinanceDoc({
         budget: { total: budget.total, categories: sanitized },

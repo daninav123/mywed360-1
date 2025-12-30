@@ -399,7 +399,7 @@ const AdminUsers = () => {
               value={suspendReason}
               onChange={(event) => setSuspendReason(event.target.value)}
               className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-              placeholder="Motivo de la suspensión"
+              placeholder={t('admin.users.suspendPlaceholder')} 
             />
             <div className="flex justify-end gap-3 text-sm">
               <button
@@ -446,7 +446,7 @@ const AdminUsers = () => {
               value={reactivateNotes}
               onChange={(event) => setReactivateNotes(event.target.value)}
               className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-              placeholder="Notas sobre la reactivación (opcional)"
+              placeholder={t('admin.users.notesPlaceholder')} 
             />
             <div className="flex justify-end gap-3 text-sm">
               <button

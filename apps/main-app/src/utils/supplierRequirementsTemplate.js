@@ -10,6 +10,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       drone: false,
       engagement: false,
@@ -28,6 +29,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       drone: false,
       highlights: false,
@@ -40,21 +42,62 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     }
   },
 
-  musica: {
+  // 🎵 MÚSICA Y ENTRETENIMIENTO - Categorías granulares por momento
+  
+  'musica-ceremonia': {
     required: [],
     desired: [],
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
-      type: 'banda',
-      genre: [],
-      instruments: [],
-      ceremonyMusic: false,
-      cocktailMusic: false,
+      type: 'cuarteto',           // cuarteto, violin, arpa, gospel, piano, organo
+      musicians: 4,
+      repertoire: [],              // Piezas musicales específicas
+      soundSystem: 'own',          // own (propio), provided (incluido), venue (del lugar)
+      rehearsal: false,            // Ensayo previo
+      customSongs: false,          // Canciones personalizadas
+      entrance: '',                // Canción entrada
+      ceremony: '',                // Canción durante ceremonia
+      exit: '',                    // Canción salida
+    }
+  },
+
+  'musica-cocktail': {
+    required: [],
+    desired: [],
+    extras: [],
+    notes: '',
+    budget: 0,
+    customOptions: [],
+    specs: {
+      type: 'jazz',               // jazz, acustica, duo, trio, clasica
+      musicians: 2,
+      duration: 2,                 // Horas
+      soundSystem: 'own',
+      genre: [],                   // Jazz, bossa nova, clásica, pop acústico
+      background: true,            // Música de fondo vs protagonista
+    }
+  },
+
+  'musica-fiesta': {
+    required: [],
+    desired: [],
+    extras: [],
+    notes: '',
+    budget: 0,
+    customOptions: [],
+    specs: {
+      type: 'banda',              // banda, orquesta, versiones, tributo
+      musicians: 6,
       hours: 4,
-      equipment: 'included',
-      playlist: '',
+      soundSystem: 'own',         // Sistema de sonido propio
+      lights: false,              // Iluminación propia
+      genre: [],                  // Rock, pop, latina, soul, funk
+      breakDJ: false,             // DJ en descansos
+      requests: true,             // Acepta peticiones
+      playlist: '',               // Playlist requerida
     }
   },
 
@@ -64,6 +107,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       lights: false,
       smoke: false,
@@ -84,6 +128,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       style: 'plated',
       courses: 3,
@@ -107,6 +152,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       bouquet: false,
       boutonniere: false,
@@ -126,6 +172,8 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     desired: [],
     extras: [],
     notes: '',
+    budget: 0,
+    customOptions: [],
     specs: {
       type: [],
       duration: 0,
@@ -139,21 +187,35 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     }
   },
 
-  iluminacion: {
+  // 📢 PRODUCCIÓN TÉCNICA - Sonido e Iluminación profesional
+  'sonido-iluminacion': {
     required: [],
     desired: [],
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
-      uplighting: false,
-      pinspots: false,
-      gobo: false,
-      chandeliers: false,
-      fairylights: false,
-      neon: false,
-      candles: false,
-      color: '',
+      soundSystem: false,         // Sistema de sonido profesional
+      lighting: false,            // Iluminación técnica
+      dj: false,                  // Incluye DJ
+      stage: false,               // Tarima/escenario
+      screens: false,             // Pantallas LED
+      projection: false,          // Proyección
+      specialEffects: false,      // Efectos especiales (humo, CO2, fuego frío)
+      ceremony: false,            // Cobertura ceremonia
+      cocktail: false,            // Cobertura cóctel
+      party: false,               // Cobertura fiesta
+      hours: 6,                   // Horas totales de servicio
+      guestCount: 0,              // Número de invitados (para dimensionar)
+      indoor: true,               // Interior vs exterior
+      technicians: 1,             // Técnicos en el evento
+      uplighting: false,          // Iluminación ambiental decorativa
+      pinspots: false,            // Focos en mesas
+      gobo: false,                // Proyección nombres/logo
+      movingHeads: false,         // Cabezas móviles
+      ledPar: false,              // Focos LED PAR
+      strobes: false,             // Estroboscopios
     }
   },
 
@@ -162,6 +224,8 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     desired: [],
     extras: [],
     notes: '',
+    budget: 0,
+    customOptions: [],
     specs: {
       backdrop: '',
       props: false,
@@ -179,6 +243,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       capacity: 0,
       indoorOutdoor: '',
@@ -200,6 +265,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       capacity: 0,
       privateRoom: false,
@@ -219,6 +285,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       tableCenterpieces: false,
       presidentialTable: false,
@@ -239,6 +306,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       dress: false,
       suit: false,
@@ -259,6 +327,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       brideHair: false,
       brideMakeup: false,
@@ -279,6 +348,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       engagementRing: false,
       weddingBands: false,
@@ -298,6 +368,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       tiers: 3,
       servings: 0,
@@ -318,6 +389,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       saveTheDates: false,
       invitations: false,
@@ -338,6 +410,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       type: '',
       quantity: 0,
@@ -357,6 +430,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       coupleTransport: false,
       guestShuttles: false,
@@ -376,6 +450,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       duration: 0,
       type: '',
@@ -395,6 +470,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       fullPlanning: false,
       partialPlanning: false,
@@ -414,6 +490,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       capacity: 0,
       religion: '',
@@ -433,6 +510,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       type: 'civil',
       personalized: false,
@@ -452,6 +530,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       rooms: 0,
       nights: 0,
@@ -471,6 +550,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       openBar: false,
       signature: false,
@@ -490,6 +570,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       tent: false,
       tentSize: 0,
@@ -509,6 +590,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       display: false,
       containers: false,
@@ -527,6 +609,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       type: '',
       servings: 0,
@@ -545,6 +628,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       security: 0,
       waiters: 0,
@@ -562,6 +646,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       valet: false,
       attendants: 0,
@@ -579,6 +664,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       nannies: 0,
       ageRange: '',
@@ -596,6 +682,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       bridePackage: false,
       couplePackage: false,
@@ -614,6 +701,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       guests: 0,
       buffet: false,
@@ -631,6 +719,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       livestream: false,
       platform: '',
@@ -649,6 +738,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       postEvent: false,
       staff: 0,
@@ -664,6 +754,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {
       destination: '',
       nights: 0,
@@ -682,6 +773,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {}
   },
 
@@ -692,6 +784,7 @@ export const SUPPLIER_SPECS_TEMPLATE = {
     extras: [],
     notes: '',
     budget: 0,
+    customOptions: [],
     specs: {}
   }
 };
@@ -791,6 +884,58 @@ export const SPEC_LABELS = {
     equipment: 'Equipamiento',
     mc: 'Maestro de ceremonias',
   },
+  'musica-ceremonia': {
+    type: 'Tipo de agrupación',
+    musicians: 'Número de músicos',
+    repertoire: 'Repertorio',
+    soundSystem: 'Sistema de sonido',
+    rehearsal: 'Ensayo previo',
+    customSongs: 'Canciones personalizadas',
+    entrance: 'Canción de entrada',
+    ceremony: 'Canción durante ceremonia',
+    exit: 'Canción de salida',
+  },
+  'musica-cocktail': {
+    type: 'Tipo de agrupación',
+    musicians: 'Número de músicos',
+    duration: 'Duración (horas)',
+    soundSystem: 'Sistema de sonido',
+    genre: 'Géneros musicales',
+    background: 'Música de fondo',
+  },
+  'musica-fiesta': {
+    type: 'Tipo de agrupación',
+    musicians: 'Número de músicos',
+    hours: 'Horas de actuación',
+    soundSystem: 'Sistema de sonido',
+    lights: 'Iluminación propia',
+    genre: 'Géneros musicales',
+    breakDJ: 'DJ en descansos',
+    requests: 'Acepta peticiones',
+    playlist: 'Playlist requerida',
+  },
+  'sonido-iluminacion': {
+    soundSystem: 'Sistema de sonido',
+    lighting: 'Iluminación técnica',
+    dj: 'Incluye DJ',
+    stage: 'Tarima/escenario',
+    screens: 'Pantallas LED',
+    projection: 'Proyección',
+    specialEffects: 'Efectos especiales',
+    ceremony: 'Cobertura ceremonia',
+    cocktail: 'Cobertura cóctel',
+    party: 'Cobertura fiesta',
+    hours: 'Horas de servicio',
+    guestCount: 'Número de invitados',
+    indoor: 'Interior/Exterior',
+    technicians: 'Técnicos en evento',
+    uplighting: 'Iluminación ambiental',
+    pinspots: 'Focos en mesas',
+    gobo: 'Proyección nombres/logo',
+    movingHeads: 'Cabezas móviles',
+    ledPar: 'Focos LED PAR',
+    strobes: 'Estroboscopios',
+  },
   animacion: {
     type: 'Tipo de animación',
     duration: 'Duración (minutos)',
@@ -801,16 +946,6 @@ export const SPEC_LABELS = {
     confetti: 'Confeti',
     bubbles: 'Burbujas',
     doves: 'Palomas',
-  },
-  iluminacion: {
-    uplighting: 'Iluminación ambiental',
-    pinspots: 'Focos en mesas',
-    gobo: 'Proyección nombres/logo',
-    chandeliers: 'Lámparas colgantes',
-    fairylights: 'Luces de hadas',
-    neon: 'Neón personalizado',
-    candles: 'Velas',
-    color: 'Color preferido',
   },
 };
 

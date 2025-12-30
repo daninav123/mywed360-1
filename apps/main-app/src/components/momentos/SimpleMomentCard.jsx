@@ -318,7 +318,16 @@ const SimpleMomentCard = ({
                             <span className="text-lg">🔥</span>
                             <div className="flex-1">
                               <p className="text-xs font-bold text-orange-900">
-                                Canción Especial - {selectedSong.specialType === 'remix' ? 'Remix' : selectedSong.specialType === 'edit' ? 'Edit' : selectedSong.specialType === 'mashup' ? 'Mashup' : selectedSong.specialType === 'live' ? 'En vivo' : 'Custom'}
+                                Canción Especial -{' '}
+                                {selectedSong.specialType === 'remix'
+                                  ? 'Remix'
+                                  : selectedSong.specialType === 'edit'
+                                    ? 'Edit'
+                                    : selectedSong.specialType === 'mashup'
+                                      ? 'Mashup'
+                                      : selectedSong.specialType === 'live'
+                                        ? 'En vivo'
+                                        : 'Custom'}
                               </p>
                               {selectedSong.djInstructions && (
                                 <p className="text-xs text-orange-700 mt-0.5 line-clamp-1">

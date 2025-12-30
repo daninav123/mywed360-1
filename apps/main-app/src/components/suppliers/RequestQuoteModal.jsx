@@ -15,6 +15,8 @@ import {
   calculateProgress,
 } from '../../data/quoteFormTemplates';
 import DynamicField from './DynamicField';
+import { db } from '../../firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 
 // Nota: El hook useTranslations está importado pero solo se usa en fallbacks.
 // La mayoría del texto está hardcodeado por simplicidad en esta primera versión.
@@ -109,6 +111,27 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
     setLoading(true);
 
     try {
+      // ✨ Cargar requisitos específicos de la categoría desde Info Boda
+      let categoryRequirements = null;
+      if (basicInfo.weddingId && supplier.category) {
+        try {
+          const weddingDocRef = doc(db, 'weddings', basicInfo.weddingId);
+          const weddingDoc = await getDoc(weddingDocRef);
+          
+          if (weddingDoc.exists()) {
+            const weddingData = weddingDoc.data();
+            const supplierReqs = weddingData.supplierRequirements || {};
+            categoryRequirements = supplierReqs[supplier.category] || null;
+            
+            if (categoryRequirements) {
+              console.log(`✅ [QuoteRequest] Requisitos de ${supplier.category} cargados:`, categoryRequirements);
+            }
+          }
+        } catch (error) {
+          console.warn('⚠️ [QuoteRequest] No se pudieron cargar requisitos de Info Boda:', error);
+        }
+      }
+
       // Preparar payload completo
       const payload = {
         // Info automática
@@ -141,6 +164,8 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
         },
         // Detalles del servicio
         serviceDetails: serviceData,
+        // ✨ Requisitos específicos de Info Boda para esta categoría
+        categoryRequirements: categoryRequirements,
         // Mensaje personalizado
         customMessage,
         // Metadatos

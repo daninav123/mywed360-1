@@ -39,7 +39,7 @@ router.post('/create-user', async (req, res) => {
     // Verificar si el usuario ya existe
     try {
       const existingUser = await admin.auth().getUserByEmail(email);
-      console.log(`[Test] Usuario ya existe: ${email}`);
+      logger.info('[Test] Usuario ya existe', { uid: existingUser.uid });
       return res.status(200).json({
         uid: existingUser.uid,
         email: existingUser.email,
@@ -59,7 +59,7 @@ router.post('/create-user', async (req, res) => {
       emailVerified: typeof emailVerified === 'boolean' ? emailVerified : true // Para tests, verificamos automáticamente salvo que se indique lo contrario
     });
 
-    console.log(`[Test] Usuario creado: ${email} (${userRecord.uid})`);
+    logger.info('[Test] Usuario creado', { uid: userRecord.uid });
 
     // Crear perfil en Firestore
     await admin.firestore().collection('users').doc(userRecord.uid).set({

@@ -8,7 +8,7 @@ import jsPDF from 'jspdf';
 /**
  * Generar PDF completo para el DJ con todas las canciones
  * Incluye canciones de Spotify Y canciones especiales con instrucciones
- * 
+ *
  * @param {Object} params
  * @param {Array} params.blocks - Bloques de momentos
  * @param {Object} params.moments - Momentos por bloque
@@ -16,12 +16,7 @@ import jsPDF from 'jspdf';
  * @param {Object} params.weddingInfo - Información de la boda
  * @returns {Promise<void>}
  */
-export async function generateDJDocument({
-  blocks,
-  moments,
-  getSelectedSong,
-  weddingInfo = {},
-}) {
+export async function generateDJDocument({ blocks, moments, getSelectedSong, weddingInfo = {} }) {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -46,7 +41,7 @@ export async function generateDJDocument({
     doc.text(`Boda de ${weddingInfo.coupleName}`, pageWidth / 2, yPosition, { align: 'center' });
     yPosition += 8;
   }
-  
+
   if (weddingInfo.weddingDate) {
     doc.text(formatDate(weddingInfo.weddingDate), pageWidth / 2, yPosition, { align: 'center' });
     yPosition += 8;
@@ -55,14 +50,21 @@ export async function generateDJDocument({
   // Estadísticas globales
   const stats = calculateStats(blocks, moments, getSelectedSong);
   yPosition += 10;
-  
+
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text(`Total de canciones: ${stats.total}`, pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 5;
-  doc.text(`Disponibles en Spotify: ${stats.spotify} | Especiales/Custom: ${stats.special}`, pageWidth / 2, yPosition, { align: 'center' });
+  doc.text(
+    `Disponibles en Spotify: ${stats.spotify} | Especiales/Custom: ${stats.special}`,
+    pageWidth / 2,
+    yPosition,
+    { align: 'center' }
+  );
   yPosition += 5;
-  doc.text(`Duración estimada: ${formatDuration(stats.totalDuration)}`, pageWidth / 2, yPosition, { align: 'center' });
+  doc.text(`Duración estimada: ${formatDuration(stats.totalDuration)}`, pageWidth / 2, yPosition, {
+    align: 'center',
+  });
 
   yPosition += 15;
 
@@ -70,11 +72,11 @@ export async function generateDJDocument({
   if (stats.special > 0) {
     doc.setFillColor(255, 243, 205);
     doc.rect(margin, yPosition, pageWidth - 2 * margin, 20, 'F');
-    
+
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.text('⚠️ ATENCIÓN: Canciones Especiales', margin + 5, yPosition + 5);
-    
+
     doc.setFont('helvetica', 'normal');
     const warningText = `Este documento incluye ${stats.special} canción${stats.special > 1 ? 'es' : ''} especial${stats.special > 1 ? 'es' : ''} (remixes, edits, versiones custom) que NO están en Spotify. Por favor, revisa las instrucciones detalladas para cada una.`;
     const splitText = doc.splitTextToSize(warningText, pageWidth - 2 * margin - 10);
@@ -88,7 +90,7 @@ export async function generateDJDocument({
 
   blocks.forEach((block, blockIndex) => {
     const blockMoments = (moments[block.id] || []).filter((m) => getSelectedSong(m));
-    
+
     if (blockMoments.length === 0) return;
 
     // Verificar si necesitamos nueva página
@@ -100,13 +102,13 @@ export async function generateDJDocument({
     // Título del bloque
     doc.setFillColor(59, 130, 246);
     doc.rect(margin, yPosition, pageWidth - 2 * margin, 10, 'F');
-    
+
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(255, 255, 255);
     doc.text(block.name.toUpperCase(), margin + 3, yPosition + 7);
     doc.setTextColor(0, 0, 0);
-    
+
     yPosition += 15;
 
     // Tabla de canciones
@@ -125,7 +127,7 @@ export async function generateDJDocument({
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
       doc.text(`${index + 1}.`, margin, yPosition);
-      
+
       if (moment.time) {
         doc.text(`[${moment.time}]`, margin + 8, yPosition);
       }
@@ -147,7 +149,7 @@ export async function generateDJDocument({
       doc.setFontSize(9);
       doc.text(`"${song.title}"`, margin + 8, yPosition);
       yPosition += 4;
-      
+
       doc.setFont('helvetica', 'normal');
       if (song.artist) {
         doc.text(`por ${song.artist}`, margin + 8, yPosition);
@@ -159,17 +161,17 @@ export async function generateDJDocument({
         doc.setFillColor(254, 242, 242);
         const boxHeight = 15;
         doc.rect(margin + 8, yPosition, pageWidth - 2 * margin - 8, boxHeight, 'F');
-        
+
         doc.setFontSize(8);
         doc.setFont('helvetica', 'bold');
-        
+
         let specialY = yPosition + 4;
-        
+
         if (song.specialType) {
           doc.text(`Tipo: ${formatSpecialType(song.specialType)}`, margin + 10, specialY);
           specialY += 4;
         }
-        
+
         if (song.djInstructions) {
           doc.setFont('helvetica', 'normal');
           const instructions = doc.splitTextToSize(
@@ -179,13 +181,13 @@ export async function generateDJDocument({
           doc.text(instructions, margin + 10, specialY);
           specialY += 4 * instructions.length;
         }
-        
+
         if (song.referenceUrl) {
           doc.setFont('helvetica', 'italic');
           doc.text(`Referencia: ${song.referenceUrl}`, margin + 10, specialY);
           specialY += 4;
         }
-        
+
         if (song.audioFile && song.audioFile.downloadURL) {
           doc.setFont('helvetica', 'bold');
           doc.setTextColor(34, 197, 94);
@@ -194,10 +196,12 @@ export async function generateDJDocument({
           specialY += 4;
           doc.setFont('helvetica', 'normal');
           doc.setFontSize(7);
-          doc.textWithLink('Descargar archivo', margin + 10, specialY, { url: song.audioFile.downloadURL });
+          doc.textWithLink('Descargar archivo', margin + 10, specialY, {
+            url: song.audioFile.downloadURL,
+          });
           specialY += 4;
         }
-        
+
         yPosition += boxHeight + 2;
       }
 
@@ -257,7 +261,9 @@ export async function generateDJDocument({
     '• No sustituir sin autorización previa',
     '',
     'CONTACTO:',
-    weddingInfo.contact ? `• ${weddingInfo.contact}` : '• Contacta con los novios para cualquier duda',
+    weddingInfo.contact
+      ? `• ${weddingInfo.contact}`
+      : '• Contacta con los novios para cualquier duda',
   ];
 
   instructions.forEach((line) => {
@@ -293,7 +299,7 @@ export async function generateDJDocument({
   const fileName = `DJ-Playlist-${weddingInfo.coupleName || 'Boda'}.pdf`
     .replace(/\s+/g, '-')
     .replace(/[^a-zA-Z0-9-]/g, '');
-  
+
   doc.save(fileName);
 }
 
@@ -331,7 +337,7 @@ function calculateStats(blocks, moments, getSelectedSong) {
 function formatDuration(seconds) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  
+
   if (hours > 0) {
     return `${hours}h ${minutes}min`;
   }
@@ -371,37 +377,37 @@ function formatDate(dateString) {
  */
 export function generateSimpleList(blocks, moments, getSelectedSong) {
   let text = '=== PLAYLIST BODA ===\n\n';
-  
+
   blocks.forEach((block) => {
     const blockMoments = (moments[block.id] || []).filter((m) => getSelectedSong(m));
     if (blockMoments.length === 0) return;
-    
+
     text += `\n${block.name.toUpperCase()}\n`;
     text += '='.repeat(block.name.length) + '\n\n';
-    
+
     blockMoments.forEach((moment, index) => {
       const song = getSelectedSong(moment);
       if (!song) return;
-      
+
       text += `${index + 1}. `;
       if (moment.time) text += `[${moment.time}] `;
       text += `${moment.title}\n`;
       text += `   "${song.title}" - ${song.artist}\n`;
-      
+
       if (song.isSpecial) {
         text += `   ⚠️ ESPECIAL (${formatSpecialType(song.specialType)})\n`;
         if (song.djInstructions) {
           text += `   Instrucciones: ${song.djInstructions}\n`;
         }
       }
-      
+
       if (song.trackUrl) {
         text += `   ${song.trackUrl}\n`;
       }
       text += '\n';
     });
   });
-  
+
   // Descargar como archivo de texto
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);

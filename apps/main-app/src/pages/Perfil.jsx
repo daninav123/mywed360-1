@@ -1,7 +1,8 @@
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { Users, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { User, Mail, Phone, Calendar, MapPin, Save, Loader } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 import { Card, Button, Input } from '../components/ui';

@@ -7,6 +7,8 @@ import {
   sendQuoteRequestEmail,
   sendQuoteReceivedNotification,
 } from '../services/quoteRequestEmailService.js';
+import { requireSupplierAuth, verifySupplierId } from '../middleware/supplierAuth.js';
+import { sendEmail } from '../services/mailgunService.js';
 
 const router = express.Router();
 
@@ -23,7 +25,7 @@ function generateResponseToken() {
 router.post('/:id/quote-requests', express.json(), async (req, res) => {
   try {
     const { id } = req.params;
-    const { weddingInfo, contacto, proveedor, serviceDetails, customMessage, userId, weddingId } =
+    const { weddingInfo, contacto, proveedor, serviceDetails, customMessage, userId, weddingId, categoryRequirements } =
       req.body;
 
     // Validaciones del nuevo formato
@@ -98,6 +100,9 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
 
       // 🎯 Detalles del servicio (dinámico por categoría)
       serviceDetails: serviceDetails || {},
+
+      // ✨ Requisitos específicos de Info Boda para esta categoría
+      categoryRequirements: categoryRequirements || null,
 
       // Mensaje personalizado
       customMessage: customMessage || '',
@@ -244,6 +249,7 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
           totalBudget: weddingInfo?.presupuestoTotal,
           categoryName: proveedor?.categoryName || 'Servicio',
           serviceDetails: serviceDetails || {},
+          categoryRequirements: categoryRequirements || null,
           customMessage: customMessage || '',
           responseUrl: quoteRequestData.responseUrl,
           requestId,
@@ -297,17 +303,10 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
  * Obtener solicitudes de presupuesto (solo para el proveedor autenticado)
  * Requiere autenticación de proveedor
  */
-router.get('/:id/quote-requests', async (req, res) => {
+router.get('/:id/quote-requests', requireSupplierAuth, verifySupplierId, async (req, res) => {
   try {
     const { id } = req.params;
     const { limit = 50, status, viewed } = req.query;
-
-    // Validar autenticación del proveedor
-    // TODO: Implementar middleware de auth
-    const supplierId = req.headers['x-supplier-id'];
-    if (!supplierId || supplierId !== id) {
-      return res.status(403).json({ error: 'forbidden' });
-    }
 
     let query = db
       .collection('suppliers')
@@ -506,7 +505,50 @@ router.post('/:id/quote-requests/:requestId/quotation', express.json(), async (r
 
     logger.info(`✅ Cotización creada: ${quotation.quotationId} para solicitud ${requestId}`);
 
-    // TODO: Enviar email al cliente con la cotización
+    // Enviar email al cliente con la cotización
+    if (requestData.contacto?.email) {
+      try {
+        const clientEmail = requestData.contacto.email;
+        const clientName = requestData.contacto?.nombre || 'Cliente';
+        
+        await sendEmail({
+          to: clientEmail,
+          subject: `Nueva cotización de ${quotation.supplierName}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #2563eb;">Has recibido una cotización de ${quotation.supplierName}</h2>
+              <p>Hola ${clientName},</p>
+              <p>El proveedor <strong>${quotation.supplierName}</strong> ha enviado una cotización para tu solicitud.</p>
+              
+              <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="margin-top: 0;">Detalles de la cotización</h3>
+                <p><strong>Subtotal:</strong> €${subtotal.toFixed(2)}</p>
+                ${discountAmount > 0 ? `<p><strong>Descuento:</strong> €${discountAmount.toFixed(2)}</p>` : ''}
+                ${taxAmount > 0 ? `<p><strong>IVA:</strong> €${taxAmount.toFixed(2)}</p>` : ''}
+                <p style="font-size: 18px; font-weight: bold; color: #2563eb;"><strong>Total:</strong> €${total.toFixed(2)}</p>
+                ${validUntil ? `<p style="color: #666; font-size: 14px;">Válido hasta: ${new Date(validUntil).toLocaleDateString()}</p>` : ''}
+              </div>
+              
+              ${notes ? `<p><strong>Notas:</strong> ${notes}</p>` : ''}
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${process.env.PUBLIC_APP_BASE_URL || 'http://localhost:5173'}/quotations/${quotation.quotationId}" 
+                   style="background-color: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                  Ver Cotización Completa
+                </a>
+              </div>
+              
+              <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+              <p style="color: #999; font-size: 12px;">MyWed360 - Plataforma de gestión de bodas</p>
+            </div>
+          `,
+          text: `Has recibido una cotización de ${quotation.supplierName}. Total: €${total.toFixed(2)}. Visita MyWed360 para ver los detalles completos.`
+        });
+        logger.info('✅ Email de cotización enviado al cliente', { email: clientEmail });
+      } catch (emailError) {
+        logger.error('⚠️ Error enviando email de cotización al cliente', emailError);
+      }
+    }
 
     return res.status(201).json({
       success: true,

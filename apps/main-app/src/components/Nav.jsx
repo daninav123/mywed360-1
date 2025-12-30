@@ -71,9 +71,17 @@ function Nav() {
   }, []);
 
   return (
-    <nav className="fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center px-3 py-4 z-30">
+    <nav 
+      className="fixed bottom-0 w-full shadow-lg flex justify-between items-center px-4 py-3 z-30"
+      style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.98)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderTop: '1px solid var(--color-border-soft)',
+      }}
+    >
       {/* Navegación principal */}
-      <div className="flex justify-around flex-1">
+      <div className="flex justify-around flex-1 max-w-lg mx-auto gap-2">
         {navItems.map(({ path, label }, idx) => {
           const isActive = location.pathname.startsWith(path);
           return (
@@ -83,32 +91,39 @@ function Nav() {
               onMouseEnter={() => prefetchForPath(path)}
               onFocus={() => prefetchForPath(path)}
               onTouchStart={() => prefetchForPath(path)}
-              className="relative"
+              className="relative flex-1 py-2 px-3 rounded-xl transition-all duration-200"
+              style={{
+                backgroundColor: isActive ? 'var(--color-lavender)' : 'transparent',
+                color: isActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              }}
             >
               <motion.span
-                animate={{ scale: isActive ? 1.1 : 1 }}
-                transition={{ type: 'spring', stiffness: 300 }}
-                className={
-                  isActive
-                    ? 'text-[color:var(--color-surface)] font-semibold drop-shadow-sm'
-                    : 'text-[color:var(--color-text)]'
-                }
+                animate={{ scale: isActive ? 1.05 : 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                className="font-medium text-sm"
+                style={{
+                  fontWeight: isActive ? 600 : 500,
+                }}
               >
                 {label}
               </motion.span>
               {isActive && (
-                <motion.span
-                  className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-[color:var(--color-surface)] rounded"
+                <motion.div
+                  className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 rounded-full"
+                  style={{
+                    width: '40%',
+                    backgroundColor: 'var(--color-primary)',
+                  }}
                   layoutId="activeUnderline"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
                 />
               )}
             </button>
           );
         })}
       </div>
-
-      {/* Espaciador derecho */}
-      <div className="ml-2" />
     </nav>
   );
 }

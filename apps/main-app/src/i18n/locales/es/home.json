@@ -45,7 +45,9 @@
   },
   "blog": {
     "title": "Blog",
-    "source": "Fuente:"
+    "source": "Fuente:",
+    "viewAll": "Ver todos",
+    "exploreAll": "Explorar todo el blog"
   },
   "news": {
     "error": "No se pudieron encontrar cuatro noticias con imagen en tu idioma en este momento. Inténtalo más tarde."
@@ -57,6 +59,48 @@
   },
   "weddingName": {
     "connector": " y "
+  },
+  "home2": {
+    "header": {
+      "greeting": "¡Hola {{name}} y {{partner}}!",
+      "greetingSingle": "¡Hola {{name}}!",
+      "subtitle": "Planifiquemos tu boda soñada",
+      "guest": "Invitado"
+    },
+    "countdown": {
+      "title": "Cuenta Atrás",
+      "daysToGo": "Días Restantes",
+      "noDate": "Configura la fecha de tu boda",
+      "past": "¡Tu boda ya pasó!"
+    },
+    "budget": {
+      "title": "Presupuesto",
+      "of": "de",
+      "spent": "Gastado"
+    },
+    "guestList": {
+      "title": "Lista de Invitados",
+      "confirmed": "Confirmados",
+      "pending": "Pendientes"
+    },
+    "tasks": {
+      "title": "Próximas Tareas",
+      "noTasks": "No hay tareas pendientes. ¡Buen trabajo!",
+      "untitled": "Tarea sin título"
+    },
+    "budgetChart": {
+      "title": "Resumen del Presupuesto",
+      "spent": "Gastado",
+      "total": "Total",
+      "venue": "Lugar",
+      "catering": "Catering",
+      "flowers": "Flores",
+      "noData": "Aún no hay datos de presupuesto"
+    },
+    "inspiration": {
+      "title": "Tablero de Inspiración",
+      "viewAll": "Ver todas las inspiraciones"
+    }
   },
   "modals": {
     "shared": {

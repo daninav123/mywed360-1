@@ -65,7 +65,8 @@ router.post('/chat', async (req, res) => {
  * Construir system prompt según contexto
  */
 function buildSystemPrompt(context = {}, phase = 'general') {
-  const { weddingInfo, weddingDesign, supplierRequirements, currentSection, currentCategory } = context;
+  const { weddingInfo, weddingDesign, supplierRequirements, currentSection, currentCategory } =
+    context;
 
   let basePrompt = `Eres un wedding designer experto y amigable que ayuda a parejas a planificar su boda perfecta.
 
@@ -85,10 +86,14 @@ REGLAS DE ORO:
 - Si mencionan algo específico, profundiza en ello
 
 INFORMACIÓN ACTUAL DE LA BODA:
-${weddingInfo ? `- Fecha: ${weddingInfo.weddingDate || 'No definida'}
+${
+  weddingInfo
+    ? `- Fecha: ${weddingInfo.weddingDate || 'No definida'}
 - Lugar: ${weddingInfo.celebrationPlace || 'No definido'}
 - Estilo general: ${weddingInfo.weddingStyle || 'No definido'}
-- Invitados: ${weddingInfo.numGuests || 'No definido'}` : 'No hay información básica todavía'}
+- Invitados: ${weddingInfo.numGuests || 'No definido'}`
+    : 'No hay información básica todavía'
+}
 
 ${weddingDesign?.vision?.overallStyle?.primary ? `ESTILO ELEGIDO: ${weddingDesign.vision.overallStyle.primary}` : ''}
 ${weddingDesign?.vision?.mood?.atmosphere ? `AMBIENTE: ${weddingDesign.vision.mood.atmosphere}` : ''}

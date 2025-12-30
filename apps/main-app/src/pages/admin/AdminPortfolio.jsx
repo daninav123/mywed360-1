@@ -142,7 +142,7 @@ const AdminPortfolio = () => {
 
       {loading ? (
         <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[color:var(--color-text-soft)]">
-          Cargando cartera...
+          {t('admin.portfolio.searchPlaceholder')}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-soft bg-surface shadow-sm">
@@ -178,7 +178,7 @@ const AdminPortfolio = () => {
                         onClick={() => setSelectedWedding(wedding)}
                         className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft)]"
                       >
-                        Ver detalle
+                        {t('admin.portfolio.providerNamePlaceholder')}
                       </button>
                     </div>
                   </td>

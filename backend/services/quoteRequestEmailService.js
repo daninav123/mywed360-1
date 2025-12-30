@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import Handlebars from 'handlebars';
 import { createMailgunClients } from '../routes/mail/clients.js';
 import logger from '../utils/logger.js';
+import { sanitizers } from '../utils/logSanitizer.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,6 +75,52 @@ function formatServiceDetails(serviceDetails) {
   });
 
   return formatted;
+}
+
+/**
+ * Formatear requisitos de categoría (desde Info Boda) para el email
+ */
+function formatCategoryRequirements(categoryRequirements) {
+  if (!categoryRequirements || typeof categoryRequirements !== 'object') {
+    return null;
+  }
+
+  const formatted = {
+    hasRequirements: false,
+    customOptions: [],
+    notes: null,
+    specs: []
+  };
+
+  // Opciones personalizadas
+  if (Array.isArray(categoryRequirements.customOptions) && categoryRequirements.customOptions.length > 0) {
+    formatted.customOptions = categoryRequirements.customOptions;
+    formatted.hasRequirements = true;
+  }
+
+  // Notas
+  if (categoryRequirements.notes && categoryRequirements.notes.trim()) {
+    formatted.notes = categoryRequirements.notes.trim();
+    formatted.hasRequirements = true;
+  }
+
+  // Specs (checkboxes marcados)
+  if (categoryRequirements.specs && typeof categoryRequirements.specs === 'object') {
+    Object.entries(categoryRequirements.specs).forEach(([key, value]) => {
+      if (value === true) {
+        // Convertir key a texto legible
+        const label = key
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/^./, (str) => str.toUpperCase())
+          .replace(/_/g, ' ')
+          .trim();
+        formatted.specs.push(label);
+        formatted.hasRequirements = true;
+      }
+    });
+  }
+
+  return formatted.hasRequirements ? formatted : null;
 }
 
 /**
@@ -215,7 +262,7 @@ MyWed360 - Plataforma de gestión de bodas
       // Guardar en subcolección del usuario si tenemos userId
       if (userId) {
         await db.collection('users').doc(userId).collection('mails').doc(mailDoc.id).set(emailData);
-        logger.info(`💾 Email guardado en subcolección usuario ${userId} - bandeja: sent`);
+        logger.info(`💾 Email guardado en subcolección usuario ${sanitizers.userId(userId)} - bandeja: sent`);
       } else {
         logger.warn('⚠️ No se proporcionó userId, email solo guardado en colección global');
       }
@@ -329,7 +376,7 @@ MyWed360
       });
     });
 
-    logger.info(`✅ Notificación enviada a ${userEmail} - Mailgun ID: ${result.id}`);
+    logger.info(`✅ Notificación enviada a ${sanitizers.email(userEmail)} - Mailgun ID: ${result.id}`);
 
     return {
       success: true,

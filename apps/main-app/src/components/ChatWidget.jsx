@@ -18,9 +18,9 @@ import { post as apiPost } from '../services/apiClient';
 import { getBackendBase } from '../utils/backendBase';
 
 // --- Modo debug opcional ---
-// Actívalo desde la consola con: (window.mywed360Debug || window.lovendaDebug) = true
+// Actívalo desde la consola con: window.planiviaDebug = true
 const chatDebug = (...args) => {
-  if (typeof window !== 'undefined' && (window.mywed360Debug || window.lovendaDebug)) {
+  if (typeof window !== 'undefined' && window.planiviaDebug) {
     // eslint-disable-next-line no-console
     // console.debug('[ChatWidget]', ...args);
   }
@@ -302,7 +302,7 @@ export default function ChatWidget() {
   // Utilidad para aplicar comandos de la IA
   const applyCommands = async (commands = []) => {
     if (!commands.length) return;
-    let meetings = JSON.parse(localStorage.getItem('mywed360Meetings') || '[]');
+    let meetings = JSON.parse(localStorage.getItem('planivia_meetings') || '[]');
     let completed = JSON.parse(localStorage.getItem('tasksCompleted') || '{}');
     let changed = false;
 
@@ -360,7 +360,7 @@ export default function ChatWidget() {
                 ),
               };
               const detail = entity === 'meeting' ? { meeting: base } : { task: base };
-              window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
+              window.dispatchEvent(new CustomEvent('planivia-tasks', { detail }));
             } catch (_) {}
             toast.success(
               entity === 'task' ? t('chat.commands.taskAdded') : t('chat.commands.meetingAdded')
@@ -395,7 +395,7 @@ export default function ChatWidget() {
                   entity === 'meeting'
                     ? { meeting: base, action: 'update' }
                     : { task: base, action: 'update' };
-                window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
+                window.dispatchEvent(new CustomEvent('planivia-tasks', { detail }));
               } catch (_) {}
               changed = true;
             }
@@ -417,7 +417,7 @@ export default function ChatWidget() {
                   entity === 'meeting'
                     ? { meeting: base, action: 'delete' }
                     : { task: base, action: 'delete' };
-                window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
+                window.dispatchEvent(new CustomEvent('planivia-tasks', { detail }));
               } catch (_) {}
               changed = true;
             }
@@ -437,7 +437,7 @@ export default function ChatWidget() {
                   entity === 'meeting'
                     ? { meeting: base, action: 'complete' }
                     : { task: base, action: 'complete' };
-                window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
+                window.dispatchEvent(new CustomEvent('planivia-tasks', { detail }));
               } catch (_) {}
               changed = true;
             }
@@ -448,7 +448,7 @@ export default function ChatWidget() {
         }
       } else if (entity === 'guest') {
         // ----- GUESTS LOGIC -----
-        let guests = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
+        let guests = JSON.parse(localStorage.getItem('planivia_guests') || '[]');
         let changedG = false;
         const findGuestIdx = (identifier) => {
           const idxById = guests.findIndex((g) => g.id === identifier);
@@ -471,7 +471,7 @@ export default function ChatWidget() {
             // Intentar persistir a Firestore vía puente de eventos
             try {
               window.dispatchEvent(
-                new CustomEvent('maloveapp-guests', { detail: { guest: { ...guestObj } } })
+                new CustomEvent('planivia-guests', { detail: { guest: { ...guestObj } } })
               );
             } catch (_) {}
             toast.success(t('chat.commands.guestAdded'));
@@ -489,7 +489,7 @@ export default function ChatWidget() {
               // Bridge: update invitado
               try {
                 window.dispatchEvent(
-                  new CustomEvent('maloveapp-guests', {
+                  new CustomEvent('planivia-guests', {
                     detail: { guest: { ...guests[idx] }, action: 'update' },
                   })
                 );
@@ -509,7 +509,7 @@ export default function ChatWidget() {
               // Bridge: delete invitado
               try {
                 window.dispatchEvent(
-                  new CustomEvent('maloveapp-guests', {
+                  new CustomEvent('planivia-guests', {
                     detail: {
                       guest: { id: payload.id || null, name: payload.name || '' },
                       action: 'delete',
@@ -525,8 +525,8 @@ export default function ChatWidget() {
             break;
         }
         if (changedG) {
-          localStorage.setItem('mywed360Guests', JSON.stringify(guests));
-          window.dispatchEvent(new Event('maloveapp-guests'));
+          localStorage.setItem('planivia_guests', JSON.stringify(guests));
+          window.dispatchEvent(new Event('planivia-guests'));
         }
       } else if (
         entity === 'movement' ||
@@ -535,7 +535,7 @@ export default function ChatWidget() {
         entity === 'ingreso'
       ) {
         // ----- MOVEMENTS LOGIC -----
-        let movements = JSON.parse(localStorage.getItem('mywed360Movements') || '[]');
+        let movements = JSON.parse(localStorage.getItem('planivia_movements') || '[]');
         let changedM = false;
         const findMovIdx = (identifier) => {
           const idxById = movements.findIndex((m) => m.id === identifier);
@@ -619,7 +619,7 @@ export default function ChatWidget() {
             break;
         }
         if (changedM) {
-          localStorage.setItem('mywed360Movements', JSON.stringify(movements));
+          localStorage.setItem('planivia_movements', JSON.stringify(movements));
           window.dispatchEvent(new Event('maloveapp-movements'));
         }
       } else if (entity === 'supplier') {
@@ -640,8 +640,8 @@ export default function ChatWidget() {
               }
               const dataS = await resp.json();
               if (Array.isArray(dataS.results) && dataS.results.length) {
-                localStorage.setItem('mywed360Suppliers', JSON.stringify(dataS.results));
-                window.dispatchEvent(new Event('maloveapp-suppliers'));
+                localStorage.setItem('planivia_suppliers', JSON.stringify(dataS.results));
+                window.dispatchEvent(new Event('planivia-suppliers'));
                 toast.success(
                   tVars('chat.commands.suppliersFound', { count: dataS.results.length })
                 );
@@ -666,13 +666,13 @@ export default function ChatWidget() {
             snippet: payload.snippet || payload.desc || '',
           };
           try {
-            const stored = JSON.parse(localStorage.getItem('mywed360Suppliers') || '[]');
-            localStorage.setItem('mywed360Suppliers', JSON.stringify([supplier, ...stored]));
-            window.dispatchEvent(new Event('maloveapp-suppliers'));
+            const stored = JSON.parse(localStorage.getItem('planivia_suppliers') || '[]');
+            localStorage.setItem('planivia_suppliers', JSON.stringify([supplier, ...stored]));
+            window.dispatchEvent(new Event('planivia-suppliers'));
           } catch {}
           try {
             window.dispatchEvent(
-              new CustomEvent('maloveapp-suppliers', {
+              new CustomEvent('planivia-suppliers', {
                 detail: { supplier: { ...supplier }, action: 'add' },
               })
             );
@@ -685,7 +685,7 @@ export default function ChatWidget() {
           action === 'modificar'
         ) {
           try {
-            const stored = JSON.parse(localStorage.getItem('mywed360Suppliers') || '[]');
+            const stored = JSON.parse(localStorage.getItem('planivia_suppliers') || '[]');
             const findIdx = (idOrName) => {
               const byId = stored.findIndex((s) => s.id === idOrName);
               if (byId !== -1) return byId;
@@ -697,11 +697,11 @@ export default function ChatWidget() {
             if (idx !== -1) {
               const updated = { ...stored[idx], ...payload };
               stored[idx] = updated;
-              localStorage.setItem('mywed360Suppliers', JSON.stringify(stored));
-              window.dispatchEvent(new Event('maloveapp-suppliers'));
+              localStorage.setItem('planivia_suppliers', JSON.stringify(stored));
+              window.dispatchEvent(new Event('planivia-suppliers'));
               try {
                 window.dispatchEvent(
-                  new CustomEvent('maloveapp-suppliers', {
+                  new CustomEvent('planivia-suppliers', {
                     detail: { supplier: { ...updated }, action: 'update' },
                   })
                 );
@@ -711,7 +711,7 @@ export default function ChatWidget() {
           } catch {}
         } else if (action === 'delete' || action === 'remove') {
           try {
-            const stored = JSON.parse(localStorage.getItem('mywed360Suppliers') || '[]');
+            const stored = JSON.parse(localStorage.getItem('planivia_suppliers') || '[]');
             const before = stored.length;
             const filtered = stored.filter(
               (s) =>
@@ -722,11 +722,11 @@ export default function ChatWidget() {
                 )
             );
             if (filtered.length < before) {
-              localStorage.setItem('mywed360Suppliers', JSON.stringify(filtered));
-              window.dispatchEvent(new Event('maloveapp-suppliers'));
+              localStorage.setItem('planivia_suppliers', JSON.stringify(filtered));
+              window.dispatchEvent(new Event('planivia-suppliers'));
               try {
                 window.dispatchEvent(
-                  new CustomEvent('maloveapp-suppliers', {
+                  new CustomEvent('planivia-suppliers', {
                     detail: {
                       supplier: {
                         id: payload.id || null,
@@ -743,7 +743,7 @@ export default function ChatWidget() {
         }
       } else if (entity === 'table') {
         // ----- TABLE MOVE LOGIC -----
-        let guests = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
+        let guests = JSON.parse(localStorage.getItem('planivia_guests') || '[]');
         let changedT = false;
         const idx = guests.findIndex(
           (g) =>
@@ -759,21 +759,21 @@ export default function ChatWidget() {
           // Bridge: update mesa
           try {
             window.dispatchEvent(
-              new CustomEvent('maloveapp-guests', {
+              new CustomEvent('planivia-guests', {
                 detail: { guest: { ...guests[idx] }, action: 'update' },
               })
             );
           } catch (_) {}
         }
         if (changedT) {
-          localStorage.setItem('mywed360Guests', JSON.stringify(guests));
-          window.dispatchEvent(new Event('maloveapp-guests'));
+          localStorage.setItem('planivia_guests', JSON.stringify(guests));
+          window.dispatchEvent(new Event('planivia-guests'));
         }
       } else if (entity === 'config') {
         // ----- CONFIG LOGIC -----
         let profile = {};
         try {
-          profile = JSON.parse(localStorage.getItem('mywed360Profile') || '{}');
+          profile = JSON.parse(localStorage.getItem('planivia_profile') || '{}');
         } catch {
           profile = {};
         }
@@ -782,16 +782,16 @@ export default function ChatWidget() {
         // merge payload into weddingInfo at top level too (for generic)
         profile.weddingInfo = { ...profile.weddingInfo, ...payload };
         Object.assign(profile, payload.root || {});
-        localStorage.setItem('mywed360Profile', JSON.stringify(profile));
-        window.dispatchEvent(new Event('maloveapp-profile'));
+        localStorage.setItem('planivia_profile', JSON.stringify(profile));
+        window.dispatchEvent(new Event('planivia-profile'));
         toast.success(t('chat.commands.configUpdated'));
       }
     });
 
     if (changed) {
-      localStorage.setItem('mywed360Meetings', JSON.stringify(meetings));
+      localStorage.setItem('planivia_meetings', JSON.stringify(meetings));
       localStorage.setItem('tasksCompleted', JSON.stringify(completed));
-      window.dispatchEvent(new Event('maloveapp-tasks'));
+      window.dispatchEvent(new Event('planivia-tasks'));
     }
   };
 
@@ -885,7 +885,7 @@ export default function ChatWidget() {
 
       // --- Persistir invitados extraídos ---
       if (data.extracted?.guests?.length) {
-        const stored = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
+        const stored = JSON.parse(localStorage.getItem('planivia_guests') || '[]');
         let nextId = stored.length ? Math.max(...stored.map((g) => g.id)) + 1 : 1;
         const mapped = data.extracted.guests.map((g) => ({
           id: nextId++,
@@ -897,14 +897,14 @@ export default function ChatWidget() {
           response: 'Pendiente',
         }));
         const updated = [...stored, ...mapped];
-        localStorage.setItem('mywed360Guests', JSON.stringify(updated));
-        window.dispatchEvent(new Event('maloveapp-guests'));
+        localStorage.setItem('planivia_guests', JSON.stringify(updated));
+        window.dispatchEvent(new Event('planivia-guests'));
         toast.success(tPlural('chat.plurals.guestsAdded', mapped.length));
       }
 
       // --- Persistir tareas extraídas ---
       if (data.extracted?.tasks?.length) {
-        const storedMeetings = JSON.parse(localStorage.getItem('mywed360Meetings') || '[]');
+        const storedMeetings = JSON.parse(localStorage.getItem('planivia_meetings') || '[]');
         let nextId = storedMeetings.length ? Date.now() : Date.now();
         const mappedT = data.extracted.tasks.map((t) => {
           // Priorizar campo "due" (ISO), luego date/start/end si vienen de la IA
@@ -923,13 +923,13 @@ export default function ChatWidget() {
           };
         });
         const updatedM = [...storedMeetings, ...mappedT];
-        localStorage.setItem('mywed360Meetings', JSON.stringify(updatedM));
-        window.dispatchEvent(new Event('maloveapp-tasks'));
-        window.dispatchEvent(new Event('maloveapp-meetings'));
+        localStorage.setItem('planivia_meetings', JSON.stringify(updatedM));
+        window.dispatchEvent(new Event('planivia-tasks'));
+        window.dispatchEvent(new Event('planivia-meetings'));
         // Disparar eventos detallados para persistir en Firestore
         try {
           mappedT.forEach((task) =>
-            window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail: { task } }))
+            window.dispatchEvent(new CustomEvent('planivia-tasks', { detail: { task } }))
           );
         } catch (_) {}
         toast.success(tPlural('chat.plurals.tasksAdded', mappedT.length));
@@ -937,7 +937,7 @@ export default function ChatWidget() {
 
       // --- Persistir reuniones extraídas ---
       if (data.extracted?.meetings?.length) {
-        const storedMeetings = JSON.parse(localStorage.getItem('mywed360Meetings') || '[]');
+        const storedMeetings = JSON.parse(localStorage.getItem('planivia_meetings') || '[]');
         let nextId = Date.now();
         const mappedR = data.extracted.meetings.map((r) => {
           const startIso = r.start || r.date || r.when || r.begin;
@@ -956,13 +956,13 @@ export default function ChatWidget() {
           };
         });
         const updatedR = [...storedMeetings, ...mappedR];
-        localStorage.setItem('mywed360Meetings', JSON.stringify(updatedR));
-        window.dispatchEvent(new Event('maloveapp-tasks'));
-        window.dispatchEvent(new Event('maloveapp-meetings'));
+        localStorage.setItem('planivia_meetings', JSON.stringify(updatedR));
+        window.dispatchEvent(new Event('planivia-tasks'));
+        window.dispatchEvent(new Event('planivia-meetings'));
         // Disparar eventos detallados para el bridge
         try {
           mappedR.forEach((meeting) =>
-            window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail: { meeting } }))
+            window.dispatchEvent(new CustomEvent('planivia-tasks', { detail: { meeting } }))
           );
         } catch (_) {}
         toast.success(tPlural('chat.plurals.meetingsAdded', mappedR.length));
@@ -971,7 +971,7 @@ export default function ChatWidget() {
       // --- Persistir movimientos extraídos ---
       const extMovs = data.extracted?.movements || data.extracted?.budgetMovements;
       if (extMovs?.length) {
-        const storedMov = JSON.parse(localStorage.getItem('mywed360Movements') || '[]');
+        const storedMov = JSON.parse(localStorage.getItem('planivia_movements') || '[]');
         let nextId = storedMov.length ? Date.now() : Date.now();
         const mappedMov = extMovs.map((m) => ({
           id: `mov-${nextId++}`,
@@ -981,7 +981,7 @@ export default function ChatWidget() {
           type: m.type === 'income' ? 'income' : 'expense',
         }));
         const updatedMov = [...storedMov, ...mappedMov];
-        localStorage.setItem('mywed360Movements', JSON.stringify(updatedMov));
+        localStorage.setItem('planivia_movements', JSON.stringify(updatedMov));
         window.dispatchEvent(new Event('maloveapp-movements'));
         // Disparar eventos detallados para persistencia
         try {

@@ -18,7 +18,8 @@ import {
   Send,
   Zap,
 } from 'lucide-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { formatDate } from '../utils/formatUtils';
@@ -53,6 +54,9 @@ import { normalizeBudgetCategoryKey } from '../utils/budgetCategories';
 import { syncPaymentScheduleWithTransactions } from '../services/paymentScheduleService';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { createQuoteRequest } from '../services/quoteRequestsService';
+import { buildSupplierQuery } from '../utils/buildSupplierQuery';
+import { db } from '../firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
@@ -275,6 +279,10 @@ const Proveedores = () => {
   const { favorites, addFavorite, refreshFavorites, isFavorite } = useFavorites();
   const [isAutoFindingAll, setIsAutoFindingAll] = useState(false);
   const [isRequestingAllQuotes, setIsRequestingAllQuotes] = useState(false);
+  
+  // Estados para requisitos y diseño de boda (Info Boda)
+  const [supplierRequirements, setSupplierRequirements] = useState({});
+  const [weddingDesign, setWeddingDesign] = useState(null);
   // Sistema de búsqueda híbrido (prioriza BD propia)
   const [aiResults, setAiResults] = useState([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -326,6 +334,42 @@ const Proveedores = () => {
         if (!cancelled && Array.isArray(data)) setWantedServices(data);
       } catch {}
     })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeWedding]);
+
+  // Cargar supplierRequirements y weddingDesign desde Firestore
+  useEffect(() => {
+    if (!activeWedding) return;
+    
+    let cancelled = false;
+    
+    (async () => {
+      try {
+        const weddingDocRef = doc(db, 'weddings', activeWedding);
+        const weddingDoc = await getDoc(weddingDocRef);
+        
+        if (!cancelled && weddingDoc.exists()) {
+          const data = weddingDoc.data();
+          
+          // Cargar supplier requirements
+          if (data.supplierRequirements) {
+            setSupplierRequirements(data.supplierRequirements);
+            console.log('✅ [AutoFind] Requisitos de proveedores cargados:', Object.keys(data.supplierRequirements).length, 'categorías');
+          }
+          
+          // Cargar wedding design
+          if (data.weddingDesign) {
+            setWeddingDesign(data.weddingDesign);
+            console.log('✅ [AutoFind] Diseño de boda cargado');
+          }
+        }
+      } catch (error) {
+        console.error('❌ [AutoFind] Error cargando datos de Info Boda:', error);
+      }
+    })();
+    
     return () => {
       cancelled = true;
     };
@@ -846,22 +890,36 @@ const Proveedores = () => {
 
     // Mapeo de categorías relacionadas para búsqueda
     const categoryAliases = {
-      'musica': ['musica', 'dj'], // Música incluye DJs
+      // Nuevas categorías granulares de música
+      'musica-ceremonia': ['musica-ceremonia', 'musica'],
+      'musica-cocktail': ['musica-cocktail', 'musica'],
+      'musica-fiesta': ['musica-fiesta', 'musica'],
+      'sonido-iluminacion': ['sonido-iluminacion', 'musica', 'dj', 'iluminacion'], // Empresas técnicas pueden estar en musica/dj/iluminacion antiguos
       'dj': ['dj', 'musica'],
+      // Categorías antiguas (retrocompatibilidad)
+      'musica': ['musica', 'dj', 'musica-ceremonia', 'musica-cocktail', 'musica-fiesta'],
+      'iluminacion': ['iluminacion', 'sonido-iluminacion'],
     };
 
     try {
       for (const service of activeServices) {
         const categoryName = service.name || service.id;
+        const categoryId = service.id;
         
         try {
-          console.log(`🔍 [AutoFind] Buscando proveedores de ${categoryName} (ID: ${service.id})...`);
+          // 🎯 NUEVO: Construir query inteligente basado en requisitos del usuario
+          const requirements = supplierRequirements[categoryId] || {};
+          const smartQuery = buildSupplierQuery(categoryId, requirements, weddingDesign);
+          
+          console.log(`🔍 [AutoFind] Buscando proveedores de ${categoryName} (ID: ${categoryId})...`);
+          console.log(`  📝 Query inteligente: "${smartQuery}"`);
+          
           // Llamar con parámetros posicionales: service, location, query
           const searchResponse = await searchSuppliersHybrid(
-            categoryName, // service
-            location,     // location
-            '',          // query (vacío para búsqueda general)
-            { limit: 50 } // filters - aumentado para obtener más resultados
+            categoryName,  // service
+            location,      // location
+            smartQuery,    // ✨ query enriquecido con requisitos del usuario
+            { limit: 50 }  // filters - aumentado para obtener más resultados
           );
 
           // searchSuppliersHybrid retorna objeto { success, suppliers: [...], count }

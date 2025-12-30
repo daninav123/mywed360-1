@@ -59,7 +59,7 @@ const AdminBroadcast = () => {
               value={subject}
               onChange={(event) => setSubject(event.target.value)}
               className="w-full rounded-md border border-soft px-3 py-2"
-              placeholder="Mantenimiento programado"
+              placeholder={t('admin.broadcast.searchPlaceholder')}
             />
           </div>
           <div className="space-y-1">

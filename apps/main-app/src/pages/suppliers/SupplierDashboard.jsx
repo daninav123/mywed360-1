@@ -894,7 +894,7 @@ export default function SupplierDashboard() {
                       onChange={(event) =>
                         setFormData({ ...formData, instagram: event.target.value })
                       }
-                      placeholder={t('suppliers.dashboard.profile.placeholders.instagram')}
+                      placeholder={t('supplier.dashboard.searchPlaceholder')}
                       className="w-full px-3 py-2 border rounded-md"
                       style={{ borderColor: 'var(--color-border)' }}
                     />

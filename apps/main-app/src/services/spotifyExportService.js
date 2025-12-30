@@ -6,7 +6,7 @@
 /**
  * Exportar canciones a Spotify Playlist
  * Solo exporta canciones con trackUrl válido (ignora canciones especiales/custom)
- * 
+ *
  * @param {Object} params
  * @param {string} params.playlistName - Nombre de la playlist
  * @param {Array} params.moments - Array de momentos con canciones
@@ -27,7 +27,7 @@ export async function exportToSpotifyPlaylist({
 
   moments.forEach((moment) => {
     const song = getSelectedSong(moment);
-    
+
     if (!song) {
       missingSongs.push({ moment: moment.title, reason: 'Sin canción asignada' });
       return;
@@ -112,14 +112,14 @@ async function createSpotifyPlaylistAPI(playlistData) {
   // 1. Verificar token de acceso
   // 2. Crear playlist: POST https://api.spotify.com/v1/users/{user_id}/playlists
   // 3. Añadir tracks: POST https://api.spotify.com/v1/playlists/{playlist_id}/tracks
-  
+
   // Por ahora, generar URL manual para que el usuario lo haga
   const trackIds = playlistData.tracks.join(',');
-  
+
   // URL para abrir Spotify con búsqueda de tracks
   // Nota: Spotify no permite crear playlists directamente desde URL
   // Se necesita OAuth flow completo
-  
+
   return `https://open.spotify.com/search/${encodeURIComponent(playlistData.name)}`;
 }
 
@@ -128,23 +128,20 @@ async function createSpotifyPlaylistAPI(playlistData) {
  */
 export function extractSpotifyTrackId(url) {
   if (!url) return null;
-  
+
   // Formatos soportados:
   // https://open.spotify.com/track/TRACK_ID
   // spotify:track:TRACK_ID
-  
-  const patterns = [
-    /spotify\.com\/track\/([a-zA-Z0-9]+)/,
-    /spotify:track:([a-zA-Z0-9]+)/,
-  ];
-  
+
+  const patterns = [/spotify\.com\/track\/([a-zA-Z0-9]+)/, /spotify:track:([a-zA-Z0-9]+)/];
+
   for (const pattern of patterns) {
     const match = url.match(pattern);
     if (match && match[1]) {
       return match[1];
     }
   }
-  
+
   return null;
 }
 
@@ -153,19 +150,23 @@ export function extractSpotifyTrackId(url) {
  */
 function buildExportMessage(spotifyCount, specialCount, missingCount) {
   const parts = [];
-  
+
   if (spotifyCount > 0) {
-    parts.push(`${spotifyCount} canción${spotifyCount !== 1 ? 'es' : ''} exportada${spotifyCount !== 1 ? 's' : ''} a Spotify`);
+    parts.push(
+      `${spotifyCount} canción${spotifyCount !== 1 ? 'es' : ''} exportada${spotifyCount !== 1 ? 's' : ''} a Spotify`
+    );
   }
-  
+
   if (specialCount > 0) {
-    parts.push(`${specialCount} canción${specialCount !== 1 ? 'es' : ''} especial${specialCount !== 1 ? 'es' : ''} (requiere documento para DJ)`);
+    parts.push(
+      `${specialCount} canción${specialCount !== 1 ? 'es' : ''} especial${specialCount !== 1 ? 'es' : ''} (requiere documento para DJ)`
+    );
   }
-  
+
   if (missingCount > 0) {
     parts.push(`${missingCount} sin canción asignada`);
   }
-  
+
   return parts.join(' • ');
 }
 
@@ -176,9 +177,9 @@ export function hasSpotifyAuth() {
   // Verificar si hay token de acceso guardado
   const token = localStorage.getItem('spotify_access_token');
   const expiry = localStorage.getItem('spotify_token_expiry');
-  
+
   if (!token || !expiry) return false;
-  
+
   // Verificar si el token no ha expirado
   return new Date(expiry) > new Date();
 }
@@ -190,18 +191,17 @@ export function initiateSpotifyAuth() {
   // Parámetros para OAuth
   const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID || '';
   const redirectUri = `${window.location.origin}/spotify-callback`;
-  const scopes = [
-    'playlist-modify-public',
-    'playlist-modify-private',
-    'user-read-private',
-  ].join(' ');
-  
-  const authUrl = `https://accounts.spotify.com/authorize?` +
+  const scopes = ['playlist-modify-public', 'playlist-modify-private', 'user-read-private'].join(
+    ' '
+  );
+
+  const authUrl =
+    `https://accounts.spotify.com/authorize?` +
     `client_id=${clientId}` +
     `&response_type=token` +
     `&redirect_uri=${encodeURIComponent(redirectUri)}` +
     `&scope=${encodeURIComponent(scopes)}`;
-  
+
   // Abrir en nueva ventana
   window.open(authUrl, 'spotify-auth', 'width=600,height=800');
 }
@@ -211,13 +211,13 @@ export function initiateSpotifyAuth() {
  */
 export function getAllSongsForExport(moments, blocks, getSelectedSong) {
   const allSongs = [];
-  
+
   blocks.forEach((block) => {
     const blockMoments = moments[block.id] || [];
-    
+
     blockMoments.forEach((moment) => {
       const song = getSelectedSong(moment);
-      
+
       if (song) {
         allSongs.push({
           blockName: block.name,
@@ -238,6 +238,6 @@ export function getAllSongsForExport(moments, blocks, getSelectedSong) {
       }
     });
   });
-  
+
   return allSongs;
 }

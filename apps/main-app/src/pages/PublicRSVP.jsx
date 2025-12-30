@@ -229,7 +229,7 @@ const PublicRSVP = () => {
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej: Juan García López"
+                placeholder={t('rsvp.namePlaceholder')}
                 className="w-full px-4 py-3 border-2 border-purple-300 rounded-lg text-lg mb-4 focus:border-purple-500 focus:outline-none"
                 disabled={searching}
               />
@@ -265,7 +265,7 @@ const PublicRSVP = () => {
                   type="email"
                   value={formData.emailConfirmacion}
                   onChange={(e) => setFormData({ ...formData, emailConfirmacion: e.target.value })}
-                  placeholder="tu@email.com"
+                  placeholder={t('rsvp.emailPlaceholder')}
                   required
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
                 />
@@ -345,7 +345,7 @@ const PublicRSVP = () => {
                           type="text"
                           value={formData.nombresAcompañantes[index] || ''}
                           onChange={(e) => handleAcompañantesChange(index, e.target.value)}
-                          placeholder={`Acompañante ${index + 1}`}
+                          placeholder={t('rsvp.companionPlaceholder', { number: index + 1 })}
                           className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-2 focus:border-purple-500 focus:outline-none"
                         />
                       ))}
@@ -486,7 +486,7 @@ const PublicRSVP = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, restriccionesAlimentarias: e.target.value })
                       }
-                      placeholder="Otras alergias, intolerancias o especificaciones..."
+                      placeholder={t('rsvp.allergiesPlaceholder')}
                       className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
                     />
                     <p className="text-xs text-gray-600 mt-2">
@@ -505,7 +505,7 @@ const PublicRSVP = () => {
                 <textarea
                   value={formData.comentarios}
                   onChange={(e) => setFormData({ ...formData, comentarios: e.target.value })}
-                  placeholder="Cualquier cosa que quieras contarnos..."
+                  placeholder={t('rsvp.commentsPlaceholder')}
                   rows="3"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
                 ></textarea>

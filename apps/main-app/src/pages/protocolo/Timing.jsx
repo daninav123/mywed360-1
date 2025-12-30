@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Clock,
   Music,
@@ -98,7 +99,7 @@ const Timing = () => {
 
     addMoment(blockId, {
       order: nextOrder,
-      title: `Nuevo momento ${nextOrder}`,
+      title: t('protocol.timing.newMoment', { number: nextOrder }),
       type: 'musical',
       time: '',
     });
@@ -134,18 +135,18 @@ const Timing = () => {
   };
 
   return (
-    <PageWrapper title="Timeline de tu Boda">
+    <PageWrapper title={t('protocol.timing.pageTitle')}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header con estadísticas */}
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Timeline del Día de tu Boda</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">{t('protocol.timing.title')}</h1>
           <p className="text-sm text-gray-600 mb-3">
-            Organiza el cronograma completo de tu celebración
+            {t('protocol.timing.subtitle')}
           </p>
           <Link to="/protocolo/dia-de-la-boda">
             <Button className="bg-[var(--color-primary)] hover:bg-[var(--color-primary)]">
               <Play size={16} className="mr-2" />
-              Activar Modo Día de la Boda
+              {t('protocol.timing.activateMode')}
             </Button>
           </Link>
         </div>
@@ -369,18 +370,6 @@ const Timing = () => {
                                       <FileText size={14} className="text-gray-400 mt-2" />
                                       <textarea
                                         value={moment.notes || ''}
-                                        onChange={(e) =>
-                                          updateMoment(block.id, moment.id, {
-                                            notes: e.target.value,
-                                          })
-                                        }
-                                        placeholder="Añadir notas (ej: pétalos, cámara especial, etc.)"
-                                        className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                        rows={2}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
 
                                 {/* Acciones */}
                                 <div className="flex-shrink-0">

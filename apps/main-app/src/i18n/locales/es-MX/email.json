@@ -163,11 +163,7 @@
           "local",
           "ubicación"
         ],
-        "providerKeywords": [
-          "proveedor",
-          "servicio",
-          "contratación"
-        ]
+        "providerKeywords": ["proveedor", "servicio", "contratación"]
       },
       "fields": {
         "title": {
@@ -1036,20 +1032,8 @@
       "noSubject": "(No subject)"
     },
     "detection": {
-      "locationKeywords": [
-        "at",
-        "located at",
-        "address",
-        "venue",
-        "location",
-        "space",
-        "room"
-      ],
-      "providerKeywords": [
-        "vendor",
-        "service",
-        "booking"
-      ]
+      "locationKeywords": ["at", "located at", "address", "venue", "location", "space", "room"],
+      "providerKeywords": ["vendor", "service", "booking"]
     },
     "fields": {
       "title": {

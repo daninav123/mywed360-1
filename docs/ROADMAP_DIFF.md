@@ -8,9 +8,11 @@
 - Specs en disco: 16
 
 ## Specs duplicados en tareas
+
 - Ninguno
 
 ## Specs faltantes según docs (E2E no encontrado)
+
 - 0. Administración Global (estado 2025-10-14): cypress/e2e/admin/admin-flow.cy.js
 - 1. Registro y Autenticación (estado 2025-10-08): cypress/e2e/auth/flow1-social-login.cy.js
 - 1. Registro y Autenticación (estado 2025-10-08): cypress/e2e/auth/flow1-verify-email.cy.js
@@ -124,6 +126,7 @@
 - Flujo 13: E2E del Seating Plan: cypress/e2e/seating/seating-export.cy.js
 
 ## Módulos con specs pero sin tareas asociadas
+
 - 0. Administración Global (estado 2025-10-14): cypress/e2e/admin/admin-flow.cy.js
 - 1. Registro y Autenticación (estado 2025-10-08): cypress/e2e/auth/flow1-signup.cy.js, cypress/e2e/auth/flow1-social-login.cy.js, cypress/e2e/auth/flow1-password-reset.cy.js, cypress/e2e/auth/flow1-verify-email.cy.js, cypress/e2e/auth/auth-flow.cy.js
 - 10. Gestión de Bodas Múltiples (estado 2025-10-16): cypress/e2e/weddings/multi-weddings-flow.cy.js, cypress/e2e/weddings/wedding-team-flow.cy.js
@@ -163,12 +166,15 @@
 - Flujo 13: E2E del Seating Plan: cypress/e2e/seating/seating_smoke.cy.js, cypress/e2e/seating/seating_assign_unassign.cy.js, cypress/e2e/seating/seating_capacity_limit.cy.js, cypress/e2e/seating/seating_no_overlap.cy.js, cypress/e2e/seating/seating_obstacles_no_overlap.cy.js, cypress/e2e/seating/seating_template_circular.cy.js, cypress/e2e/seating/seating_template_u_l_imperial.cy.js, cypress/e2e/seating/seating_ceremony.cy.js, cypress/e2e/seating/seating_fit.cy.js, cypress/e2e/seating/seating_aisle_min.cy.js, cypress/e2e/seating/seating_toasts.cy.js, cypress/e2e/seating/seating_auto_ai.cy.js, cypress/e2e/seating/seating_area_type.cy.js, cypress/e2e/seating/seating_delete_duplicate.cy.js, cypress/e2e/seating/seating-content-flow.cy.js, cypress/e2e/seating/seating-basic.cy.js, cypress/e2e/seating/seating-conflicts.cy.js, cypress/e2e/seating/seating_ui_panels.cy.js, cypress/e2e/seating/seating-export.cy.js
 
 ## Tareas con specs no mencionados en docs
+
 - Ninguno
 
 ## Tareas con specs inexistentes en disco
+
 - Ninguno
 
 ## Specs huérfanos (en disco, sin tarea)
+
 - cypress/e2e/accept-quote-flow.cy.js
 - cypress/e2e/auth/auth-flow.cy.js
 - cypress/e2e/auth/flow1-password-reset.cy.js

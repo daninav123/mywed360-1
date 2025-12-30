@@ -1,6 +1,13 @@
 // Script simple para testear login de ReSona
 import fetch from 'node-fetch';
 
+// ⚠️ PROTECCIÓN: Este script NO debe ejecutarse en producción
+if (process.env.NODE_ENV === 'production') {
+  console.error('❌ ERROR: Este script de testing NO debe ejecutarse en producción');
+  console.error('   Está diseñado solo para desarrollo local');
+  process.exit(1);
+}
+
 const BACKEND_URL = 'http://localhost:4004';
 
 async function testLogin(email, password) {

@@ -1,0 +1,16 @@
+{
+  "weddingContext": {
+    "ceremonyType": "religiosa",
+    "budget": "medium",
+    "leadTimeMonths": 8,
+    "guestCount": 150,
+    "style": "romantic",
+    "city": "Valencia",
+    "weddingDate": "2025-09-15",
+    "venueType": "finca",
+    "manyChildren": true,
+    "guestsFromOutside": true,
+    "samePlaceCeremonyReception": true,
+    "hasPlanner": false
+  }
+}

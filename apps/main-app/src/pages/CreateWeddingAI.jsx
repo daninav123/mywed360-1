@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { Card } from '../components/ui/Card';
@@ -7,7 +8,7 @@ import { createWedding } from '../services/WeddingService';
 import { useWedding } from '../context/WeddingContext';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import {
-  EVENT_STYLE_OPTIONS,
+  getEventStyleOptions,
   GUEST_COUNT_OPTIONS,
   FORMALITY_OPTIONS,
   CEREMONY_TYPE_OPTIONS,
@@ -284,7 +285,7 @@ export default function CreateWeddingAI() {
                     value={form.location}
                     onChange={handleChange}
                     className="w-full border rounded px-3 py-2"
-                    placeholder="Sevilla, España"
+                    placeholder={t('createWedding.locationPlaceholder')}
                   />
                   {fieldErrors.location && (
                     <p className="mt-1 text-xs text-red-600">{fieldErrors.location}</p>
@@ -347,7 +348,7 @@ export default function CreateWeddingAI() {
                     onChange={handleChange}
                     className="w-full border rounded px-3 py-2"
                   >
-                    {GUEST_COUNT_OPTIONS.map((option) => (
+                    {getGuestCountOptions(t).map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -365,7 +366,7 @@ export default function CreateWeddingAI() {
                     onChange={handleChange}
                     className="w-full border rounded px-3 py-2"
                   >
-                    {FORMALITY_OPTIONS.map((option) => (
+                    {getFormalityOptions(t).map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -386,7 +387,7 @@ export default function CreateWeddingAI() {
                     onChange={handleChange}
                     className="w-full border rounded px-3 py-2"
                   >
-                    {CEREMONY_TYPE_OPTIONS.map((option) => (
+                    {getCeremonyTypeOptions(t).map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -398,7 +399,7 @@ export default function CreateWeddingAI() {
               <div>
                 <span className="block text-sm font-medium mb-1">Eventos relacionados</span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {RELATED_EVENT_OPTIONS.map((option) => {
+                  {getRelatedEventOptions(t).map((option) => {
                     const checked = form.relatedEvents.includes(option.value);
                     return (
                       <label
@@ -433,7 +434,7 @@ export default function CreateWeddingAI() {
                   value={form.notes}
                   onChange={handleChange}
                   className="w-full border rounded px-3 py-2 h-28"
-                  placeholder="Cuéntanos detalles sobre estilo, inspiración o restricciones."
+                  placeholder={t('createWedding.notesPlaceholder')}
                 />
               </div>
             </section>

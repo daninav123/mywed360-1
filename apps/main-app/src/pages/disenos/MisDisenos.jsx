@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useWedding } from '../../context/WeddingContext';
@@ -72,7 +73,7 @@ export default function MisDiseños() {
         <h1 className="text-xl font-semibold">
           {t('designsLibrary.myDesigns.title', 'Mis diseños')}
         </h1>
-        <Link to="/disenos" className="text-blue-600 hover:underline">
+        <Link placeholder={t('design.myDesigns.searchPlaceholder')} className="text-blue-600 hover:underline">
           {t('designsLibrary.myDesigns.backLink', 'Volver a Diseños')}
         </Link>
       </div>

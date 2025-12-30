@@ -1283,27 +1283,40 @@ export const useSeatingPlan = () => {
     }
 
     const apply = (prev) => {
+      // FIX: Crear deep copy para evitar referencias compartidas
       const result = prev.map((t) => {
         const match = String(t.id) === String(tableId);
         if (match) {
-          return { ...t, x: pos.x, y: pos.y };
+          // Deep clone con spread de todos los campos para evitar mutaciones
+          return {
+            ...t,
+            x: Number(pos.x),
+            y: Number(pos.y),
+          };
         }
-        return t;
+        // Devolver copia del objeto para evitar referencias compartidas
+        return { ...t };
       });
 
       // ⚠️ PROTECCIÓN: Detectar corrupción en tiempo real
       const uniquePos = new Set(result.map((t) => `${t.x},${t.y}`)).size;
       if (result.length > 3 && uniquePos < result.length * 0.3) {
-        console.error('[moveTable] CORRUPCIÓN DETECTADA', {
+        console.error('[moveTable] 🔴 CORRUPCIÓN DETECTADA - RECHAZANDO UPDATE', {
           total: result.length,
           posicionesUnicas: uniquePos,
+          tableIdMovido: tableId,
+          posicionDestino: pos,
         });
+        // Rechazar el update para prevenir corrupción
+        return prev;
       }
 
       return result;
     };
+    
     if (tab === 'ceremony') setTablesCeremony((p) => apply(p));
     else setTablesBanquet((p) => apply(p));
+    
     if (finalize) {
       try {
         pushHistory({

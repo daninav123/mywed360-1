@@ -154,10 +154,10 @@ const AdminReports = () => {
               disabled={generating}
               className="w-full rounded-md border border-soft px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option value="global">Métricas globales</option>
-              <option value="portfolio">Portfolio</option>
-              <option value="ia">Costes IA</option>
-              <option value="email">Rendimiento emails</option>
+              <option value="global">{t('admin.reports.types.global')}</option>
+              <option value="portfolio">{t('admin.reports.types.portfolio')}</option>
+              <option value="ia">{t('admin.reports.types.ai')}</option>
+              <option value="email">{t('admin.reports.types.email')}</option>
             </select>
           </div>
 
@@ -172,7 +172,7 @@ const AdminReports = () => {
               onChange={(event) => setRecipients(event.target.value)}
               disabled={generating}
               className="w-full rounded-md border border-soft px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              placeholder="direccion@maloveapp.com, admin@maloveapp.com"
+              placeholder={t('admin.reports.searchPlaceholder')}
             />
           </div>
 

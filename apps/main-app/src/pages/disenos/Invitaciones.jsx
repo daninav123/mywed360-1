@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 import { useWedding } from '../../context/WeddingContext';

@@ -135,10 +135,9 @@ export default function TransactionImportModal({
     }
   }, [open]);
 
-  const loadXLSX = async () => {
-    const mod = await import('xlsx');
-    const XLSX = mod.default || mod;
-    return XLSX;
+  const loadExcelJS = async () => {
+    const mod = await import('exceljs');
+    return mod.default || mod;
   };
 
   const handleFileChange = async (event) => {
@@ -147,17 +146,23 @@ export default function TransactionImportModal({
     setError(null);
     setParsing(true);
     try {
-      const XLSX = await loadXLSX();
+      const ExcelJS = await loadExcelJS();
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, {
-        type: 'array',
-        cellDates: true,
-        dateNF: 'yyyy-mm-dd',
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(data);
+      
+      const worksheet = workbook.worksheets[0];
+      if (!worksheet) throw new Error('No se encontró ninguna pestaña en el archivo.');
+      
+      const raw = [];
+      worksheet.eachRow((row, rowNumber) => {
+        const rowData = [];
+        row.eachCell({ includeEmpty: true }, (cell) => {
+          rowData.push(cell.value || '');
+        });
+        raw.push(rowData);
       });
-      const sheetName = workbook.SheetNames[0];
-      if (!sheetName) throw new Error('No se encontró ninguna pestaña en el archivo.');
-      const worksheet = workbook.Sheets[sheetName];
-      const raw = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+      
       if (!Array.isArray(raw) || raw.length < 2) {
         throw new Error('El archivo no contiene filas suficientes.');
       }
@@ -215,7 +220,6 @@ export default function TransactionImportModal({
     if (!onImport || !rows.length) return;
     setSubmitting(true);
     try {
-      const XLSX = await loadXLSX();
       const normalized = rows
         .map((row, index) => {
           const getValue = (fieldKey) => {

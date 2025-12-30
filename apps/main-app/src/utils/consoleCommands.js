@@ -40,7 +40,7 @@ if (typeof window !== 'undefined') {
   };
 
   console.info(
-    '✅  Comandos de consola MaLoveApp registrados: mywed.checkAll(), mywed.clearDiagnostics()'
+    '✅  Comandos de consola Planivia registrados: mywed.checkAll(), mywed.clearDiagnostics()'
   );
 }
 
@@ -330,7 +330,7 @@ Comandos disponibles:
 
   showHelp() {
     console.log(`
-📖 MaLoveApp - Comandos de Diagnóstico
+📖 Planivia - Comandos de Diagnóstico
 ===
 
 DIAGNÓSTICOS:
@@ -516,10 +516,10 @@ EJEMPLOS DE USO:
     console.group('🧪 TEST DE RESTAURACIÓN DE SESIÓN ADMIN');
     
     const ADMIN_SESSION_FLAG = 'isAdminAuthenticated';
-    const ADMIN_PROFILE_KEY = 'MaLoveApp_admin_profile';
-    const ADMIN_SESSION_TOKEN_KEY = 'MaLoveApp_admin_session_token';
-    const ADMIN_SESSION_EXPIRES_KEY = 'MaLoveApp_admin_session_expires';
-    const ADMIN_SESSION_ID_KEY = 'MaLoveApp_admin_session_id';
+    const ADMIN_PROFILE_KEY = 'Planivia_admin_profile';
+    const ADMIN_SESSION_TOKEN_KEY = 'Planivia_admin_session_token';
+    const ADMIN_SESSION_EXPIRES_KEY = 'Planivia_admin_session_expires';
+    const ADMIN_SESSION_ID_KEY = 'Planivia_admin_session_id';
     
     console.log('Simulando función restoreAdminSession()...\n');
     
@@ -614,7 +614,7 @@ EJEMPLOS DE USO:
       key.includes('admin') || 
       key.includes('Admin') || 
       key.includes('isAuthenticated') ||
-      key.includes('MaLoveApp_admin')
+      key.includes('Planivia_admin')
     );
     
     console.log(`Total de claves relacionadas con admin: ${adminKeys.length}\n`);
@@ -653,10 +653,10 @@ EJEMPLOS DE USO:
     
     const keys = [
       'isAdminAuthenticated',
-      'MaLoveApp_admin_profile',
-      'MaLoveApp_admin_session_token',
-      'MaLoveApp_admin_session_expires',
-      'MaLoveApp_admin_session_id',
+      'Planivia_admin_profile',
+      'Planivia_admin_session_token',
+      'Planivia_admin_session_expires',
+      'Planivia_admin_session_id',
     ];
     
     keys.forEach(key => {

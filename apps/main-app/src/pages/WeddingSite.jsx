@@ -1,6 +1,7 @@
 import { differenceInSeconds } from 'date-fns';
 import { doc, getDoc, collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 import ExternalImage from '@/components/ExternalImage';

@@ -402,9 +402,9 @@ export default function SupplierAvailability() {
                     backgroundColor: 'var(--color-background)',
                   }}
                 >
-                  <option value="blocked">Bloqueada</option>
-                  <option value="booked">Reservada</option>
-                  <option value="holiday">Vacaciones</option>
+                  <option value="blocked">{t('supplier.availability.blocked')}</option>
+                  <option value="booked">{t('supplier.availability.booked')}</option>
+                  <option value="holiday">{t('supplier.availability.holiday')}</option>
                 </select>
               </div>
 

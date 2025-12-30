@@ -1,5 +1,6 @@
 import { Users, Briefcase, Clock, Layers, User, Heart } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, Outlet } from 'react-router-dom';
 
 import useTranslations from '../hooks/useTranslations';
@@ -45,36 +46,83 @@ export default function More() {
   // Push handlers removed
 
   return (
-    <div className="p-4 md:p-6 space-y-8">
+    <div className="p-6 md:p-8 space-y-10 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">{t('pages.more.title')}</h1>
+      <div className="mb-10">
+        <h1 
+          className="text-3xl font-bold"
+          style={{
+            color: 'var(--color-text)',
+            fontFamily: "'Playfair Display', serif",
+          }}
+        >
+          {t('pages.more.title')}
+        </h1>
+        <p className="mt-2" style={{ color: 'var(--color-text-secondary)' }}>
+          Accede a todas las funcionalidades de tu boda
+        </p>
       </div>
 
       {/* Tiles */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
         <div className="relative">
           <button
             onClick={() => setOpenMenu(openMenu === 'invitados' ? null : 'invitados')}
-            className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full"
+            className="p-6 flex flex-col text-left w-full transition-all duration-200"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border-soft)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+              e.currentTarget.style.borderColor = 'var(--color-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
+              e.currentTarget.style.borderColor = 'var(--color-border-soft)';
+            }}
           >
-            <Users size={32} className="text-primary mb-2" />
-            <h2 className="font-semibold mb-1">{t('pages.more.sections.guests.title')}</h2>
-            <p className="text-sm text-muted">{t('pages.more.sections.guests.description')}</p>
+            <Users size={32} style={{ color: 'var(--color-primary)', marginBottom: '12px' }} />
+            <h2 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+              {t('pages.more.sections.guests.title')}
+            </h2>
+            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              {t('pages.more.sections.guests.description')}
+            </p>
           </button>
           {openMenu === 'invitados' && (
             <div
-              className="absolute bg-[var(--color-surface)] border border-soft rounded shadow mt-2 w-full z-10"
+              className="absolute w-full z-10 mt-2"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border-soft)',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                overflow: 'hidden',
+              }}
               onMouseEnter={pfInvitadosMenu}
               onFocus={pfInvitadosMenu}
               onTouchStart={pfInvitadosMenu}
             >
-              <Link to="/invitados" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
+              <Link 
+                to="/invitados" 
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
                 {t('pages.more.sections.guests.links.guests')}
               </Link>
               <Link
                 to="/invitados/seating"
-                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 {t('pages.more.sections.guests.links.seating')}
               </Link>
@@ -85,25 +133,61 @@ export default function More() {
         <div className="relative">
           <button
             onClick={() => setOpenMenu(openMenu === 'proveedores' ? null : 'proveedores')}
-            className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full"
+            className="p-6 flex flex-col text-left w-full transition-all duration-200"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border-soft)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+              e.currentTarget.style.borderColor = 'var(--color-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
+              e.currentTarget.style.borderColor = 'var(--color-border-soft)';
+            }}
           >
-            <Briefcase size={32} className="text-primary mb-2" />
-            <h2 className="font-semibold mb-1">{t('pages.more.sections.providers.title')}</h2>
-            <p className="text-sm text-muted">{t('pages.more.sections.providers.description')}</p>
+            <Briefcase size={32} style={{ color: 'var(--color-primary)', marginBottom: '12px' }} />
+            <h2 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+              {t('pages.more.sections.providers.title')}
+            </h2>
+            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              {t('pages.more.sections.providers.description')}
+            </p>
           </button>
           {openMenu === 'proveedores' && (
             <div
-              className="absolute bg-[var(--color-surface)] border border-soft rounded shadow mt-2 w-full z-10"
+              className="absolute w-full z-10 mt-2"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border-soft)',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                overflow: 'hidden',
+              }}
               onMouseEnter={pfProveedoresMenu}
               onFocus={pfProveedoresMenu}
               onTouchStart={pfProveedoresMenu}
             >
-              <Link to="/proveedores" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
+              <Link 
+                to="/proveedores" 
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
                 {t('pages.more.sections.providers.links.providers')}
               </Link>
               <Link
                 to="/proveedores/contratos"
-                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 {t('pages.more.sections.providers.links.contracts')}
               </Link>
@@ -114,46 +198,88 @@ export default function More() {
         <div className="relative">
           <button
             onClick={() => setOpenMenu(openMenu === 'protocolo' ? null : 'protocolo')}
-            className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full"
+            className="p-6 flex flex-col text-left w-full transition-all duration-200"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border-soft)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+              e.currentTarget.style.borderColor = 'var(--color-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
+              e.currentTarget.style.borderColor = 'var(--color-border-soft)';
+            }}
           >
-            <Clock size={32} className="text-primary mb-2" />
-            <h2 className="font-semibold mb-1">{t('pages.more.sections.protocol.title')}</h2>
-            <p className="text-sm text-muted">{t('pages.more.sections.protocol.description')}</p>
+            <Clock size={32} style={{ color: 'var(--color-primary)', marginBottom: '12px' }} />
+            <h2 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+              {t('pages.more.sections.protocol.title')}
+            </h2>
+            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              {t('pages.more.sections.protocol.description')}
+            </p>
           </button>
           {openMenu === 'protocolo' && (
             <div
-              className="absolute bg-[var(--color-surface)] border border-soft rounded shadow mt-2 w-full z-10"
+              className="absolute w-full z-10 mt-2"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border-soft)',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                overflow: 'hidden',
+              }}
               onMouseEnter={pfProtocoloMenu}
               onFocus={pfProtocoloMenu}
               onTouchStart={pfProtocoloMenu}
             >
               <Link
                 to="/protocolo/momentos-especiales"
-                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 {t('pages.more.sections.protocol.links.specialMoments')}
               </Link>
               <Link
                 to="/protocolo/timing"
-                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 {t('pages.more.sections.protocol.links.timing')}
               </Link>
               <Link
                 to="/protocolo/checklist"
-                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 {t('pages.more.sections.protocol.links.checklist')}
               </Link>
               <Link
                 to="/protocolo/ayuda-ceremonia"
-                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 {t('pages.more.sections.protocol.links.ceremonyHelp')}
               </Link>
               <Link
                 to="/protocolo/documentos"
-                className="block px-4 py-2 hover:bg-[var(--color-accent-10)]"
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 {t('pages.more.sections.protocol.links.documents')}
               </Link>
@@ -164,29 +290,89 @@ export default function More() {
         <div className="relative">
           <button
             onClick={() => setOpenMenu(openMenu === 'extras' ? null : 'extras')}
-            className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full"
+            className="p-6 flex flex-col text-left w-full transition-all duration-200"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border-soft)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+              e.currentTarget.style.borderColor = 'var(--color-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
+              e.currentTarget.style.borderColor = 'var(--color-border-soft)';
+            }}
           >
-            <Layers size={32} className="text-primary mb-2" />
-            <h2 className="font-semibold mb-1">{t('pages.more.sections.extras.title')}</h2>
-            <p className="text-sm text-muted">{t('pages.more.sections.extras.description')}</p>
+            <Layers size={32} style={{ color: 'var(--color-primary)', marginBottom: '12px' }} />
+            <h2 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+              {t('pages.more.sections.extras.title')}
+            </h2>
+            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              {t('pages.more.sections.extras.description')}
+            </p>
           </button>
           {openMenu === 'extras' && (
             <div
-              className="absolute bg-[var(--color-surface)] border border-soft rounded shadow mt-2 w-full z-10"
+              className="absolute w-full z-10 mt-2"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border-soft)',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                overflow: 'hidden',
+              }}
               onMouseEnter={pfExtrasMenu}
               onFocus={pfExtrasMenu}
               onTouchStart={pfExtrasMenu}
             >
-              <Link to="/diseno-web" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
+              <Link 
+                to="/diseno-web" 
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
                 {t('pages.more.sections.extras.links.web')}
               </Link>
-              <Link to="/disenos" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
-                {t('pages.more.sections.extras.links.designs')}
+              <Link 
+                to="/editor-disenos" 
+                className="block px-4 py-3 font-medium transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                {t('pages.more.sections.extras.links.designEditor', { defaultValue: 'Editor de Diseños' })}
               </Link>
-              <Link to="/ideas" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
+              <Link 
+                to="/disenos" 
+                className="block px-4 py-3 text-sm transition-colors"
+                style={{ color: 'var(--color-text-secondary)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                {t('pages.more.sections.extras.links.designs')} (Legacy)
+              </Link>
+              <Link 
+                to="/ideas" 
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
                 {t('pages.more.sections.extras.links.ideas')}
               </Link>
-              <Link to="/momentos" className="block px-4 py-2 hover:bg-[var(--color-accent-10)]">
+              <Link 
+                to="/momentos" 
+                className="block px-4 py-3 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
                 {t('pages.more.sections.extras.links.moments')}
               </Link>
             </div>

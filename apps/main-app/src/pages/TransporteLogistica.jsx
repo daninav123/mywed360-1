@@ -3,6 +3,7 @@
  * FASE 6.2 del WORKFLOW-USUARIO.md
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Car, Bus, MapPin, Clock, Users, Plus, Edit2, Trash2, Navigation, Phone } from 'lucide-react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -10,25 +11,26 @@ import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
 
-const VEHICLE_TYPES = [
-  { id: 'coche', name: 'Coche', icon: '🚗', capacity: 4 },
-  { id: 'minivan', name: 'Minivan', icon: '🚙', capacity: 7 },
-  { id: 'autobus', name: 'Autobús', icon: '🚌', capacity: 50 },
-  { id: 'microbus', name: 'Microbús', icon: '🚐', capacity: 20 },
-  { id: 'limusina', name: 'Limusina', icon: '🚗', capacity: 8 },
-  { id: 'vintage', name: 'Coche Vintage', icon: '🚙', capacity: 4 },
+const getVehicleTypes = (t) => [
+  { id: 'coche', name: t('transport.vehicleTypes.car'), icon: '🚗', capacity: 4 },
+  { id: 'minivan', name: t('transport.vehicleTypes.minivan'), icon: '🚙', capacity: 7 },
+  { id: 'autobus', name: t('transport.vehicleTypes.bus'), icon: '🚌', capacity: 50 },
+  { id: 'microbus', name: t('transport.vehicleTypes.microbus'), icon: '🚐', capacity: 20 },
+  { id: 'limusina', name: t('transport.vehicleTypes.limousine'), icon: '🚗', capacity: 8 },
+  { id: 'vintage', name: t('transport.vehicleTypes.vintage'), icon: '🚙', capacity: 4 },
 ];
 
-const ROUTE_TYPES = [
-  { id: 'hotel-ceremonia', name: 'Hotel → Ceremonia', icon: '⛪' },
-  { id: 'ceremonia-banquete', name: 'Ceremonia → Banquete', icon: '🍽️' },
-  { id: 'banquete-hotel', name: 'Banquete → Hotel', icon: '🏨' },
-  { id: 'aeropuerto-hotel', name: 'Aeropuerto → Hotel', icon: '✈️' },
-  { id: 'otro', name: 'Otra ruta', icon: '🗺️' },
+const getRouteTypes = (t) => [
+  { id: 'hotel-ceremonia', name: t('transport.routeTypes.hotelToCeremony'), icon: '⛪' },
+  { id: 'ceremonia-banquete', name: t('transport.routeTypes.ceremonyToReception'), icon: '🍽️' },
+  { id: 'banquete-hotel', name: t('transport.routeTypes.receptionToHotel'), icon: '🏨' },
+  { id: 'aeropuerto-hotel', name: t('transport.routeTypes.airportToHotel'), icon: '✈️' },
+  { id: 'otro', name: t('transport.routeTypes.other'), icon: '🗺️' },
 ];
 
-const VehicleCard = ({ vehicle, onEdit, onDelete }) => {
-  const typeConfig = VEHICLE_TYPES.find(t => t.id === vehicle.type) || VEHICLE_TYPES[0];
+const VehicleCard = ({ vehicle, onEdit, onDelete, t }) => {
+  const vehicleTypes = getVehicleTypes(t);
+  const typeConfig = vehicleTypes.find(vt => vt.id === vehicle.type) || vehicleTypes[0];
   
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
@@ -85,8 +87,9 @@ const VehicleCard = ({ vehicle, onEdit, onDelete }) => {
   );
 };
 
-const RouteCard = ({ route, vehicles, onEdit, onDelete }) => {
-  const typeConfig = ROUTE_TYPES.find(t => t.id === route.type) || ROUTE_TYPES[4];
+const RouteCard = ({ route, vehicles, onEdit, onDelete, t }) => {
+  const routeTypes = getRouteTypes(t);
+  const typeConfig = routeTypes.find(rt => rt.id === route.type) || routeTypes[4];
   const assignedVehicle = vehicles.find(v => v.id === route.vehicleId);
 
   return (
@@ -168,7 +171,7 @@ const RouteCard = ({ route, vehicles, onEdit, onDelete }) => {
   );
 };
 
-const VehicleModal = ({ vehicle, onSave, onClose }) => {
+const VehicleModal = ({ vehicle, onSave, onClose, t }) => {
   const [formData, setFormData] = useState(
     vehicle || {
       type: 'coche',
@@ -185,7 +188,8 @@ const VehicleModal = ({ vehicle, onSave, onClose }) => {
     onSave(formData);
   };
 
-  const selectedType = VEHICLE_TYPES.find(t => t.id === formData.type) || VEHICLE_TYPES[0];
+  const vehicleTypes = getVehicleTypes(t);
+  const selectedType = vehicleTypes.find(vt => vt.id === formData.type) || vehicleTypes[0];
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -260,7 +264,7 @@ const VehicleModal = ({ vehicle, onSave, onClose }) => {
                 type="text"
                 value={formData.provider}
                 onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
-                placeholder="Nombre de la empresa"
+                placeholder={t('transport.typePlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>
@@ -273,7 +277,7 @@ const VehicleModal = ({ vehicle, onSave, onClose }) => {
                 type="text"
                 value={formData.contact}
                 onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                placeholder="Teléfono o email"
+                placeholder={t('transport.destinationPlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>

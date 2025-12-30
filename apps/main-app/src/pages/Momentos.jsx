@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import PageWrapper from '@/components/PageWrapper';
@@ -32,11 +33,11 @@ import { formatDate as formatDateUtil } from '../utils/formatUtils';
 
 const ALBUM_ID = 'momentos';
 
-const TABS = [
-  { id: 'overview', label: 'Resumen' },
-  { id: 'moderation', label: 'Moderación' },
-  { id: 'slideshow', label: 'Slideshow' },
-  { id: 'downloads', label: 'Descargas' },
+const getTabs = (t) => [
+  { id: 'overview', label: t('moments.tabs.overview') },
+  { id: 'moderation', label: t('moments.tabs.moderation') },
+  { id: 'slideshow', label: t('moments.tabs.slideshow') },
+  { id: 'downloads', label: t('moments.tabs.downloads') },
 ];
 
 const PUBLIC_BASE =
@@ -68,8 +69,10 @@ const normalizeWeddingDate = (value) => {
 const formatDate = (date) => (date ? formatDateUtil(date, 'custom') : '');
 
 export default function Momentos() {
+  const { t } = useTranslation('pages');
   const { activeWedding, weddingsReady, activeWeddingData } = useWedding();
   const { currentUser } = useAuth();
+  const tabs = getTabs(t);
 
   const [album, setAlbum] = useState(null);
   const [photos, setPhotos] = useState([]);
@@ -328,7 +331,7 @@ export default function Momentos() {
 
   return (
     <PageWrapper title="Galería de recuerdos">
-      <PageTabs value={activeTab} onChange={setActiveTab} options={TABS} className="mb-6" />
+      <PageTabs value={activeTab} onChange={setActiveTab} options={tabs} className="mb-6" />
 
       {activeTab === 'overview' && (
         <div className="space-y-6">
@@ -346,6 +349,7 @@ export default function Momentos() {
             </div>
           )}
           <AlbumOverview
+            placeholder={t('moments.searchPlaceholder')}
             album={album}
             photos={approvedPhotos}
             highlights={highlights}

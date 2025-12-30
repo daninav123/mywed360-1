@@ -1,8 +1,19 @@
 import express from 'express';
 import { db } from '../db.js';
 import admin from 'firebase-admin';
+import { requireAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// Middleware: Solo permitir en desarrollo/test o con admin auth
+const developmentOrAdmin = (req, res, next) => {
+  const env = process.env.NODE_ENV || 'production';
+  if (env === 'development' || env === 'test') {
+    return next();
+  }
+  // En producción, requiere admin
+  return requireAdmin(req, res, next);
+};
 
 /**
  * Endpoint de test simple sin dependencias externas
@@ -21,8 +32,9 @@ router.get('/ping', (req, res) => {
 
 /**
  * Test de Mailgun simplificado
+ * PROTEGIDO: Solo desarrollo/test o admin
  */
-router.get('/mailgun', (req, res) => {
+router.get('/mailgun', developmentOrAdmin, (req, res) => {
   const { MAILGUN_API_KEY, MAILGUN_DOMAIN } = process.env;
   
   res.status(200).json({
@@ -40,8 +52,9 @@ router.get('/mailgun', (req, res) => {
 
 /**
  * Test de variables de entorno
+ * PROTEGIDO: Solo desarrollo/test o admin
  */
-router.get('/env', (req, res) => {
+router.get('/env', developmentOrAdmin, (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Environment test endpoint working',

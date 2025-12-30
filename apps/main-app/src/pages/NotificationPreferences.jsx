@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../components/PageWrapper';
 import { Card, Button } from '../components/ui';
 import { useUserContext } from '../context/UserContext';
 import useTranslations from '../hooks/useTranslations';
-import {
   getNotificationPreferences,
   saveNotificationPreferences,
 } from '../services/notificationPreferencesService';

@@ -264,6 +264,7 @@ const AdminSuppliers = () => {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <KPICard
           title="Total proveedores"
+          placeholder={t('admin.suppliers.searchPlaceholder')}
           value={formatNumber(analytics.totals.suppliers)}
           subtitle={`Weddings vinculadas: ${formatNumber(analytics.totals.weddings)}`}
           tone="primary"
@@ -398,7 +399,7 @@ const AdminSuppliers = () => {
                 onKeyDown={(event) => {
                   if (event.key === 'Enter') applySearch();
                 }}
-                placeholder="Nombre, email, tag..."
+                placeholder={t('admin.suppliers.namePlaceholder')}
                 className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none"
               />
               <button

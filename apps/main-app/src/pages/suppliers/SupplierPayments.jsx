@@ -27,6 +27,8 @@ export default function SupplierPayments() {
       <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)' }}>
         <CreditCard size={32} className="mb-4" />
         <p>Estado: {status?.paymentsEnabled ? 'Activo' : 'No configurado'}</p>
+        <input type="text" placeholder={t('supplier.payments.amountPlaceholder')} />
+        <input type="text" placeholder={t('supplier.payments.searchPlaceholder')} />
       </div>
     </div>
   );

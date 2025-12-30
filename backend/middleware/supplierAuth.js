@@ -4,7 +4,7 @@
  */
 
 import jwt from 'jsonwebtoken';
-import { db } from '../firebase-admin.js';
+import { db } from '../db.js';
 import logger from '../utils/logger.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';

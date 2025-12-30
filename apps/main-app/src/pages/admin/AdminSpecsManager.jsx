@@ -86,7 +86,6 @@ export default function AdminSpecsManager() {
     try {
       setSaving(true);
       await saveSupplierSpecs(specs, user.uid);
-      setDynamicSpecs(specs);
       toast.success('✅ Especificaciones guardadas');
     } catch (error) {
       toast.error('Error guardando especificaciones');
@@ -121,6 +120,7 @@ export default function AdminSpecsManager() {
     }
 
     try {
+      setSaving(true);
       const updatedSpecs = { ...specs };
       if (!updatedSpecs[selectedCategory].specs) {
         updatedSpecs[selectedCategory].specs = {};
@@ -129,29 +129,40 @@ export default function AdminSpecsManager() {
       updatedSpecs[selectedCategory].specs[newField.name] = newField.defaultValue;
       setSpecs(updatedSpecs);
       
+      // Guardar automáticamente en Firestore
+      await saveSupplierSpecs(updatedSpecs, user.uid);
+      
       setNewField({ name: '', type: 'boolean', defaultValue: false });
       setShowAddField(false);
       
-      toast.success(`✅ Campo "${newField.name}" añadido`);
+      toast.success(`✅ Campo "${newField.name}" añadido y guardado`);
     } catch (error) {
       toast.error('Error añadiendo campo');
       console.error(error);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleRemoveField = (fieldName) => {
+  const handleRemoveField = async (fieldName) => {
     if (!window.confirm(`¿Eliminar el campo "${fieldName}"?`)) {
       return;
     }
 
     try {
+      setSaving(true);
       const updatedSpecs = { ...specs };
       delete updatedSpecs[selectedCategory].specs[fieldName];
       setSpecs(updatedSpecs);
-      toast.success(`✅ Campo "${fieldName}" eliminado`);
+      
+      // Guardar automáticamente en Firestore
+      await saveSupplierSpecs(updatedSpecs, user.uid);
+      toast.success(`✅ Campo "${fieldName}" eliminado y guardado`);
     } catch (error) {
       toast.error('Error eliminando campo');
       console.error(error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -271,7 +282,7 @@ export default function AdminSpecsManager() {
                 <div className="grid grid-cols-3 gap-3 mb-3">
                   <input
                     type="text"
-                    placeholder="Nombre del campo (ej: catering)"
+                    placeholder={t('admin.specs.fieldNamePlaceholder')}
                     value={newField.name}
                     onChange={(e) => setNewField({ ...newField, name: e.target.value })}
                     className="px-3 py-2 border border-gray-300 rounded-lg"

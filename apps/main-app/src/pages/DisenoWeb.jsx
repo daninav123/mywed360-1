@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -290,12 +291,12 @@ const buildFallbackHtml = (weddingInfo, template) => {
       const type = hotel.type || hotel.category || '';
       const link = hotel.link || hotel.url;
       return `
-        <div class="maloveapp-card">
+        <div class="planivia-card">
           <h3>${title}</h3>
           ${type ? `<p>${type}</p>` : ''}
           ${distance ? `<p><strong>Distancia:</strong> ${distance}</p>` : ''}
           ${hotel.priceRange ? `<p><strong>Precio:</strong> ${hotel.priceRange}</p>` : ''}
-          ${link ? `<a class="maloveapp-button-secondary" href="${link}" target="_blank" rel="noopener">Ver sitio</a>` : ''}
+          ${link ? `<a class="planivia-button-secondary" href="${link}" target="_blank" rel="noopener">Ver sitio</a>` : ''}
         </div>
       `;
     })
@@ -308,8 +309,8 @@ const buildFallbackHtml = (weddingInfo, template) => {
   const mapSection = mapAddress
     ? `
     <section data-enhanced="mapa" id="mapa">
-      <div class="maloveapp-section-heading"><span>Mapa de la celebración</span></div>
-      <div class="maloveapp-card">
+      <div class="planivia-section-heading"><span>Mapa de la celebración</span></div>
+      <div class="planivia-card">
         <iframe
           title="Ubicación de la boda"
           src="https://maps.google.com/maps?q=${encodeURIComponent(mapAddress)}&output=embed"
@@ -325,7 +326,7 @@ const buildFallbackHtml = (weddingInfo, template) => {
   const faqEntries = (Array.isArray(safeWeddingInfo.faqs) ? safeWeddingInfo.faqs : [])
     .map(
       (faq) => `
-      <div class="maloveapp-faq__item">
+      <div class="planivia-faq__item">
         <div class="font-semibold text-gray-800 mb-1">${faq.question || ''}</div>
         <p class="text-sm text-gray-600">${faq.answer || ''}</p>
       </div>`
@@ -334,8 +335,8 @@ const buildFallbackHtml = (weddingInfo, template) => {
   const faqSection = faqEntries
     ? `
     <section data-enhanced="faq" id="faq">
-      <div class="maloveapp-section-heading"><span>Preguntas frecuentes</span></div>
-      <div class="maloveapp-card maloveapp-faq">
+      <div class="planivia-section-heading"><span>Preguntas frecuentes</span></div>
+      <div class="planivia-card planivia-faq">
         ${faqEntries}
       </div>
     </section>`
@@ -344,14 +345,14 @@ const buildFallbackHtml = (weddingInfo, template) => {
   return `
   <main>
     <section data-enhanced="timeline">
-      <div class="maloveapp-section-heading"><span>Agenda del d�a</span></div>
-      <div class="maloveapp-grid maloveapp-grid--two">
-        <div class="maloveapp-card">
+      <div class="planivia-section-heading"><span>Agenda del d�a</span></div>
+      <div class="planivia-grid planivia-grid--two">
+        <div class="planivia-card">
           <h3>Ceremonia</h3>
           <p>${ceremony || 'Pronto más detalles'}</p>
           ${safeWeddingInfo.ceremonyAddress ? `<small>${safeWeddingInfo.ceremonyAddress}</small>` : ''}
         </div>
-        <div class="maloveapp-card">
+        <div class="planivia-card">
           <h3>Recepción</h3>
           <p>${reception || 'Pronto más detalles'}</p>
           ${safeWeddingInfo.receptionAddress ? `<small>${safeWeddingInfo.receptionAddress}</small>` : ''}
@@ -360,10 +361,10 @@ const buildFallbackHtml = (weddingInfo, template) => {
     </section>
 
     <section data-enhanced="transport" id="transporte">
-      <div class="maloveapp-section-heading"><span>Transporte y autobuses</span></div>
-      <div class="maloveapp-card">
+      <div class="planivia-section-heading"><span>Transporte y autobuses</span></div>
+      <div class="planivia-card">
         <p>${safeWeddingInfo.transportation || 'Habrá servicio de transporte para invitados. Consulta los horarios en la tabla.'}</p>
-        <div class="maloveapp-table-wrapper">
+        <div class="planivia-table-wrapper">
           <table>
             <thead>
               <tr>
@@ -389,27 +390,27 @@ const buildFallbackHtml = (weddingInfo, template) => {
     </section>
 
     <section data-enhanced="gallery">
-      <div class="maloveapp-section-heading"><span>Galer�a</span></div>
-      <div class="maloveapp-gallery">
-        <div class="maloveapp-gallery__item"></div>
-        <div class="maloveapp-gallery__item"></div>
-        <div class="maloveapp-gallery__item"></div>
+      <div class="planivia-section-heading"><span>Galer�a</span></div>
+      <div class="planivia-gallery">
+        <div class="planivia-gallery__item"></div>
+        <div class="planivia-gallery__item"></div>
+        <div class="planivia-gallery__item"></div>
       </div>
     </section>
 
     <section data-enhanced="story">
-      <div class="maloveapp-section-heading"><span>Nuestra historia</span></div>
+      <div class="planivia-section-heading"><span>Nuestra historia</span></div>
       <p>${safeWeddingInfo.story || safeWeddingInfo.additionalInfo || 'Pronto compartiremos detalles de nuestra historia.'}</p>
       <p>Inspiración visual: ${styleNote}.</p>
     </section>
 
     <section data-enhanced="lodging">
-      <div class="maloveapp-section-heading"><span>Hospedaje cercano</span></div>
-      <div class="maloveapp-grid maloveapp-grid--two">
+      <div class="planivia-section-heading"><span>Hospedaje cercano</span></div>
+      <div class="planivia-grid planivia-grid--two">
         ${
           lodgingCards ||
           `
-          <div class="maloveapp-card">
+          <div class="planivia-card">
             <p>Pronto a�adiremos hoteles y alojamientos recomendados cercanos a la celebraci�n.</p>
           </div>
         `
@@ -418,20 +419,20 @@ const buildFallbackHtml = (weddingInfo, template) => {
     </section>
 
     <section data-enhanced="travel-guide">
-      <div class="maloveapp-section-heading"><span>C�mo llegar</span></div>
-      <div class="maloveapp-grid maloveapp-grid--two">
-        <div class="maloveapp-card">
+      <div class="planivia-section-heading"><span>C�mo llegar</span></div>
+      <div class="planivia-grid planivia-grid--two">
+        <div class="planivia-card">
           <h3>En avi�n</h3>
           <p>${(travel.airports || []).map((a) => `" ${a}`).join('<br/>') || 'Aeropuertos cercanos y tiempos estimados aparecer�n aqu�.'}</p>
           ${travel.byPlane ? `<p>${travel.byPlane}</p>` : ''}
         </div>
-        <div class="maloveapp-card">
+        <div class="planivia-card">
           <h3>En tren / bus</h3>
           <p>${(travel.stations || []).map((s) => `" ${s}`).join('<br/>') || 'Estaciones y conexiones se publicar�n pronto.'}</p>
           ${travel.byTrain ? `<p>${travel.byTrain}</p>` : ''}
         </div>
       </div>
-      <div class="maloveapp-card">
+      <div class="planivia-card">
         <h3>En coche</h3>
         <p>${travel.byCar || 'Recibir�s las indicaciones para llegar en coche tan pronto est�n listas.'}</p>
         ${travel.tips ? `<p><strong>Tips:</strong> ${travel.tips}</p>` : ''}
@@ -442,8 +443,8 @@ const buildFallbackHtml = (weddingInfo, template) => {
     ${faqSection}
 
     <section data-enhanced="contacto" id="contacto">
-      <div class="maloveapp-section-heading"><span>Contacto</span></div>
-      <div class="maloveapp-card">${contact || 'Escr�benos para m�s informaci�n.'}</div>
+      <div class="planivia-section-heading"><span>Contacto</span></div>
+      <div class="planivia-card">${contact || 'Escríbenos para más información.'}</div>
     </section>
   </main>
   <footer>
@@ -1251,7 +1252,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      placeholder={t('common.websiteGenerator.logistics.schedule.notes', 'Notas')}
+                      placeholder={t('webDesign.contentPlaceholder')}
                       className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                       value={item.notes}
                       onChange={(event) => updateScheduleItem(index, 'notes', event.target.value)}
@@ -1572,7 +1573,7 @@ export default function DisenoWeb() {
     return (
       <div className="p-6 space-y-6">
         <header className="space-y-2">
-          <h1 className="text-2xl font-semibold">Dise�o web</h1>
+          <h1 className="text-2xl font-semibold">Diseño web</h1>
           <p className="text-sm text-gray-600">
             Selecciona una plantilla y genera una vista previa ficticia (modo E2E).
           </p>
@@ -1604,7 +1605,7 @@ export default function DisenoWeb() {
         <div className="space-y-3">
           <textarea
             className="w-full h-40 border rounded-lg p-4"
-            placeholder="Describe el tono, estructura y elementos clave que deseas."
+            placeholder={t('webDesign.sectionTitlePlaceholder')}
             value={testPrompt}
             onChange={(event) => {
               setTestPrompt(event.target.value);

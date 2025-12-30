@@ -345,57 +345,72 @@ export default function PlannerDashboard() {
           </h2>
           <Link
             to="/blog"
-            className="text-sm text-rose-500 hover:text-rose-600 font-medium"
+            className="text-sm text-rose-500 hover:text-rose-600 font-medium flex items-center gap-1"
             onClick={() => logCardClick('blog')}
           >
             {t('planner.dashboard.blog.viewAll')}
+            <span className="text-xs">→</span>
           </Link>
         </div>
         {blogPosts.error ? (
           <p className="text-sm text-gray-500">{t('planner.dashboard.blog.error')}</p>
         ) : (
-          <ul className="space-y-2">
-            {blogPosts.loading
-              ? Array.from({ length: MAX_BLOG_POSTS }).map((_, idx) => (
-                  <li
-                    key={`blog-skeleton-${idx}`}
-                    className="bg-white rounded shadow p-3 animate-pulse"
-                    role="status"
-                    aria-label={t('planner.dashboard.blog.loadingAria')}
-                  />
-                ))
-              : blogPosts.items.map((post) => {
-                  const published = post.publishedAt ? new Date(post.publishedAt) : null;
-                  const subtitle = published
-                    ? (() => {
-                        try {
-                          return new Intl.DateTimeFormat(currentLanguage || 'es', {
-                            day: 'numeric',
-                            month: 'short',
-                          }).format(published);
-                        } catch {
-                          return published.toDateString();
-                        }
-                      })()
-                    : post.language?.toUpperCase();
-                  return (
+          <>
+            <ul className="space-y-2">
+              {blogPosts.loading
+                ? Array.from({ length: MAX_BLOG_POSTS }).map((_, idx) => (
                     <li
-                      key={post.id || post.slug}
-                      className="bg-white rounded shadow p-3 hover:bg-gray-50"
-                    >
-                      <Link
-                        to={post.slug ? `/blog/${post.slug}` : '/blog'}
-                        onClick={() => handleBlogClick(post)}
-                        className="block space-y-1"
+                      key={`blog-skeleton-${idx}`}
+                      className="bg-white rounded shadow p-3 animate-pulse"
+                      role="status"
+                      aria-label={t('planner.dashboard.blog.loadingAria')}
+                    />
+                  ))
+                : blogPosts.items.map((post) => {
+                    const published = post.publishedAt ? new Date(post.publishedAt) : null;
+                    const subtitle = published
+                      ? (() => {
+                          try {
+                            return new Intl.DateTimeFormat(currentLanguage || 'es', {
+                              day: 'numeric',
+                              month: 'short',
+                            }).format(published);
+                          } catch {
+                            return published.toDateString();
+                          }
+                        })()
+                      : post.language?.toUpperCase();
+                    return (
+                      <li
+                        key={post.id || post.slug}
+                        className="bg-white rounded shadow p-3 hover:bg-gray-50 transition"
                       >
-                        <p className="text-base font-semibold text-gray-800">{post.title}</p>
-                        <p className="text-sm text-gray-600 line-clamp-2">{post.excerpt}</p>
-                        <span className="text-xs text-gray-500">{subtitle || 'Lovenda'}</span>
-                      </Link>
-                    </li>
-                  );
-                })}
-          </ul>
+                        <Link
+                          to={post.slug ? `/blog/${post.slug}` : '/blog'}
+                          onClick={() => handleBlogClick(post)}
+                          className="block space-y-1"
+                        >
+                          <p className="text-base font-semibold text-gray-800">{post.title}</p>
+                          <p className="text-sm text-gray-600 line-clamp-2">{post.excerpt}</p>
+                          <span className="text-xs text-gray-500">{subtitle || 'Lovenda'}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+            </ul>
+            {blogPosts.items.length > 0 && (
+              <div className="mt-4 text-center">
+                <Link
+                  to="/blog"
+                  onClick={() => logCardClick('blog_cta')}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-rose-600 transition-colors"
+                >
+                  {t('planner.dashboard.blog.exploreAll', { defaultValue: 'Explorar todo el blog' })}
+                  <span>→</span>
+                </Link>
+              </div>
+            )}
+          </>
         )}
       </section>
     </div>

@@ -357,11 +357,11 @@ export default function SupplierProducts() {
                       onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                       className="w-full px-3 py-2 rounded-md border border-soft bg-surface text-body focus:ring-2 ring-primary"
                     >
-                      <option value="servicio">Servicio</option>
-                      <option value="hora">Hora</option>
-                      <option value="día">Día</option>
-                      <option value="persona">Persona</option>
-                      <option value="unidad">Unidad</option>
+                      <option value="servicio">{t('supplier.products.units.service')}</option>
+                      <option value="hora">{t('supplier.products.units.hour')}</option>
+                      <option value="día">{t('supplier.products.units.day')}</option>
+                      <option value="persona">{t('supplier.products.units.person')}</option>
+                      <option value="unidad">{t('supplier.products.units.unit')}</option>
                     </select>
                   </div>
                 </div>
@@ -374,10 +374,10 @@ export default function SupplierProducts() {
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="w-full px-3 py-2 rounded-md border border-soft bg-surface text-body focus:ring-2 ring-primary"
                   >
-                    <option value="general">General</option>
-                    <option value="basico">Básico</option>
-                    <option value="premium">Premium</option>
-                    <option value="vip">VIP</option>
+                    <option value="general">{t('supplier.products.categories.general')}</option>
+                    <option value="basico">{t('supplier.products.categories.basic')}</option>
+                    <option value="premium">{t('supplier.products.categories.premium')}</option>
+                    <option value="vip">{t('supplier.products.categories.vip')}</option>
                   </select>
                 </div>
 

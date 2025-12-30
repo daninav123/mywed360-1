@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Bell } from 'lucide-react';
 import { toast } from 'react-toastify';
 import PageWrapper from '../components/PageWrapper';
 import NotificationSettings from '../components/settings/NotificationSettings';
 import Button from '../components/ui/Button';
-import useTranslations from '../hooks/useTranslations';
 import {
   getNotifications,
   markNotificationRead,

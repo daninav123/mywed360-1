@@ -390,7 +390,7 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
                           value={tier.label || ''}
                           onChange={(event) => handleTierFieldChange(period.id, tier.id, 'label', event.target.value)}
                           disabled={disabled}
-                          placeholder={`Tramo ${tierIndex + 1}`}
+                          placeholder={t('admin.discounts.tier', { number: tierIndex + 1 })}
                           className="w-32 rounded-md border border-soft px-2 py-1 text-xs"
                         />
                       </td>
@@ -1345,17 +1345,6 @@ const AdminDiscounts = () => {
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por código, URL, comercial o jefe"
-              className="rounded-md border border-soft px-3 py-2 text-sm"
-            />
-            <select
-              value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value)}
               className="rounded-md border border-soft px-3 py-2 text-sm"
             >
               <option value="all">Todos los estados</option>
@@ -1923,7 +1912,7 @@ const AdminDiscounts = () => {
                   type="text"
                   value={formData.code}
                   onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
-                  placeholder="VERANO2025"
+                  placeholder={t('admin.discounts.codePlaceholder')}
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm uppercase"
                   required
                 />

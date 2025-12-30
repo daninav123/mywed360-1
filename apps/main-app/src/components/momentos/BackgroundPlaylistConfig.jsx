@@ -16,8 +16,8 @@ const BackgroundPlaylistConfig = ({ block, onSave, onClose }) => {
   const [error, setError] = useState('');
 
   const handleUrlChange = (url) => {
-    setConfig(prev => ({ ...prev, url }));
-    
+    setConfig((prev) => ({ ...prev, url }));
+
     // Validar URL de Spotify
     if (url && !url.includes('spotify.com/playlist/')) {
       setError('Debe ser una URL válida de playlist de Spotify');
@@ -64,7 +64,7 @@ const BackgroundPlaylistConfig = ({ block, onSave, onClose }) => {
             <input
               type="checkbox"
               checked={config.enabled}
-              onChange={(e) => setConfig(prev => ({ ...prev, enabled: e.target.checked }))}
+              onChange={(e) => setConfig((prev) => ({ ...prev, enabled: e.target.checked }))}
               className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500"
             />
             <span className="text-sm font-medium text-gray-700">
@@ -88,9 +88,7 @@ const BackgroundPlaylistConfig = ({ block, onSave, onClose }) => {
                     error ? 'border-red-300' : 'border-gray-300'
                   }`}
                 />
-                {error && (
-                  <p className="text-xs text-red-600 mt-1">{error}</p>
-                )}
+                {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
                 <p className="text-xs text-gray-500 mt-2">
                   💡 Busca o crea una playlist en Spotify y pega aquí el enlace
                 </p>
@@ -104,7 +102,7 @@ const BackgroundPlaylistConfig = ({ block, onSave, onClose }) => {
                 <input
                   type="text"
                   value={config.name}
-                  onChange={(e) => setConfig(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) => setConfig((prev) => ({ ...prev, name: e.target.value }))}
                   placeholder="Ej: Música Cena Romántica"
                   className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
@@ -115,8 +113,9 @@ const BackgroundPlaylistConfig = ({ block, onSave, onClose }) => {
                 <p className="text-xs text-blue-900">
                   <strong>ℹ️ ¿Qué es música de ambiente?</strong>
                   <br />
-                  Es una playlist que suena de fondo durante todo el bloque, separada de los momentos especiales. 
-                  Por ejemplo, música suave durante la cena mientras se intercalan momentos como el Primer Baile.
+                  Es una playlist que suena de fondo durante todo el bloque, separada de los
+                  momentos especiales. Por ejemplo, música suave durante la cena mientras se
+                  intercalan momentos como el Primer Baile.
                 </p>
               </div>
 
@@ -125,9 +124,7 @@ const BackgroundPlaylistConfig = ({ block, onSave, onClose }) => {
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <Check size={16} className="text-green-600" />
-                    <span className="text-sm font-semibold text-green-900">
-                      Playlist válida
-                    </span>
+                    <span className="text-sm font-semibold text-green-900">Playlist válida</span>
                   </div>
                   <a
                     href={config.url}
@@ -146,10 +143,7 @@ const BackgroundPlaylistConfig = ({ block, onSave, onClose }) => {
 
         {/* Footer */}
         <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
-          <Button
-            onClick={onClose}
-            variant="outline"
-          >
+          <Button onClick={onClose} variant="outline">
             Cancelar
           </Button>
           <Button
@@ -171,13 +165,13 @@ const BackgroundPlaylistConfig = ({ block, onSave, onClose }) => {
  */
 function extractPlaylistName(url) {
   if (!url) return '';
-  
+
   // Intentar extraer ID de la URL
   const match = url.match(/playlist\/([a-zA-Z0-9]+)/);
   if (match) {
     return `Playlist ${match[1].substring(0, 8)}`;
   }
-  
+
   return 'Playlist de Spotify';
 }
 

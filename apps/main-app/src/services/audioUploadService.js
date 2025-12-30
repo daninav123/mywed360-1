@@ -7,7 +7,15 @@ import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebas
 import { storage } from '../firebaseConfig';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB máximo
-const ALLOWED_FORMATS = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/aac', 'audio/flac'];
+const ALLOWED_FORMATS = [
+  'audio/mpeg',
+  'audio/mp3',
+  'audio/wav',
+  'audio/x-wav',
+  'audio/ogg',
+  'audio/aac',
+  'audio/flac',
+];
 
 /**
  * Validar archivo de audio antes de subir
@@ -38,7 +46,7 @@ export function validateAudioFile(file) {
 
 /**
  * Subir archivo de audio a Firebase Storage
- * 
+ *
  * @param {Object} params
  * @param {File} params.file - Archivo de audio
  * @param {string} params.weddingId - ID de la boda
@@ -58,7 +66,7 @@ export async function uploadAudioFile({ file, weddingId, momentId, songId, onPro
   const timestamp = Date.now();
   const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
   const fileName = `${timestamp}_${sanitizedFileName}`;
-  
+
   // Ruta en Storage: weddings/{weddingId}/audio-especiales/{momentId}/{songId}/{fileName}
   const storagePath = `weddings/${weddingId}/audio-especiales/${momentId}/${songId}/${fileName}`;
   const storageRef = ref(storage, storagePath);
@@ -94,7 +102,7 @@ export async function uploadAudioFile({ file, weddingId, momentId, songId, onPro
       async () => {
         try {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          
+
           resolve({
             downloadURL,
             storagePath,
@@ -151,12 +159,12 @@ export function getAudioFileInfo(audioData) {
  */
 function formatFileSize(bytes) {
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }
 
 /**
@@ -171,7 +179,7 @@ export async function generateDJDownloadLink(storagePath) {
   try {
     const storageRef = ref(storage, storagePath);
     const downloadURL = await getDownloadURL(storageRef);
-    
+
     // Firebase URLs no expiran automáticamente, pero podemos agregar metadata
     return {
       url: downloadURL,
@@ -195,7 +203,7 @@ export async function downloadAudioFile(downloadURL, fileName) {
     // Fetch el archivo
     const response = await fetch(downloadURL);
     const blob = await response.blob();
-    
+
     // Crear enlace de descarga
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -205,7 +213,7 @@ export async function downloadAudioFile(downloadURL, fileName) {
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
-    
+
     return { success: true };
   } catch (error) {
     console.error('Error downloading file:', error);
@@ -219,13 +227,13 @@ export async function downloadAudioFile(downloadURL, fileName) {
  */
 export function getAllSpecialSongsWithAudio(moments, blocks, getSelectedSong) {
   const songsWithAudio = [];
-  
+
   blocks.forEach((block) => {
     const blockMoments = moments[block.id] || [];
-    
+
     blockMoments.forEach((moment) => {
       const song = getSelectedSong(moment);
-      
+
       if (song && song.isSpecial && song.audioFile) {
         songsWithAudio.push({
           blockName: block.name,
@@ -242,7 +250,7 @@ export function getAllSpecialSongsWithAudio(moments, blocks, getSelectedSong) {
       }
     });
   });
-  
+
   return songsWithAudio;
 }
 
@@ -252,20 +260,20 @@ export function getAllSpecialSongsWithAudio(moments, blocks, getSelectedSong) {
 export function calculateTotalAudioStorage(moments, blocks, getSelectedSong) {
   let totalBytes = 0;
   let fileCount = 0;
-  
+
   blocks.forEach((block) => {
     const blockMoments = moments[block.id] || [];
-    
+
     blockMoments.forEach((moment) => {
       const song = getSelectedSong(moment);
-      
+
       if (song && song.isSpecial && song.audioFile && song.audioFile.fileSize) {
         totalBytes += song.audioFile.fileSize;
         fileCount++;
       }
     });
   });
-  
+
   return {
     totalBytes,
     totalFormatted: formatFileSize(totalBytes),

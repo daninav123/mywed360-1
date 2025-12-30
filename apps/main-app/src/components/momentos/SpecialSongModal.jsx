@@ -34,12 +34,12 @@ const SpecialSongModal = ({ isOpen, onClose, song, onSave, momentId }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     onSave({
       ...formData,
       duration: formData.duration ? parseInt(formData.duration) * 60 : null,
     });
-    
+
     onClose();
   };
 
@@ -110,8 +110,8 @@ const SpecialSongModal = ({ isOpen, onClose, song, onSave, momentId }) => {
                   Esta es una canción especial (no está en Spotify)
                 </label>
                 <p className="text-sm text-gray-600 mt-1">
-                  Marca esto si es un remix, edit, mashup o versión especial que el DJ debe
-                  buscar por su cuenta
+                  Marca esto si es un remix, edit, mashup o versión especial que el DJ debe buscar
+                  por su cuenta
                 </p>
               </div>
             </div>
@@ -209,7 +209,8 @@ const SpecialSongModal = ({ isOpen, onClose, song, onSave, momentId }) => {
                   <p className="font-semibold mb-1">Esta canción NO se exportará a Spotify</p>
                   <p>
                     Aparecerá en el PDF para DJ con todas las instrucciones que has proporcionado.
-                    {formData.audioFile && ' El DJ podrá descargar el archivo de audio directamente.'}
+                    {formData.audioFile &&
+                      ' El DJ podrá descargar el archivo de audio directamente.'}
                   </p>
                 </div>
               </div>

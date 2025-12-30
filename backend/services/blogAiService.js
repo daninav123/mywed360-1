@@ -17,7 +17,9 @@ const FALLBACK_COVER_PROMPT =
 const DEFAULT_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'dall-e-3';
 const DEFAULT_TRANSLATION_MODEL =
   process.env.OPENAI_MODEL_TRANSLATION || process.env.OPENAI_MODEL || 'gpt-4o-mini';
-const SUPPORTED_TRANSLATION_LANGUAGES = (process.env.BLOG_SUPPORTED_LANGUAGES || 'es,en,fr,pt,it,de')
+const SUPPORTED_TRANSLATION_LANGUAGES = (
+  process.env.BLOG_SUPPORTED_LANGUAGES || 'es,en,fr,pt,it,de'
+)
   .split(',')
   .map((code) => code.trim().toLowerCase())
   .filter(Boolean);
@@ -27,7 +29,11 @@ async function ensureOpenAI() {
   const apiKeyPrefix = apiKey ? apiKey.slice(0, 8) : null;
 
   if (!apiKey) return null;
-  if (openaiClient && openAIConfig.apiKeyPrefix === apiKeyPrefix && openAIConfig.projectId === (projectId || null)) {
+  if (
+    openaiClient &&
+    openAIConfig.apiKeyPrefix === apiKeyPrefix &&
+    openAIConfig.projectId === (projectId || null)
+  ) {
     return openaiClient;
   }
   const { default: OpenAI } = await import('openai');

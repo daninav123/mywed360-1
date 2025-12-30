@@ -7,6 +7,7 @@ import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import logger from '../utils/logger.js';
 import crypto from 'crypto';
+import { sendEmail } from '../services/mailgunService.js';
 import { generateSupplierSlug } from '../utils/slugGenerator.js';
 
 const router = express.Router();
@@ -173,8 +174,34 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
     const baseUrl = process.env.PUBLIC_APP_BASE_URL || 'http://localhost:5173';
     const setupPasswordUrl = `${baseUrl}/supplier/setup-password?email=${encodeURIComponent(data.email)}&token=${verificationToken}`;
 
-    // TODO: Enviar email de verificación con el enlace
-    // await sendVerificationEmail(data.email, verificationToken, setupPasswordUrl);
+    // Enviar email de verificación
+    try {
+      await sendEmail({
+        to: data.email,
+        subject: '¡Bienvenido a MyWed360! Verifica tu cuenta',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #2563eb;">¡Bienvenido a MyWed360, ${data.name}!</h2>
+            <p>Tu registro como proveedor ha sido recibido. Para activar tu cuenta y establecer tu contraseña, haz clic en el siguiente enlace:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${setupPasswordUrl}" 
+                 style="background-color: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                Verificar Cuenta y Establecer Contraseña
+              </a>
+            </div>
+            <p style="color: #666; font-size: 14px;">Este enlace es válido por 7 días. Si no solicitaste este registro, ignora este email.</p>
+            <p style="color: #666; font-size: 14px;">Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+            <p style="color: #2563eb; font-size: 12px; word-break: break-all;">${setupPasswordUrl}</p>
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+            <p style="color: #999; font-size: 12px;">MyWed360 - Plataforma de gestión de bodas</p>
+          </div>
+        `,
+        text: `¡Bienvenido a MyWed360, ${data.name}! Para verificar tu cuenta, visita: ${setupPasswordUrl}`
+      });
+      logger.info('✅ Email de verificación enviado', { email: data.email });
+    } catch (emailError) {
+      logger.error('⚠️ Error enviando email de verificación (registro continúa)', emailError);
+    }
 
     logger.info('Nuevo proveedor registrado', {
       supplierId,

@@ -1111,7 +1111,7 @@ const AdminTaskTemplates = () => {
                     id="task-template-name"
                     value={form.name}
                     onChange={handleFieldChange('name')}
-                    placeholder="Plantilla base 2025"
+                    placeholder={t('admin.taskTemplates.searchPlaceholder')}
                     className="w-full rounded-md border border-soft px-3 py-2"
                   />
                 </div>

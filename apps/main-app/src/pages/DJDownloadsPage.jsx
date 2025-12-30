@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Download, Music, File, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { Button } from '../components/ui';
-import { getAllSpecialSongsWithAudio, downloadAudioFile, calculateTotalAudioStorage } from '../services/audioUploadService';
+import {
+  getAllSpecialSongsWithAudio,
+  downloadAudioFile,
+  calculateTotalAudioStorage,
+} from '../services/audioUploadService';
 
 /**
  * Página pública para que el DJ descargue archivos de audio de canciones especiales
  * URL: /dj-downloads/:weddingId/:token
  */
 const DJDownloadsPage = () => {
+  const { t } = useTranslation('pages');
   const { weddingId, token } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -49,7 +55,7 @@ const DJDownloadsPage = () => {
 
       if (specialSnap.exists()) {
         const { blocks = [], moments = {} } = specialSnap.data();
-        
+
         // Obtener función getSelectedSong
         const getSelectedSong = (moment) => {
           if (!moment || !moment.songCandidates) return null;
@@ -127,12 +133,8 @@ const DJDownloadsPage = () => {
               <Music className="text-white" size={32} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Archivos de Audio - DJ
-              </h1>
-              <p className="text-gray-600">
-                {weddingData?.weddingInfo?.coupleName || 'Boda'}
-              </p>
+              <h1 className="text-3xl font-bold text-gray-900">Archivos de Audio - DJ</h1>
+              <p className="text-gray-600">{weddingData?.weddingInfo?.coupleName || 'Boda'}</p>
             </div>
           </div>
 
@@ -151,16 +153,17 @@ const DJDownloadsPage = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-purple-50 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-purple-600">
-                {songsWithAudio.length}
-              </div>
+              <div className="text-3xl font-bold text-purple-600">{songsWithAudio.length}</div>
               <div className="text-sm text-gray-600">Canciones Especiales</div>
             </div>
             <div className="bg-blue-50 rounded-lg p-4 text-center">
               <div className="text-3xl font-bold text-blue-600">
                 {songsWithAudio.reduce((acc, s) => acc + (s.song.audioFile?.fileSize || 0), 0) > 0
                   ? Math.round(
-                      songsWithAudio.reduce((acc, s) => acc + (s.song.audioFile?.fileSize || 0), 0) /
+                      songsWithAudio.reduce(
+                        (acc, s) => acc + (s.song.audioFile?.fileSize || 0),
+                        0
+                      ) /
                         (1024 * 1024)
                     )
                   : 0}{' '}
@@ -210,9 +213,7 @@ const DJDownloadsPage = () => {
 
                   <div className="flex-1 min-w-0">
                     {/* Título y artista */}
-                    <h3 className="text-lg font-bold text-gray-900">
-                      {item.song.title}
-                    </h3>
+                    <h3 className="text-lg font-bold text-gray-900">{item.song.title}</h3>
                     <p className="text-sm text-gray-600">{item.song.artist}</p>
 
                     {/* Metadata */}
@@ -221,10 +222,15 @@ const DJDownloadsPage = () => {
                         {item.blockName}
                       </span>
                       <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full font-semibold">
-                        {item.song.specialType === 'remix' ? 'Remix' : 
-                         item.song.specialType === 'edit' ? 'Edit' :
-                         item.song.specialType === 'mashup' ? 'Mashup' :
-                         item.song.specialType === 'live' ? 'En vivo' : 'Especial'}
+                        {item.song.specialType === 'remix'
+                          ? 'Remix'
+                          : item.song.specialType === 'edit'
+                            ? 'Edit'
+                            : item.song.specialType === 'mashup'
+                              ? 'Mashup'
+                              : item.song.specialType === 'live'
+                                ? 'En vivo'
+                                : 'Especial'}
                       </span>
                       {item.momentTime && (
                         <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
@@ -236,12 +242,8 @@ const DJDownloadsPage = () => {
                     {/* Instrucciones DJ */}
                     {item.song.djInstructions && (
                       <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                        <p className="text-xs font-semibold text-amber-900 mb-1">
-                          Instrucciones:
-                        </p>
-                        <p className="text-sm text-amber-800">
-                          {item.song.djInstructions}
-                        </p>
+                        <p className="text-xs font-semibold text-amber-900 mb-1">Instrucciones:</p>
+                        <p className="text-sm text-amber-800">{item.song.djInstructions}</p>
                       </div>
                     )}
 
@@ -251,7 +253,9 @@ const DJDownloadsPage = () => {
                         <CheckCircle className="text-green-600" size={16} />
                         <span>
                           {item.song.audioFile.fileName} •{' '}
-                          {Math.round((item.song.audioFile.fileSize || 0) / (1024 * 1024) * 100) / 100} MB
+                          {Math.round(((item.song.audioFile.fileSize || 0) / (1024 * 1024)) * 100) /
+                            100}{' '}
+                          MB
                         </span>
                       </div>
                     )}

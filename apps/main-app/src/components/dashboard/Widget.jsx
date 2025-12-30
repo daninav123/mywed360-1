@@ -95,7 +95,7 @@ export const Widget = ({ widget, index, isEditing, onRemove, onMove, onConfigUpd
   return (
     <motion.div
       ref={ref}
-      className="relative group"
+      className={`relative group ${cursor}`}
       style={{ opacity }}
       variants={widgetVariants}
       initial="hidden"
@@ -110,13 +110,26 @@ export const Widget = ({ widget, index, isEditing, onRemove, onMove, onConfigUpd
       layout
     >
       <div
-        className={`bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-200 ${
-          isEditing ? 'ring-2 ring-blue-400 ring-opacity-50 hover:ring-blue-400' : 'hover:shadow-md'
-        }`}
+        className="overflow-hidden transition-all duration-200"
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          borderRadius: 'var(--radius-lg)',
+          border: `1px solid ${isEditing ? 'var(--color-primary)' : 'var(--color-border-soft)'}`,
+          boxShadow: isEditing ? 'var(--shadow-md)' : 'var(--shadow-card)',
+        }}
       >
-        <div className="p-4 border-b border-gray-100 bg-[var(--color-primary)]">
+        <div 
+          className="p-4"
+          style={{
+            borderBottom: '1px solid var(--color-border-soft)',
+            background: 'linear-gradient(135deg, var(--color-lavender) 0%, var(--color-peach) 100%)',
+          }}
+        >
           <div className="flex justify-between items-center">
-            <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
+            <h3 
+              className="text-base font-semibold flex items-center gap-2"
+              style={{ color: 'var(--color-text)' }}
+            >
               {widget.type === 'calendar' && <span className="text-blue-500">📅</span>}
               {widget.type === 'tasks' && <span className="text-green-500">✅</span>}
               {widget.type === 'budget' && <span className="text-yellow-500">💰</span>}
@@ -131,7 +144,18 @@ export const Widget = ({ widget, index, isEditing, onRemove, onMove, onConfigUpd
                     e.stopPropagation();
                     setShowConfig(!showConfig);
                   }}
-                  className="p-1.5 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="p-1.5 rounded-full transition-all"
+                  style={{
+                    color: 'var(--color-text-secondary)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.5)';
+                    e.currentTarget.style.color = 'var(--color-text)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  }}
                   aria-label="Configurar widget"
                 >
                   <svg
@@ -160,7 +184,16 @@ export const Widget = ({ widget, index, isEditing, onRemove, onMove, onConfigUpd
                     e.stopPropagation();
                     onRemove(widget.id);
                   }}
-                  className="p-1.5 rounded-full text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                  className="p-1.5 rounded-full transition-all"
+                  style={{
+                    color: 'var(--color-danger)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-danger-10)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                   aria-label="Eliminar widget"
                 >
                   <svg
@@ -178,7 +211,10 @@ export const Widget = ({ widget, index, isEditing, onRemove, onMove, onConfigUpd
                     />
                   </svg>
                 </button>
-                <div className="w-6 h-6 flex items-center justify-center text-gray-300 cursor-grab active:cursor-grabbing">
+                <div 
+                  className="w-6 h-6 flex items-center justify-center cursor-grab active:cursor-grabbing"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
                   <svg
                     className="w-4 h-4"
                     fill="none"
@@ -206,9 +242,9 @@ export const Widget = ({ widget, index, isEditing, onRemove, onMove, onConfigUpd
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="border-b border-gray-100"
+              style={{ borderBottom: '1px solid var(--color-border-soft)' }}
             >
-              <div className="p-4 bg-gray-50">
+              <div className="p-4" style={{ backgroundColor: 'var(--color-yellow)' }}>
                 <WidgetConfig
                   config={widget.config}
                   onUpdate={(newConfig) => onConfigUpdate(widget.id, newConfig)}

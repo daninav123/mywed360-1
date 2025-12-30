@@ -97,10 +97,10 @@ const LANGUAGE_METADATA = {
   da: { name: 'Danish', flag: 'DK', order: 20 },
   de: { name: 'German', flag: 'DE', order: 8 },
   el: { name: 'Greek', flag: 'GR', order: 20 },
-  en: { name: 'English', flag: 'EN', order: 3 },
-  es: { name: 'Spanish (Spain)', flag: 'ES', order: 0 },
-  'es-AR': { name: 'Spanish (Argentina)', flag: 'AR', order: 2 },
-  'es-MX': { name: 'Spanish (Mexico)', flag: 'MX', order: 1 },
+  en: { name: 'English', flag: 'EN', order: 0 },
+  es: { name: 'Spanish (Spain)', flag: 'ES', order: 1 },
+  'es-AR': { name: 'Spanish (Argentina)', flag: 'AR', order: 3 },
+  'es-MX': { name: 'Spanish (Mexico)', flag: 'MX', order: 2 },
   et: { name: 'Estonian', flag: 'EE', order: 20 },
   eu: { name: 'Basque', flag: 'EU', order: 20 },
   fi: { name: 'Finnish', flag: 'FI', order: 20 },
@@ -125,8 +125,8 @@ const LANGUAGE_METADATA = {
   tr: { name: 'Turkish', flag: 'TR', order: 20 },
 };
 
-const FALLBACK_LANGUAGE = 'es';
-const FALLBACK_LANGUAGES = [FALLBACK_LANGUAGE, 'en'];
+const FALLBACK_LANGUAGE = 'en';
+const FALLBACK_LANGUAGES = [FALLBACK_LANGUAGE, 'es'];
 
 const buildAvailableLanguages = () =>
   Object.keys(resources)

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../hooks/useAuth';
@@ -32,7 +33,7 @@ export default function AcceptInvitation() {
   return (
     <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 text-center shadow-sm">
-        <p className="text-[color:var(--color-text)]">
+        <p placeholder={t('acceptInvitation.namePlaceholder')} className="text-[color:var(--color-text)]">
           {t(`common.public.invitation.accept.${statusKey}`, { message: errorMessage })}
         </p>
       </div>

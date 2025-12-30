@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
-import { Music, FileText, Download, Loader2, AlertCircle, CheckCircle, Link2, Copy } from 'lucide-react';
+import {
+  Music,
+  FileText,
+  Download,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  Link2,
+  Copy,
+} from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Button } from '../ui';
 import { exportToSpotifyPlaylist, getAllSongsForExport } from '../../services/spotifyExportService';
 import { generateDJDocument, generateSimpleList } from '../../services/djDocumentService';
-import { exportMultiplePlaylistsByBlock, createSpotifyPlaylists } from '../../services/multiPlaylistExportService';
+import {
+  exportMultiplePlaylistsByBlock,
+  createSpotifyPlaylists,
+} from '../../services/multiPlaylistExportService';
 import { getAllSpecialSongsWithAudio } from '../../services/audioUploadService';
 import { useWedding } from '../../context/WeddingContext';
 
@@ -46,15 +58,15 @@ const ExportActionsBar = ({
       if (result.success && result.playlists.length > 0) {
         // Crear las playlists en Spotify
         const createdPlaylists = await createSpotifyPlaylists(result.playlists);
-        
-        const momentPlaylists = createdPlaylists.filter(p => p.type === 'moments');
-        const backgroundPlaylists = createdPlaylists.filter(p => p.type === 'background');
-        
+
+        const momentPlaylists = createdPlaylists.filter((p) => p.type === 'moments');
+        const backgroundPlaylists = createdPlaylists.filter((p) => p.type === 'background');
+
         toast.success(
           `✅ ${result.playlists.length} playlist${result.playlists.length > 1 ? 's' : ''} generada${result.playlists.length > 1 ? 's' : ''}: ${momentPlaylists.length} de momentos + ${backgroundPlaylists.length} de ambiente`,
           { autoClose: 5000 }
         );
-        
+
         if (result.summary.specialSongs > 0) {
           setTimeout(() => {
             toast.info(
@@ -128,7 +140,7 @@ const ExportActionsBar = ({
     }
 
     const songsWithAudio = getAllSpecialSongsWithAudio(moments, blocks, getSelectedSong);
-    
+
     if (songsWithAudio.length === 0) {
       toast.warning('No hay archivos de audio subidos para compartir');
       return;
@@ -137,10 +149,10 @@ const ExportActionsBar = ({
     const token = btoa(`${activeWedding}-${Date.now()}`).substring(0, 20);
     const baseUrl = window.location.origin;
     const link = `${baseUrl}/dj-downloads/${activeWedding}/${token}`;
-    
+
     setDjDownloadLink(link);
     navigator.clipboard.writeText(link);
-    
+
     toast.success(
       `🔗 Enlace copiado al portapapeles (${songsWithAudio.length} archivo${songsWithAudio.length > 1 ? 's' : ''})`,
       { autoClose: 5000 }
@@ -193,7 +205,8 @@ const ExportActionsBar = ({
           <AlertCircle className="text-amber-600 flex-shrink-0" size={20} />
           <div className="text-sm text-amber-900">
             <p className="font-semibold">
-              Tienes {stats.specialSongs} canción{stats.specialSongs > 1 ? 'es' : ''} especial{stats.specialSongs > 1 ? 'es' : ''}
+              Tienes {stats.specialSongs} canción{stats.specialSongs > 1 ? 'es' : ''} especial
+              {stats.specialSongs > 1 ? 'es' : ''}
             </p>
             <p className="mt-1">
               Estas canciones NO se exportarán a Spotify. Genera el PDF para DJ con todas las
@@ -265,11 +278,7 @@ const ExportActionsBar = ({
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
         >
-          {isExporting ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : (
-            <Music size={18} />
-          )}
+          {isExporting ? <Loader2 size={18} className="animate-spin" /> : <Music size={18} />}
           Exportar a Spotify
           {stats.spotifySongs > 0 && (
             <span className="bg-white text-green-700 text-xs px-2 py-0.5 rounded-full font-semibold">
@@ -288,11 +297,7 @@ const ExportActionsBar = ({
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
         >
-          {isExporting ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : (
-            <FileText size={18} />
-          )}
+          {isExporting ? <Loader2 size={18} className="animate-spin" /> : <FileText size={18} />}
           PDF para DJ (Completo)
           {stats.specialSongs > 0 && (
             <span className="bg-amber-100 text-amber-700 text-xs px-2 py-0.5 rounded-full font-semibold">

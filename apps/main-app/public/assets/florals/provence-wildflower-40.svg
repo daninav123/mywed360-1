@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <g transform="translate(100, 100)">
+    <circle cx="-15" cy="-15" r="7" fill="#D8BFD8"/><circle cx="0" cy="-15" r="7" fill="#D8BFD8"/><circle cx="15" cy="-15" r="7" fill="#D8BFD8"/><circle cx="-15" cy="0" r="7" fill="#D8BFD8"/><circle cx="0" cy="0" r="7" fill="#D8BFD8"/><circle cx="15" cy="0" r="7" fill="#D8BFD8"/><circle cx="-15" cy="15" r="7" fill="#D8BFD8"/><circle cx="0" cy="15" r="7" fill="#D8BFD8"/><circle cx="15" cy="15" r="7" fill="#D8BFD8"/>
+  </g>
+</svg>

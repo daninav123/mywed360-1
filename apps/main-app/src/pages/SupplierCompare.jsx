@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -48,13 +49,10 @@ const SupplierCompare = () => {
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
           <MessageCircle className="h-16 w-16 text-gray-400 mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {t('suppliers.compare.empty.title', 'No hay proveedores para comparar')}
+            {t('suppliers.compare.empty.title', { placeholder: t('supplierCompare.searchPlaceholder') })}
           </h2>
           <p className="text-gray-600 mb-6">
-            {t(
-              'suppliers.compare.empty.description',
-              'Selecciona proveedores desde la búsqueda usando el checkbox de comparar.'
-            )}
+            {t('suppliers.compare.empty.description', { placeholder: t('supplierCompare.notesPlaceholder') })}
           </p>
           <Button onClick={handleBack}>
             <ArrowLeft className="h-4 w-4 mr-2" />

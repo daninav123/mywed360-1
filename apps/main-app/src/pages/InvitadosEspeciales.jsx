@@ -3,6 +3,7 @@
  * FASE 2.5 del WORKFLOW-USUARIO.md
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users, AlertCircle, Utensils, Baby, Heart, Plus, Edit2, Trash2, Search } from 'lucide-react';
 import { doc, getDoc, setDoc, collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -10,33 +11,52 @@ import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
 
-const DIETAS_ESPECIALES = [
-  { id: 'vegetariana', nombre: 'Vegetariana', icon: '🥗', color: 'green' },
-  { id: 'vegana', nombre: 'Vegana', icon: '🌱', color: 'emerald' },
-  { id: 'celiaca', nombre: 'Celíaca / Sin gluten', icon: '🌾', color: 'yellow' },
-  { id: 'lactosa', nombre: 'Sin lactosa', icon: '🥛', color: 'blue' },
-  { id: 'kosher', nombre: 'Kosher', icon: '✡️', color: 'purple' },
-  { id: 'halal', nombre: 'Halal', icon: '☪️', color: 'teal' },
-  { id: 'diabetes', nombre: 'Diabética', icon: '🍬', color: 'red' },
-  { id: 'otra', nombre: 'Otra', icon: '🍽️', color: 'gray' }
+const getDietsAndNeeds = (t) => [
+  { id: 'vegetarian', name: t('specialGuests.diets.vegetarian'), icon: '🥗', category: 'diet' },
+  { id: 'vegan', name: t('specialGuests.diets.vegan'), icon: '🥦', category: 'diet' },
+  { id: 'gluten-free', name: t('specialGuests.diets.glutenFree'), icon: '🌾', category: 'diet' },
+  { id: 'lactose-free', name: t('specialGuests.diets.lactoseFree'), icon: '🧀', category: 'diet' },
+  { id: 'kosher', name: t('specialGuests.diets.kosher'), icon: '✡️', category: 'diet' },
+  { id: 'halal', name: t('specialGuests.diets.halal'), icon: '☪️', category: 'diet' },
+  { id: 'diabetes', name: t('specialGuests.diets.diabetes'), icon: '🍬', category: 'diet' },
+  { id: 'other', name: t('specialGuests.diets.other'), icon: '🍽️', category: 'diet' },
+  { id: 'movilidad', name: t('specialGuests.needs.mobility'), icon: '♿', category: 'need' },
+  { id: 'visual', name: t('specialGuests.needs.visual'), icon: '👓', category: 'need' },
+  { id: 'auditiva', name: t('specialGuests.needs.hearing'), icon: '👂', category: 'need' },
+  { id: 'embarazada', name: t('specialGuests.needs.pregnant'), icon: '🤰', category: 'need' },
+  { id: 'bebe', name: t('specialGuests.needs.baby'), icon: '👶', category: 'need' },
+  { id: 'mayor', name: t('specialGuests.needs.elderly'), icon: '👴', category: 'need' },
+  { id: 'other', name: t('specialGuests.needs.other'), icon: '⚠️', category: 'need' }
 ];
 
-const ALERGIAS_COMUNES = [
-  'Frutos secos', 'Mariscos', 'Pescado', 'Huevo', 'Lácteos', 
-  'Gluten', 'Soja', 'Sulfitos', 'Mostaza', 'Sésamo'
+const getAlergiasComunes = (t) => [
+  t('specialGuests.allergies.nuts'),
+  t('specialGuests.allergies.shellfish'),
+  t('specialGuests.allergies.fish'),
+  t('specialGuests.allergies.egg'),
+  t('specialGuests.allergies.dairy'),
+  t('specialGuests.allergies.gluten'),
+  t('specialGuests.allergies.soy'),
+  t('specialGuests.allergies.sulfites'),
+  t('specialGuests.allergies.mustard'),
+  t('specialGuests.allergies.sesame')
 ];
 
-const NECESIDADES_ESPECIALES = [
-  { id: 'movilidad', nombre: 'Movilidad reducida', icon: '♿', color: 'blue' },
-  { id: 'visual', nombre: 'Discapacidad visual', icon: '👓', color: 'purple' },
-  { id: 'auditiva', nombre: 'Discapacidad auditiva', icon: '👂', color: 'indigo' },
-  { id: 'embarazada', nombre: 'Embarazada', icon: '🤰', color: 'pink' },
-  { id: 'bebe', nombre: 'Con bebé', icon: '👶', color: 'yellow' },
-  { id: 'mayor', nombre: 'Persona mayor', icon: '👴', color: 'orange' },
-  { id: 'otra', nombre: 'Otra', icon: '⚠️', color: 'gray' }
+const getNecesidadesEspeciales = (t) => [
+  { id: 'movilidad', nombre: t('specialGuests.needs.mobility'), icon: '♿', color: 'blue' },
+  { id: 'visual', nombre: t('specialGuests.needs.visual'), icon: '👓', color: 'purple' },
+  { id: 'auditiva', nombre: t('specialGuests.needs.hearing'), icon: '👂', color: 'indigo' },
+  { id: 'embarazada', nombre: t('specialGuests.needs.pregnant'), icon: '🤰', color: 'pink' },
+  { id: 'bebe', nombre: t('specialGuests.needs.baby'), icon: '👶', color: 'yellow' },
+  { id: 'mayor', nombre: t('specialGuests.needs.elderly'), icon: '👴', color: 'orange' },
+  { id: 'otra', nombre: t('specialGuests.needs.other'), icon: '⚠️', color: 'gray' }
 ];
 
 const NecesidadCard = ({ invitado, onEdit, onDelete }) => {
+  const { t } = useTranslation('pages');
+  const DIETAS_ESPECIALES = getDietasEspeciales(t);
+  const NECESIDADES_ESPECIALES = getNecesidadesEspeciales(t);
+  
   const getDietaBadges = () => {
     if (!invitado.dietas || invitado.dietas.length === 0) return null;
     return invitado.dietas.map(dietaId => {
@@ -223,349 +243,19 @@ const NecesidadModal = ({ invitado, onSave, onClose }) => {
                   type="text"
                   value={formData.nombre}
                   onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                  placeholder="Nombre y apellidos"
+                  placeholder={t('specialGuests.namePlaceholder')}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   required
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mesa asignada
-                </label>
-                <input
-                  type="text"
-                  value={formData.mesa}
-                  onChange={(e) => setFormData({ ...formData, mesa: e.target.value })}
-                  placeholder="Ej: Mesa 5"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Dietas especiales
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {DIETAS_ESPECIALES.map((dieta) => (
-                  <button
-                    key={dieta.id}
-                    type="button"
-                    onClick={() => toggleDieta(dieta.id)}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      formData.dietas.includes(dieta.id)
-                        ? `border-${dieta.color}-500 bg-${dieta.color}-50`
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <span className="text-xl block mb-1">{dieta.icon}</span>
-                    <span className="text-xs text-gray-700">{dieta.nombre}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Alergias e intolerancias
-              </label>
-              
-              {formData.alergias.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {formData.alergias.map((alergia, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm"
-                    >
-                      ⚠️ {alergia}
-                      <button
-                        type="button"
-                        onClick={() => removeAlergia(alergia)}
-                        className="hover:text-red-900"
-                      >
-                        ✕
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={newAlergia}
-                  onChange={(e) => setNewAlergia(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAlergia(newAlergia))}
-                  placeholder="Escribir alergia..."
-                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => addAlergia(newAlergia)}
-                  className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
-
-              <p className="text-xs text-gray-500 mb-2">Alergias comunes (clic para añadir):</p>
-              <div className="flex flex-wrap gap-2">
-                {ALERGIAS_COMUNES.map((alergia) => (
-                  <button
-                    key={alergia}
-                    type="button"
-                    onClick={() => addAlergia(alergia)}
-                    className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs hover:bg-gray-200 transition-colors"
-                  >
-                    + {alergia}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Necesidades especiales
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {NECESIDADES_ESPECIALES.map((nec) => (
-                  <button
-                    key={nec.id}
-                    type="button"
-                    onClick={() => toggleNecesidad(nec.id)}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      formData.necesidades.includes(nec.id)
-                        ? `border-${nec.color}-500 bg-${nec.color}-50`
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <span className="text-xl block mb-1">{nec.icon}</span>
-                    <span className="text-xs text-gray-700">{nec.nombre}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notas adicionales
-              </label>
-              <textarea
-                value={formData.notasEspeciales}
-                onChange={(e) => setFormData({ ...formData, notasEspeciales: e.target.value })}
-                placeholder="Cualquier otra información relevante..."
-                rows={3}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-              />
-            </div>
-
-            <div className="flex gap-2 pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-              >
-                {invitado ? 'Guardar' : 'Crear'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default function InvitadosEspeciales() {
-  const { activeWedding } = useWedding();
-  const [invitados, setInvitados] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [editingInvitado, setEditingInvitado] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterDieta, setFilterDieta] = useState('all');
-  const [filterNecesidad, setFilterNecesidad] = useState('all');
-
-  useEffect(() => {
-    if (!activeWedding) {
-      setLoading(false);
-      return;
-    }
-
-    const loadData = async () => {
-      try {
-        const docRef = doc(db, 'weddings', activeWedding, 'guests', 'special-needs');
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setInvitados(data.invitados || []);
-        }
-      } catch (error) {
-        console.error('Error loading special needs:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [activeWedding]);
-
-  const saveData = useCallback(async (newInvitados) => {
-    if (!activeWedding) return;
-
-    try {
-      const docRef = doc(db, 'weddings', activeWedding, 'guests', 'special-needs');
-      await setDoc(docRef, {
-        invitados: newInvitados,
-        updatedAt: new Date(),
-      }, { merge: true });
-    } catch (error) {
-      console.error('Error saving special needs:', error);
-      toast.error('Error al guardar');
-    }
-  }, [activeWedding]);
-
-  const handleSave = useCallback((formData) => {
-    let newInvitados;
-    
-    if (editingInvitado) {
-      newInvitados = invitados.map(i => 
-        i.id === editingInvitado.id ? { ...formData, id: i.id } : i
-      );
-      toast.success('Invitado actualizado');
-    } else {
-      const newInvitado = {
-        ...formData,
-        id: `guest-${Date.now()}`,
-      };
-      newInvitados = [...invitados, newInvitado];
-      toast.success('Invitado añadido');
-    }
-
-    setInvitados(newInvitados);
-    saveData(newInvitados);
-    setShowModal(false);
-    setEditingInvitado(null);
-  }, [invitados, editingInvitado, saveData]);
-
-  const handleDelete = useCallback((id) => {
-    if (!confirm('¿Eliminar este invitado?')) return;
-    
-    const newInvitados = invitados.filter(i => i.id !== id);
-    setInvitados(newInvitados);
-    saveData(newInvitados);
-    toast.success('Invitado eliminado');
-  }, [invitados, saveData]);
-
-  const filteredInvitados = useMemo(() => {
-    return invitados.filter(inv => {
-      const matchSearch = inv.nombre.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchDieta = filterDieta === 'all' || inv.dietas?.includes(filterDieta);
-      const matchNecesidad = filterNecesidad === 'all' || inv.necesidades?.includes(filterNecesidad);
-      return matchSearch && matchDieta && matchNecesidad;
-    });
-  }, [invitados, searchTerm, filterDieta, filterNecesidad]);
-
-  const stats = useMemo(() => {
-    const conDietas = invitados.filter(i => i.dietas?.length > 0).length;
-    const conAlergias = invitados.filter(i => i.alergias?.length > 0).length;
-    const conNecesidades = invitados.filter(i => i.necesidades?.length > 0).length;
-    const total = invitados.length;
-
-    const dietaCount = {};
-    DIETAS_ESPECIALES.forEach(d => {
-      dietaCount[d.id] = invitados.filter(i => i.dietas?.includes(d.id)).length;
-    });
-
-    return {
-      total,
-      conDietas,
-      conAlergias,
-      conNecesidades,
-      dietaCount
-    };
-  }, [invitados]);
-
-  if (loading) {
-    return (
-      <PageWrapper>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Cargando invitados...</p>
-          </div>
-        </div>
-      </PageWrapper>
-    );
-  }
-
-  return (
-    <PageWrapper>
-      <div className="max-w-6xl mx-auto py-8 px-4">
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-white rounded-lg shadow-sm">
-                  <Heart className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-800">Invitados Especiales</h1>
-                  <p className="text-sm text-gray-600">
-                    Gestiona necesidades, dietas y alergias
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  setEditingInvitado(null);
-                  setShowModal(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-                Añadir invitado
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <div className="text-2xl font-bold text-gray-800">{stats.total}</div>
-                <div className="text-xs text-gray-600">Total invitados</div>
-              </div>
-              <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <div className="text-2xl font-bold text-green-600">{stats.conDietas}</div>
-                <div className="text-xs text-gray-600">Con dietas especiales</div>
-              </div>
-              <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <div className="text-2xl font-bold text-red-600">{stats.conAlergias}</div>
-                <div className="text-xs text-gray-600">Con alergias</div>
-              </div>
-              <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <div className="text-2xl font-bold text-blue-600">{stats.conNecesidades}</div>
-                <div className="text-xs text-gray-600">Con necesidades</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Buscar invitado..."
+                  placeholder={t('specialGuests.searchPlaceholder')}
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg"
                 />
               </div>

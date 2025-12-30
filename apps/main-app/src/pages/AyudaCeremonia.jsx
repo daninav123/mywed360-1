@@ -1,5 +1,6 @@
 import { MessageSquare, Clock, RefreshCcw } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../components/PageWrapper';
 import { useAuth } from '../hooks/useAuth';
@@ -20,6 +21,7 @@ const GENERIC_MOMENTS = [
 ];
 
 export default function AyudaCeremonia() {
+  const { t } = useTranslation('pages');
   const { userProfile, hasRole, isLoading } = useAuth();
   const allowed =
     hasRole('owner', 'pareja', 'assistant', 'ayudante', 'planner', 'wedding_planner', 'admin') ||
@@ -119,7 +121,7 @@ export default function AyudaCeremonia() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           className="w-full h-32 border rounded p-2 text-sm"
-          placeholder="Escribe el texto que te gustaría utilizar…"
+          placeholder={t('ceremony.searchPlaceholder')} 
         />
       </div>
 

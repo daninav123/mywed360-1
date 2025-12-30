@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import InspirationGallery from '../components/gallery/InspirationGallery';
 import SearchBar from '../components/SearchBar';
@@ -60,6 +61,7 @@ export default function Inspiration() {
     setQuery('wedding');
     setSelectedTag('all');
   }, [activeWedding]);
+
   const lastItemRef = useCallback(
     (node) => {
       if (loading) return;
@@ -82,12 +84,13 @@ export default function Inspiration() {
             firestore: true,
             collection: 'userIdeas',
             fallbackToLocal: true,
+            placeholder: { title: t('inspiration.titlePlaceholder'), imageUrl: t('inspiration.imageUrlPlaceholder') },
           });
           if (Array.isArray(legacyRemote) && legacyRemote.length) {
             return legacyRemote;
           }
         } catch (error) {
-          // console.warn('[Inspiration] No se pudo leer favoritos legacy remotos:', error);
+          console.warn(`[Inspiration] No se pudo leer favoritos legacy remotos: ${error}`);
         }
       }
       try {
@@ -159,18 +162,32 @@ export default function Inspiration() {
   }, [loadFavorites]);
 
   useEffect(() => {
-    if (selectedTag === 'favs') return; // No cargar muro cuando estamos en pestaña favoritos
+    if (selectedTag === 'favs') {
+      console.log('[Inspiration] 🏷️ selectedTag es "favs", no cargando muro');
+      return; // No cargar muro cuando estamos en pestaña favoritos
+    }
     async function load() {
+      console.log('[Inspiration] 📡 Cargando muro - page:', page, 'query:', query, 'selectedTag:', selectedTag);
       setLoading(true);
-      const newItems = await fetchWall(page, query);
-      setItems((prev) => {
-        const merged = [...prev, ...newItems.filter((it) => !prev.some((p) => p.id === it.id))];
-        // Personalización: boost posts que incluyan tags preferidos
-        const score = (item) =>
-          (item.tags || []).some((t) => prefTags.includes(normalizeTag(t))) ? 1 : 0;
-        return merged.sort((a, b) => score(b) - score(a));
-      });
-      setLoading(false);
+      try {
+        const newItems = await fetchWall(page, query);
+        console.log('[Inspiration] ✅ fetchWall devolvió', newItems?.length || 0, 'items');
+        if (newItems && newItems.length > 0) {
+          console.log('[Inspiration] 📸 Primera imagen:', newItems[0]);
+        }
+        setItems((prev) => {
+          const merged = [...prev, ...newItems.filter((it) => !prev.some((p) => p.id === it.id))];
+          console.log('[Inspiration] 🔀 Items merged:', merged.length, 'total');
+          // Personalización: boost posts que incluyan tags preferidos
+          const score = (item) =>
+            (item.tags || []).some((t) => prefTags.includes(normalizeTag(t))) ? 1 : 0;
+          return merged.sort((a, b) => score(b) - score(a));
+        });
+      } catch (error) {
+        console.error('[Inspiration] ❌ Error en fetchWall:', error);
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, [page, query, selectedTag]);
@@ -231,18 +248,39 @@ export default function Inspiration() {
   };
 
   const handleTag = async (rawTag) => {
+    console.log('[Inspiration] 🏷️ handleTag llamado con rawTag:', rawTag);
     const tag = normalizeFilterValue(rawTag);
+    console.log('[Inspiration] 🏷️ Tag normalizado:', tag);
     setSelectedTag(tag);
     if (tag === 'favs') {
+      console.log('[Inspiration] ⭐ Cambiando a pestaña favoritos');
       const favs = await loadData(storageKey, syncOptions);
       setItems(Array.isArray(favs) ? favs : []);
       setPage(1);
       return;
     }
+    console.log('[Inspiration] 🔄 Reseteando items y cargando nueva categoría');
     setItems([]);
     setPage(1);
-    setQuery(tag === 'all' ? 'wedding' : tag);
+    const newQuery = tag === 'all' ? 'wedding' : tag;
+    console.log('[Inspiration] 🔍 Nueva query:', newQuery);
+    setQuery(newQuery);
   };
+
+  // Leer tag de URL al cargar (ej: /inspiracion?tag=decoracion)
+  useEffect(() => {
+    console.log('[Inspiration] 🌐 Leyendo tag de URL');
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlTag = urlParams.get('tag');
+    console.log('[Inspiration] 🌐 Tag de URL:', urlTag);
+    if (urlTag) {
+      console.log('[Inspiration] 🚀 Aplicando filtro desde URL');
+      handleTag(urlTag);
+    } else {
+      console.log('[Inspiration] ℹ️ No hay tag en URL, carga normal');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="p-4 md:p-6">

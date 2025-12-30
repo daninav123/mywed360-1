@@ -1,13 +1,15 @@
 /**
  * Ruta de debug para ver solicitudes de presupuesto
+ * PROTEGIDO: Solo admin puede acceder
  */
 
 import express from 'express';
 import { db } from '../db.js';
+import { requireAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/debug-quote-requests/:userId', async (req, res) => {
+router.get('/debug-quote-requests/:userId', requireAdmin, async (req, res) => {
   try {
     const { userId } = req.params;
     

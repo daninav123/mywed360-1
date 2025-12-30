@@ -5,7 +5,7 @@
  * con y sin caché, permitiendo validar las optimizaciones.
  */
 
-import EmailService from '../services/emailService';
+import * as EmailService from '../services/emailService';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import { templateCache } from '../services/TemplateCacheService';
 

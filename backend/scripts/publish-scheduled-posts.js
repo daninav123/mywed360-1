@@ -18,17 +18,15 @@ const db = admin.firestore();
 
 async function publishScheduledPosts() {
   console.log('🔍 Buscando posts scheduled...');
-  
-  const snapshot = await db.collection('blogPosts')
-    .where('status', '==', 'scheduled')
-    .get();
-  
+
+  const snapshot = await db.collection('blogPosts').where('status', '==', 'scheduled').get();
+
   console.log(`📊 Encontrados: ${snapshot.size} posts`);
-  
+
   for (const doc of snapshot.docs) {
     const data = doc.data();
     console.log(`✏️  Publicando: ${data.title?.substring(0, 50)}...`);
-    
+
     await doc.ref.update({
       status: 'published',
       publishedAt: data.publishedAt || admin.firestore.FieldValue.serverTimestamp(),
@@ -36,7 +34,7 @@ async function publishScheduledPosts() {
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
   }
-  
+
   console.log('✅ Todos los posts actualizados a published');
   process.exit(0);
 }

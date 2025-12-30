@@ -672,9 +672,12 @@ export default function useSpecialMoments() {
     setBlocks((prev) => prev.map((b) => (b.id === blockId ? { ...b, ...updates } : b)));
   }, []);
 
-  const renameBlock = useCallback((blockId, newName) => {
-    updateBlock(blockId, { name: newName });
-  }, [updateBlock]);
+  const renameBlock = useCallback(
+    (blockId, newName) => {
+      updateBlock(blockId, { name: newName });
+    },
+    [updateBlock]
+  );
 
   const removeBlock = useCallback((id) => {
     setBlocks((prev) => prev.filter((b) => b.id !== id));
@@ -933,10 +936,10 @@ export default function useSpecialMoments() {
       const next = { ...prev };
       next[blockId] = (prev[blockId] || []).map((m) => {
         if (m.id !== momentId) return m;
-        
+
         const updatedCandidates = (m.songCandidates || []).map((c) => {
           if (c.id !== songId) return c;
-          
+
           return {
             ...c,
             isSpecial: specialData.isSpecial || false,
@@ -947,7 +950,7 @@ export default function useSpecialMoments() {
             audioFile: specialData.audioFile || c.audioFile || null,
           };
         });
-        
+
         return {
           ...m,
           songCandidates: updatedCandidates,
@@ -963,7 +966,7 @@ export default function useSpecialMoments() {
     let spotifySongs = 0;
     let specialSongs = 0;
     let definitiveCount = 0;
-    
+
     Object.entries(moments).forEach(([blockId, blockMoments]) => {
       blockMoments.forEach((moment) => {
         const song = getSelectedSong(moment);
@@ -978,7 +981,7 @@ export default function useSpecialMoments() {
         }
       });
     });
-    
+
     return {
       totalSongs,
       spotifySongs,

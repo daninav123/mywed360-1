@@ -4,22 +4,34 @@ import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { Button } from '../ui';
 import { getSongSuggestions } from '../../utils/popularWeddingSongs';
-import { generateSuggestionsFromDescription, enrichWithSpotify } from '../../services/simpleSuggestionsService';
+import {
+  generateSuggestionsFromDescription,
+  enrichWithSpotify,
+} from '../../services/simpleSuggestionsService';
 
 /**
  * CleanSongPicker - Modal ultra-limpio para buscar canciones
  * Búsqueda directa en Spotify con reproducción completa
  */
-const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentType = '', blockType = '', userDescription = '', onDescriptionChange }) => {
+const CleanSongPicker = ({
+  isOpen,
+  onClose,
+  onSelect,
+  momentTitle = '',
+  momentType = '',
+  blockType = '',
+  userDescription = '',
+  onDescriptionChange,
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
-  
+
   // Descripción editable localmente
   const [localDescription, setLocalDescription] = useState(userDescription);
-  
+
   // Sugerencias basadas en descripción del usuario
   const [aiSuggestions, setAiSuggestions] = useState([]);
   const [loadingAI, setLoadingAI] = useState(false);
@@ -53,21 +65,21 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
 
       if (result.success && result.suggestions.length > 0) {
         const enriched = await enrichWithSpotify(result.suggestions);
-        
+
         if (reset) {
           // Primera carga o cambio de descripción: reemplazar
           setAiSuggestions(enriched);
           setCanLoadMore(true);
         } else {
           // Cargar más: añadir sin duplicados
-          setAiSuggestions(prev => {
-            const existingTitles = new Set(prev.map(s => `${s.title}-${s.artist}`.toLowerCase()));
+          setAiSuggestions((prev) => {
+            const existingTitles = new Set(prev.map((s) => `${s.title}-${s.artist}`.toLowerCase()));
             const newSuggestions = enriched.filter(
-              s => !existingTitles.has(`${s.title}-${s.artist}`.toLowerCase())
+              (s) => !existingTitles.has(`${s.title}-${s.artist}`.toLowerCase())
             );
             return [...prev, ...newSuggestions];
           });
-          
+
           // Si no hay nuevas sugerencias únicas, deshabilitar "Ver más"
           if (enriched.length === 0) {
             setCanLoadMore(false);
@@ -157,11 +169,11 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
       handleSelectSong(suggestion);
       return;
     }
-    
+
     // Buscar automáticamente la sugerencia en Spotify
     setSearchQuery(`${suggestion.title} ${suggestion.artist}`);
     setShowSuggestions(false);
-    
+
     setIsSearching(true);
     setError(null);
 
@@ -186,7 +198,6 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
       setIsSearching(false);
     }
   };
-
 
   if (!isOpen) return null;
 
@@ -244,12 +255,11 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
               </Button>
             </div>
           </div>
-          
+
           {/* Búsqueda manual */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <Search size={14} className="text-blue-600" />
-              O busca manualmente en Spotify
+              <Search size={14} className="text-blue-600" />O busca manualmente en Spotify
             </label>
             <div className="flex gap-2">
               <div className="flex-1 relative">
@@ -308,9 +318,7 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
                     ✨ Sugerencias de IA para tu descripción
                   </h3>
                 </div>
-                {loadingAI && (
-                  <Loader2 size={14} className="text-purple-600 animate-spin" />
-                )}
+                {loadingAI && <Loader2 size={14} className="text-purple-600 animate-spin" />}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {aiSuggestions.map((suggestion) => (
@@ -336,7 +344,7 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
                   </button>
                 ))}
               </div>
-              
+
               {/* Botón para cargar más */}
               {canLoadMore && aiSuggestions.length >= 8 && (
                 <div className="mt-4 text-center">
@@ -362,7 +370,6 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
             </div>
           )}
 
-
           {/* Sugerencias populares */}
           {showSuggestions && suggestions.length > 0 && !searchQuery && (
             <div className="mb-6">
@@ -387,9 +394,7 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
                         <div className="font-medium text-sm text-gray-900 truncate">
                           {song.title}
                         </div>
-                        <div className="text-xs text-gray-600 truncate">
-                          {song.artist}
-                        </div>
+                        <div className="text-xs text-gray-600 truncate">{song.artist}</div>
                       </div>
                       <div className="flex-shrink-0">
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity text-blue-600 text-xs font-medium">
@@ -438,7 +443,8 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
             <div className="space-y-3">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-semibold text-gray-900">
-                  🎵 {results.length} resultado{results.length !== 1 ? 's' : ''} encontrado{results.length !== 1 ? 's' : ''}
+                  🎵 {results.length} resultado{results.length !== 1 ? 's' : ''} encontrado
+                  {results.length !== 1 ? 's' : ''}
                 </p>
                 <p className="text-xs text-gray-500">Click para seleccionar</p>
               </div>
@@ -473,7 +479,9 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
                           <h4 className="font-bold text-base text-gray-900 truncate group-hover:text-blue-600 transition-colors">
                             {song.title}
                           </h4>
-                          <p className="text-sm text-gray-700 truncate mt-1 font-medium">{song.artist}</p>
+                          <p className="text-sm text-gray-700 truncate mt-1 font-medium">
+                            {song.artist}
+                          </p>
                         </div>
                         <div className="flex-shrink-0">
                           <div className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
@@ -482,19 +490,20 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '', momentTy
                           </div>
                         </div>
                       </div>
-                      
+
                       {song.album && (
                         <p className="text-xs text-gray-600 truncate mt-1 flex items-center gap-1">
                           <span className="inline-block w-1 h-1 bg-gray-400 rounded-full"></span>
                           {song.album}
                         </p>
                       )}
-                      
+
                       {/* Preview info */}
                       <div className="flex items-center gap-3 mt-2">
                         {song.duration && (
                           <span className="text-xs text-gray-500 flex items-center gap-1">
-                            🕒 {Math.floor(song.duration / 60000)}:{String(Math.floor((song.duration % 60000) / 1000)).padStart(2, '0')}
+                            🕒 {Math.floor(song.duration / 60000)}:
+                            {String(Math.floor((song.duration % 60000) / 1000)).padStart(2, '0')}
                           </span>
                         )}
                         {song.popularity && (

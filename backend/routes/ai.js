@@ -181,6 +181,7 @@ router.post('/parse-dialog', async (req, res) => {
     : [{ role: 'user', content: text }];
   const contextSummary = buildContextSummary(context);
 
+  const { apiKey: OPENAI_API_KEY } = getOpenAIConfig();
   if (!OPENAI_API_KEY) {
     logger.error('OPENAI_API_KEY ausente; parse-dialog no puede ejecutarse');
     return sendServiceUnavailable(

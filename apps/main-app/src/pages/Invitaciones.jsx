@@ -1,5 +1,6 @@
 import { Search, Eye, Download, Save, Copy, Zap } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Spinner from '../components/Spinner';
 import Toast from '../components/Toast';
@@ -15,6 +16,7 @@ import { invitationTemplates } from '../data/invitationTemplates';
 import sanitizeHtml from '../utils/sanitizeHtml';
 
 export default function Invitaciones() {
+  const { t } = useTranslation('pages');
   const { activeWedding } = useWedding();
   const { info: weddingInfo } = useActiveWeddingInfo();
   const { guests } = useGuests();
@@ -213,13 +215,13 @@ export default function Invitaciones() {
   return (
     <Card className="p-6 space-y-6">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      <h1 className="text-2xl font-semibold">Diseño de Invitaciones</h1>
+      <h1 className="text-2xl font-semibold">{t('invitations.title')}</h1>
       {/* Etiqueta invisible global para satisfacer aserciones iniciales en E2E sin afectar UI */}
       <span className="opacity-0">Selecci�n de Plantilla</span>
       <div className="flex justify-between mb-4">
         {step > 1 && (
           <button onClick={() => setStep(step - 1)} className="bg-gray-200 px-3 py-1 rounded">
-            Anterior
+            {t('invitations.buttons.previous')}
           </button>
         )}
         {step < 4 && (
@@ -227,7 +229,7 @@ export default function Invitaciones() {
             onClick={() => setStep(step + 1)}
             className="bg-blue-600 text-white px-3 py-1 rounded"
           >
-            Siguiente
+            {t('invitations.buttons.next')}
           </button>
         )}
         {step === 4 && (
@@ -235,7 +237,7 @@ export default function Invitaciones() {
             onClick={() => alert('Wizard completado')}
             className="bg-green-600 text-white px-3 py-1 rounded"
           >
-            Finalizar
+            {t('invitations.buttons.finish')}
           </button>
         )}
       </div>
@@ -243,10 +245,10 @@ export default function Invitaciones() {
       {/* Asistente de IA */}
       {step === 1 && (
         <section className="border rounded p-4 space-y-4">
-          <h2 className="text-lg font-semibold">Asistente de IA</h2>
+          <h2 className="text-lg font-semibold">{t('invitations.aiAssistant.title')}</h2>
           <textarea
             rows={3}
-            placeholder="Describe cómo quieres tu invitación..."
+            placeholder={t('invitations.aiAssistant.placeholder')}
             value={aiPrompt}
             onChange={(e) => setAiPrompt(e.target.value)}
             className="w-full border rounded p-2"
@@ -257,7 +259,7 @@ export default function Invitaciones() {
             className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center"
           >
             {loading ? <Spinner size={16} className="mr-2" /> : <Zap size={16} className="mr-2" />}{' '}
-            {loading ? 'Generando...' : 'Generar invitación'}
+            {loading ? t('invitations.aiAssistant.generating') : t('invitations.aiAssistant.generate')}
           </button>
         </section>
       )}
@@ -265,7 +267,7 @@ export default function Invitaciones() {
       {/* Selecci�n de Plantilla */}
       {step === 2 && (
         <section className="border rounded p-4 space-y-4">
-          <h2 className="text-lg font-semibold">Selecci�n de Plantilla</h2>
+          <h2 className="text-lg font-semibold">{t('invitations.templateSelection.title')}</h2>
           <div className="flex gap-4 flex-wrap">
             <select
               value={filterCategory}
@@ -376,7 +378,7 @@ export default function Invitaciones() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 className="block w-full border rounded px-2 py-1 mt-1"
-                placeholder="Asunto del correo"
+                placeholder={t('invitations.emailSubjectPlaceholder')}
               />
             </label>
           </div>

@@ -1,6 +1,7 @@
 import { doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc } from 'firebase/firestore';
 import { Plus, Trash, Zap } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import { useAuth } from '../hooks/useAuth';
@@ -222,7 +223,7 @@ export default function WebEditor() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input
             className="border p-2 rounded"
-            placeholder="Nombres de la pareja"
+            placeholder={t('webEditor.coupleNamesPlaceholder')}
             value={info.coupleName}
             onChange={(e) => setInfo({ ...info, coupleName: e.target.value })}
           />
@@ -234,7 +235,7 @@ export default function WebEditor() {
           />
           <input
             className="border p-2 rounded sm:col-span-2"
-            placeholder="Lugar de la celebración"
+            placeholder={t('webEditor.venuePlaceholder')}
             value={info.celebrationPlace}
             onChange={(e) => setInfo({ ...info, celebrationPlace: e.target.value })}
           />
@@ -242,7 +243,7 @@ export default function WebEditor() {
         <textarea
           className="border p-2 rounded w-full"
           rows="4"
-          placeholder="Nuestra historia"
+          placeholder={t('webEditor.storyPlaceholder')}
           value={info.story}
           onChange={(e) => setInfo({ ...info, story: e.target.value })}
         />
@@ -256,7 +257,7 @@ export default function WebEditor() {
         </button>
         <input
           className="border p-2 rounded w-full"
-          placeholder="Cuenta bancaria / lista de regalos"
+          placeholder={t('webEditor.giftAccountPlaceholder')}
           value={info.giftAccount}
           onChange={(e) => setInfo({ ...info, giftAccount: e.target.value })}
         />
@@ -310,7 +311,7 @@ export default function WebEditor() {
             />
             <input
               className="border p-1 rounded flex-grow"
-              placeholder="Descripción"
+              placeholder={t('webEditor.descriptionPlaceholder')}
               value={s.title}
               onChange={(e) => updateSchedule(idx, 'title', e.target.value)}
             />
@@ -340,7 +341,7 @@ export default function WebEditor() {
           <div key={g.id || idx} className="flex gap-2 items-center">
             <input
               className="border p-1 rounded flex-grow"
-              placeholder="URL de la imagen"
+              placeholder={t('webEditor.imageUrlPlaceholder')}
               value={g.url}
               onChange={(e) => updateImage(idx, e.target.value)}
             />

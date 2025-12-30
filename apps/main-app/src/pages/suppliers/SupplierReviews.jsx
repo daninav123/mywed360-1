@@ -314,7 +314,7 @@ export default function SupplierReviews() {
                     <textarea
                       value={responseText}
                       onChange={(e) => setResponseText(e.target.value)}
-                      placeholder="Escribe tu respuesta..."
+                      placeholder={t('supplier.reviews.responsePlaceholder')}
                       className="w-full p-3 border rounded-lg mb-2"
                       style={{ borderColor: 'var(--color-border)' }}
                       rows={3}

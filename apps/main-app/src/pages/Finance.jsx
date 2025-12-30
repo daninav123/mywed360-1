@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sparkles } from 'lucide-react';
 
 import BudgetManager from '../components/finance/BudgetManager';
@@ -146,7 +147,7 @@ function Finance() {
         });
       } else {
         const legacyKey = normalizeBudgetCategoryKey(
-          provider?.service || provider?.servicio || provider?.category || provider?.categoria || ''
+          t('finance.searchPlaceholder') || provider?.servicio || provider?.category || provider?.categoria || ''
         );
         if (legacyKey) {
           const currentAmount = map.get(legacyKey) || 0;
@@ -157,7 +158,7 @@ function Finance() {
     });
     
     return map;
-  }, [supplierProviders]);
+  }, [supplierProviders, t]);
 
   const handleCompleteWizard = async (wizardData) => {
     try {
@@ -261,17 +262,17 @@ function Finance() {
         <p className="text-muted mb-6">Gestión financiera de tu boda</p>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <KPICard
             label={t('finance.kpi.totalBudget', { defaultValue: 'Presupuesto Total' })}
             value={formatCurrency(totalBudget)}
             icon="💵"
-            color="primary"
+            placeholder={t('finance.searchPlaceholder', { defaultValue: 'Buscar...' })}
           />
           <KPICard
             label={t('finance.kpi.spent', { defaultValue: 'Gastado' })}
             value={formatCurrency(totalSpent)}
             icon="💸"
+            placeholder={t('finance.amountPlaceholder', { defaultValue: 'Cantidad...' })}
             color={totalSpent > totalBudget * 0.9 ? 'danger' : 'info'}
             trend={totalBudget > 0 ? `${((totalSpent / totalBudget) * 100).toFixed(1)}% del total` : undefined}
           />
@@ -282,78 +283,6 @@ function Finance() {
             color={available < 0 ? 'danger' : 'success'}
             trend={totalBudget > 0 ? `${((available / totalBudget) * 100).toFixed(1)}% restante` : undefined}
           />
-        </div>
-
-        {/* Alertas de Pagos Programados */}
-        <UpcomingPaymentsAlert
-          transactions={transactions}
-          currentBalance={available}
-          daysLookahead={90}
-        />
-
-        {/* CTA Wizard si no completado */}
-        {!wizardCompleted && (
-          <Card className="p-6 mb-6 bg-gradient-to-r from-[var(--color-primary-10)] to-[var(--color-primary-5)] border-[color:var(--color-primary-30)]">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-[color:var(--color-primary)] mb-1">
-                  {t('finance.wizard.cta.title', { defaultValue: '👋 ¡Bienvenido a Finanzas!' })}
-                </h3>
-                <p className="text-sm text-[color:var(--color-primary-80)]">
-                  {t('finance.wizard.cta.description', { defaultValue: 'Configura tu presupuesto en 3 pasos sencillos' })}
-                </p>
-              </div>
-              <Button onClick={() => setShowWizard(true)} leftIcon={<Sparkles size={18} />}>
-                {t('finance.wizard.cta.button', { defaultValue: 'Configurar Ahora' })}
-              </Button>
-            </div>
-          </Card>
-        )}
-
-        {/* Error Toast-style */}
-        {error && (
-          <div className="mb-6 p-4 rounded-lg bg-[var(--color-danger-10)] border border-[color:var(--color-danger-30)] flex items-start gap-3">
-            <span className="text-[color:var(--color-danger)]">⚠️</span>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-[color:var(--color-danger)]">
-                {t("finance.error.title", { defaultValue: "Error en Gestión financiera" })}
-              </p>
-              <p className="text-sm text-[color:var(--color-danger-80)] mt-1">{error}</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Tabs Reducidos: 3 en vez de 5 */}
-      <PageTabs
-        value={activeTab}
-        onChange={setActiveTab}
-        options={[
-          { id: 'budget', label: '💰 Presupuesto', icon: '💰' },
-          { id: 'transactions', label: '💸 Transacciones', icon: '💸' },
-          { id: 'analytics', label: '📊 Análisis', icon: '📊' },
-        ]}
-        className="w-full mb-6"
-      />
-
-      {/* Contenido de Tabs */}
-      <div className="space-y-6">
-        {/* Tab: Presupuesto */}
-        {activeTab === 'budget' && (
-          <div className="space-y-6">
-            {/* Aportaciones Colapsables */}
-            <Collapsible 
-              title={t('finance.contributions.title', { defaultValue: 'Configurar Aportaciones' })}
-              icon="💵"
-              defaultOpen={false}
-            >
-              <ContributionSettings
-                contributions={contributions}
-                onUpdateContributions={updateContributions}
-                onLoadGuestCount={loadGuestCount}
-                isLoading={isLoading}
-              />
-            </Collapsible>
 
             {/* Budget Manager */}
             <BudgetManager

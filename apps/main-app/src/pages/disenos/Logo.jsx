@@ -1,5 +1,6 @@
 ﻿import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 import Card from '../../components/ui/Card';
@@ -70,25 +71,24 @@ export default function Logo() {
 
   return (
     <div className="space-y-6">
-      <UploadImageCard title="Subir Logo" storageKey="logoImage" />
+      <UploadImageCard title={t('design.logo.uploadImage')} storageKey="logoImage" />
 
       <Card className="p-4 flex flex-col gap-4 items-start">
-        <h2 className="text-lg font-semibold">Color principal</h2>
+        <h2 className="text-lg font-semibold">{t('design.logo.mainColor')}</h2>
         <input
           type="color"
           value={hex}
           onChange={handleColor}
           className="w-16 h-10 p-0 border-0 cursor-pointer"
-          aria-label="Seleccionar color del logo"
+          aria-label={t('design.logo.selectColor')}
         />
-        <p className="text-sm text-gray-600">Código: {hex}</p>
+        <p className="text-sm text-gray-600">{t('design.logo.colorCode')}: {hex}</p>
       </Card>
 
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Diseña el logo para tu boda</h2>
+        <h2 className="text-xl font-semibold mb-2">{t('design.logo.designLogo')}</h2>
         <p className="text-gray-600">
-          Crea un logo personalizado que represente vuestra boda. Podrás usarlo en invitaciones,
-          regalos, decoración y más.
+          {t('design.logo.createCustomLogo')}
         </p>
       </div>
 

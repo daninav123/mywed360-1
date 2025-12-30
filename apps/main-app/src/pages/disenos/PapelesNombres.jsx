@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 import Card from '../../components/ui/Card';
@@ -78,7 +79,7 @@ export default function PapelesNombres() {
         <div className="mt-2">
           <p className="text-sm text-blue-600">
             <span className="font-medium">Consejo:</span> Para mejores resultados, añade primero a
-            tus invitados en la sección de Invitados.
+            {t('design.nameCards.searchPlaceholder')} en la sección de Invitados.
           </p>
         </div>
       </Card>

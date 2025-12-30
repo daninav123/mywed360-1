@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import BudgetManager from '../components/finance/BudgetManager';
 import BudgetWizardModal from '../components/finance/BudgetWizardModal';

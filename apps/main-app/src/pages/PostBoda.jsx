@@ -3,6 +3,7 @@
  * FASE 8.1 del WORKFLOW-USUARIO.md
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Heart, Mail, Image, Star, MessageCircle, Plus, Edit2, Trash2, Download, Send, CheckCircle2 } from 'lucide-react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -10,27 +11,38 @@ import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
 
-const CATEGORIAS_AGRADECIMIENTOS = [
-  { id: 'invitados', nombre: 'Invitados', icon: '👥', color: 'blue' },
-  { id: 'familia', nombre: 'Familia cercana', icon: '👨‍👩‍👧‍👦', color: 'purple' },
-  { id: 'padrinos', nombre: 'Padrinos y testigos', icon: '👑', color: 'yellow' },
-  { id: 'proveedores', nombre: 'Proveedores', icon: '💼', color: 'green' }
+const getCategoriesThankYou = (t) => [
+  { id: 'invitados', nombre: t('postBoda.categories.guests'), icon: '👥', color: 'blue' },
+  { id: 'familia', nombre: t('postBoda.categories.closeFamily'), icon: '👨‍👩‍👧‍👦', color: 'purple' },
+  { id: 'padrinos', nombre: t('postBoda.categories.godparents'), icon: '👑', color: 'yellow' },
+  { id: 'proveedores', nombre: t('postBoda.categories.suppliers'), icon: '💼', color: 'green' }
 ];
 
-const TIPOS_RECUERDO = [
-  { id: 'foto', nombre: 'Foto', icon: '📸', color: 'pink' },
-  { id: 'video', nombre: 'Vídeo', icon: '🎥', color: 'red' },
-  { id: 'mensaje', nombre: 'Mensaje', icon: '💌', color: 'purple' },
-  { id: 'otro', nombre: 'Otro', icon: '⭐', color: 'gray' }
+const getMemoryTypes = (t) => [
+  { id: 'foto', nombre: t('postBoda.memoryTypes.photo'), icon: '📸', color: 'pink' },
+  { id: 'video', nombre: t('postBoda.memoryTypes.video'), icon: '🎥', color: 'red' },
+  { id: 'mensaje', nombre: t('postBoda.memoryTypes.message'), icon: '💌', color: 'purple' },
+  { id: 'otro', nombre: t('postBoda.memoryTypes.other'), icon: '⭐', color: 'gray' }
 ];
 
-const PROVEEDORES_TIPO = [
-  'Fotógrafo', 'Videógrafo', 'Lugar ceremonia', 'Lugar banquete', 
-  'Catering', 'Florista', 'DJ/Música', 'Coordinador', 
-  'Peluquería', 'Maquillaje', 'Transporte', 'Otro'
+const getSupplierTypes = (t) => [
+  t('postBoda.supplierTypes.photographer'), 
+  t('postBoda.supplierTypes.videographer'), 
+  t('postBoda.supplierTypes.ceremonyVenue'), 
+  t('postBoda.supplierTypes.receptionVenue'),
+  t('postBoda.supplierTypes.catering'), 
+  t('postBoda.supplierTypes.florist'), 
+  t('postBoda.supplierTypes.djMusic'), 
+  t('postBoda.supplierTypes.coordinator'),
+  t('postBoda.supplierTypes.hairdresser'), 
+  t('postBoda.supplierTypes.makeup'), 
+  t('postBoda.supplierTypes.transport'), 
+  t('postBoda.supplierTypes.other')
 ];
 
 const AgradecimientoCard = ({ agradecimiento, onEdit, onDelete, onToggleEnviado }) => {
+  const { t } = useTranslation('pages');
+  const CATEGORIAS_AGRADECIMIENTOS = getCategoriesThankYou(t);
   const categoria = CATEGORIAS_AGRADECIMIENTOS.find(c => c.id === agradecimiento.categoria) || CATEGORIAS_AGRADECIMIENTOS[0];
   
   return (
@@ -145,7 +157,7 @@ const RecuerdoCard = ({ recuerdo, onEdit, onDelete }) => {
           className="text-sm text-blue-600 hover:underline flex items-center gap-1"
         >
           <Download className="w-3 h-3" />
-          Ver/Descargar
+          {t('postBoda.viewDownload')}
         </a>
       )}
 
@@ -204,9 +216,9 @@ const ValoracionCard = ({ valoracion, onEdit, onDelete }) => {
       {valoracion.recomendaria !== undefined && (
         <div className="mt-2 text-sm">
           {valoracion.recomendaria ? (
-            <span className="text-green-600">✓ Recomendaría</span>
+            <span className="text-green-600">✓ {t('postBoda.wouldRecommend')}</span>
           ) : (
-            <span className="text-red-600">✗ No recomendaría</span>
+            <span className="text-red-600">✗ {t('postBoda.wouldNotRecommend')}</span>
           )}
         </div>
       )}
@@ -284,7 +296,7 @@ const AgradecimientoModal = ({ agradecimiento, onSave, onClose }) => {
                 type="text"
                 value={formData.destinatario}
                 onChange={(e) => setFormData({ ...formData, destinatario: e.target.value })}
-                placeholder="Nombre del destinatario"
+                placeholder={t('postBoda.recipientNamePlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 required
               />
@@ -293,156 +305,24 @@ const AgradecimientoModal = ({ agradecimiento, onSave, onClose }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="email@ejemplo.com"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-sm font-medium text-gray-700">
-                  Mensaje
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, mensaje: mensajesPlantilla[formData.categoria] })}
-                  className="text-xs text-blue-600 hover:text-blue-700"
-                >
-                  Usar plantilla
-                </button>
-              </div>
-              <textarea
-                value={formData.mensaje}
-                onChange={(e) => setFormData({ ...formData, mensaje: e.target.value })}
-                placeholder="Escribe tu mensaje de agradecimiento..."
-                rows={6}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-              />
-            </div>
-
-            <div className="flex gap-2 pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                {agradecimiento ? 'Guardar' : 'Crear'}
-              </button>
-            </div>
-          </form>
         </div>
-      </div>
-    </div>
-  );
-};
+      );
+    };
 
-const RecuerdoModal = ({ recuerdo, onSave, onClose }) => {
-  const [formData, setFormData] = useState(
-    recuerdo || {
-      tipo: 'foto',
-      titulo: '',
-      descripcion: '',
-      url: '',
-      fecha: ''
-    }
-  );
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.titulo) {
-      toast.error('El título es obligatorio');
-      return;
-    }
-    onSave(formData);
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-800">
-              {recuerdo ? 'Editar recuerdo' : 'Nuevo recuerdo'}
-            </h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tipo
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {TIPOS_RECUERDO.map((tipo) => (
-                  <button
-                    key={tipo.id}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, tipo: tipo.id })}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      formData.tipo === tipo.id
-                        ? `border-${tipo.color}-500 bg-${tipo.color}-50`
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <span className="text-2xl block mb-1">{tipo.icon}</span>
-                    <span className="text-xs text-gray-700">{tipo.nombre}</span>
-                  </button>
-                ))}
+    const RecuerdoCard = ({ recuerdo, onEdit, onDelete }) => {
+      const tipo = TIPOS_RECUERDO.find(t => t.id === recuerdo.tipo) || TIPOS_RECUERDO[0];
+      
+      return (
+        <div className={`border-2 border-${tipo.color}-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow`}>
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{tipo.icon}</span>
+              <div>
+                <h3 className="font-semibold text-gray-800">{recuerdo.titulo}</h3>
+                <p className="text-xs text-gray-600">{tipo.nombre}</p>
               </div>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Título *
-              </label>
-              <input
-                type="text"
-                value={formData.titulo}
-                onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
-                placeholder="Ej: Fotos ceremonia"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Descripción
-              </label>
-              <textarea
-                value={formData.descripcion}
-                onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-                placeholder="Descripción del recuerdo..."
-                rows={3}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                URL (Drive, Dropbox, etc.)
-              </label>
-              <input
-                type="url"
-                value={formData.url}
-                onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                placeholder="https://..."
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-              />
-            </div>
-
-            <div>
+            <div className="flex items-center gap-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Fecha
               </label>
@@ -516,7 +396,7 @@ const ValoracionModal = ({ valoracion, onSave, onClose }) => {
                 type="text"
                 value={formData.proveedor}
                 onChange={(e) => setFormData({ ...formData, proveedor: e.target.value })}
-                placeholder="Nombre del proveedor"
+                placeholder={t('common.providerNamePlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 required
               />
@@ -570,7 +450,7 @@ const ValoracionModal = ({ valoracion, onSave, onClose }) => {
               <textarea
                 value={formData.comentario}
                 onChange={(e) => setFormData({ ...formData, comentario: e.target.value })}
-                placeholder="Cuéntanos tu experiencia..."
+                placeholder={t('postBoda.tellUsExperiencePlaceholder')}
                 rows={4}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />

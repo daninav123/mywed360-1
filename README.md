@@ -1,8 +1,8 @@
-# MaLove.App – Monorepo (Frontend + Backend + Docs)
+# Planivia – Monorepo (Frontend + Backend + Docs)
 
 ## Propósito del producto
 
-MaLove.App funciona como wedding planner digital. Capturamos el estilo, prioridades y restricciones únicas de cada boda para guiar a las parejas y planners hacia las mejores decisiones en cada etapa. El perfil de la boda alimenta las recomendaciones del checklist, los proveedores sugeridos, el presupuesto y los contenidos generados por IA.  
+Planivia funciona como wedding planner digital. Capturamos el estilo, prioridades y restricciones únicas de cada boda para guiar a las parejas y planners hacia las mejores decisiones en cada etapa. El perfil de la boda alimenta las recomendaciones del checklist, los proveedores sugeridos, el presupuesto y los contenidos generados por IA.  
 Más detalles y playbooks en `docs/personalizacion/README.md`.
 
 Este repositorio contiene el frontend (React + Vite + Tailwind, PWA), el backend (Express) y documentación operativa. Sirve como punto de entrada para desarrollo local, CI/CD y despliegues.

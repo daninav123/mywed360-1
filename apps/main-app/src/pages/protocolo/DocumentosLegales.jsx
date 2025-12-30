@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react';
+import { Download, Plus, X, GitCompare, ListChecks, Sparkles } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -22,6 +22,13 @@ import { formatDate } from '../../utils/formatUtils';
 import { useAuth } from '../../hooks/useAuth';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 import legalCatalog from '../../data/legalRequirementsCatalog.json';
+import legalCatalogExtended from '../../data/legalRequirementsExtended.json';
+import legalRequirementsComplete from '../../data/legalRequirementsComplete.json';
+import LegalTimeline from '../../components/legal/LegalTimeline';
+import LegalStats from '../../components/legal/LegalStats';
+import LegalDisclaimer from '../../components/legal/LegalDisclaimer';
+import ReportIssueButton from '../../components/legal/ReportIssueButton';
+import { generateLegalTasks, createLegalReminders } from '../../utils/legalTasksGenerator';
 
 // Persistencia local de progreso de requisitos por boda
 const LEGAL_LS_KEY = (weddingId) => `legalRequirements_${weddingId}`;
@@ -38,14 +45,31 @@ function saveLegalProgress(weddingId, data) {
   } catch {}
 }
 
-const COUNTRY_CATALOG = legalCatalog?.countries || {};
+const COUNTRY_CATALOG = {
+  ...(legalCatalog?.countries || {}),
+  ...(legalCatalogExtended?.countries || {}),
+  ...(legalRequirementsComplete?.countries || {})
+};
 const DEFAULT_COUNTRY = COUNTRY_CATALOG.ES
   ? 'ES'
   : Object.keys(COUNTRY_CATALOG)[0] || 'ES';
 const LEGAL_TYPE_OPTIONS = [
-  { key: 'civil', label: 'Civil / Juzgado' },
-  { key: 'religious_catholic', label: 'Iglesia (efectos civiles)' },
+  { key: 'civil', label: 'Civil / Juzgado', icon: '⚖️' },
+  { key: 'religious_catholic', label: 'Católico (efectos civiles)', icon: '⛪' },
+  { key: 'same_sex', label: 'Matrimonio igualitario', icon: '🏳️‍🌈' },
+  { key: 'civil_partnership', label: 'Unión civil / Pareja de hecho', icon: '🤝' },
+  { key: 'religious_other', label: 'Otros religiosos', icon: '🕌' },
 ];
+// Regiones geográficas
+const REGIONS = {
+  europe: { label: 'Europa', countries: ['ES', 'FR', 'DE', 'IT', 'PT', 'BE', 'NL', 'LU', 'AT', 'IE', 'DK', 'SE', 'FI', 'EE', 'LV', 'LT', 'PL', 'CZ', 'SK', 'HU', 'SI', 'HR', 'RO', 'BG', 'GR', 'CY', 'MT', 'GB'] },
+  americas: { label: 'América', countries: ['US', 'CA', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE'] },
+  asia: { label: 'Asia', countries: ['JP', 'CN', 'IN', 'SG', 'TH', 'KR', 'PH', 'MY'] },
+  oceania: { label: 'Oceanía', countries: ['AU', 'NZ'] },
+  africa: { label: 'África', countries: ['ZA', 'EG', 'MA', 'NG', 'KE'] },
+  middle_east: { label: 'Oriente Medio', countries: ['AE', 'QA', 'IL', 'TR', 'SA'] }
+};
+
 const COUNTRY_OPTIONS = Object.entries(COUNTRY_CATALOG)
   .map(([code, info]) => ({ code, name: info?.name || code }))
   .sort((a, b) => a.name.localeCompare(b.name));
@@ -307,6 +331,31 @@ export default function DocumentosLegales() {
   const [legalType, setLegalType] = useState('civil');
   const [legalProgress, setLegalProgress] = useState({});
   const [uploadingReq, setUploadingReq] = useState({}); // { key: boolean }
+  const [searchCountry, setSearchCountry] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState('all');
+  const [generatingTasks, setGeneratingTasks] = useState(false);
+
+  // Países filtrados por búsqueda y región
+  const filteredCountries = useMemo(() => {
+    let filtered = COUNTRY_OPTIONS;
+    
+    // Filtrar por región
+    if (selectedRegion !== 'all') {
+      const regionCountries = REGIONS[selectedRegion]?.countries || [];
+      filtered = filtered.filter(c => regionCountries.includes(c.code));
+    }
+    
+    // Filtrar por búsqueda
+    if (searchCountry.trim()) {
+      const search = searchCountry.toLowerCase();
+      filtered = filtered.filter(c => 
+        c.name.toLowerCase().includes(search) || 
+        c.code.toLowerCase().includes(search)
+      );
+    }
+    
+    return filtered;
+  }, [searchCountry, selectedRegion]);
 
   const progressSyncRef = useRef({
     localLoaded: false,
@@ -541,6 +590,56 @@ export default function DocumentosLegales() {
     return byRegion[templateKey] || [];
   }, [form.region, legalType]);
 
+  // Obtener región del país seleccionado
+  const currentCountryRegion = useMemo(() => {
+    for (const [key, region] of Object.entries(REGIONS)) {
+      if (region.countries.includes(form.region)) {
+        return { key, ...region };
+      }
+    }
+    return null;
+  }, [form.region]);
+
+  // Handler para generar tareas automáticas
+  const handleGenerateTasks = async () => {
+    if (!activeWedding || !activeCountry || !currentUser?.uid) {
+      toast.error('Faltan datos necesarios para generar tareas');
+      return;
+    }
+
+    setGeneratingTasks(true);
+    try {
+      const taskIds = await generateLegalTasks(
+        activeWedding,
+        activeCountry,
+        legalType,
+        form.region,
+        weddingInfo?.weddingDate || weddingInfo?.date,
+        currentUser.uid
+      );
+
+      if (taskIds.length > 0) {
+        await createLegalReminders(activeWedding, taskIds, currentUser.uid);
+        toast.success(`✅ ${taskIds.length} tareas creadas automáticamente en tu lista de tareas`, {
+          autoClose: 5000,
+        });
+        performanceMonitor.logEvent('legal_tasks_auto_generated', {
+          weddingId: activeWedding,
+          countryCode: form.region,
+          legalType,
+          tasksCount: taskIds.length,
+        });
+      } else {
+        toast.info('No se pudieron generar tareas para esta selección');
+      }
+    } catch (error) {
+      console.error('Error generando tareas:', error);
+      toast.error('Error al generar tareas automáticas');
+    } finally {
+      setGeneratingTasks(false);
+    }
+  };
+
   return (
     <PageWrapper title="Documentos">
       {!activeWedding && (
@@ -553,35 +652,96 @@ export default function DocumentosLegales() {
         <>
           {/* Requisitos legales */}
           <Card className="p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-              <h2 className="text-lg font-semibold">Requisitos para registrar la boda</h2>
-              <div className="flex flex-wrap items-center gap-2">
-                <label className="text-sm text-gray-600">Tipo:</label>
-                <div className="inline-flex rounded overflow-hidden border">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Requisitos para registrar la boda</h2>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-800 rounded-lg text-sm font-medium">
+                <span className="text-lg">🌍</span>
+                <span>{Object.keys(COUNTRY_CATALOG).length} países disponibles</span>
+              </div>
+            </div>
+            
+            {/* Disclaimer Legal */}
+            <LegalDisclaimer
+              countryName={activeCountry?.name || form.region}
+              officialUrl={activeCountry?.ceremonyTypes?.[legalType]?.requirements?.[0]?.links?.[0]?.url}
+            />
+            
+            {/* Estadísticas */}
+            <LegalStats
+              progress={legalProgress}
+              totalRequirements={requirementsList.length}
+              countryInfo={activeCountry}
+              legalType={legalType}
+            />
+            
+            {/* Selector de País Mejorado */}
+            <div className="mb-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Búsqueda de país */}
+                <div>
+
+                {/* Filtro por región */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    🌍 Región
+                  </label>
+                  <select
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                    value={selectedRegion}
+                    onChange={(e) => setSelectedRegion(e.target.value)}
+                  >
+                    <option value="all">Todas las regiones</option>
+                    {Object.entries(REGIONS).map(([key, region]) => (
+                      <option key={key} value={key}>
+                        {region.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Selector de país */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    🗺️ País {currentCountryRegion && `(${currentCountryRegion.label})`}
+                  </label>
+                  <select
+                    className="w-full border rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500"
+                    value={form.region}
+                    onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))}
+                  >
+                    {filteredCountries.map((option) => (
+                      <option key={option.code} value={option.code}>
+                        {option.name}
+                      </option>
+                    ))}
+                  </select>
+                  {filteredCountries.length === 0 && (
+                    <p className="text-xs text-red-600 mt-1">No hay países con ese criterio</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Selector de tipo de matrimonio */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  💍 Tipo de matrimonio
+                </label>
+                <div className="flex flex-wrap gap-2">
                   {availableLegalTypes.map((option) => (
                     <button
                       key={option.key}
                       className={`${
-                        legalType === option.key ? 'bg-blue-600 text-white' : 'bg-white'
-                      } px-3 py-1 text-sm transition-colors`}
+                        legalType === option.key
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
+                      } px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all flex items-center gap-2`}
                       onClick={() => setLegalType(option.key)}
                     >
-                      {option.label}
+                      <span>{option.icon}</span>
+                      <span>{option.label}</span>
                     </button>
                   ))}
                 </div>
-                <label className="text-sm text-gray-600 ml-2">País:</label>
-                <select
-                  className="border rounded px-2 py-1 text-sm"
-                  value={form.region}
-                  onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))}
-                >
-                  {COUNTRY_OPTIONS.map((option) => (
-                    <option key={option.code} value={option.code}>
-                      {option.name}
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-3">
@@ -855,7 +1015,15 @@ export default function DocumentosLegales() {
               formattedLeadTime ||
               countryNotes.length > 0 ||
               sourceLinks.length > 0) && (
-              <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-2 text-sm text-slate-700">
+              <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-3 text-sm text-slate-700">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-300">
+                  <h3 className="font-semibold text-slate-900">Información del país</h3>
+                  <ReportIssueButton
+                    countryCode={form.region}
+                    legalType={legalType}
+                    requirementId="country-info"
+                  />
+                </div>
                 {requirementSummary.authorities.length > 0 && (
                   <div>
                     <span className="font-semibold">Autoridades clave:</span>{' '}
@@ -896,6 +1064,58 @@ export default function DocumentosLegales() {
                 )}
               </div>
             )}
+
+            {/* Timeline Visual y Calculadora de Tiempos */}
+            <div className="mt-6">
+              <LegalTimeline
+                steps={activeCountry?.ceremonyTypes?.[legalType]?.requirements?.[0]?.steps || []}
+                leadTimeDays={requirementSummary.leadTimeDays}
+                weddingDate={weddingInfo?.weddingDate || weddingInfo?.date}
+                costEstimate={activeCountry?.ceremonyTypes?.[legalType]?.requirements?.[0]?.costEstimate}
+              />
+            </div>
+
+            {/* Generación Automática de Tareas */}
+            {requirementsList.length > 0 && (
+              <div className="mt-6">
+                <div className="rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 p-4">
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="text-purple-600 flex-shrink-0 mt-0.5" size={24} />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-purple-900 mb-1">
+                        ✨ Generación automática de tareas
+                      </h3>
+                      <p className="text-sm text-purple-800 mb-3">
+                        Crea automáticamente todas las tareas necesarias para completar tus trámites legales en {activeCountry?.name}. 
+                        Incluye fechas de vencimiento calculadas según tu fecha de boda y recordatorios automáticos.
+                      </p>
+                      <button
+                        onClick={handleGenerateTasks}
+                        disabled={generatingTasks}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                      >
+                        {generatingTasks ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                            Generando...
+                          </>
+                        ) : (
+                          <>
+                            <ListChecks size={18} />
+                            Generar tareas automáticas
+                          </>
+                        )}
+                      </button>
+                      {!weddingInfo?.weddingDate && !weddingInfo?.date && (
+                        <p className="text-xs text-orange-700 mt-2">
+                          ⚠️ Configura la fecha de tu boda para calcular fechas de vencimiento precisas
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </Card>
 
           {/* Descargables */}
@@ -914,7 +1134,7 @@ export default function DocumentosLegales() {
                 {templatesForSelection.map((tpl) => (
                   <div
                     key={tpl.id}
-                    className="border rounded-lg p-3 flex items-center justify-between bg-white"
+                    placeholder={t('protocol.documents.searchCountryPlaceholder')} className="border rounded-lg p-3 flex items-center justify-between bg-white"
                   >
                     <div>
                       <div className="font-medium">{tpl.title}</div>

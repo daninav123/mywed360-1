@@ -6,7 +6,8 @@ import {
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -28,10 +29,10 @@ import { performanceMonitor } from '../services/PerformanceMonitor';
 import { createWedding } from '../services/WeddingService';
 import { bulkSyncWeddings, syncWeddingWithCRM } from '../services/crmSyncService';
 
-const STATUS_TAB_OPTIONS = [
-  { id: 'active', label: 'Bodas activas' },
-  { id: 'archived', label: 'Bodas archivadas' },
-  { id: 'portfolio', label: 'Resumen multi boda' },
+const getStatusTabOptions = (t) => [
+  { value: 'active', label: t('weddings.tabs.active') },
+  { value: 'archived', label: t('weddings.tabs.archived') },
+  { value: 'multi', label: t('weddings.tabs.multiSummary') },
 ];
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;

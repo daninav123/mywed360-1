@@ -209,13 +209,14 @@ export default function SupplierPublicPage() {
                     {filteredPortfolio.map((photo, index) => (
                       <div
                         key={photo.id}
+                        placeholder={t('supplier.publicPage.namePlaceholder')}
                         className="relative aspect-square group cursor-pointer overflow-hidden rounded-lg"
                         onClick={() => openLightbox(index)}
                       >
                         <img
                           src={photo.thumbnails?.medium || photo.original}
                           alt={photo.title || ''}
-                          className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                          className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <div className="text-white text-center">
@@ -234,23 +235,23 @@ export default function SupplierPublicPage() {
               {/* Botones de Acción */}
               <div className="bg-surface border border-border rounded-lg p-6 sticky top-4 space-y-4">
                 <button className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-[var(--color-primary-90)] transition-colors">
-                  Solicitar Presupuesto
+                  {t('supplier.publicPage.messagePlaceholder')}
                 </button>
 
                 <div className="flex gap-2">
                   <button className="flex-1 flex items-center justify-center gap-2 py-2 border border-border rounded-lg hover:bg-surface-muted transition-colors">
                     <Heart className="h-5 w-5" />
-                    Guardar
+                    {t('supplier.publicPage.savePlaceholder')}
                   </button>
                   <button className="flex-1 flex items-center justify-center gap-2 py-2 border border-border rounded-lg hover:bg-surface-muted transition-colors">
                     <Share2 className="h-5 w-5" />
-                    Compartir
+                    {t('supplier.publicPage.sharePlaceholder')}
                   </button>
                 </div>
 
                 {/* Información de Contacto */}
                 <div className="pt-4 border-t border-border space-y-3">
-                  <h3 className="font-semibold text-foreground mb-3">Contacto</h3>
+                  <h3 className="font-semibold text-foreground mb-3">{t('supplier.publicPage.contactTitle')}</h3>
 
                   {supplier.location?.city && (
                     <div className="flex items-start gap-3">

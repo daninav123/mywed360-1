@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import { Upload, File, X, Download, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '../ui';
-import { uploadAudioFile, deleteAudioFile, getAudioFileInfo, downloadAudioFile } from '../../services/audioUploadService';
+import {
+  uploadAudioFile,
+  deleteAudioFile,
+  getAudioFileInfo,
+  downloadAudioFile,
+} from '../../services/audioUploadService';
 
 /**
  * Componente para subir archivos de audio para canciones especiales
  */
-const AudioUploader = ({ 
-  audioFile, 
-  onUploadComplete, 
-  onDelete,
-  weddingId,
-  momentId,
-  songId 
-}) => {
+const AudioUploader = ({ audioFile, onUploadComplete, onDelete, weddingId, momentId, songId }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
@@ -52,7 +50,7 @@ const AudioUploader = ({
 
   const handleDelete = async () => {
     if (!audioFile?.storagePath) return;
-    
+
     if (!window.confirm('¿Estás seguro de eliminar este archivo?')) {
       return;
     }
@@ -99,10 +97,7 @@ const AudioUploader = ({
             className="hidden"
             id="audio-upload"
           />
-          <label
-            htmlFor="audio-upload"
-            className="cursor-pointer flex flex-col items-center gap-3"
-          >
+          <label htmlFor="audio-upload" className="cursor-pointer flex flex-col items-center gap-3">
             {uploading ? (
               <>
                 <Loader2 className="text-purple-600 animate-spin" size={40} />
@@ -123,9 +118,7 @@ const AudioUploader = ({
                   <p className="text-sm font-medium text-gray-700">
                     Click para subir archivo de audio
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    MP3, WAV, OGG, AAC, FLAC (máx. 50MB)
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">MP3, WAV, OGG, AAC, FLAC (máx. 50MB)</p>
                 </div>
               </>
             )}
@@ -138,7 +131,7 @@ const AudioUploader = ({
             <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
               <CheckCircle className="text-green-600" size={20} />
             </div>
-            
+
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <File className="text-green-600 flex-shrink-0" size={16} />
@@ -146,11 +139,12 @@ const AudioUploader = ({
                   {audioInfo?.name || 'Archivo de audio'}
                 </p>
               </div>
-              
+
               <p className="text-xs text-gray-600 mt-1">
-                {audioInfo?.size} • Subido {audioInfo?.uploadedAt ? new Date(audioInfo.uploadedAt).toLocaleDateString() : ''}
+                {audioInfo?.size} • Subido{' '}
+                {audioInfo?.uploadedAt ? new Date(audioInfo.uploadedAt).toLocaleDateString() : ''}
               </p>
-              
+
               <div className="flex gap-2 mt-3">
                 <Button
                   size="sm"
@@ -160,7 +154,7 @@ const AudioUploader = ({
                   <Download size={14} className="mr-1" />
                   Descargar
                 </Button>
-                
+
                 <Button
                   size="sm"
                   variant="outline"
@@ -190,7 +184,8 @@ const AudioUploader = ({
 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <p className="text-xs text-blue-900">
-          <strong>💡 Consejo:</strong> Sube aquí el archivo de audio si tienes la canción especial. El DJ podrá descargarla directamente desde el documento que generes.
+          <strong>💡 Consejo:</strong> Sube aquí el archivo de audio si tienes la canción especial.
+          El DJ podrá descargarla directamente desde el documento que generes.
         </p>
       </div>
     </div>

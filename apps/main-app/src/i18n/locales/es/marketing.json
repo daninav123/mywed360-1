@@ -172,12 +172,7 @@
         ],
         "trust": {
           "title": "Confían en MaLove.App",
-          "brands": [
-            "Lumiere Events",
-            "Novia Atelier",
-            "Festiva Group",
-            "Urban Weddings"
-          ],
+          "brands": ["Lumiere Events", "Novia Atelier", "Festiva Group", "Urban Weddings"],
           "note": "Más de 200 organizadores activos en Europa y LATAM utilizan MaLove.App para estandarizar procesos y ofrecer experiencias memorables."
         }
       },
@@ -249,14 +244,7 @@
           "badge": "MaLove.App Workspace",
           "title": "Un ecosistema conectado",
           "description": "Modulos sincronizados, roles personalizados y permisos granulares para colaborar sin perder contexto.",
-          "tags": [
-            "Panel",
-            "Invitados",
-            "Finanzas",
-            "Comunicacion",
-            "Diseno",
-            "Automatizaciones"
-          ]
+          "tags": ["Panel", "Invitados", "Finanzas", "Comunicacion", "Diseno", "Automatizaciones"]
         }
       },
       "modules": {

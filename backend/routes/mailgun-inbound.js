@@ -179,11 +179,11 @@ router.post('/', upload.any(), async (req, res) => {
         // Lista de emails a probar (incluyendo versión sin mg. si aplica)
         const emailsToTry = [rcpt];
         
-        // Si el email es @mg.malove.app, también probar con @malove.app
-        if (rcpt.endsWith('@mg.malove.app')) {
-          const withoutMg = rcpt.replace('@mg.malove.app', '@malove.app');
+        // Si el email es @mg.planivia.net, también probar con @planivia.net
+        if (rcpt.endsWith('@mg.planivia.net')) {
+          const withoutMg = rcpt.replace('@mg.planivia.net', '@planivia.net');
           emailsToTry.push(withoutMg);
-          console.log(`📧 [Mailgun] Email detectado en @mg.malove.app, también probaré: ${withoutMg}`);
+          console.log(`📧 [Mailgun] Email detectado en @mg.planivia.net, también probaré: ${withoutMg}`);
         }
         
         let userSnap = { empty: true };

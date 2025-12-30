@@ -6,7 +6,14 @@ import {
   Camera,
   Video,
   Music,
+  Music2,
+  Music3,
+  Music4,
   Disc,
+  Radio,
+  Mic2,
+  Volume2,
+  Lightbulb,
   UtensilsCrossed,
   Home,
   Flower2,
@@ -28,8 +35,13 @@ import {
 export const CATEGORY_ICONS = {
   fotografia: Camera,
   video: Video,
-  musica: Music,
+  // Nuevas categorías de música granulares
+  'musica-ceremonia': Music2,
+  'musica-cocktail': Music3,
+  'musica-fiesta': Music4,
   dj: Disc,
+  'sonido-iluminacion': Radio,
+  // Resto de categorías
   catering: UtensilsCrossed,
   lugares: Home,
   restaurantes: UtensilsCrossed,
@@ -49,8 +61,13 @@ export const CATEGORY_ICONS = {
 export const CATEGORY_EMOJIS = {
   fotografia: '📸',
   video: '🎥',
-  musica: '🎵',
+  // Nuevas categorías de música granulares
+  'musica-ceremonia': '🎻',
+  'musica-cocktail': '🎹',
+  'musica-fiesta': '🎸',
   dj: '🎧',
+  'sonido-iluminacion': '🔊',
+  // Resto de categorías
   catering: '🍽️',
   lugares: '🏛️',
   restaurantes: '🍴',
@@ -80,17 +97,35 @@ export const CATEGORY_COLORS = {
     border: 'border-purple-200',
     badge: 'bg-purple-100 text-purple-800',
   },
-  musica: {
+  'musica-ceremonia': {
     bg: 'bg-pink-50',
     text: 'text-pink-700',
     border: 'border-pink-200',
     badge: 'bg-pink-100 text-pink-800',
+  },
+  'musica-cocktail': {
+    bg: 'bg-fuchsia-50',
+    text: 'text-fuchsia-700',
+    border: 'border-fuchsia-200',
+    badge: 'bg-fuchsia-100 text-fuchsia-800',
+  },
+  'musica-fiesta': {
+    bg: 'bg-rose-50',
+    text: 'text-rose-700',
+    border: 'border-rose-200',
+    badge: 'bg-rose-100 text-rose-800',
   },
   dj: {
     bg: 'bg-indigo-50',
     text: 'text-indigo-700',
     border: 'border-indigo-200',
     badge: 'bg-indigo-100 text-indigo-800',
+  },
+  'sonido-iluminacion': {
+    bg: 'bg-slate-50',
+    text: 'text-slate-700',
+    border: 'border-slate-200',
+    badge: 'bg-slate-100 text-slate-800',
   },
   catering: {
     bg: 'bg-orange-50',

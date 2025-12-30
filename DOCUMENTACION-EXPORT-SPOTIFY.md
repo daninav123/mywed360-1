@@ -14,12 +14,14 @@
 ## 🎯 Características Principales
 
 ### 1. Canciones de Spotify (Normal)
+
 - ✅ Se exportan directamente a playlist de Spotify
 - ✅ Reproducción instantánea con Spotify Web Player
 - ✅ Preview de 30 segundos sin login
 - ✅ Track completo con Spotify Premium
 
 ### 2. Canciones Especiales/Custom
+
 - 🔥 **NO se exportan a Spotify** (no están disponibles)
 - ✅ Se incluyen en PDF con instrucciones detalladas para el DJ
 - ✅ Tipos soportados:
@@ -47,6 +49,7 @@
 ## 📦 Estructura de Archivos
 
 ### Servicios
+
 ```
 src/services/
 ├── spotifyExportService.js    # Exportación a Spotify (solo disponibles)
@@ -54,6 +57,7 @@ src/services/
 ```
 
 ### Componentes
+
 ```
 src/components/momentos/
 ├── ExportActionsBar.jsx        # Barra con botones de exportación y estadísticas
@@ -62,6 +66,7 @@ src/components/momentos/
 ```
 
 ### Hook Actualizado
+
 ```
 src/hooks/
 └── useSpecialMoments.js        # + updateSongSpecialStatus() + getExportStats()
@@ -74,6 +79,7 @@ src/hooks/
 ### Para el Usuario (Novios)
 
 #### 1. Seleccionar Canciones Normales
+
 ```
 1. Expandir momento ("Entrada Novia")
 2. Click en "Buscar canción"
@@ -82,13 +88,14 @@ src/hooks/
 ```
 
 #### 2. Marcar Canción como Especial
+
 ```
 1. Expandir momento con canción seleccionada
 2. Click en "Marcar especial" (botón naranja)
 3. Activar checkbox "Esta es una canción especial"
 4. Seleccionar tipo (Remix, Edit, etc.)
 5. Escribir instrucciones DETALLADAS para el DJ:
-   Ejemplo: "Buscar el remix de Avicii de 2019, versión extendida 
+   Ejemplo: "Buscar el remix de Avicii de 2019, versión extendida
    de 6 minutos. Importante: debe tener intro larga de piano"
 6. Añadir URL de referencia (YouTube/SoundCloud)
 7. Guardar
@@ -97,6 +104,7 @@ src/hooks/
 #### 3. Exportar para el DJ
 
 **Opción A: Playlist de Spotify** (solo canciones normales)
+
 ```
 1. Click en "Exportar a Spotify"
 2. Se crea/abre playlist con canciones disponibles
@@ -104,6 +112,7 @@ src/hooks/
 ```
 
 **Opción B: PDF Completo para DJ** (recomendado)
+
 ```
 1. Click en "PDF para DJ (Completo)"
 2. Se genera PDF profesional con:
@@ -118,6 +127,7 @@ src/hooks/
 ```
 
 **Opción C: Lista Simple** (.txt)
+
 ```
 1. Click en "Lista Simple (.txt)"
 2. Descarga archivo de texto con todas las canciones
@@ -127,11 +137,13 @@ src/hooks/
 ### Para el DJ
 
 #### Canciones de Spotify
+
 - Acceder a la playlist compartida
 - Reproducir directamente desde Spotify
 - No requiere búsqueda manual
 
 #### Canciones Especiales (marcadas en PDF)
+
 1. Identificar canciones marcadas en ROJO
 2. Leer instrucciones específicas
 3. Reproducir URL de referencia para escuchar versión exacta
@@ -152,7 +164,7 @@ const handleSaveSpecialSong = (specialData) => {
     specialType: 'remix',
     djInstructions: 'Buscar remix de Avicii 2019, versión 6 min',
     referenceUrl: 'https://youtube.com/watch?v=abc',
-    duration: 360
+    duration: 360,
   });
 };
 ```
@@ -164,7 +176,7 @@ const result = await exportToSpotifyPlaylist({
   playlistName: 'Boda María y Juan',
   moments: allMoments,
   getSelectedSong,
-  blockName: 'Completa'
+  blockName: 'Completa',
 });
 
 console.log(result);
@@ -187,8 +199,8 @@ await generateDJDocument({
   weddingInfo: {
     coupleName: 'María y Juan',
     weddingDate: '2026-06-15',
-    contact: '+34 600 000 000'
-  }
+    contact: '+34 600 000 000',
+  },
 });
 // Se descarga: DJ-Playlist-Maria-y-Juan.pdf
 ```
@@ -221,22 +233,20 @@ Genera el PDF para DJ con todas las instrucciones.
 ### Badge de Canción Especial
 
 ```jsx
-{selectedSong.isSpecial && (
-  <div className="bg-gradient-to-r from-orange-100 to-red-100 border border-orange-300">
-    🔥 ESPECIAL - Remix
-    Instrucciones: Buscar versión de 2021...
-  </div>
-)}
+{
+  selectedSong.isSpecial && (
+    <div className="bg-gradient-to-r from-orange-100 to-red-100 border border-orange-300">
+      🔥 ESPECIAL - Remix Instrucciones: Buscar versión de 2021...
+    </div>
+  );
+}
 ```
 
 ### Botón de Configuración
 
 ```jsx
-<Button 
-  className={selectedSong.isSpecial 
-    ? 'border-orange-400 text-orange-700' 
-    : 'border-gray-300'
-  }
+<Button
+  className={selectedSong.isSpecial ? 'border-orange-400 text-orange-700' : 'border-gray-300'}
 >
   <Settings size={14} />
   {selectedSong.isSpecial ? 'Editar especial' : 'Marcar especial'}
@@ -248,6 +258,7 @@ Genera el PDF para DJ con todas las instrucciones.
 ## 🧪 Tests E2E
 
 ### Suite 1: Exportación (`momentos-export-spotify.cy.js`)
+
 - ✅ Barra de exportación visible
 - ✅ Estadísticas mostradas correctamente
 - ✅ Botones de exportación funcionales
@@ -255,6 +266,7 @@ Genera el PDF para DJ con todas las instrucciones.
 - ✅ Progreso por bloque
 
 ### Suite 2: Canciones Especiales (`momentos-special-songs.cy.js`)
+
 - ✅ Modal de configuración
 - ✅ Marcar/desmarcar como especial
 - ✅ Campos requeridos (tipo, instrucciones)
@@ -267,16 +279,18 @@ Genera el PDF para DJ con todas las instrucciones.
 ## 🔒 Validaciones
 
 ### Al Exportar a Spotify
+
 ```javascript
 if (spotifySongs.length === 0) {
   return {
     success: false,
-    error: 'No hay canciones de Spotify para exportar'
+    error: 'No hay canciones de Spotify para exportar',
   };
 }
 ```
 
 ### Canciones Especiales
+
 ```javascript
 // Campos requeridos si isSpecial = true
 - specialType: required
@@ -289,6 +303,7 @@ if (spotifySongs.length === 0) {
 ## 📱 Integración Futura con Spotify API
 
 ### OAuth Flow (Pendiente)
+
 ```javascript
 // 1. Autenticación
 initiateSpotifyAuth();
@@ -296,20 +311,20 @@ initiateSpotifyAuth();
 // 2. Crear playlist
 const playlist = await fetch('https://api.spotify.com/v1/users/{user_id}/playlists', {
   method: 'POST',
-  headers: { 'Authorization': `Bearer ${token}` },
+  headers: { Authorization: `Bearer ${token}` },
   body: JSON.stringify({
     name: 'Boda María y Juan',
     description: 'Creada desde MaLoveApp',
-    public: false
-  })
+    public: false,
+  }),
 });
 
 // 3. Añadir tracks
 await fetch(`https://api.spotify.com/v1/playlists/${playlist.id}/tracks`, {
   method: 'POST',
   body: JSON.stringify({
-    uris: spotifyTrackURIs
-  })
+    uris: spotifyTrackURIs,
+  }),
 });
 ```
 
@@ -318,28 +333,31 @@ await fetch(`https://api.spotify.com/v1/playlists/${playlist.id}/tracks`, {
 ## 🎯 Casos de Uso Reales
 
 ### Caso 1: Boda con Remix Específico
+
 ```
 Momento: Primer Baile
 Canción: "Perfect" - Ed Sheeran
 Especial: ✅ Remix
 Tipo: Remix
-Instrucciones: "Versión remix de Tiësto 2021, 4:30 min. 
+Instrucciones: "Versión remix de Tiësto 2021, 4:30 min.
                IMPORTANTE: No la versión radio edit de 3 min"
 Referencia: https://youtube.com/watch?v=xyz
 ```
 
 ### Caso 2: Entrada con Mashup
+
 ```
 Momento: Entrada Novios
 Canción: "Here Comes The Sun / Signed, Sealed, Delivered"
 Especial: ✅ Mashup
 Tipo: Mashup
-Instrucciones: "Mashup custom de DJ Earworm 2020. 
+Instrucciones: "Mashup custom de DJ Earworm 2020.
                Transición debe ser suave a los 2:15"
 Referencia: https://soundcloud.com/dj-earworm/mashup-wedding
 ```
 
 ### Caso 3: Edit Personalizado
+
 ```
 Momento: Último tema
 Canción: "Don't Stop Believin'" - Journey
@@ -354,6 +372,7 @@ Instrucciones: "Empezar directamente en el coro (1:20),
 ## 📋 Checklist de Implementación
 
 ### Completado ✅
+
 - [x] Extender modelo de datos con campos especiales
 - [x] Servicio de exportación a Spotify
 - [x] Servicio de generación de PDF
@@ -366,6 +385,7 @@ Instrucciones: "Empezar directamente en el coro (1:20),
 - [x] Documentación completa
 
 ### Pendiente (Opcional) 🔜
+
 - [ ] OAuth completo con Spotify API
 - [ ] Preview de playlist antes de exportar
 - [ ] Biblioteca de canciones especiales populares
@@ -380,11 +400,13 @@ Instrucciones: "Empezar directamente en el coro (1:20),
 **Problema Solucionado**: Canciones especiales que no están en Spotify
 
 **Solución**: Sistema híbrido inteligente que:
+
 1. Exporta canciones normales a Spotify ✅
 2. Genera PDF profesional con canciones especiales 🔥
 3. Proporciona instrucciones detalladas al DJ 📋
 
 **Resultado**: El DJ tiene:
+
 - Playlist de Spotify lista para usar
 - Documento completo con todas las canciones especiales
 - Instrucciones específicas por canción

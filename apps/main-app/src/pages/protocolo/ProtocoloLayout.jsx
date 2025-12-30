@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import LanguageSelector from '../../components/ui/LanguageSelector';
 

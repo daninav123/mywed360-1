@@ -119,7 +119,16 @@ const BaseModal = ({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                className="p-1 rounded-md transition-colors"
+                style={{ color: 'var(--color-text-secondary)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-yellow)';
+                  e.currentTarget.style.color = 'var(--color-text)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                }}
                 aria-label={t('app.close')}
               >
                 <X size={20} />
@@ -141,7 +150,13 @@ const BaseModal = ({
 
         {/* Pie del modal */}
         {footer && (
-          <div className="p-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">{footer}</div>
+          <div 
+            className="p-4 border-t flex-shrink-0"
+            style={{
+              borderColor: 'var(--color-border-soft)',
+              backgroundColor: 'var(--color-yellow)',
+            }}
+          >{footer}</div>
         )}
       </div>
     </div>

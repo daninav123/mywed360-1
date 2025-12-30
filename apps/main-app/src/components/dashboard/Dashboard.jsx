@@ -60,7 +60,7 @@ export function Dashboard() {
   }, []);
 
   return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 p-6 md:p-8 max-w-7xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -68,8 +68,13 @@ export function Dashboard() {
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4"
       >
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Panel de Control</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 
+            className="text-2xl md:text-3xl font-bold"
+            style={{ color: 'var(--color-text)', fontFamily: "'Playfair Display', serif" }}
+          >
+            Panel de Control
+          </h1>
+          <p className="mt-2 text-base" style={{ color: 'var(--color-text-secondary)' }}>
             {isEditing
               ? 'Arrastra y suelta para reorganizar los widgets'
               : 'Vista general de tu boda'}
@@ -77,11 +82,22 @@ export function Dashboard() {
         </div>
         <button
           onClick={toggleEditing}
-          className={`px-4 py-2 rounded-md transition-all flex items-center gap-2 ${
-            isEditing
-              ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-              : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm'
-          }`}
+          className="px-5 py-2.5 transition-all flex items-center gap-2 font-medium text-sm"
+          style={{
+            backgroundColor: isEditing ? 'var(--color-lavender)' : 'var(--color-surface)',
+            color: isEditing ? 'var(--color-primary)' : 'var(--color-text)',
+            border: `1px solid ${isEditing ? 'var(--color-primary)' : 'var(--color-border)'}`,
+            borderRadius: 'var(--radius-md)',
+            boxShadow: isEditing ? '0 2px 8px rgba(94, 187, 255, 0.15)' : '0 1px 3px rgba(0,0,0,0.05)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.boxShadow = isEditing ? '0 4px 12px rgba(94, 187, 255, 0.2)' : '0 2px 6px rgba(0,0,0,0.08)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = isEditing ? '0 2px 8px rgba(94, 187, 255, 0.15)' : '0 1px 3px rgba(0,0,0,0.05)';
+          }}
         >
           {isEditing ? (
             <>
@@ -172,13 +188,15 @@ export function Dashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-16 text-center text-gray-500"
+          className="mt-16 text-center"
+          style={{ color: 'var(--color-text-secondary)' }}
         >
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="mx-auto h-12 w-12"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            style={{ color: 'var(--color-muted)' }}
           >
             <path
               strokeLinecap="round"
@@ -187,13 +205,30 @@ export function Dashboard() {
               d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
             />
           </svg>
-          <h3 className="mt-2 text-lg font-medium text-gray-700">No hay widgets en tu panel</h3>
-          <p className="mt-1">
+          <h3 className="mt-4 text-lg font-medium" style={{ color: 'var(--color-text)' }}>
+            No hay widgets en tu panel
+          </h3>
+          <p className="mt-2" style={{ color: 'var(--color-text-secondary)' }}>
             Haz clic en &quot;Personalizar&quot; para agregar widgets a tu panel de control.
           </p>
           <button
             onClick={startEditing}
-            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="mt-6 inline-flex items-center px-5 py-2.5 text-sm font-medium"
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-on-primary)',
+              border: 'none',
+              borderRadius: 'var(--radius-md)',
+              boxShadow: '0 2px 8px rgba(94, 187, 255, 0.25)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(94, 187, 255, 0.35)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(94, 187, 255, 0.25)';
+            }}
           >
             <svg
               className="-ml-1 mr-2 h-5 w-5"

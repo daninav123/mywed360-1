@@ -229,6 +229,36 @@
                 </div>
             </div>
 
+            <!-- Requisitos específicos desde Info Boda -->
+            {{#if categoryRequirements.hasRequirements}}
+            <div class="section">
+                <div class="section-title">
+                    <span>⭐</span>
+                    <span>Requisitos Específicos del Cliente</span>
+                </div>
+                <div class="service-list">
+                    {{#each categoryRequirements.customOptions}}
+                    <div class="service-item">
+                        <span class="service-icon">✓</span>
+                        <span><strong>{{this}}</strong></span>
+                    </div>
+                    {{/each}}
+                    {{#each categoryRequirements.specs}}
+                    <div class="service-item">
+                        <span class="service-icon">✓</span>
+                        <span><strong>{{this}}</strong></span>
+                    </div>
+                    {{/each}}
+                    {{#if categoryRequirements.notes}}
+                    <div class="service-item" style="border-bottom: none;">
+                        <span class="service-icon">📝</span>
+                        <span><strong>Notas adicionales:</strong> {{categoryRequirements.notes}}</span>
+                    </div>
+                    {{/if}}
+                </div>
+            </div>
+            {{/if}}
+
             <!-- Mensaje del cliente -->
             {{#if customMessage}}
             <div class="section">

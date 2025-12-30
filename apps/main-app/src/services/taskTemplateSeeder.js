@@ -3,6 +3,8 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
+  deleteDoc,
   serverTimestamp,
   setDoc,
 } from 'firebase/firestore';
@@ -198,6 +200,8 @@ export async function seedWeddingTasksFromTemplate({
   projectEnd,
   skipIfSeeded = true,
   forceRefresh = false,
+  customTemplate = null,
+  clearPrevious = false,
 } = {}) {
   if (!db || !weddingId) {
     return { seeded: false, reason: 'missing_context' };
@@ -212,7 +216,25 @@ export async function seedWeddingTasksFromTemplate({
     }
   }
 
-  const template = await fetchPublishedTaskTemplate({ forceRefresh });
+  // Si clearPrevious = true, eliminar todas las tareas anteriores
+  if (clearPrevious) {
+    console.log('[taskTemplateSeeder] 🗑️ Eliminando tareas previas antes de regenerar...');
+    const tasksRef = collection(db, 'weddings', weddingId, 'tasks');
+    const tasksSnapshot = await getDocs(tasksRef);
+    
+    const deletePromises = [];
+    tasksSnapshot.forEach((taskDoc) => {
+      // No eliminar el documento _seed_meta
+      if (taskDoc.id !== '_seed_meta') {
+        deletePromises.push(deleteDoc(taskDoc.ref));
+      }
+    });
+    
+    await Promise.all(deletePromises);
+    console.log('[taskTemplateSeeder] ✅ Eliminadas', deletePromises.length, 'tareas anteriores');
+  }
+
+  const template = customTemplate || await fetchPublishedTaskTemplate({ forceRefresh });
   const blocks = Array.isArray(template?.blocks) ? template.blocks : [];
   if (!blocks.length) {
     return { seeded: false, reason: 'template_empty' };

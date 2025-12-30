@@ -62,10 +62,17 @@ import { useWedding } from '../../context/WeddingContext';
 import useTheme from '../../hooks/useTheme';
 import { post as apiPost } from '../../services/apiClient';
 import useTranslations from '../../hooks/useTranslations';
+import { useMobileViewport } from '../../hooks/useMobileViewport';
+
+// Modo móvil
+import SeatingMobile from './SeatingMobile';
 
 export default function SeatingPlanModern() {
   const { t } = useTranslations();
   const { activeWedding } = useWedding();
+  
+  // Detectar viewport móvil (≤1024px)
+  const isMobile = useMobileViewport(1024);
 
   // Hook principal de seating
   const {
@@ -182,6 +189,37 @@ export default function SeatingPlanModern() {
     updateSessionData: () => {},
   };
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
+
+  // Si es móvil, renderizar interfaz móvil optimizada
+  if (isMobile) {
+    return (
+      <SeatingMobile
+        tables={tables || []}
+        guests={guests || []}
+        onAssignGuest={(guestId, tableId) => moveGuest(guestId, tableId)}
+        onUpdateTable={(tableId, updates) => {
+          // Implementar actualización de mesa
+          console.log('Update table:', tableId, updates);
+        }}
+        onAddTable={addTable}
+        onAddGuest={() => {
+          // Abrir modal de agregar invitado
+          setGuestDrawerOpen(true);
+        }}
+        onExport={() => setExportWizardOpen(true)}
+        onImport={() => {
+          // Implementar importación
+          console.log('Import');
+        }}
+        onUndo={undo}
+        onRedo={redo}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        collaborativeEditors={{}} // TODO: Integrar colaboración en tiempo real
+        currentUser={activeWedding?.ownerIds?.[0] || 'user'}
+      />
+    );
+  }
 
   // Calculate statistics
   const stats = useMemo(() => {

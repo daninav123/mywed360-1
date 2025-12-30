@@ -3,7 +3,7 @@ import { formatDate } from '../utils/formatUtils';
 
 import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useAuth } from './useAuth';
-import EmailService from '../services/emailService';
+import * as EmailService from '../services/emailService';
 import { createTrackingRecord } from '../services/EmailTrackingService';
 import { addTagToEmail } from '../services/tagService';
 

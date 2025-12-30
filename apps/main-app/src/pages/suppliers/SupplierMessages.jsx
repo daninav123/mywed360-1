@@ -198,7 +198,7 @@ export default function SupplierMessages() {
                 />
                 <input
                   type="text"
-                  placeholder="Buscar conversación..."
+                  placeholder={t('supplier.messages.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-3 py-2 rounded-lg text-sm"
@@ -372,7 +372,7 @@ export default function SupplierMessages() {
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Escribe un mensaje..."
+                      placeholder={t('supplier.messages.typePlaceholder')}
                       className="flex-1 px-4 py-2 rounded-lg"
                       style={{
                         border: '1px solid var(--color-border)',

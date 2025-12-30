@@ -1,5 +1,6 @@
 ﻿import { Plus, Trash2 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 import Card from '../../components/ui/Card';
@@ -114,14 +115,14 @@ export default function MenuDiseno() {
             onChange={(e) => setCourse(e.target.value)}
             className="border rounded px-3 py-2"
           >
-            <option value="entradas">Entradas</option>
-            <option value="principales">Plato principal</option>
-            <option value="postres">Postres</option>
-            <option value="bebidas">Bebidas</option>
+            <option value="entradas">{t('design.menu.courses.starters')}</option>
+            <option value="principales">{t('design.menu.courses.main')}</option>
+            <option value="postres">{t('design.menu.courses.desserts')}</option>
+            <option value="bebidas">{t('design.menu.courses.drinks')}</option>
           </select>
           <input
             type="text"
-            placeholder="Nombre del plato"
+            placeholder={t('design.menu.dishNamePlaceholder')}
             value={dish}
             onChange={(e) => setDish(e.target.value)}
             className="flex-grow border rounded px-3 py-2"

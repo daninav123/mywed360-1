@@ -3,6 +3,7 @@
  * FASE 5.6 del WORKFLOW-USUARIO.md
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Calendar, MapPin, Users, Clock, Edit2, Trash2, Plus, Wine, Coffee, PartyPopper, Music } from 'lucide-react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -10,52 +11,52 @@ import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
 
-const EVENT_TYPES = [
+const getEventTypes = (t) => [
   {
     id: 'despedida-soltera',
-    name: 'Despedida de soltera',
+    name: t('relatedEvents.types.bridal'),
     icon: '👰',
     color: 'pink',
     defaultActivities: ['Spa', 'Cena', 'Fiesta', 'Juegos']
   },
   {
     id: 'despedida-soltero',
-    name: 'Despedida de soltero',
+    name: t('relatedEvents.types.bachelor'),
     icon: '🤵',
     color: 'blue',
     defaultActivities: ['Karting', 'Paintball', 'Cena', 'Copa']
   },
   {
     id: 'cena-ensayo',
-    name: 'Cena de ensayo',
+    name: t('relatedEvents.types.rehearsal'),
     icon: '🍽️',
     color: 'purple',
     defaultActivities: ['Ensayo ceremonia', 'Cena íntima', 'Brindis']
   },
   {
     id: 'brunch-post',
-    name: 'Brunch post-boda',
+    name: t('relatedEvents.types.brunch'),
     icon: '☕',
     color: 'orange',
     defaultActivities: ['Desayuno', 'Fotos informales', 'Despedidas']
   },
   {
     id: 'welcome-party',
-    name: 'Welcome party',
+    name: t('relatedEvents.types.welcome'),
     icon: '🎉',
     color: 'green',
     defaultActivities: ['Recepción', 'Cóctel', 'Presentaciones']
   },
   {
     id: 'ceremonia-civil',
-    name: 'Ceremonia civil',
+    name: t('relatedEvents.types.civil'),
     icon: '📋',
     color: 'gray',
     defaultActivities: ['Firma documentos', 'Ceremonia breve', 'Fotos']
   },
   {
     id: 'otro',
-    name: 'Otro evento',
+    name: t('relatedEvents.types.other'),
     icon: '🎊',
     color: 'indigo',
     defaultActivities: []
@@ -63,7 +64,9 @@ const EVENT_TYPES = [
 ];
 
 const EventCard = ({ event, onEdit, onDelete }) => {
-  const typeConfig = EVENT_TYPES.find(t => t.id === event.type) || EVENT_TYPES[6];
+  const { t } = useTranslation('pages');
+  const EVENT_TYPES = getEventTypes(t);
+  const typeConfig = EVENT_TYPES.find(type => type.id === event.type) || EVENT_TYPES[6];
   
   const getColorClasses = (color) => {
     const colors = {
@@ -263,13 +266,13 @@ const EventModal = ({ event, onSave, onClose }) => {
             {formData.type === 'otro' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre del evento
+                  {t('relatedEvents.namePlaceholder')}
                 </label>
                 <input
                   type="text"
                   value={formData.customName}
                   onChange={(e) => setFormData({ ...formData, customName: e.target.value })}
-                  placeholder="Ej: Comida con amigos"
+                  placeholder={t('relatedEvents.namePlaceholder')}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
@@ -405,7 +408,7 @@ const EventModal = ({ event, onSave, onClose }) => {
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Detalles, recordatorios, información especial..."
+                placeholder={t('relatedEvents.notesPlaceholder')}
                 rows={3}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />

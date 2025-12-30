@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import PageWrapper from '../components/PageWrapper';
@@ -7,20 +8,21 @@ import { Card } from '../components/ui/Card';
 import { useAuth } from '../hooks/useAuth';
 import { createWedding } from '../services/WeddingService';
 import {
-  EVENT_TYPE_OPTIONS,
-  EVENT_STYLE_OPTIONS,
-  GUEST_COUNT_OPTIONS,
-  FORMALITY_OPTIONS,
-  CEREMONY_TYPE_OPTIONS,
+  getEventStyleOptions,
+  getGuestCountOptions,
+  getFormalityOptions,
+  getCeremonyTypeOptions,
+  getRelatedEventOptions,
+  getEventTypeOptions,
 } from '../config/eventStyles';
 
-const OPTION_SETS = {
-  eventType: EVENT_TYPE_OPTIONS,
-  style: EVENT_STYLE_OPTIONS,
-  guestCountRange: GUEST_COUNT_OPTIONS,
-  formalityLevel: FORMALITY_OPTIONS,
-  ceremonyType: CEREMONY_TYPE_OPTIONS,
-};
+const getOptionSets = (t) => ({
+  eventType: getEventTypeOptions(t),
+  style: getEventStyleOptions(t),
+  guestCountRange: getGuestCountOptions(t),
+  formalityLevel: getFormalityOptions(t),
+  ceremonyType: getCeremonyTypeOptions(t),
+});
 
 const BASE_STEPS = [
   {
@@ -569,18 +571,6 @@ export default function CreateWeddingAssistant() {
             </div>
           )}
           <div className="flex gap-2">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(event) => setInputValue(event.target.value)}
-              disabled={creating}
-              placeholder="Escribe tu respuesta y pulsa Enter..."
-              className="flex-1 rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
-            />
-            <Button type="submit" disabled={!inputValue.trim() || creating}>
-              Enviar
-            </Button>
-          </div>
           {activeStep.optional && (
             <button
               type="button"

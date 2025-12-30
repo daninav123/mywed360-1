@@ -1,12 +1,13 @@
 import { Plus, Edit2, Download, Filter, CheckCircle, Circle } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import PageWrapper from '../components/PageWrapper';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import '../styles/wedding-warm.css';
 
 export default function Checklist() {
+  const { t } = useTranslation();
   const [view, setView] = useState('list');
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
@@ -186,10 +187,12 @@ export default function Checklist() {
               onChange={(e) => setTypeFilter(e.target.value)}
               className="ww-select"
             >
-              <option value="">Tipo</option>
-              <option value="ensayo">Ensayo</option>
-              <option value="montaje">Montaje</option>
-              <option value="audio/vídeo">Audio/Vídeo</option>
+              <option value="">{t('checklist.allCategories')}</option>
+              <option value="documentation">{t('checklist.categories.documentation')}</option>
+              <option value="ceremony">{t('checklist.categories.ceremony')}</option>
+              <option value="suppliers">{t('checklist.categories.suppliers')}</option>
+              <option value="personal">{t('checklist.categories.personal')}</option>
+              <option value="technical">{t('checklist.categories.technical')}</option>
             </select>
             <select
               value={responsibleFilter}

@@ -457,9 +457,7 @@
   "modulesWithNoTaskForSpecs": [
     {
       "module": "0. Administración Global (estado 2025-10-14)",
-      "specs": [
-        "cypress/e2e/admin/admin-flow.cy.js"
-      ]
+      "specs": ["cypress/e2e/admin/admin-flow.cy.js"]
     },
     {
       "module": "1. Registro y Autenticación (estado 2025-10-08)",
@@ -480,33 +478,23 @@
     },
     {
       "module": "11. Protocolo y Ceremonias (visión global)",
-      "specs": [
-        "cypress/e2e/protocolo/ceremony-tabs-flow.cy.js"
-      ]
+      "specs": ["cypress/e2e/protocolo/ceremony-tabs-flow.cy.js"]
     },
     {
       "module": "11A. Momentos Especiales de la Boda",
-      "specs": [
-        "cypress/e2e/protocolo/protocolo-flows.cy.js"
-      ]
+      "specs": ["cypress/e2e/protocolo/protocolo-flows.cy.js"]
     },
     {
       "module": "11B. Timeline Global del Día B",
-      "specs": [
-        "cypress/e2e/protocolo/protocolo-flows.cy.js"
-      ]
+      "specs": ["cypress/e2e/protocolo/protocolo-flows.cy.js"]
     },
     {
       "module": "11C. Checklist de Última Hora",
-      "specs": [
-        "cypress/e2e/protocolo/protocolo-flows.cy.js"
-      ]
+      "specs": ["cypress/e2e/protocolo/protocolo-flows.cy.js"]
     },
     {
       "module": "11D. Guía de Documentación Legal",
-      "specs": [
-        "cypress/e2e/protocolo/protocolo-flows.cy.js"
-      ]
+      "specs": ["cypress/e2e/protocolo/protocolo-flows.cy.js"]
     },
     {
       "module": "11E. Ayuda a Lecturas y Votos",
@@ -517,21 +505,15 @@
     },
     {
       "module": "12. Notificaciones y Configuración (estado 2025-10-07)",
-      "specs": [
-        "cypress/e2e/notifications/preferences-flow.cy.js"
-      ]
+      "specs": ["cypress/e2e/notifications/preferences-flow.cy.js"]
     },
     {
       "module": "14. Checklist Avanzado (estado 2025-10-07)",
-      "specs": [
-        "cypress/e2e/tasks/all_subtasks_modal.cy.js"
-      ]
+      "specs": ["cypress/e2e/tasks/all_subtasks_modal.cy.js"]
     },
     {
       "module": "15. Contratos y Documentos (estado 2025-10-07)",
-      "specs": [
-        "cypress/e2e/contracts/contracts-flow.cy.js"
-      ]
+      "specs": ["cypress/e2e/contracts/contracts-flow.cy.js"]
     },
     {
       "module": "16. Asistente Virtual y Automatizaciones IA (estado 2025-10-07)",
@@ -559,9 +541,7 @@
     },
     {
       "module": "19. Diseno de Invitaciones (estado 2025-10-07)",
-      "specs": [
-        "cypress/e2e/invitaciones_rsvp.cy.js"
-      ]
+      "specs": ["cypress/e2e/invitaciones_rsvp.cy.js"]
     },
     {
       "module": "2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08",
@@ -618,15 +598,11 @@
     },
     {
       "module": "25. Planes y Suscripciones (estado 2025-10-13)",
-      "specs": [
-        "cypress/e2e/subscriptions/subscription-flow.cy.js"
-      ]
+      "specs": ["cypress/e2e/subscriptions/subscription-flow.cy.js"]
     },
     {
       "module": "27. Momentos (Álbum Compartido) — estado 2025-10-24",
-      "specs": [
-        "cypress/e2e/moments/moments-empty-state.cy.js"
-      ]
+      "specs": ["cypress/e2e/moments/moments-empty-state.cy.js"]
     },
     {
       "module": "28. Dashboard Wedding Planner (estado 2025-10-13)",
@@ -639,9 +615,7 @@
     },
     {
       "module": "29. Upgrade de Rol (Owner → Assistant → Planner) (estado 2025-10-13)",
-      "specs": [
-        "cypress/e2e/account/role-upgrade-flow.cy.js"
-      ]
+      "specs": ["cypress/e2e/account/role-upgrade-flow.cy.js"]
     },
     {
       "module": "2B. Asistente Conversacional para Crear Bodas/Eventos · estado 2025-10-11",
@@ -654,9 +628,7 @@
     },
     {
       "module": "2C. Personalización IA Continua (estado 2025-10-14)",
-      "specs": [
-        "cypress/e2e/personalization/personalization-preferences.cy.js"
-      ]
+      "specs": ["cypress/e2e/personalization/personalization-preferences.cy.js"]
     },
     {
       "module": "3. Gestión de Invitados (estado 2025-10-07)",
@@ -668,21 +640,15 @@
     },
     {
       "module": "30. Página de inicio (estado 2025-10-13)",
-      "specs": [
-        "cypress/e2e/home/home-greeting-names.cy.js"
-      ]
+      "specs": ["cypress/e2e/home/home-greeting-names.cy.js"]
     },
     {
       "module": "31. Estilo Global (estado 2025-10-13)",
-      "specs": [
-        "cypress/e2e/style/style-global.cy.js"
-      ]
+      "specs": ["cypress/e2e/style/style-global.cy.js"]
     },
     {
       "module": "5b. Timeline y Tareas (estado 2025-10-07)",
-      "specs": [
-        "cypress/e2e/tasks/all_subtasks_modal.cy.js"
-      ]
+      "specs": ["cypress/e2e/tasks/all_subtasks_modal.cy.js"]
     },
     {
       "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
@@ -718,9 +684,7 @@
     },
     {
       "module": "8. Diseno Web y Personalizacion (estado 2025-10-08)",
-      "specs": [
-        "cypress/e2e/web/diseno-web-flow.cy.js"
-      ]
+      "specs": ["cypress/e2e/web/diseno-web-flow.cy.js"]
     },
     {
       "module": "9. RSVP y Confirmaciones (estado 2025-10-07)",

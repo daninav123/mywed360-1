@@ -1,5 +1,5 @@
 /**
- * Hook centralizado para la autenticación en MaLoveApp
+ * Hook centralizado para la autenticación en Planivia
  * Este hook proporciona funcionalidades de autenticación y gestión de perfil de usuario
  */
 
@@ -66,12 +66,12 @@ const isMockAuthEnabled = () => {
   return getEnv('VITE_MOCK_AUTH', 'false') === 'true' || isTestMode();
 };
 
-const ADMIN_EMAIL = getEnv('VITE_ADMIN_EMAIL', 'admin@maloveapp.com');
-const ADMIN_PROFILE_KEY = 'MaLoveApp_admin_profile';
+const ADMIN_EMAIL = getEnv('VITE_ADMIN_EMAIL', 'admin@planivia.net');
+const ADMIN_PROFILE_KEY = 'Planivia_admin_profile';
 const ADMIN_SESSION_FLAG = 'isAdminAuthenticated';
-const ADMIN_SESSION_TOKEN_KEY = 'MaLoveApp_admin_session_token';
-const ADMIN_SESSION_EXPIRES_KEY = 'MaLoveApp_admin_session_expires';
-const ADMIN_SESSION_ID_KEY = 'MaLoveApp_admin_session_id';
+const ADMIN_SESSION_TOKEN_KEY = 'Planivia_admin_session_token';
+const ADMIN_SESSION_EXPIRES_KEY = 'Planivia_admin_session_expires';
+const ADMIN_SESSION_ID_KEY = 'Planivia_admin_session_id';
 const ADMIN_ALLOWED_DOMAINS = getEnv('VITE_ADMIN_ALLOWED_DOMAINS', 'lovenda.com');
 const isCypressRuntime = () => typeof window !== 'undefined' && !!window.Cypress;
 // Flag para desactivar explícitamente el autologin/mock en Cypress (por defecto desactivado)

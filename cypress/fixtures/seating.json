@@ -1,0 +1,80 @@
+{
+  "weddingId": "test-wedding-001",
+  "spaces": {
+    "ceremony": {
+      "id": "ceremony",
+      "name": "Ceremonia",
+      "type": "ceremony",
+      "capacity": 120,
+      "layout": "rows"
+    },
+    "banquet": {
+      "id": "banquet",
+      "name": "Banquete",
+      "type": "banquet",
+      "capacity": 120,
+      "layout": "round_tables"
+    }
+  },
+  "tables": [
+    {
+      "id": "test-table-001",
+      "name": "Mesa Presidencial",
+      "capacity": 10,
+      "shape": "rectangular",
+      "x": 400,
+      "y": 200,
+      "rotation": 0,
+      "space": "banquet",
+      "vip": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "test-table-002",
+      "name": "Mesa 1",
+      "capacity": 8,
+      "shape": "round",
+      "x": 200,
+      "y": 400,
+      "rotation": 0,
+      "space": "banquet",
+      "vip": false,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "test-table-003",
+      "name": "Mesa 2",
+      "capacity": 8,
+      "shape": "round",
+      "x": 600,
+      "y": 400,
+      "rotation": 0,
+      "space": "banquet",
+      "vip": false,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "test-table-004",
+      "name": "Mesa 3",
+      "capacity": 8,
+      "shape": "round",
+      "x": 400,
+      "y": 600,
+      "rotation": 0,
+      "space": "banquet",
+      "vip": false,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "assignments": [
+    { "guestId": "test-guest-001", "tableId": "test-table-001", "seatNumber": 1 },
+    { "guestId": "test-guest-002", "tableId": "test-table-001", "seatNumber": 2 },
+    { "guestId": "test-guest-003", "tableId": "test-table-002", "seatNumber": 1 },
+    { "guestId": "test-guest-004", "tableId": "test-table-002", "seatNumber": 2 },
+    { "guestId": "test-guest-006", "tableId": "test-table-003", "seatNumber": 1 },
+    { "guestId": "test-guest-007", "tableId": "test-table-003", "seatNumber": 2 },
+    { "guestId": "test-guest-008", "tableId": "test-table-004", "seatNumber": 1 },
+    { "guestId": "test-guest-009", "tableId": "test-table-004", "seatNumber": 2 },
+    { "guestId": "test-guest-010", "tableId": "test-table-004", "seatNumber": 3 }
+  ]
+}

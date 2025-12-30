@@ -3,6 +3,7 @@
  * FASE 2.6 del WORKFLOW-USUARIO.md
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Calendar, Clock, MapPin, FileText, Plus, Edit2, Trash2, Camera, CheckCircle2 } from 'lucide-react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -10,19 +11,22 @@ import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
 
-const APPOINTMENT_TYPES = [
-  { id: 'vestido', name: 'Prueba de vestido', icon: '👗', color: 'pink' },
-  { id: 'traje', name: 'Prueba de traje', icon: '🤵', color: 'blue' },
-  { id: 'menu', name: 'Prueba de menú', icon: '🍽️', color: 'orange' },
-  { id: 'maquillaje', name: 'Prueba de maquillaje', icon: '💄', color: 'purple' },
-  { id: 'peluqueria', name: 'Prueba de peinado', icon: '💇', color: 'indigo' },
-  { id: 'preboda', name: 'Sesión pre-boda', icon: '📸', color: 'red' },
-  { id: 'ensayo', name: 'Ensayo de ceremonia', icon: '⛪', color: 'green' },
-  { id: 'otro', name: 'Otra cita', icon: '📅', color: 'gray' },
+const getAppointmentTypes = (t) => [
+  { id: 'dress', name: t('appointments.types.dress'), icon: '👗', color: 'pink' },
+  { id: 'suit', name: t('appointments.types.suit'), icon: '🤵', color: 'blue' },
+  { id: 'hair', name: t('appointments.types.hair'), icon: '💇', color: 'purple' },
+  { id: 'makeup', name: t('appointments.types.makeup'), icon: '💄', color: 'rose' },
+  { id: 'tasting', name: t('appointments.types.tasting'), icon: '🍽️', color: 'orange' },
+  { id: 'cake', name: t('appointments.types.cake'), icon: '🎂', color: 'yellow' },
+  { id: 'music', name: t('appointments.types.music'), icon: '🎵', color: 'green' },
+  { id: 'rehearsal', name: t('appointments.types.rehearsal'), icon: '⛪', color: 'indigo' },
+  { id: 'other', name: t('appointments.types.other'), icon: '📅', color: 'gray' },
 ];
 
 const AppointmentCard = ({ appointment, onEdit, onDelete, onToggleComplete }) => {
-  const typeConfig = APPOINTMENT_TYPES.find(t => t.id === appointment.type) || APPOINTMENT_TYPES[7];
+  const { t } = useTranslation('pages');
+  const APPOINTMENT_TYPES = getAppointmentTypes(t);
+  const typeConfig = APPOINTMENT_TYPES.find(type => type.id === appointment.type) || APPOINTMENT_TYPES[7];
   
   const colorClasses = {
     pink: 'border-pink-200 bg-pink-50',
@@ -233,37 +237,22 @@ const AppointmentModal = ({ appointment, onSave, onClose }) => {
                 type="text"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="Dirección del lugar"
+                placeholder={t('Dirección del lugar')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Proveedor
-              </label>
-              <input
-                type="text"
-                value={formData.provider}
-                onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
-                placeholder="Nombre del proveedor"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Notas
               </label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Notas o recordatorios..."
+                placeholder={t('Notas o recordatorios...')}
                 rows={3}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>
-
             <div className="flex gap-2 pt-4">
               <button
                 type="button"

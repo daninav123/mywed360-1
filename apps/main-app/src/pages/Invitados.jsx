@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ContactsImporter from '../components/guests/ContactsImporter';
 import GuestBulkGrid from '../components/guests/GuestBulkGrid';
@@ -1330,7 +1331,7 @@ function Invitados() {
               <div className="px-4 py-3 border-b font-medium">Confirmados (Nombre y Mesa)</div>
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
-                  <thead className="bg-gray-50">
+                  <thead style={{ backgroundColor: 'var(--color-yellow)' }}>
                     <tr>
                       <th className="px-3 py-2 text-left">Nombre</th>
                       <th className="px-3 py-2 text-center">Mesa</th>

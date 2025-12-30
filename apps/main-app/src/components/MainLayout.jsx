@@ -129,7 +129,7 @@ export default function MainLayout() {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-[var(--color-bg)] text-[color:var(--color-text)] font-sans">
-      <div className="absolute top-4 right-4 z-50 flex items-center space-x-4">
+      <div className="absolute top-6 right-6 z-50 flex items-center space-x-3">
         {/* Watchers de notificaciones (sin icono visible aquí) */}
         <NotificationWatcher intervalMs={3000} />
         <TaskNotificationWatcher intervalMs={5 * 60 * 1000} />
@@ -140,28 +140,27 @@ export default function MainLayout() {
 
         {/* Avatar y menú de usuario */}
         <div className="relative" data-user-menu>
-          <div
+          <button
             onClick={() => setOpenMenu(!openMenu)}
-            className={`w-12 h-12 rounded-full cursor-pointer transition-all duration-200 hover:ring-2 ${
-              openMenu
-                ? 'ring-2 bg-[var(--color-accent-20)]'
-                : 'bg-[var(--color-surface)] hover:bg-[var(--color-accent-20)]'
-            } flex items-center justify-center`}
+            className="w-11 h-11 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center"
             title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })}
             style={{
-              '--tw-ring-color': 'var(--color-primary)',
-              '--tw-ring-offset-color': 'var(--color-bg)',
+              backgroundColor: openMenu ? 'var(--color-lavender)' : 'var(--color-surface)',
+              border: `2px solid ${openMenu ? 'var(--color-primary)' : 'var(--color-border-soft)'}`,
+              boxShadow: openMenu ? '0 4px 12px rgba(94, 187, 255, 0.2)' : '0 2px 8px rgba(0,0,0,0.04)',
             }}
           >
-            <img
-              src={`${import.meta.env.BASE_URL}maloveapp-logo.png`}
-              alt={brandLabel}
-              className="h-11 w-11 rounded-full object-contain"
-              loading="lazy"
-            />
-          </div>
+            <User className="w-5 h-5" style={{ color: openMenu ? 'var(--color-primary)' : 'var(--color-text-secondary)' }} />
+          </button>
           {openMenu && (
-            <div className="absolute right-0 mt-2 bg-[var(--color-surface)] border border-[color:var(--color-text-15)] rounded-lg shadow-lg p-1 space-y-1 min-w-[220px] z-50">
+            <div 
+              className="absolute right-0 mt-3 bg-[var(--color-surface)] p-2 space-y-1 min-w-[240px] z-50"
+              style={{
+                border: '1px solid var(--color-border-soft)',
+                borderRadius: 'var(--radius-lg)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+              }}
+            >
               <div className="px-2 py-1">
                 <NotificationCenter />
               </div>
@@ -169,9 +168,14 @@ export default function MainLayout() {
               <Link
                 to="/perfil"
                 onClick={() => setOpenMenu(false)}
-                className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent-20)] rounded-md transition-colors"
+                className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
+                style={{
+                  color: 'var(--color-text)',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
-                <User className="w-4 h-4 mr-2" />{' '}
+                <User className="w-4 h-4 mr-3" />
                 {t('navigation.profile', { defaultValue: 'Perfil' })}
               </Link>
               {false && (
@@ -190,34 +194,43 @@ export default function MainLayout() {
               <Link
                 to="/email"
                 onClick={() => setOpenMenu(false)}
-                onMouseEnter={prefetchEmail}
+                onMouseEnter={(e) => { prefetchEmail(); e.currentTarget.style.backgroundColor = 'var(--color-lavender)'; }}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 onFocus={prefetchEmail}
                 onTouchStart={prefetchEmail}
-                className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent-20)] rounded-md transition-colors"
+                className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
+                style={{ color: 'var(--color-text)' }}
               >
-                <Mail className="w-4 h-4 mr-2" />{' '}
+                <Mail className="w-4 h-4 mr-3" />
                 {t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
               </Link>
 
-              <div className="px-3 py-2 hover:bg-[var(--color-accent-20)] rounded-md transition-colors">
+              <div 
+                className="px-3 py-2.5 rounded-xl transition-all duration-200"
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm flex items-center">
-                    <Moon className="w-4 h-4 mr-2" />{' '}
+                  <span className="text-sm flex items-center" style={{ color: 'var(--color-text)' }}>
+                    <Moon className="w-4 h-4 mr-3" />
                     {t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}
                   </span>
                   <DarkModeToggle className="ml-2" />
                 </div>
               </div>
 
-              <div className="border-t border-[color:var(--color-text-15)] my-1"></div>
+              <div style={{ height: '1px', backgroundColor: 'var(--color-border-soft)', margin: '8px 0' }}></div>
               <button
                 onClick={() => {
                   logoutUnified();
                   setOpenMenu(false);
                 }}
-                className="w-full text-left px-3 py-2 text-sm text-[color:var(--color-danger)] hover:bg-[var(--color-danger-10)] rounded-md transition-colors flex items-center"
+                className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center"
+                style={{ color: 'var(--color-danger)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
-                <LogOut className="w-4 h-4 mr-2" />{' '}
+                <LogOut className="w-4 h-4 mr-3" />
                 {t('navigation.logout', { defaultValue: 'Cerrar sesión' })}
               </button>
             </div>

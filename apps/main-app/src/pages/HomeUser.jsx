@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HomePage from '../components/HomePage';
 import { prefetchModule } from '../utils/prefetch';
 
 export default function HomeUser() {
+  const { t } = useTranslation();
   React.useEffect(() => {
     // Prefetch bandeja de email en segundo plano (si red lo permite)
     prefetchModule('UnifiedEmail', () => import('./UnifiedEmail'));
@@ -13,7 +15,10 @@ export default function HomeUser() {
   }, []);
   return (
     <>
-      <HomePage />
+      <HomePage 
+        placeholder={t('homeUser.searchPlaceholder')} 
+        quickTaskPlaceholder={t('homeUser.quickTaskPlaceholder')} 
+      />
     </>
   );
 }

@@ -109,11 +109,15 @@ export async function saveMusicPreferences(weddingId, preferences) {
 
   try {
     const docRef = doc(db, 'weddings', weddingId, 'musicPreferences', 'main');
-    
-    await setDoc(docRef, {
-      ...preferences,
-      lastUpdated: serverTimestamp(),
-    }, { merge: true });
+
+    await setDoc(
+      docRef,
+      {
+        ...preferences,
+        lastUpdated: serverTimestamp(),
+      },
+      { merge: true }
+    );
 
     return { success: true };
   } catch (error) {
@@ -127,7 +131,7 @@ export async function saveMusicPreferences(weddingId, preferences) {
  */
 export function analyzeSelectedSongs(moments, blocks, getSelectedSong) {
   const selectedSongs = [];
-  
+
   blocks.forEach((block) => {
     const blockMoments = moments[block.id] || [];
     blockMoments.forEach((moment) => {
@@ -147,14 +151,14 @@ export function analyzeSelectedSongs(moments, blocks, getSelectedSong) {
   // Extraer patrones
   const patterns = {
     totalSongs: selectedSongs.length,
-    definitiveCount: selectedSongs.filter(s => s.isDefinitive).length,
-    
+    definitiveCount: selectedSongs.filter((s) => s.isDefinitive).length,
+
     // Artistas más frecuentes
-    topArtists: extractTopItems(selectedSongs.map(s => s.artist)),
-    
+    topArtists: extractTopItems(selectedSongs.map((s) => s.artist)),
+
     // Tipos de momentos con canciones
-    momentTypes: [...new Set(selectedSongs.map(s => s.momentType))],
-    
+    momentTypes: [...new Set(selectedSongs.map((s) => s.momentType))],
+
     // Bloques con más canciones
     blockDistribution: selectedSongs.reduce((acc, song) => {
       acc[song.blockType] = (acc[song.blockType] || 0) + 1;
@@ -196,7 +200,7 @@ export function generateUserMusicProfile(preferences, selectedSongsAnalysis) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([genre]) => genre);
-  
+
   if (topGenres.length > 0) {
     parts.push(`Géneros favoritos: ${topGenres.join(', ')}`);
   }
@@ -210,7 +214,7 @@ export function generateUserMusicProfile(preferences, selectedSongsAnalysis) {
   const selectedDecades = Object.entries(preferences.favoriteDecades)
     .filter(([_, selected]) => selected)
     .map(([decade]) => decade);
-  
+
   if (selectedDecades.length > 0) {
     parts.push(`Décadas preferidas: ${selectedDecadas.join(', ')}`);
   }
@@ -219,7 +223,7 @@ export function generateUserMusicProfile(preferences, selectedSongsAnalysis) {
   const selectedMoods = Object.entries(preferences.preferredMoods)
     .filter(([_, selected]) => selected)
     .map(([mood]) => mood);
-  
+
   if (selectedMoods.length > 0) {
     parts.push(`Ambiente preferido: ${selectedMoods.join(', ')}`);
   }
@@ -228,7 +232,7 @@ export function generateUserMusicProfile(preferences, selectedSongsAnalysis) {
   const selectedLanguages = Object.entries(preferences.languages)
     .filter(([_, selected]) => selected)
     .map(([lang]) => lang);
-  
+
   if (selectedLanguages.length > 0) {
     parts.push(`Idiomas: ${selectedLanguages.join(', ')}`);
   }
@@ -254,12 +258,12 @@ export function calculateSongRelevance(song, preferences, momentType) {
 
   // Basado en géneros favoritos (si tenemos esa info)
   // Esto requeriría enriquecer las canciones con metadata de Spotify
-  
+
   // Basado en artistas favoritos
   if (preferences.favoriteArtists && preferences.favoriteArtists.length > 0) {
     const artistLower = song.artist?.toLowerCase() || '';
-    const matchesArtist = preferences.favoriteArtists.some(
-      fav => artistLower.includes(fav.toLowerCase())
+    const matchesArtist = preferences.favoriteArtists.some((fav) =>
+      artistLower.includes(fav.toLowerCase())
     );
     if (matchesArtist) score += 50;
   }
@@ -281,10 +285,10 @@ export function needsPreferencesSetup(preferences) {
   }
 
   // Verificar si tiene al menos algo configurado
-  const hasGenres = Object.values(preferences.favoriteGenres || {}).some(v => v > 0);
+  const hasGenres = Object.values(preferences.favoriteGenres || {}).some((v) => v > 0);
   const hasArtists = preferences.favoriteArtists && preferences.favoriteArtists.length > 0;
-  const hasDecades = Object.values(preferences.favoriteDecades || {}).some(v => v);
-  const hasMoods = Object.values(preferences.preferredMoods || {}).some(v => v);
+  const hasDecades = Object.values(preferences.favoriteDecades || {}).some((v) => v);
+  const hasMoods = Object.values(preferences.preferredMoods || {}).some((v) => v);
 
   return !(hasGenres || hasArtists || hasDecades || hasMoods);
 }

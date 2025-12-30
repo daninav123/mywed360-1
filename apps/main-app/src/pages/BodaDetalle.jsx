@@ -1,7 +1,8 @@
 import { doc, onSnapshot, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore';
 import { ArrowLeft, CheckCircle, Circle } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useTranslations from '../hooks/useTranslations';
 import { formatDate } from '../utils/formatUtils';
@@ -12,17 +13,15 @@ import { Card } from '../components/ui/Card';
 import { Progress } from '../components/ui/Progress';
 import WeddingModulePermissionsCard from '../components/weddings/WeddingModulePermissionsCard.jsx';
 import { db } from '../firebaseConfig';
-import useWeddingCollection from '../hooks/useWeddingCollection';
 import { useWedding } from '../context/WeddingContext';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import { updateWeddingModulePermissions } from '../services/WeddingService';
 import {
-  EVENT_TYPE_LABELS,
-  EVENT_STYLE_OPTIONS,
-  GUEST_COUNT_OPTIONS,
-  FORMALITY_OPTIONS,
-  CEREMONY_TYPE_OPTIONS,
-  RELATED_EVENT_OPTIONS,
+  getEventStyleOptions,
+  getGuestCountOptions,
+  getFormalityOptions,
+  getCeremonyTypeOptions,
+  getEventTypeOptions,
 } from '../config/eventStyles';
 
 const toLabelMap = (options) =>
@@ -96,6 +95,7 @@ export default function BodaDetalle() {
           eventType: data.eventType || 'boda',
           eventProfile: data.eventProfile || null,
           eventProfileSummary: data.eventProfileSummary || null,
+          placeholder: t('weddingDetail.namePlaceholder'),
           preferences: data.preferences || {},
           modulePermissions: data.modulePermissions || {},
         });
@@ -287,11 +287,11 @@ export default function BodaDetalle() {
           <p className="text-sm text-muted">Tareas pendientes</p>
           <p className="text-2xl font-bold text-[color:var(--color-text)]">{pendingTasks}</p>
         </Card>
-      <Card className="text-center cursor-pointer" onClick={() => navigate('/proveedores')}>
-        <p className="text-sm text-muted">Proveedores</p>
-        <p className="text-2xl font-bold text-[color:var(--color-text)]">{(Array.isArray(suppliers) ? suppliers.length : 0)}</p>
-      </Card>
-    </div>
+        <Card className="text-center cursor-pointer" onClick={() => navigate('/proveedores')}>
+          <p className="text-sm text-muted">Proveedores</p>
+          <p className="text-2xl font-bold text-[color:var(--color-text)]">{(Array.isArray(suppliers) ? suppliers.length : 0)}</p>
+        </Card>
+      </div>
 
       <WeddingModulePermissionsCard
         modulePermissions={wedding.modulePermissions}
@@ -300,7 +300,7 @@ export default function BodaDetalle() {
         saving={savingPermissions}
       />
 
-    <div className="mt-6">
+      <div className="mt-6">
         <div className="flex justify-between text-sm mb-1">
           <span>Progreso</span>
           <span className="font-medium">{wedding.progress}%</span>
@@ -350,6 +350,7 @@ export default function BodaDetalle() {
                   href={d.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  placeholder={t('weddingDetail.descriptionPlaceholder')}
                   className="text-primary underline"
                 >
                   Ver

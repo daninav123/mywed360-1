@@ -10,6 +10,77 @@ import logger from '../utils/logger.js';
 const router = express.Router();
 
 /**
+ * Construye actualizaciones de InfoBoda según la categoría del proveedor aceptado
+ */
+function buildInfoBodaUpdates(categoryKey, supplierData) {
+  const updates = {};
+  
+  switch (categoryKey) {
+    case 'lugares':
+      updates.celebrationPlace = supplierData.venueName || supplierData.name;
+      updates.celebrationAddress = supplierData.address;
+      updates.celebrationCity = supplierData.city;
+      updates.ceremonyGPS = supplierData.gps;
+      updates.venueManagerName = supplierData.managerName || supplierData.contactName;
+      updates.venueManagerPhone = supplierData.contactPhone || supplierData.phone;
+      updates._celebrationPlaceSource = 'supplier-confirmed';
+      updates._celebrationPlaceSupplierId = supplierData.supplierId;
+      break;
+      
+    case 'restaurantes':
+      updates.celebrationPlace = supplierData.name;
+      updates.celebrationAddress = supplierData.address;
+      updates.celebrationCity = supplierData.city;
+      updates.banquetPlace = supplierData.name;
+      updates.receptionAddress = supplierData.address;
+      updates.venueManagerName = supplierData.contactName;
+      updates.venueManagerPhone = supplierData.contactPhone || supplierData.phone;
+      updates._banquetPlaceSource = 'supplier-confirmed';
+      break;
+      
+    case 'catering':
+      updates.cateringContact = supplierData.contactPhone || supplierData.phone;
+      if (supplierData.menuDescription) {
+        updates.menu = supplierData.menuDescription;
+      }
+      updates._cateringSource = 'supplier-confirmed';
+      updates._cateringSupplierId = supplierData.supplierId;
+      break;
+      
+    case 'fotografia':
+      updates.photographerContact = supplierData.contactPhone || supplierData.phone;
+      updates._photographerSource = 'supplier-confirmed';
+      updates._photographerSupplierId = supplierData.supplierId;
+      break;
+      
+    case 'musica-ceremonia':
+    case 'musica-cocktail':
+    case 'musica-fiesta':
+    case 'dj':
+      updates.musicContact = supplierData.contactPhone || supplierData.phone;
+      updates[`_${categoryKey}Source`] = 'supplier-confirmed';
+      break;
+      
+    case 'organizacion':
+      updates.coordinatorName = supplierData.contactName || supplierData.name;
+      updates.coordinatorPhone = supplierData.contactPhone || supplierData.phone;
+      updates._coordinatorSource = 'supplier-confirmed';
+      updates._coordinatorSupplierId = supplierData.supplierId;
+      break;
+  }
+  
+  // Añadir metadata de actualización
+  if (Object.keys(updates).length > 0) {
+    updates._lastUpdateSource = 'supplier-acceptance';
+    updates._lastUpdateCategory = categoryKey;
+    updates._lastUpdateSupplierName = supplierData.name;
+    updates._lastUpdateTimestamp = Date.now();
+  }
+  
+  return updates;
+}
+
+/**
  * GET /api/quote-responses
  * Listar presupuestos recibidos (filtrable por usuario/boda)
  */
@@ -319,14 +390,34 @@ router.post('/:id/accept', express.json(), async (req, res) => {
       },
     };
 
-    // 8. Guardar cambios en la boda
+    // 8. Preparar datos del proveedor para propagación a InfoBoda
+    const supplierDataForPropagation = {
+      name: supplierName,
+      supplierId: supplierId,
+      contactPhone: quote.contactPhone || quote.supplierPhone || '',
+      contactName: quote.contactName || supplierName,
+      address: quote.venueAddress || quote.address || '',
+      city: quote.city || '',
+      gps: quote.venueGPS || quote.gps || '',
+      venueName: quote.venueName || supplierName,
+      menuDescription: quote.menuDescription || '',
+      phone: quote.contactPhone || quote.supplierPhone || '',
+      managerName: quote.managerName || quote.contactName || '',
+    };
+
+    // 8.1. Actualizar campos de InfoBoda según categoría (PROPAGACIÓN AUTOMÁTICA)
+    const infoBodaUpdates = buildInfoBodaUpdates(categoryKey, supplierDataForPropagation);
+
+    // 8.2. Guardar cambios en la boda (incluyendo propagación a InfoBoda)
     await weddingRef.update({
       services: updatedServices,
       budget: updatedBudget,
+      ...infoBodaUpdates,
       updatedAt: new Date(),
     });
 
-    logger.info(`[quote-responses] Boda actualizada - Total categoría: ${totalCategoryBudget}€`);
+    logger.info(`[quote-responses] ✅ Boda actualizada - Total categoría: ${totalCategoryBudget}€`);
+    logger.info(`[quote-responses] ✅ InfoBoda actualizada - Campos: ${Object.keys(infoBodaUpdates).join(', ')}`);
 
     // 9. Notificar al proveedor (si está habilitado)
     if (notifyProvider && quote.supplierEmail) {

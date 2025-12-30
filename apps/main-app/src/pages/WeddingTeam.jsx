@@ -3,6 +3,7 @@
  * FASE 6.1 del WORKFLOW-USUARIO.md
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users, UserPlus, Crown, Heart, CheckCircle2, Plus, Edit2, Trash2, Phone, Mail, ClipboardList } from 'lucide-react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -10,25 +11,25 @@ import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
 
-const TEAM_ROLES = [
+const getTeamRoles = (t) => [
   {
     id: 'coordinador',
-    name: 'Coordinador/a de boda',
+    name: t('weddingTeam.roles.coordinator.name'),
     icon: '👔',
-    description: 'Gestiona y coordina todos los aspectos del día',
+    description: t('weddingTeam.roles.coordinator.description'),
     responsibilities: [
-      'Coordinar con todos los proveedores',
-      'Gestionar timeline del día',
-      'Resolver imprevistos',
-      'Supervisar montaje y desmontaje',
-      'Coordinar llegadas de invitados'
+      t('weddingTeam.roles.coordinator.resp1'),
+      t('weddingTeam.roles.coordinator.resp2'),
+      t('weddingTeam.roles.coordinator.resp3'),
+      t('weddingTeam.roles.coordinator.resp4'),
+      t('weddingTeam.roles.coordinator.resp5')
     ]
   },
   {
     id: 'padrinos',
-    name: 'Padrinos',
+    name: t('weddingTeam.roles.godparents.name'),
     icon: '👑',
-    description: 'Acompañan y apoyan a los novios',
+    description: t('weddingTeam.roles.godparents.description'),
     responsibilities: [
       'Acompañar en la ceremonia',
       'Firmar como testigos',
@@ -39,9 +40,9 @@ const TEAM_ROLES = [
   },
   {
     id: 'damas',
-    name: 'Damas de honor',
+    name: t('weddingTeam.roles.bridesmaids.name'),
     icon: '👗',
-    description: 'Apoyan a la novia antes y durante el día',
+    description: t('weddingTeam.roles.bridesmaids.description'),
     responsibilities: [
       'Ayudar con preparativos novia',
       'Organizar despedida de soltera',
@@ -52,9 +53,9 @@ const TEAM_ROLES = [
   },
   {
     id: 'testigos',
-    name: 'Testigos',
+    name: t('weddingTeam.roles.witnesses.name'),
     icon: '✍️',
-    description: 'Testigos oficiales de la ceremonia',
+    description: t('weddingTeam.roles.witnesses.description'),
     responsibilities: [
       'Firmar documentos legales',
       'Acompañar en ceremonia',
@@ -64,9 +65,9 @@ const TEAM_ROLES = [
   },
   {
     id: 'maestro',
-    name: 'Maestro de ceremonias',
+    name: t('weddingTeam.roles.mc.name'),
     icon: '🎤',
-    description: 'Presenta y coordina el programa del día',
+    description: t('weddingTeam.roles.mc.description'),
     responsibilities: [
       'Presentar momentos clave',
       'Coordinar discursos',
@@ -314,7 +315,7 @@ const MemberModal = ({ member, onSave, onClose }) => {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nombre y apellidos"
+                placeholder={t('weddingTeam.memberNamePlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 required
               />
@@ -342,7 +343,7 @@ const MemberModal = ({ member, onSave, onClose }) => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="email@ejemplo.com"
+                  placeholder={t('weddingTeam.emailPlaceholder')}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>

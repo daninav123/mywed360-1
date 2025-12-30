@@ -48,6 +48,7 @@
     "settings": "Configuración",
     "logout": "Cerrar sesión",
     "more": "Más",
+    "blog": "Blog",
     "createEvent": "Crear nuevo evento",
     "weddings": "Bodas",
     "emailInbox": "Bandeja de correo",
@@ -2995,8 +2996,13 @@
     "catering": "Catering",
     "photography": "Fotografía",
     "video": "Vídeo",
+    "musica-ceremonia": "Música Ceremonia",
+    "musica-cocktail": "Música Cóctel",
+    "musica-fiesta": "Música Fiesta",
     "music": "Música",
     "musicDJ": "Música / DJ",
+    "dj": "DJ",
+    "sonido-iluminacion": "Sonido e Iluminación",
     "decoration": "Decoración",
     "flowers": "Flores",
     "transport": "Transporte",
@@ -3459,6 +3465,11 @@
         "video": "Vídeo",
         "catering": "Catering",
         "flowers": "Flores y decoración",
+        "musica-ceremonia": "Música Ceremonia",
+        "musica-cocktail": "Música Cóctel",
+        "musica-fiesta": "Música Fiesta",
+        "dj": "DJ",
+        "sonido-iluminacion": "Sonido e Iluminación",
         "music": "Música / DJ",
         "beauty": "Peluquería y maquillaje",
         "stationery": "Invitaciones",
@@ -4285,18 +4296,8 @@
           "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
           "location": "Madrid",
           "price": "€1,200 - €2,500",
-          "tags": [
-            "natural",
-            "documentary",
-            "outdoor",
-            "sunlight"
-          ],
-          "keywords": [
-            "photographer",
-            "natural",
-            "documentary",
-            "boda"
-          ]
+          "tags": ["natural", "documentary", "outdoor", "sunlight"],
+          "keywords": ["photographer", "natural", "documentary", "boda"]
         },
         {
           "id": "2",
@@ -4306,17 +4307,8 @@
           "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
           "location": "Barcelona",
           "price": "€1,500 - €3,000",
-          "tags": [
-            "beach",
-            "outdoor",
-            "nature"
-          ],
-          "keywords": [
-            "photographer",
-            "bodas",
-            "beach",
-            "experience"
-          ]
+          "tags": ["beach", "outdoor", "nature"],
+          "keywords": ["photographer", "bodas", "beach", "experience"]
         },
         {
           "id": "3",
@@ -4326,16 +4318,8 @@
           "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
           "location": "Madrid",
           "price": "€70 - €120 por invitado",
-          "tags": [
-            "vegetarian",
-            "vegan",
-            "buffet"
-          ],
-          "keywords": [
-            "catering",
-            "buffet",
-            "event"
-          ]
+          "tags": ["vegetarian", "vegan", "buffet"],
+          "keywords": ["catering", "buffet", "event"]
         },
         {
           "id": "4",
@@ -4345,16 +4329,8 @@
           "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
           "location": "Valencia",
           "price": "€800 - €1,500",
-          "tags": [
-            "dj",
-            "music",
-            "lighting"
-          ],
-          "keywords": [
-            "dj",
-            "music",
-            "event"
-          ]
+          "tags": ["dj", "music", "lighting"],
+          "keywords": ["dj", "music", "event"]
         },
         {
           "id": "5",
@@ -4364,16 +4340,8 @@
           "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
           "location": "Seville",
           "price": "€500 - €1,500",
-          "tags": [
-            "flores",
-            "decoration",
-            "boho"
-          ],
-          "keywords": [
-            "flores",
-            "decoration",
-            "bodas"
-          ]
+          "tags": ["flores", "decoration", "boho"],
+          "keywords": ["flores", "decoration", "bodas"]
         }
       ]
     },
@@ -6540,5 +6508,365 @@
     "tokenPayload": "Token Payload",
     "backend": "Backend",
     "localStorage": "Local Storage"
+  },
+  "landing": {
+    "hero": {
+      "title": "Planifica Tu Boda Perfecta",
+      "subtitle": "Desde el '¡Sí!' hasta el 'Sí, quiero' - organiza cada momento mágico con la plataforma amada por miles de parejas en todo el mundo",
+      "cta": {
+        "primary": "Comenzar Gratis",
+        "secondary": "Ver Cómo Funciona"
+      }
+    },
+    "features": {
+      "title": "Todo Lo Que Necesitas, Bellamente Organizado",
+      "subtitle": "Herramientas poderosas diseñadas para parejas modernas",
+      "planning": {
+        "title": "Planificación Inteligente",
+        "description": "Organiza cada detalle con líneas de tiempo inteligentes y recordatorios automatizados"
+      },
+      "guests": {
+        "title": "Gestión de Invitados",
+        "description": "Rastrea confirmaciones, preferencias dietéticas y distribución de mesas sin esfuerzo"
+      },
+      "vendors": {
+        "title": "Red de Proveedores",
+        "description": "Conecta con profesionales de bodas de confianza y gestiona todas las comunicaciones"
+      }
+    },
+    "benefits": {
+      "title": "Diseñado Para Tu Aventura",
+      "subtitle": "Desde el compromiso hasta la luna de miel, te tenemos cubierto",
+      "collaboration": "Colaboración en tiempo real con tu pareja",
+      "time": "Ahorra horas con flujos de trabajo automatizados",
+      "security": "Almacenamiento seguro de documentos y contratos",
+      "design": "Diseños personalizables hermosos",
+      "registry": "Gestión integrada de lista de regalos",
+      "ai": "Asistente de planificación con IA"
+    },
+    "social": {
+      "title": "Únete a Más de 50,000 Parejas Planificando Su Boda Soñada",
+      "quote": "Esta plataforma transformó nuestra planificación de boda de abrumadora a disfrutable. Cada detalle organizado bellamente en un solo lugar.",
+      "author": "— Sarah y Michael, casados en junio de 2024"
+    },
+    "stats": {
+      "couples": "Parejas Felices",
+      "vendors": "Proveedores de Confianza",
+      "tasks": "Tareas Completadas",
+      "rating": "Valoración Promedio"
+    },
+    "cta": {
+      "title": "¿Listo Para Comenzar a Planificar?",
+      "subtitle": "Crea tu cuenta gratuita y comienza a organizar tu boda soñada hoy",
+      "primary": "Comenzar Gratis",
+      "secondary": "Ver Precios"
+    },
+    "explore": {
+      "title": "Explora Nuestra Plataforma",
+      "subtitle": "Descubre todas las características y servicios que ofrecemos",
+      "learnMore": "Saber Más",
+      "app": {
+        "title": "App de Planificación de Bodas",
+        "description": "Suite completa de herramientas para organizar tu día perfecto"
+      },
+      "suppliers": {
+        "title": "Para Proveedores",
+        "description": "Haz crecer tu negocio de bodas con nuestra red de proveedores"
+      },
+      "planners": {
+        "title": "Para Planners",
+        "description": "Herramientas profesionales para negocios de planificación de bodas"
+      }
+    }
+  },
+  "appOverview": {
+    "hero": {
+      "title": "Plataforma Todo-en-Uno Para Planificar Bodas",
+      "subtitle": "Todo lo que necesitas para planificar, organizar y celebrar tu día de boda perfecto - todo en una hermosa plataforma",
+      "cta": {
+        "primary": "Comenzar Prueba Gratis",
+        "secondary": "Ver Precios"
+      }
+    },
+    "modulesTitle": "Módulos Principales",
+    "modulesSubtitle": "Herramientas poderosas diseñadas para simplificar cada aspecto de la planificación de bodas",
+    "modules": {
+      "timeline": {
+        "title": "Línea de Tiempo Inteligente",
+        "description": "Organiza cada detalle con gestión inteligente de tareas y recordatorios automatizados"
+      },
+      "guests": {
+        "title": "Gestión de Invitados",
+        "description": "Sistema completo de RSVP con planos de mesas y seguimiento dietético"
+      },
+      "budget": {
+        "title": "Presupuesto y Finanzas",
+        "description": "Rastrea gastos, pagos y contratos de proveedores en tiempo real"
+      },
+      "communication": {
+        "title": "Centro de Comunicación",
+        "description": "Envía invitaciones, actualizaciones y recordatorios a todos los invitados"
+      },
+      "design": {
+        "title": "Estudio de Diseño",
+        "description": "Crea hermosas invitaciones y sitios web de bodas"
+      },
+      "analytics": {
+        "title": "Panel de Análisis",
+        "description": "Información en tiempo real y seguimiento de progreso para tu boda"
+      }
+    },
+    "integration": {
+      "title": "Todo Funciona Junto Sin Problemas",
+      "subtitle": "Todos los módulos están profundamente integrados para proporcionar una experiencia unificada. Los cambios se sincronizan automáticamente en cada función."
+    },
+    "features": {
+      "vendors": "Gestión de proveedores y contratos",
+      "notifications": "Notificaciones inteligentes y recordatorios",
+      "storage": "Almacenamiento seguro de documentos",
+      "mobile": "App móvil para iOS y Android",
+      "collaboration": "Herramientas de planificación colaborativa",
+      "export": "Herramientas de exportación e informes"
+    },
+    "collaboration": {
+      "title": "Construido Para Colaboración",
+      "description": "Invita a tu pareja, familia y wedding planner a colaborar en tiempo real. Todos se mantienen actualizados con notificaciones automáticas y acceso compartido a planes, presupuestos y listas de invitados.",
+      "sync": "Sincronización en tiempo real en todos los dispositivos",
+      "permissions": "Permisos basados en roles para miembros del equipo",
+      "activity": "Feed de actividad con historial completo",
+      "comments": "Comentarios y notas en cada elemento"
+    },
+    "cta": {
+      "title": "¿Listo Para Comenzar?",
+      "subtitle": "Únete a miles de parejas planificando su boda soñada",
+      "primary": "Comenzar Planificación Gratis",
+      "secondary": "Ver Planes de Precios"
+    }
+  },
+  "forSuppliers": {
+    "hero": {
+      "title": "Haz Crecer Tu Negocio de Bodas",
+      "subtitle": "Conecta con parejas que buscan activamente proveedores talentosos como tú. Únete a nuestra red de confianza de profesionales de bodas.",
+      "cta": {
+        "primary": "Unirse Como Proveedor",
+        "secondary": "Acceso de Proveedores"
+      }
+    },
+    "benefits": {
+      "title": "¿Por Qué Unirse a Nuestra Plataforma?",
+      "subtitle": "Todo lo que necesitas para tener éxito en la industria de bodas",
+      "exposure": {
+        "title": "Alcanza Más Parejas",
+        "description": "Sé descubierto por miles de parejas comprometidas planificando activamente sus bodas"
+      },
+      "bookings": {
+        "title": "Gestiona Reservas",
+        "description": "Optimiza tu calendario, presupuestos y comunicaciones con clientes en un solo lugar"
+      },
+      "grow": {
+        "title": "Haz Crecer Tu Negocio",
+        "description": "Accede a análisis, información y herramientas para expandir tus servicios de bodas"
+      }
+    },
+    "features": {
+      "title": "Construido Para Profesionales de Bodas",
+      "description": "Nuestra plataforma proporciona todas las herramientas que necesitas para gestionar tu negocio de bodas de manera eficiente y profesional.",
+      "profile": {
+        "title": "Perfil Profesional",
+        "description": "Muestra tu portafolio, servicios y reseñas con un hermoso perfil de proveedor"
+      },
+      "messaging": {
+        "title": "Mensajería Directa",
+        "description": "Comunícate directamente con las parejas y responde a consultas al instante"
+      },
+      "reviews": {
+        "title": "Genera Confianza",
+        "description": "Recopila reseñas verificadas y valoraciones de parejas reales"
+      }
+    },
+    "cta": {
+      "title": "¿Listo Para Hacer Crecer Tu Negocio?",
+      "subtitle": "Únete a miles de profesionales de bodas que ya están creciendo con nosotros",
+      "primary": "Crear Cuenta de Proveedor",
+      "secondary": "Ver Precios"
+    }
+  },
+  "forPlanners": {
+    "hero": {
+      "title": "Escala Tu Negocio de Planificación",
+      "subtitle": "Herramientas profesionales diseñadas para wedding planners que gestionan múltiples eventos. Optimiza operaciones y ofrece experiencias excepcionales.",
+      "cta": {
+        "primary": "Comenzar Prueba Gratis",
+        "secondary": "Ver Precios Para Planners"
+      }
+    },
+    "benefits": {
+      "title": "Construido Para Planners Profesionales",
+      "subtitle": "Todo lo que necesitas para gestionar tu negocio de planificación de bodas",
+      "multi": {
+        "title": "Gestión Multi-Boda",
+        "description": "Gestiona múltiples bodas simultáneamente con espacios de trabajo dedicados para cada evento"
+      },
+      "team": {
+        "title": "Colaboración en Equipo",
+        "description": "Trabaja sin problemas con tu equipo, proveedores y clientes en una plataforma"
+      },
+      "analytics": {
+        "title": "Análisis de Negocio",
+        "description": "Rastrea rendimiento, ingresos y satisfacción del cliente en todos tus eventos"
+      }
+    },
+    "features": {
+      "title": "Funciones Poderosas Para Tu Equipo",
+      "description": "Gestiona toda tu operación de planificación desde una plataforma central. Desde la consulta inicial hasta el día de la boda.",
+      "templates": {
+        "title": "Plantillas Reutilizables",
+        "description": "Crea y guarda plantillas para listas de tareas, presupuestos y líneas de tiempo"
+      },
+      "scheduling": {
+        "title": "Programación Avanzada",
+        "description": "Gestiona múltiples líneas de tiempo de eventos con detección inteligente de conflictos"
+      },
+      "automation": {
+        "title": "Automatización de Flujos",
+        "description": "Automatiza tareas repetitivas y concéntrate en lo que más importa"
+      }
+    },
+    "cta": {
+      "title": "¿Listo Para Transformar Tu Negocio?",
+      "subtitle": "Únete a cientos de planners profesionales que ya usan nuestra plataforma",
+      "primary": "Comenzar Prueba de 14 Días",
+      "secondary": "Comparar Planes"
+    }
+  },
+  "partners": {
+    "hero": {
+      "title": "Gana Comisiones Ayudando a Parejas a Organizar Su Boda Perfecta",
+      "subtitle": "Únete a nuestro programa de partners y recibe comisiones recurrentes por cada cliente que refieras. Sin inversión inicial. Comisiones atractivas. Material de marketing incluido.",
+      "cta": "Solicitar Acceso al Programa",
+      "secondary": "Contáctanos"
+    },
+    "benefits": {
+      "title": "Por Qué Ser Partner",
+      "subtitle": "Beneficios diseñados para maximizar tu potencial de ingresos",
+      "commissions": {
+        "title": "Comisiones Atractivas",
+        "description": "Gana comisiones recurrentes por cada suscripción que vendas"
+      },
+      "dashboard": {
+        "title": "Dashboard de Seguimiento",
+        "description": "Monitorea tus conversiones, comisiones y estadísticas en tiempo real"
+      },
+      "materials": {
+        "title": "Material de Marketing",
+        "description": "Acceso a presentaciones, demos y recursos para facilitar tus ventas"
+      },
+      "support": {
+        "title": "Soporte Dedicado",
+        "description": "Equipo de soporte disponible para ayudarte con tus clientes"
+      },
+      "training": {
+        "title": "Formación Incluida",
+        "description": "Capacitación completa sobre la plataforma y mejores prácticas de venta"
+      },
+      "unlimited": {
+        "title": "Sin Límites",
+        "description": "No hay techo en tus comisiones. Cuanto más vendas, más ganas"
+      }
+    },
+    "process": {
+      "title": "Cómo Funciona",
+      "subtitle": "Empieza a generar ingresos en 4 simples pasos",
+      "step1": {
+        "title": "Únete al Programa",
+        "description": "Completa el formulario de solicitud y espera nuestra aprobación"
+      },
+      "step2": {
+        "title": "Recibe Formación",
+        "description": "Accede a materiales y sesiones de capacitación sobre la plataforma"
+      },
+      "step3": {
+        "title": "Comparte tu Link",
+        "description": "Recibe tu enlace único de afiliado para rastrear tus conversiones"
+      },
+      "step4": {
+        "title": "Gana Comisiones",
+        "description": "Recibe comisiones recurrentes por cada cliente que se suscriba"
+      }
+    },
+    "profiles": {
+      "title": "¿Eres un Buen Candidato?",
+      "subtitle": "Buscamos profesionales con conexiones en el sector nupcial",
+      "consultants": {
+        "title": "Consultores de Bodas",
+        "description": "Asesores que trabajan con parejas y pueden recomendar herramientas profesionales"
+      },
+      "influencers": {
+        "title": "Influencers del Sector",
+        "description": "Creadores de contenido con audiencia interesada en organización de bodas"
+      },
+      "eventPros": {
+        "title": "Profesionales de Eventos",
+        "description": "Organizadores de eventos que pueden introducir nuestra plataforma a su red de contactos"
+      }
+    },
+    "form": {
+      "badge": "Solicitud de Acceso",
+      "title": "Únete al Programa de Partners",
+      "description": "Completa el formulario y nuestro equipo revisará tu solicitud. Te contactaremos en menos de 48 horas.",
+      "name": "Nombre Completo *",
+      "namePlaceholder": "Tu nombre",
+      "email": "Email *",
+      "emailPlaceholder": "tu@email.com",
+      "experienceLabel": "Experiencia en el Sector",
+      "experiencePlaceholder": "Selecciona una opción",
+      "experience": {
+        "consultant": "Consultor/a de Bodas",
+        "influencer": "Influencer / Creador de Contenido",
+        "eventPro": "Profesional de Eventos",
+        "supplier": "Proveedor de Servicios de Boda",
+        "other": "Otro"
+      },
+      "about": "Cuéntanos Sobre Ti",
+      "aboutPlaceholder": "Describe tu experiencia, tu red de contactos y por qué quieres ser partner...",
+      "submit": "Enviar Solicitud",
+      "submitting": "Enviando...",
+      "success": "¡Gracias por tu interés! Revisaremos tu solicitud y te contactaremos pronto.",
+      "error": "Por favor completa todos los campos obligatorios.",
+      "consent": "Al enviar este formulario aceptas que revisemos tu perfil y nos pongamos en contacto contigo. No compartimos tu información con terceros."
+    },
+    "cta": {
+      "title": "¿Listo Para Empezar a Generar Ingresos Recurrentes?",
+      "subtitle": "Únete a nuestro programa de partners y empieza a ganar comisiones hoy mismo",
+      "primary": "Solicitar Acceso Ahora"
+    }
+  },
+  "navbar": {
+    "features": "Características",
+    "pricing": "Precios",
+    "suppliers": "Para Proveedores",
+    "planners": "Para Planners",
+    "partners": "Partners",
+    "login": "Iniciar Sesión",
+    "signup": "Comenzar Gratis"
+  },
+  "footer": {
+    "copyright": "© 2025 Wedding Planner. Haciendo realidad bodas de ensueño.",
+    "product": "Producto",
+    "features": "Características",
+    "pricing": "Precios",
+    "demo": "Demo",
+    "forProfessionals": "Para Profesionales",
+    "suppliers": "Para Proveedores",
+    "planners": "Para Planners",
+    "partners": "Partners",
+    "company": "Empresa",
+    "about": "Sobre Nosotros",
+    "contact": "Contacto",
+    "blog": "Blog",
+    "support": "Soporte",
+    "help": "Centro de Ayuda",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio"
   }
 }

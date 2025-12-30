@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import ExternalImage from '@/components/ExternalImage';
 import useTranslations from '../hooks/useTranslations';
@@ -99,7 +100,7 @@ export default function PublicWedding() {
             </h2>
             <ul className="space-y-3">
               {timeline.map((t) => (
-                <li key={t.id} className="flex items-start gap-3">
+                <li key={t.id} placeholder={t('publicWedding.confirmPlaceholder')} className="flex items-start gap-3">
                   <span className="text-sm text-gray-500 w-24">{t.time || t.hour || ''}</span>
                   <div>
                     <div className="font-medium">{t.label || t.title || ''}</div>
@@ -123,7 +124,7 @@ export default function PublicWedding() {
                 key={g.id}
                 src={g.url || g.src}
                 alt="Foto"
-                className="object-cover w-full h-40 rounded"
+                placeholder={t('publicWedding.namePlaceholder')} className="object-cover w-full h-40 rounded"
               />
             ))}
           </div>

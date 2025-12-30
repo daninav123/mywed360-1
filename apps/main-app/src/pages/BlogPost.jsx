@@ -1,6 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import PageWrapper from '../components/PageWrapper';
 import Spinner from '../components/Spinner';
@@ -8,6 +10,65 @@ import { formatDate } from '../utils/formatUtils';
 import { fetchBlogPostBySlug, fetchBlogPosts } from '../services/blogContentService';
 import useTranslations from '../hooks/useTranslations';
 import { listBlogAuthors } from '../utils/blogAuthors';
+
+function parseInlineMarkdown(text) {
+  const parts = [];
+  let current = '';
+  let i = 0;
+
+  while (i < text.length) {
+    // Enlaces [texto](url)
+    if (text[i] === '[') {
+      const linkMatch = text.slice(i).match(/^\[([^\]]+)\]\(([^)]+)\)/);
+      if (linkMatch) {
+        if (current) {
+          parts.push({ type: 'text', content: current });
+          current = '';
+        }
+        parts.push({ type: 'link', text: linkMatch[1], url: linkMatch[2] });
+        i += linkMatch[0].length;
+        continue;
+      }
+    }
+
+    // Negrita **texto**
+    if (text[i] === '*' && text[i + 1] === '*') {
+      const boldMatch = text.slice(i).match(/^\*\*([^*]+)\*\*/);
+      if (boldMatch) {
+        if (current) {
+          parts.push({ type: 'text', content: current });
+          current = '';
+        }
+        parts.push({ type: 'bold', content: boldMatch[1] });
+        i += boldMatch[0].length;
+        continue;
+      }
+    }
+
+    // Cursiva *texto*
+    if (text[i] === '*' && text[i + 1] !== '*') {
+      const italicMatch = text.slice(i).match(/^\*([^*]+)\*/);
+      if (italicMatch) {
+        if (current) {
+          parts.push({ type: 'text', content: current });
+          current = '';
+        }
+        parts.push({ type: 'italic', content: italicMatch[1] });
+        i += italicMatch[0].length;
+        continue;
+      }
+    }
+
+    current += text[i];
+    i++;
+  }
+
+  if (current) {
+    parts.push({ type: 'text', content: current });
+  }
+
+  return parts;
+}
 
 function parseMarkdown(markdown = '') {
   const lines = markdown.split(/\r?\n/);
@@ -69,6 +130,38 @@ function parseMarkdown(markdown = '') {
   return blocks;
 }
 
+const InlineText = ({ text }) => {
+  const parts = useMemo(() => parseInlineMarkdown(text), [text]);
+  
+  return (
+    <>
+      {parts.map((part, idx) => {
+        const key = `inline-${idx}`;
+        switch (part.type) {
+          case 'link':
+            return (
+              <a
+                key={key}
+                href={part.url}
+                className="text-[color:var(--color-primary)] underline hover:text-[color:var(--color-primary-dark)] font-medium"
+                target={part.url.startsWith('http') ? '_blank' : undefined}
+                rel={part.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+              >
+                {part.text}
+              </a>
+            );
+          case 'bold':
+            return <strong key={key} className="font-semibold">{part.content}</strong>;
+          case 'italic':
+            return <em key={key} className="italic">{part.content}</em>;
+          default:
+            return <span key={key}>{part.content}</span>;
+        }
+      })}
+    </>
+  );
+};
+
 const MarkdownRenderer = ({ markdown }) => {
   const blocks = useMemo(() => parseMarkdown(markdown), [markdown]);
   if (!blocks.length) return null;
@@ -80,13 +173,13 @@ const MarkdownRenderer = ({ markdown }) => {
           case 'h2':
             return (
               <h2 key={key} className="text-2xl font-semibold text-gray-900">
-                {block.text}
+                <InlineText text={block.text} />
               </h2>
             );
           case 'h3':
             return (
               <h3 key={key} className="text-xl font-semibold text-gray-900">
-                {block.text}
+                <InlineText text={block.text} />
               </h3>
             );
           case 'ul':
@@ -94,7 +187,7 @@ const MarkdownRenderer = ({ markdown }) => {
               <ul key={key} className="list-disc space-y-2 pl-5">
                 {block.items.map((item, idx) => (
                   <li key={`${key}-item-${idx}`} className="text-gray-700">
-                    {item}
+                    <InlineText text={item} />
                   </li>
                 ))}
               </ul>
@@ -105,13 +198,13 @@ const MarkdownRenderer = ({ markdown }) => {
                 key={key}
                 className="border-l-4 border-indigo-200 bg-indigo-50/60 px-4 py-2 italic text-gray-700"
               >
-                {block.text}
+                <InlineText text={block.text} />
               </blockquote>
             );
           default:
             return (
               <p key={key} className="text-gray-700">
-                {block.text}
+                <InlineText text={block.text} />
               </p>
             );
         }
@@ -139,12 +232,29 @@ const BlogPost = () => {
 
   useEffect(() => {
     let cancelled = false;
+    let timeoutId = null;
+    
     async function load() {
       setLoading(true);
       setError(null);
+      
+      timeoutId = setTimeout(() => {
+        if (!cancelled) {
+          setLoading(false);
+          setError(
+            t('blog.post.errors.timeout', {
+              defaultValue: 'La carga está tardando demasiado. Por favor, recarga la página.',
+            })
+          );
+        }
+      }, 10000);
+      
       try {
         const response = await fetchBlogPostBySlug(slug, { language: normalizedLanguage });
         if (cancelled) return;
+        
+        if (timeoutId) clearTimeout(timeoutId);
+        
         setPost(response?.post || null);
         if (!response?.post) {
           setError(
@@ -156,7 +266,8 @@ const BlogPost = () => {
         }
       } catch (err) {
         if (cancelled) return;
-        // console.error('[BlogPost] fetch failed', err);
+        if (timeoutId) clearTimeout(timeoutId);
+        
         setError(
           t('blog.post.errors.loadFailed', {
             defaultValue: 'No se pudo cargar el contenido. Inténtalo de nuevo más tarde.',
@@ -166,11 +277,14 @@ const BlogPost = () => {
         if (!cancelled) setLoading(false);
       }
     }
+    
     load();
+    
     return () => {
       cancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [slug, normalizedLanguage, t]);
+  }, [slug, normalizedLanguage]);
 
   const publishedAt = useMemo(() => {
     if (!post?.publishedAt) return null;
@@ -180,13 +294,24 @@ const BlogPost = () => {
 
   useEffect(() => {
     let cancelled = false;
+    let timeoutId = null;
+    
     async function loadRelated() {
       if (!post) {
         setRelatedPosts([]);
         setLoadingRelated(false);
         return;
       }
+      
       setLoadingRelated(true);
+      
+      timeoutId = setTimeout(() => {
+        if (!cancelled) {
+          setLoadingRelated(false);
+          setRelatedPosts([]);
+        }
+      }, 8000);
+      
       const usedSlugs = new Set([post.slug]);
       const pool = [];
       const pushCandidate = (candidate) => {
@@ -194,6 +319,7 @@ const BlogPost = () => {
         usedSlugs.add(candidate.slug);
         pool.push(candidate);
       };
+      
       try {
         const baseOptions = { language: normalizedLanguage, limit: 12 };
         const queries = [];
@@ -208,6 +334,8 @@ const BlogPost = () => {
           (response?.posts || []).forEach(pushCandidate);
           if (pool.length >= 8) break;
         }
+
+        if (timeoutId) clearTimeout(timeoutId);
 
         const postTags = (post.tags || []).map((tag) => String(tag).toLowerCase());
         const score = (candidate) => {
@@ -229,16 +357,19 @@ const BlogPost = () => {
         }
       } catch (err) {
         if (!cancelled) {
-          // console.error('[BlogPost] related fetch failed', err);
+          if (timeoutId) clearTimeout(timeoutId);
           setRelatedPosts([]);
         }
       } finally {
         if (!cancelled) setLoadingRelated(false);
       }
     }
+    
     loadRelated();
+    
     return () => {
       cancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
     };
   }, [post, normalizedLanguage]);
 
@@ -427,26 +558,98 @@ const BlogPost = () => {
               <p className="text-sm italic text-gray-500">{post.byline.signature}</p>
             ) : null}
 
+            <div className="flex flex-wrap items-center gap-3 py-4 border-y border-gray-200">
+              <span className="text-sm font-medium text-gray-700">Compartir:</span>
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(canonicalHref)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-md bg-[#1DA1F2] px-3 py-1.5 text-sm font-medium text-white transition hover:brightness-110"
+                aria-label="Compartir en Twitter"
+              >
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                </svg>
+                Twitter
+              </a>
+              <a
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(canonicalHref)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-md bg-[#0A66C2] px-3 py-1.5 text-sm font-medium text-white transition hover:brightness-110"
+                aria-label="Compartir en LinkedIn"
+              >
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                </svg>
+                LinkedIn
+              </a>
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(post.title + ' ' + canonicalHref)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-md bg-[#25D366] px-3 py-1.5 text-sm font-medium text-white transition hover:brightness-110"
+                aria-label="Compartir en WhatsApp"
+              >
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                </svg>
+                WhatsApp
+              </a>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(canonicalHref)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-md bg-[#1877F2] px-3 py-1.5 text-sm font-medium text-white transition hover:brightness-110"
+                aria-label="Compartir en Facebook"
+              >
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+                Facebook
+              </a>
+            </div>
+
             <MarkdownRenderer markdown={post.content?.markdown || ''} />
 
-            <section className="rounded-2xl border border-[color:var(--color-primary-20)] bg-[var(--color-primary-5)] p-6 space-y-3">
-              <h2 className="text-xl font-semibold text-[color:var(--color-primary)]">
-                {ctaCopy.title}
-              </h2>
-              <p className="text-sm text-gray-700">{ctaCopy.description}</p>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  to="/signup"
-                  className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-95"
-                >
-                  {ctaCopy.primary}
-                </Link>
-                <Link
-                  to="/app"
-                  className="inline-flex items-center justify-center rounded-md border border-[color:var(--color-primary)] px-5 py-2.5 text-sm font-semibold text-[color:var(--color-primary)] transition hover:bg-[var(--color-primary-10)]"
-                >
-                  {ctaCopy.secondary}
-                </Link>
+            <section className="my-8 rounded-xl bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50 p-8 shadow-sm">
+              <div className="max-w-3xl mx-auto text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-md mb-4">
+                  <span className="text-2xl">💍</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                  ¿Te ha gustado este artículo?
+                </h2>
+                <p className="text-gray-700 mb-6">
+                  Descubre cómo Lovenda te ayuda a planificar cada detalle de tu boda de forma sencilla. Miles de parejas ya confían en nosotros.
+                </p>
+                <div className="flex flex-wrap justify-center gap-3 mb-6">
+                  <Link
+                    to="/signup"
+                    className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-rose-500 to-pink-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:shadow-lg hover:scale-105"
+                  >
+                    ✨ Prueba Lovenda Gratis
+                  </Link>
+                  <Link
+                    to="/precios"
+                    className="inline-flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition hover:border-rose-300 hover:bg-rose-50"
+                  >
+                    Ver Planes y Precios
+                  </Link>
+                </div>
+                <div className="flex flex-wrap justify-center gap-4 text-sm">
+                  <Link to="/para-planners" className="text-rose-600 hover:text-rose-700 font-medium hover:underline">
+                    Para Wedding Planners
+                  </Link>
+                  <span className="text-gray-400">•</span>
+                  <Link to="/para-proveedores" className="text-rose-600 hover:text-rose-700 font-medium hover:underline">
+                    Para Proveedores
+                  </Link>
+                  <span className="text-gray-400">•</span>
+                  <Link to="/blog" className="text-rose-600 hover:text-rose-700 font-medium hover:underline">
+                    Más Artículos
+                  </Link>
+                </div>
               </div>
             </section>
 
@@ -461,7 +664,7 @@ const BlogPost = () => {
                         <a
                           href={ref.url}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)]"
                         >
                           {ref.title || ref.url}
@@ -477,15 +680,22 @@ const BlogPost = () => {
 
             {authorProfile?.bio ? (
               <section className="flex gap-4 rounded-2xl border border-soft bg-surface p-4">
-                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-full border border-soft bg-[var(--color-primary)]">
+                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-full border border-soft bg-[var(--color-primary)] flex items-center justify-center text-white text-xl font-bold">
                   {authorProfile.avatar ? (
                     <img
                       src={authorProfile.avatar}
                       alt={authorProfile.name}
                       className="h-full w-full object-cover"
                       loading="lazy"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                      }}
                     />
                   ) : null}
+                  <span style={{ display: authorProfile.avatar ? 'none' : 'flex' }}>
+                    {authorProfile.name?.charAt(0)?.toUpperCase() || '?'}
+                  </span>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-gray-900">{authorProfile.name}</p>

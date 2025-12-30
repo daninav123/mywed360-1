@@ -5,18 +5,22 @@
 > Snapshot histórico: `docs/archive/roadmap-2025-v2.md` (09/10/2025). Úsalo solo como referencia histórica.
 
 ## Resumen ejecutivo
+
 ### Objetivos trimestrales
+
 - Estabilizar el core operativo (Seating Plan, RSVP, reglas de negocio).
 - Completar modulos prioritarios (Tasks/Checklist, Emails, Notificaciones) con calidad de produccion.
 - Habilitar primeras capacidades de IA aplicadas a Diseno Web y Proveedores.
 
 ### KPIs y metas
+
 - Retencion de planners +10%.
 - Exportaciones listas para imprenta con <2% de incidencias rechazadas.
 - NPS planners = 45.
 - Cobertura E2E critica = 90% en CI.
 
 ### Estado actual por flujo
+
 - Implementado/parcial: flujos 3, 5, 7, 9, 10, 11 (sub-secciones), 12 y 19.
 - Pendiente/por definir: integraciones IA avanzadas, marketplace de plantillas, automatizaciones push/SMS completas.
 - Ejecucion priorizada: ver docs/TODO.md (Seating plan, protocolo 11A-11E, asistente IA y modulo Momentos).
@@ -100,9 +104,9 @@
 - **[E2E specs]** 0/1 presentes
   - [faltante] cypress/e2e/protocolo/ceremony-tabs-flow.cy.js
 - **[roadmap/pending (doc)]**
-  - - Integración con registros civiles y APIs públicas para validar documentación automáticamente.  
-  - - Generador de programas/QR a partir de momentos y timeline.  
-  - - Alertas inteligentes en tiempo real (retrasos, clima adverso, tareas críticas).  
+  - - Integración con registros civiles y APIs públicas para validar documentación automáticamente.
+  - - Generador de programas/QR a partir de momentos y timeline.
+  - - Alertas inteligentes en tiempo real (retrasos, clima adverso, tareas críticas).
   - - Dashboard operativo para planners el día del evento.
   - > Consulta los enlaces 11A–11E para reglas de negocio, UX y pruebas específicas de cada módulo.
 
@@ -115,13 +119,13 @@
 - **[E2E specs]** 0/1 presentes
   - [faltante] cypress/e2e/protocolo/protocolo-flows.cy.js
 - **[roadmap/pending (doc)]**
-  - - Campos adicionales (responsables, requisitos técnicos, suppliers, estado) descritos originalmente.  
-  - - Reordenamiento drag&drop y límite de 200 momentos.  
-  - - Alertas por campos faltantes y duplicado/movimiento con UI guiada.  
+  - - Campos adicionales (responsables, requisitos técnicos, suppliers, estado) descritos originalmente.
+  - - Reordenamiento drag&drop y límite de 200 momentos.
+  - - Alertas por campos faltantes y duplicado/movimiento con UI guiada.
   - - Destinatario opcional por momento (selector colapsable que permite asociar invitados/roles concretos para integraciones como seating VIP).
 - **[checklist despliegue]**
-  - - Verificar reglas Firestore de `specialMoments`.  
-  - - Asegurar traducciones (labels de bloques y placeholders).  
+  - - Verificar reglas Firestore de `specialMoments`.
+  - - Asegurar traducciones (labels de bloques y placeholders).
   - - Mantener catálogo `MUSIC_INSPIRATION` actualizado y sin enlaces caídos.
 
 ## 11B. Timeline Global del Día B
@@ -133,13 +137,13 @@
 - **[E2E specs]** 0/1 presentes
   - [faltante] cypress/e2e/protocolo/protocolo-flows.cy.js
 - **[roadmap/pending (doc)]**
-  - - Mover la persistencia de `timing` a una subcolección separada (`weddings/{id}/timing`).  
-  - - Editar el estado del bloque (on-time/slightly-delayed/delayed) desde la UI.  
-  - - Reordenamiento drag&drop, límites de 30 hitos y validaciones de coherencia horaria.  
+  - - Mover la persistencia de `timing` a una subcolección separada (`weddings/{id}/timing`).
+  - - Editar el estado del bloque (on-time/slightly-delayed/delayed) desde la UI.
+  - - Reordenamiento drag&drop, límites de 30 hitos y validaciones de coherencia horaria.
   - - Alertas automáticas según retraso.
 - **[checklist despliegue]**
-  - - Asegurar reglas Firestore para `timing` y `ceremonyTimeline`.  
-  - - Revisar traducciones de estados y mensajes en UI.  
+  - - Asegurar reglas Firestore para `timing` y `ceremonyTimeline`.
+  - - Revisar traducciones de estados y mensajes en UI.
   - - Validar que seeds carguen timeline demo (`scripts/seedTestDataForPlanner.js:266`).
 
 ## 11C. Checklist de Última Hora
@@ -151,11 +155,11 @@
 - **[E2E specs]** 0/1 presentes
   - [faltante] cypress/e2e/protocolo/protocolo-flows.cy.js
 - **[roadmap/pending (doc)]**
-  - - Alertas sonoras/notificaciones push para requisitos críticos.  
+  - - Alertas sonoras/notificaciones push para requisitos críticos.
   - - Sincronización con centro de notificaciones.
 - **[checklist despliegue]**
-  - - Reglas Firestore para `ceremonyChecklist`.  
-  - - Traducciones y etiquetas de categorías (ES/EN/FR).  
+  - - Reglas Firestore para `ceremonyChecklist`.
+  - - Traducciones y etiquetas de categorías (ES/EN/FR).
   - - Seeds actualizados (`scripts/seedTestDataForPlanner.js:352`) para mostrar ejemplo funcional.
 
 ## 11D. Guía de Documentación Legal
@@ -167,15 +171,15 @@
 - **[E2E specs]** 0/1 presentes
   - [faltante] cypress/e2e/protocolo/protocolo-flows.cy.js
 - **[roadmap/pending (doc)]**
-  - - Tipos adicionales (simbólica, destino) y más países.  
+  - - Tipos adicionales (simbólica, destino) y más países.
   - - Desplegar variaciones completas por país: para cada combinación `tipo de ceremonia × país` se definen bloques (preparación, obtención, legalización), responsables, plazos sugeridos y alertas contextuales (ej. apostillas). La disposición se ajusta por jurisdicción sin depender de pestañas compartidas.
   - - Selector de país con memoria multiusuario: el país asignado automáticamente se almacena en `weddings/{id}/ceremony/legal.countryOrigin`, mientras que los overrides manuales se registran por usuario para evitar conflictos (`legalSettings/{uid}` con `preferredCountry` y timestamp).
-  - - Sincronización multiusuario (guardar progreso en Firestore) y notas por requisito.  
+  - - Sincronización multiusuario (guardar progreso en Firestore) y notas por requisito.
   - - Instrumentación (`ceremony_document_guide_opened`) y automatismos en checklist (marcar estado).
   - - Catálogo global de requisitos mantenido en Firestore/Storage para cubrir certificados civiles, religiosos y especiales (ver sección de Datos y modelo).
 - **[checklist despliegue]**
-  - - Revisar contenidos por país y mantener enlaces actualizados.  
-  - - Verificar traducciones y formato de fechas.  
+  - - Revisar contenidos por país y mantener enlaces actualizados.
+  - - Verificar traducciones y formato de fechas.
   - - Confirmar que las plantillas existen en `docs/protocolo` y se exponen correctamente desde la UI.
 
 ## 11E. Ayuda a Lecturas y Votos
@@ -188,18 +192,18 @@
   - [faltante] cypress/e2e/email/smart-composer.cy.js
   - [faltante] cypress/e2e/email/ai-provider-email.cy.js
 - **[roadmap/pending (doc)]**
-  - - Tabs adicionales (votos, discursos) y plantillas específicas por tipo.  
-  - - Tabs deben soportar experiencias segmentadas para cada miembro de la pareja (votos ella/él/elle) y para ayudantes.  
-  - - Campos extra: notas privadas, enlace directo a momentos de 11A, responsables asignados y tags de inspiración.  
-  - - Control de versiones con historial consultable, duplicado, favoritos y exportación (PDF/proyección).  
-  - - Validaciones en cliente (título requerido, evitar duplicados, longitud mínima) con surfaced feedback y recuperación ante errores de red.  
-  - - Integración IA (reescritura, tono) y publicación automática en flujo 21.  
-  - - Validación de permisos en backend y auditoría detallada, incluyendo trazabilidad de quién vio o editó cada texto.  
-  - - Métricas operativas en UI (duración total de ceremonia, ratio de textos finalizados) y eventos adicionales para checklist 11C.  
+  - - Tabs adicionales (votos, discursos) y plantillas específicas por tipo.
+  - - Tabs deben soportar experiencias segmentadas para cada miembro de la pareja (votos ella/él/elle) y para ayudantes.
+  - - Campos extra: notas privadas, enlace directo a momentos de 11A, responsables asignados y tags de inspiración.
+  - - Control de versiones con historial consultable, duplicado, favoritos y exportación (PDF/proyección).
+  - - Validaciones en cliente (título requerido, evitar duplicados, longitud mínima) con surfaced feedback y recuperación ante errores de red.
+  - - Integración IA (reescritura, tono) y publicación automática en flujo 21.
+  - - Validación de permisos en backend y auditoría detallada, incluyendo trazabilidad de quién vio o editó cada texto.
+  - - Métricas operativas en UI (duración total de ceremonia, ratio de textos finalizados) y eventos adicionales para checklist 11C.
   - - Pruebas E2E dedicadas para usuarios ayudantes y miembros de la pareja cubriendo visibilidad, estados y vistas previas.
 - **[checklist despliegue]**
-  - - Verificar reglas Firestore para `ceremonyTexts`.  
-  - - Revisar textos de muestra y traducciones.  
+  - - Verificar reglas Firestore para `ceremonyTexts`.
+  - - Revisar textos de muestra y traducciones.
   - - Validar permisos según rol y auditoría (`updatedBy`).
 
 ## 12. Notificaciones y Configuración (estado 2025-10-07)
@@ -406,9 +410,9 @@
 - **[checklist despliegue]**
   - - Reglas Firestore: permitir escritura de `eventType`, `eventProfile`, `eventProfileSummary` y nuevos campos en `_seed_meta`.
   - - Script `scripts/migrate-event-profile.js` para etiquetar eventos legacy con `eventType: 'boda'` y generar `eventProfileSummary` básico antes del switch.
-  -   1. Obtener credenciales (`serviceAccount.json`) y ejecutar: `node scripts/migrate-event-profile.js --credentials path/to/serviceAccount.json`.
-  -   2. Verificar en staging que `weddings/{id}` contiene `eventType/eventProfile` normalizados y que cada `users/{uid}/weddings/{id}` refleja `eventProfileSummary`.
-  -   3. Revisar logs de consola (totales migrados) y auditar uno o dos documentos en la consola de Firestore antes de seguir a producción.
+  - 1. Obtener credenciales (`serviceAccount.json`) y ejecutar: `node scripts/migrate-event-profile.js --credentials path/to/serviceAccount.json`.
+  - 2. Verificar en staging que `weddings/{id}` contiene `eventType/eventProfile` normalizados y que cada `users/{uid}/weddings/{id}` refleja `eventProfileSummary`.
+  - 3. Revisar logs de consola (totales migrados) y auditar uno o dos documentos en la consola de Firestore antes de seguir a producción.
   - - Revisión de copy/traducciones (`Crear boda`, `Crear evento`) y estilos centralizados (`config/eventStyles.js`).
   - - Telemetría: preparar dashboard funnel + ratio adopción Paso 2.
   - - QA: actualizar suites Cypress/E2E con los casos anteriores.
@@ -603,19 +607,19 @@
   - [faltante] cypress/e2e/moments/moments-empty-state.cy.js
 - **[roadmap/pending (doc)]**
   - 1. **MVP interno (Sprint 1-2)**:
-  -    - Crear álbum único `momentos` por boda.
-  -    - Flujo invitado con token + subida foto + moderación manual + aprobación.
-  -    - Feed anfitrión básico + download simple (lista enlaces).
+  - - Crear álbum único `momentos` por boda.
+  - - Flujo invitado con token + subida foto + moderación manual + aprobación.
+  - - Feed anfitrión básico + download simple (lista enlaces).
   - 2. **Release público (Sprint 3-4)**:
-  -    - QR dinamico, slideshow, export ZIP, reacciones, analytics básicos.
-  -    - Vision API para flag + email diarios.
-  -    - Escenas configurables + selector en flujo invitado + filtros host.
-  -    - Gamificación base (badges, leaderboard diario, mensajes de agradecimiento).
+  - - QR dinamico, slideshow, export ZIP, reacciones, analytics básicos.
+  - - Vision API para flag + email diarios.
+  - - Escenas configurables + selector en flujo invitado + filtros host.
+  - - Gamificación base (badges, leaderboard diario, mensajes de agradecimiento).
   - 3. **Optimización (Sprint 5+)**:
-  -    - App nativa offline, subida video corto, stories automáticas.
-  -    - Auto-highlights con heurística avanzada + experimentos IA ligera (detección emociones, nitidez).
-  -    - Álbumes múltiples (Preboda, Postboda), integraciones fotógrafo.
-  -    - Automatizaciones marketing (`compartir con invitados` + plantillas email).
+  - - App nativa offline, subida video corto, stories automáticas.
+  - - Auto-highlights con heurística avanzada + experimentos IA ligera (detección emociones, nitidez).
+  - - Álbumes múltiples (Preboda, Postboda), integraciones fotógrafo.
+  - - Automatizaciones marketing (`compartir con invitados` + plantillas email).
 
 ## 28. Dashboard Wedding Planner (estado 2025-10-13)
 
@@ -685,9 +689,9 @@
 - **[roadmap/pending (doc)]**
   - - Instrumentar eventos para comparar funnels (wizard vs. asistente).
   - - Añadir capa IA:
-  -   - Sugiere estilos/notas basadas en respuestas anteriores o perfil del usuario.
-  -   - Generar mensaje de agradecimiento/introducción automático listo para enviar a invitados.
-  -   - Respuestas contextualizadas (ej. si fecha está cerca, ofrecer recomendaciones de próximos pasos).
+  - - Sugiere estilos/notas basadas en respuestas anteriores o perfil del usuario.
+  - - Generar mensaje de agradecimiento/introducción automático listo para enviar a invitados.
+  - - Respuestas contextualizadas (ej. si fecha está cerca, ofrecer recomendaciones de próximos pasos).
   - - Documentar copy guía con propuesta de tono (cercano, propositivo, sin tecnicismos); coordinar con equipo de UX writing.
   - - Integrar CTA desde dashboard/onboarding y ofrecer elección entre modos.
   - - Soporte para múltiples rondas (editar una respuesta concreta sin reiniciar).
@@ -743,76 +747,76 @@
   - **Implementación: ✅ 95%** | **Cobertura E2E: 🟡 65%**
   - **✅ IMPLEMENTADO Y FUNCIONAL:**
   - 1. **CRUD Completo de Invitados** ✅
-  -    - `src/pages/Invitados.jsx` ✅
-  -    - `src/components/guests/GuestList.jsx` ✅
-  -    - `src/components/guests/GuestForm.jsx` ✅
-  -    - `src/hooks/useGuests.js` ✅
+  - - `src/pages/Invitados.jsx` ✅
+  - - `src/components/guests/GuestList.jsx` ✅
+  - - `src/components/guests/GuestForm.jsx` ✅
+  - - `src/hooks/useGuests.js` ✅
   - 2. **Importación Masiva** ✅
-  -    - `src/components/guests/ContactsImporter.jsx` ✅
-  -    - `src/components/guests/GuestBulkGrid.jsx` ✅
-  -    - Soporta CSV/Excel, Contact Picker API
-  -    - Deduplicación por email/teléfono
+  - - `src/components/guests/ContactsImporter.jsx` ✅
+  - - `src/components/guests/GuestBulkGrid.jsx` ✅
+  - - Soporta CSV/Excel, Contact Picker API
+  - - Deduplicación por email/teléfono
   - 3. **WhatsApp Batch Messaging** ✅
-  -    - `src/services/whatsappService.js` ✅
-  -    - `src/components/guests/WhatsAppModal.jsx` ✅
-  -    - `src/services/WhatsAppBatchService.js` ✅
-  -    - Programación de envíos
-  -    - Límite 250 mensajes por lote
+  - - `src/services/whatsappService.js` ✅
+  - - `src/components/guests/WhatsAppModal.jsx` ✅
+  - - `src/services/WhatsAppBatchService.js` ✅
+  - - Programación de envíos
+  - - Límite 250 mensajes por lote
   - 4. **RSVP Tracking** ✅
-  -    - `src/pages/RSVPDashboard.jsx` ✅
-  -    - Dashboard con métricas
-  -    - Estados: pending/confirmed/declined
+  - - `src/pages/RSVPDashboard.jsx` ✅
+  - - Dashboard con métricas
+  - - Estados: pending/confirmed/declined
   - 5. **Grupos y Asignación** ✅
-  -    - `src/components/guests/GroupManager.jsx` ✅
-  -    - Gestión de grupos
-  -    - Asignación de mesa básica
+  - - `src/components/guests/GroupManager.jsx` ✅
+  - - Gestión de grupos
+  - - Asignación de mesa básica
   - 6. **Offline-First** ✅
-  -    - Sincronización con localStorage
-  -    - `src/services/SyncService.js` ✅
-  -    - Eventos `MaLove.App-guests-updated`
+  - - Sincronización con localStorage
+  - - `src/services/SyncService.js` ✅
+  - - Eventos `MaLove.App-guests-updated`
   - 7. **Tests E2E** 🟡
-  -    - `cypress/e2e/guests/` (4 archivos)
-  -    - `cypress/e2e/critical/guests.cy.js` ✅
-  -    - `cypress/e2e/critical/guests-real.cy.js` ✅
-  -    - Cobertura: ~65% (tests básicos)
+  - - `cypress/e2e/guests/` (4 archivos)
+  - - `cypress/e2e/critical/guests.cy.js` ✅
+  - - `cypress/e2e/critical/guests-real.cy.js` ✅
+  - - Cobertura: ~65% (tests básicos)
   - **🟡 PARCIALMENTE IMPLEMENTADO:**
   - 1. **Integración Seating Bidireccional** 🟡
-  -    - Asignación a mesa: ✅ Funciona
-  -    - Sincronización bidireccional: ❌ Pendiente
-  -    - Campo `seatAssignment` existe pero no se sincroniza automáticamente
-  -    - Estimación: 8-12 horas
+  - - Asignación a mesa: ✅ Funciona
+  - - Sincronización bidireccional: ❌ Pendiente
+  - - Campo `seatAssignment` existe pero no se sincroniza automáticamente
+  - - Estimación: 8-12 horas
   - 2. **Manejo Defensivo de Hooks** 🟡
-  -    - Página usa valores mock para estabilidad (decisión temporal)
-  -    - Try-catch implementado pero hooks deshabilitados
-  -    - Reintegración gradual pendiente
+  - - Página usa valores mock para estabilidad (decisión temporal)
+  - - Try-catch implementado pero hooks deshabilitados
+  - - Reintegración gradual pendiente
   - **❌ NO IMPLEMENTADO:**
   - 1. **IA para Agrupar Invitados** ❌
-  -    - Sugerencias automáticas de grupos ❌
-  -    - Mensajes personalizados con IA ❌
-  -    - Estimación: 15-20 horas
+  - - Sugerencias automáticas de grupos ❌
+  - - Mensajes personalizados con IA ❌
+  - - Estimación: 15-20 horas
   - 2. **Mensajería Omnicanal** ❌
-  -    - SMS/push orquestada ❌
-  -    - Automatizaciones avanzadas ❌
-  -    - Estimación: 20-30 horas
+  - - SMS/push orquestada ❌
+  - - Automatizaciones avanzadas ❌
+  - - Estimación: 20-30 horas
   - 3. **Portal Colaborador** ❌
-  -    - Permisos restringidos ❌
-  -    - Vista externa ❌
-  -    - Estimación: 30-40 horas
+  - - Permisos restringidos ❌
+  - - Vista externa ❌
+  - - Estimación: 30-40 horas
   - 4. **Sincronización CRM Externo** ❌
-  -    - Integración CRM ❌
-  -    - Estimación: 25-35 horas
+  - - Integración CRM ❌
+  - - Estimación: 25-35 horas
   - **⚠️ TESTS FALTANTES:**
   - 1. **WhatsApp Service** ❌
-  -    - `whatsappService.js` sin tests E2E
-  -    - `WhatsAppBatchService.js` sin tests
-  -    - Estimación tests: 4 horas
+  - - `whatsappService.js` sin tests E2E
+  - - `WhatsAppBatchService.js` sin tests
+  - - Estimación tests: 4 horas
   - 2. **Importación Masiva** 🟡
-  -    - Tests parciales en `guests-import.cy.js`
-  -    - Falta cobertura completa
-  -    - Estimación: 3 horas
+  - - Tests parciales en `guests-import.cy.js`
+  - - Falta cobertura completa
+  - - Estimación: 3 horas
   - 3. **Grupos** ❌
-  -    - `GroupManager.jsx` sin tests
-  -    - Estimación: 3 horas
+  - - `GroupManager.jsx` sin tests
+  - - Estimación: 3 horas
   - ### Pendientes Priorizados:
   - **Corto Plazo (1-2 semanas):**
   - - ⏳ Sincronización bidireccional Seating (8-12h)
@@ -868,16 +872,16 @@
 - **[E2E specs]** 0/1 presentes
   - [faltante] cypress/e2e/style/style-global.cy.js
 - **[roadmap/pending (doc)]**
-  - - Consumir `branding/main.palette` en `websitePromptBuilder` y en generadores de invitaciones (`ImageGeneratorAI`).  
-  - - Anadir UI declarativa de paleta/tipografias en `/perfil` con preview y guardado directo en Firestore (sin depender de localStorage).  
-  - - Emitir eventos de monitoreo (p.ej. `style_updated`, `palette_saved`) y panel en dashboard admin.  
-  - - Soportar estilos personalizados (valores libres) con normalizacion y mapeo IA.  
-  - - Consolidar tokens CSS (crear `src/styles/tokens.css` referenciado en docs) y documentar proceso de override.  
+  - - Consumir `branding/main.palette` en `websitePromptBuilder` y en generadores de invitaciones (`ImageGeneratorAI`).
+  - - Anadir UI declarativa de paleta/tipografias en `/perfil` con preview y guardado directo en Firestore (sin depender de localStorage).
+  - - Emitir eventos de monitoreo (p.ej. `style_updated`, `palette_saved`) y panel en dashboard admin.
+  - - Soportar estilos personalizados (valores libres) con normalizacion y mapeo IA.
+  - - Consolidar tokens CSS (crear `src/styles/tokens.css` referenciado en docs) y documentar proceso de override.
   - - Tests e2e para vector editor y para cambios via comandos IA.
 - **[checklist despliegue]**
-  - - Confirmar que `EVENT_STYLE_OPTIONS` coincide con copy publico y traducciones.  
-  - - Verificar reglas de seguridad Firestore para `weddings/{id}/branding`.  
-  - - Asegurar que el bundle incluye `ThemeToggle` y variables CSS sin colisiones.  
+  - - Confirmar que `EVENT_STYLE_OPTIONS` coincide con copy publico y traducciones.
+  - - Verificar reglas de seguridad Firestore para `weddings/{id}/branding`.
+  - - Asegurar que el bundle incluye `ThemeToggle` y variables CSS sin colisiones.
   - - Revisar que asistentes IA reciban contexto (`style`, `guestCount`, `formality`) en `ChatWidget` antes de habilitar nuevas plantillas.
 
 ## 4. Invitados – Plan de Asientos (estado 2025-10-12)
@@ -885,11 +889,11 @@
 - **[archivo]** docs/flujos-especificos/flujo-4-invitados-operativa.md
 - **[conclusion]** pendiente
 - **[pendiente (doc)]**
-  - 
+  -
 - **[roadmap/pending (doc)]**
-  - - Panel lateral inteligente con recomendaciones autónomas y resolución de conflictos por IA.  
-  - - Colaboración en tiempo real: evolucionar hacia versionado avanzado (locks y merge multi-editor) sobre la presencia y sincronización actuales.  
-  - - Integración con proveedores/venues (ingesta automática de planos y configuraciones).  
+  - - Panel lateral inteligente con recomendaciones autónomas y resolución de conflictos por IA.
+  - - Colaboración en tiempo real: evolucionar hacia versionado avanzado (locks y merge multi-editor) sobre la presencia y sincronización actuales.
+  - - Integración con proveedores/venues (ingesta automática de planos y configuraciones).
   - - Exportaciones con presets guardados y envío directo a stakeholders.
   - - Reestructurar el PDF avanzado en secciones dedicadas (mapa de ceremonia, plano de banquete, lista global, invitados por mesa, dietas especiales, VIP de Momentos Especiales).
 - **[checklist despliegue]**
@@ -1007,75 +1011,75 @@
   - ### 🔍 ESTADO REAL VERIFICADO (2025-10-24)
   - **✅ IMPLEMENTADO Y FUNCIONAL:**
   - 1. **emailSchedulerCron** - `backend/jobs/emailSchedulerCron.js` ✅
-  -    - Código completo con `runEmailSchedulerJob()`
-  -    - Exporta función ejecutable manualmente o vía cron
-  -    - Integrado con `processScheduledEmailQueue`
-  -    - ⚠️ FALTA: Configurar en Cloud Scheduler/Render Cron para ejecución automática
+  - - Código completo con `runEmailSchedulerJob()`
+  - - Exporta función ejecutable manualmente o vía cron
+  - - Integrado con `processScheduledEmailQueue`
+  - - ⚠️ FALTA: Configurar en Cloud Scheduler/Render Cron para ejecución automática
   - 2. **emailTrashRetention** - `backend/jobs/emailTrashRetention.js` ✅
-  -    - Job de limpieza automática implementado
-  -    - Elimina emails con más de 30 días en papelera
-  -    - Auditoría en colección `emailRetentionAudit`
-  -    - ⚠️ FALTA: Configurar cron diario (0 2 * * *)
+  - - Job de limpieza automática implementado
+  - - Elimina emails con más de 30 días en papelera
+  - - Auditoría en colección `emailRetentionAudit`
+  - - ⚠️ FALTA: Configurar cron diario (0 2 \* \* \*)
   - 3. **onMailUpdated Cloud Function** - `functions/index.js:23-97` ✅
-  -    - Actualiza contadores de carpetas automáticamente
-  -    - Maneja cambios en folder y estado read
-  -    - Colección `emailFolderStats` con totalCount y unreadCount
-  -    - Función auxiliar `updateFolderCount()` completa
+  - - Actualiza contadores de carpetas automáticamente
+  - - Maneja cambios en folder y estado read
+  - - Colección `emailFolderStats` con totalCount y unreadCount
+  - - Función auxiliar `updateFolderCount()` completa
   - 4. **Webhooks Mailgun** - `backend/routes/mailgun-webhook.js` ✅
-  -    - Endpoint `/webhooks/deliverability` funcional
-  -    - Verificación de firma Mailgun implementada
-  -    - Registro de eventos básicos
+  - - Endpoint `/webhooks/deliverability` funcional
+  - - Verificación de firma Mailgun implementada
+  - - Registro de eventos básicos
   - **✅ IMPLEMENTADO (CORRECCIÓN):**
   - 1. **callClassificationAPI** ✅ - `backend/services/emailClassificationService.js`
-  -    - **Estado:** EXISTE Y FUNCIONAL (351 líneas)
-  -    - Clasificación con OpenAI GPT-4o-mini
-  -    - Fallback heurístico local
-  -    - 8 categorías: Proveedor, Invitado, Finanzas, Contratos, Facturas, Reuniones, RSVP, General
-  -    - Métricas y auditoría completa
-  -    - **Nota:** Error en análisis anterior - esta funcionalidad SÍ está implementada con OpenAI para clasificación
-  -    - La documentación marcaba esto como "✅ 2025-10-20" INCORRECTAMENTE
-  -    - Impacto: Clasificación solo usa heurísticas locales básicas
+  - - **Estado:** EXISTE Y FUNCIONAL (351 líneas)
+  - - Clasificación con OpenAI GPT-4o-mini
+  - - Fallback heurístico local
+  - - 8 categorías: Proveedor, Invitado, Finanzas, Contratos, Facturas, Reuniones, RSVP, General
+  - - Métricas y auditoría completa
+  - - **Nota:** Error en análisis anterior - esta funcionalidad SÍ está implementada con OpenAI para clasificación
+  - - La documentación marcaba esto como "✅ 2025-10-20" INCORRECTAMENTE
+  - - Impacto: Clasificación solo usa heurísticas locales básicas
   - **🟡 PARCIALMENTE IMPLEMENTADO:**
   - 1. **Auto-respuestas sincronización**
-  -    - Backend endpoints: `GET/PUT /api/email-automation/config` ✅
-  -    - Persistencia en Firestore ✅
-  -    - Frontend aún usa localStorage como primario 🟡
+  - - Backend endpoints: `GET/PUT /api/email-automation/config` ✅
+  - - Persistencia en Firestore ✅
+  - - Frontend aún usa localStorage como primario 🟡
   - ### Roadmap Actualizado:
   - 1. **Automatización y backend (Owner: Backend Squad)**
-  -    - ⏳ PENDIENTE: callClassificationAPI con OpenAI (estimado: 8-12h)
-  -    - ✅ CÓDIGO LISTO: emailSchedulerCron (solo falta configurar cron externo)
-  -    - ✅ CÓDIGO LISTO: emailTrashRetention (solo falta configurar cron diario)
-  -    - ✅ IMPLEMENTADO: onMailUpdated Cloud Function
-  -    - 🟡 MEJORAR: Webhooks Mailgun (completar procesamiento de deliverability)
+  - - ⏳ PENDIENTE: callClassificationAPI con OpenAI (estimado: 8-12h)
+  - - ✅ CÓDIGO LISTO: emailSchedulerCron (solo falta configurar cron externo)
+  - - ✅ CÓDIGO LISTO: emailTrashRetention (solo falta configurar cron diario)
+  - - ✅ IMPLEMENTADO: onMailUpdated Cloud Function
+  - - 🟡 MEJORAR: Webhooks Mailgun (completar procesamiento de deliverability)
   - 2. **UX / funcionalidad (Owner: Frontend Squad, ETA Q1 2026)**
-  -    - Drag & drop y reorder de carpetas personalizadas con sincronización emailFolderStats.
-  -    - Papelera avanzada: restaurar carpeta original, métricas de retención y vaciado masivo.
-  -    - Búsqueda/orden integrados en estado global y backend (GET /api/mail).
-  -    - Toggle de buzón legacy solo soporte y plan de retirada.
-  -    - Onboarding completo con validación DKIM/SPF y correo de prueba automatizado.
+  - - Drag & drop y reorder de carpetas personalizadas con sincronización emailFolderStats.
+  - - Papelera avanzada: restaurar carpeta original, métricas de retención y vaciado masivo.
+  - - Búsqueda/orden integrados en estado global y backend (GET /api/mail).
+  - - Toggle de buzón legacy solo soporte y plan de retirada.
+  - - Onboarding completo con validación DKIM/SPF y correo de prueba automatizado.
   - 3. **Analítica y monitoreo (Owner: Data/Analytics, ETA Q1 2026)**
-  -    - Dashboard Grafana/BigQuery con KPIs (deliverySuccess, openRate, 
+  - - Dashboard Grafana/BigQuery con KPIs (deliverySuccess, openRate,
   - eplyTimeMedian, utoReplyCoverage, iaAdoption, cleanupRate).
-  -    - Alertas automáticas: rebotes >5% diario, complained >0.5%, SLA respuesta >24h.
+  - - Alertas automáticas: rebotes >5% diario, complained >0.5%, SLA respuesta >24h.
   - 4. **Integraciones cruzadas (Owner: Orquestador/IA, ETA Q2 2026)**
-  -    - Consolidar workflows IA (Flujo 16) con etiquetado y borradores state=draft.
-  -    - Journeys multicanal (email + push + WhatsApp) y timeline conversacional.
-  -    - Sincronizar preferencias de notificaciones (Flujo 12) con auto-respuestas.
+  - - Consolidar workflows IA (Flujo 16) con etiquetado y borradores state=draft.
+  - - Journeys multicanal (email + push + WhatsApp) y timeline conversacional.
+  - - Sincronizar preferencias de notificaciones (Flujo 12) con auto-respuestas.
   - 5. **Testing y QA (Owner: QA Guild, continuo)**
-  -    - Actualizar suites Cypress/Vitest para Inbox, comentarios, agenda, feedback y programados.
-  -    - Automatizar pruebas de alias/onboarding y fallback Mailgun.
-  -    - Añadir cobertura para emailTrashRetention, webhooks de rebote y métricas.
+  - - Actualizar suites Cypress/Vitest para Inbox, comentarios, agenda, feedback y programados.
+  - - Automatizar pruebas de alias/onboarding y fallback Mailgun.
+  - - Añadir cobertura para emailTrashRetention, webhooks de rebote y métricas.
   - Mantener esta lista viva antes de iniciar nuevas implementaciones en Flujo 7.
 - **[checklist despliegue]**
   - - **Variables de entorno front/back:**
-  -   - `VITE_BACKEND_BASE_URL` (si hay API Gateway), `VITE_ENABLE_EMAIL_ANALYZE` (`1` para permitir `/api/email-insights/analyze`), `VITE_ENABLE_DIRECT_OPENAI`, `VITE_OPENAI_API_KEY`, `VITE_OPENAI_PROJECT_ID` para funciones IA.
-  -   - `VITE_MAILGUN_DOMAIN` y `VITE_FIREBASE_FUNCTIONS_URL` (`mailgunService` / `MailgunTester`).
-  -   - `VITE_ENABLE_AI_SUPPLIERS` para búsqueda IA de proveedores.
+  - - `VITE_BACKEND_BASE_URL` (si hay API Gateway), `VITE_ENABLE_EMAIL_ANALYZE` (`1` para permitir `/api/email-insights/analyze`), `VITE_ENABLE_DIRECT_OPENAI`, `VITE_OPENAI_API_KEY`, `VITE_OPENAI_PROJECT_ID` para funciones IA.
+  - - `VITE_MAILGUN_DOMAIN` y `VITE_FIREBASE_FUNCTIONS_URL` (`mailgunService` / `MailgunTester`).
+  - - `VITE_ENABLE_AI_SUPPLIERS` para búsqueda IA de proveedores.
   - - **Firestore/Cloud Functions:**
-  -   - Colecciones: `emailUsernames`, `users`, `emailMetrics` (+ subcolección `daily`), `users/{uid}/mails` (si se usa fallback), `mails` (global).
-  -   - Reglas de seguridad que permitan leer/escribir `emailUsernames`, `emailMetrics`, `users/{uid}/mails` y evitar filtraciones cross-user.
-  -   - Función (cron) o job que invoque `processScheduledEmails(sendMail)` periódicamente en el backend para habilitar programaciones.
-  -   - Webhooks Mailgun (inbound/outbound) si se habilita backend.
+  - - Colecciones: `emailUsernames`, `users`, `emailMetrics` (+ subcolección `daily`), `users/{uid}/mails` (si se usa fallback), `mails` (global).
+  - - Reglas de seguridad que permitan leer/escribir `emailUsernames`, `emailMetrics`, `users/{uid}/mails` y evitar filtraciones cross-user.
+  - - Función (cron) o job que invoque `processScheduledEmails(sendMail)` periódicamente en el backend para habilitar programaciones.
+  - - Webhooks Mailgun (inbound/outbound) si se habilita backend.
   - - **Frontend:** exponer data-testids alineados con Cypress, asegurar que `UnifiedInbox` reemplaza completamente al legacy y limpiar scripts/estilos duplicados antes de release.
 
 ## 8. Diseno Web y Personalizacion (estado 2025-10-08)
@@ -1087,17 +1091,17 @@
 - **[E2E specs]** 0/1 presentes
   - [faltante] cypress/e2e/web/diseno-web-flow.cy.js
 - **[roadmap/pending (doc)]**
-  - - Editor de prompts avanzado (CRUD, versionado, biblioteca compartida por rol).  
-  - - Refactor de generacion IA: mover a backend/`AIWebGenerator` con streaming seguro, quotas y manejo centralizado de errores.  
-  - - Historial enriquecido: diffs, etiquetas, undo/redo y soporte de borradores previos a publicar.  
-  - - Analitica integrada (dashboard, alertas) sobre `analytics/websiteEvents` + tracking de visitas publicas.  
-  - - Dominio personalizado y SEO avanzado (metatags dinamicos, sitemap, OG images, fallback offline).  
+  - - Editor de prompts avanzado (CRUD, versionado, biblioteca compartida por rol).
+  - - Refactor de generacion IA: mover a backend/`AIWebGenerator` con streaming seguro, quotas y manejo centralizado de errores.
+  - - Historial enriquecido: diffs, etiquetas, undo/redo y soporte de borradores previos a publicar.
+  - - Analitica integrada (dashboard, alertas) sobre `analytics/websiteEvents` + tracking de visitas publicas.
+  - - Dominio personalizado y SEO avanzado (metatags dinamicos, sitemap, OG images, fallback offline).
   - - Colaboracion multirol (comentarios, sugerencias, aprobaciones con permisos granulares).
 - **[checklist despliegue]**
-  - - Definir `OPENAI_API_KEY`, `VITE_ENABLE_DIRECT_OPENAI`, `VITE_OPENAI_PROJECT_ID` y modelo antes de habilitar IA directa.  
-  - - Configurar hosting/CDN para publicar `weddings/{id}/publicSite/site` y limpiar cache tras cada publish.  
-  - - Revisar consentimiento de datos publicos y clausulas de privacidad.  
-  - - Validar peso total del HTML + assets (< 2 MB recomendado).  
+  - - Definir `OPENAI_API_KEY`, `VITE_ENABLE_DIRECT_OPENAI`, `VITE_OPENAI_PROJECT_ID` y modelo antes de habilitar IA directa.
+  - - Configurar hosting/CDN para publicar `weddings/{id}/publicSite/site` y limpiar cache tras cada publish.
+  - - Revisar consentimiento de datos publicos y clausulas de privacidad.
+  - - Validar peso total del HTML + assets (< 2 MB recomendado).
   - - Preparar rollbacks en caso de fallo del backend `/api/public/weddings/:id/publish`.
 
 ## 9. RSVP y Confirmaciones (estado 2025-10-07)

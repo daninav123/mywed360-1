@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import OpenAI from 'openai';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { requireAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -40,18 +41,19 @@ const upload = multer({
 
 /**
  * DEBUG: Endpoint para verificar configuración de OpenAI
+ * PROTEGIDO: Solo admin puede acceder
  */
-router.get('/debug-config', (req, res) => {
+router.get('/debug-config', requireAdmin, (req, res) => {
   const apiKey = process.env.OPENAI_API_KEY || 'NO_SET';
   const projectId = process.env.OPENAI_PROJECT_ID || 'NO_SET';
   
   return res.json({
     success: true,
     config: {
-      apiKeyPrefix: apiKey.substring(0, 20) + '...',
-      apiKeySuffix: '...' + apiKey.substring(apiKey.length - 10),
+      apiKeyPrefix: apiKey !== 'NO_SET' ? apiKey.substring(0, 10) + '...' : 'NO_SET',
+      apiKeySuffix: apiKey !== 'NO_SET' ? '...' + apiKey.substring(apiKey.length - 4) : 'NO_SET',
       projectId: projectId,
-      openaiConfigured: true,
+      openaiConfigured: apiKey !== 'NO_SET',
     }
   });
 });

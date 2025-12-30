@@ -7,19 +7,21 @@ import React from 'react';
  * @param {string} className - Clases adicionales
  */
 const Badge = ({ type = 'default', children, className = '', ...props }) => {
-  const typeClasses = {
-    default: 'bg-gray-100 text-gray-800',
-    primary: 'bg-blue-100 text-blue-800',
-    info: 'bg-cyan-100 text-cyan-800',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-yellow-100 text-yellow-800',
-    error: 'bg-red-100 text-red-800',
+  const typeStyles = {
+    default: { backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' },
+    primary: { backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)' },
+    info: { backgroundColor: 'var(--color-info-10)', color: 'var(--color-info)' },
+    success: { backgroundColor: 'var(--color-success-10)', color: 'var(--color-success)' },
+    warning: { backgroundColor: 'var(--color-yellow)', color: 'var(--color-text)' },
+    error: { backgroundColor: 'var(--color-danger-10)', color: 'var(--color-danger)' },
   };
 
-  const badgeClasses = `inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${typeClasses[type] || typeClasses.default} ${className}`;
-
   return (
-    <span className={badgeClasses} {...props}>
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${className}`}
+      style={typeStyles[type] || typeStyles.default}
+      {...props}
+    >
       {children}
     </span>
   );

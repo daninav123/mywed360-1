@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100">
+  <path d="M 20 30 L 280 30 L 290 50 L 280 70 L 20 70 L 10 50 Z" 
+        fill="#E8D5B7" stroke="#C9A959" stroke-width="2"/>
+  <path d="M 20 30 L 10 20 L 10 50 Z" fill="#D4A574" stroke="#C9A959" stroke-width="1"/>
+  <path d="M 280 30 L 290 20 L 290 50 Z" fill="#D4A574" stroke="#C9A959" stroke-width="1"/>
+  <path d="M 20 70 L 10 80 L 10 50 Z" fill="#C9A77A" stroke="#C9A959" stroke-width="1"/>
+  <path d="M 280 70 L 290 80 L 290 50 Z" fill="#C9A77A" stroke="#C9A959" stroke-width="1"/>
+</svg>

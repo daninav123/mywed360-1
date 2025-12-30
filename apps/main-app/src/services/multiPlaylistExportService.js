@@ -25,7 +25,7 @@ export async function exportMultiplePlaylistsByBlock({
 
   for (const block of blocks) {
     const blockMoments = moments[block.id] || [];
-    
+
     // Playlist de momentos especiales
     const momentPlaylist = buildMomentPlaylist({
       block,
@@ -75,10 +75,10 @@ function buildMomentPlaylist({ block, moments, getSelectedSong, weddingName }) {
 
   moments.forEach((moment) => {
     const song = getSelectedSong(moment);
-    
+
     if (!song) {
-      missingSongs.push({ 
-        moment: moment.title, 
+      missingSongs.push({
+        moment: moment.title,
         reason: 'Sin canción asignada',
         time: moment.time,
       });
@@ -157,9 +157,9 @@ export async function createSpotifyPlaylists(playlists) {
         const url = await createSpotifyPlaylistAPI({
           name: playlist.name,
           description: playlist.description,
-          tracks: playlist.songs.map(s => s.trackId),
+          tracks: playlist.songs.map((s) => s.trackId),
         });
-        
+
         results.push({
           ...playlist,
           url,
@@ -188,9 +188,9 @@ async function createSpotifyPlaylistAPI({ name, description, tracks }) {
   // 2. Crear playlist
   // 3. Añadir tracks
   // 4. Devolver URL
-  
+
   console.log('Creating Spotify playlist:', { name, description, trackCount: tracks.length });
-  
+
   // Por ahora, devolver URL de ejemplo
   return `https://open.spotify.com/playlist/example-${Date.now()}`;
 }
@@ -202,28 +202,28 @@ export function generatePlaylistsSummary(playlists) {
   const summary = {
     total: playlists.length,
     byType: {
-      moments: playlists.filter(p => p.type === 'moments').length,
-      background: playlists.filter(p => p.type === 'background').length,
+      moments: playlists.filter((p) => p.type === 'moments').length,
+      background: playlists.filter((p) => p.type === 'background').length,
     },
     byBlock: {},
     totalSongs: 0,
     totalSpecialSongs: 0,
   };
 
-  playlists.forEach(playlist => {
+  playlists.forEach((playlist) => {
     if (!summary.byBlock[playlist.blockName]) {
       summary.byBlock[playlist.blockName] = {
         moments: 0,
         background: 0,
       };
     }
-    
+
     summary.byBlock[playlist.blockName][playlist.type]++;
-    
+
     if (playlist.songs) {
       summary.totalSongs += playlist.songs.length;
     }
-    
+
     if (playlist.specialSongs) {
       summary.totalSpecialSongs += playlist.specialSongs.length;
     }

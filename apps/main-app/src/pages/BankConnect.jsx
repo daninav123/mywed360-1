@@ -1,5 +1,6 @@
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../components/PageWrapper';
 import { Card, Button } from '../components/ui';
@@ -146,7 +147,7 @@ export default function BankConnect() {
               className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
             >
               <option value="">
-                {t('finance.bank.selectBankPlaceholder', { defaultValue: 'Selecciona un banco...' })}
+                {t('finance.bank.selectBankPlaceholder', { placeholder: t('bankConnect.selectBankPlaceholder') })}
               </option>
               {institutions.map((institution) => (
                 <option key={institution.id} value={institution.id}>

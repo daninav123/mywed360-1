@@ -30,6 +30,7 @@ import { db } from '../firebaseConfig';
 import { performanceMonitor } from './PerformanceMonitor';
 import { seedWeddingTasksFromTemplate } from './taskTemplateSeeder';
 import { syncWeddingWithCRM } from './crmSyncService';
+import { personalizeTaskTemplate, buildWeddingContext } from './taskPersonalizationService';
 
 const DEFAULT_EVENT_TYPE = 'boda';
 
@@ -290,12 +291,47 @@ export async function seedDefaultTasksForWedding(weddingId, weddingData) {
     projectEnd = weddingData.weddingDate;
   }
 
+  // 🤖 NUEVO: Intentar personalización con IA primero
+  let personalizedTemplate = null;
+  try {
+    const weddingContext = buildWeddingContext(weddingData);
+    console.log('🤖 [WeddingService] Personalizando tareas con IA...', weddingContext);
+    
+    const result = await personalizeTaskTemplate(weddingContext);
+    
+    if (result.success && result.template) {
+      personalizedTemplate = result.template;
+      console.log('✅ [WeddingService] Plantilla personalizada con IA:', {
+        personalized: result.personalized,
+        usedAI: result.usedAI,
+        blocks: result.template.blocks?.length || 0,
+      });
+      
+      // Registrar telemetría
+      try {
+        performanceMonitor?.logEvent?.('task_template_personalized', {
+          weddingId,
+          usedAI: result.usedAI,
+          personalized: result.personalized,
+          blocksCount: result.template.blocks?.length || 0,
+          ceremonyType: weddingContext.ceremonyType,
+          leadTimeMonths: weddingContext.leadTimeMonths,
+        });
+      } catch {}
+    } else {
+      console.warn('⚠️ [WeddingService] Personalización IA falló, usando plantilla genérica');
+    }
+  } catch (error) {
+    console.warn('⚠️ [WeddingService] Error en personalización IA:', error);
+  }
+
   try {
     await seedWeddingTasksFromTemplate({
       db,
       weddingId,
       projectEnd,
       skipIfSeeded: true,
+      customTemplate: personalizedTemplate, // ✨ Usar plantilla personalizada si existe
     });
   } catch (error) {
     // console.warn('[WeddingService] seed default tasks failed', error);

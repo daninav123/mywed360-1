@@ -93,7 +93,7 @@ function extractEmailFromPage($, html) {
   const foundEmail = uniqueEmails.length > 0 ? uniqueEmails[0] : null;
   
   if (foundEmail) {
-    console.log(`📧 [WebScraper] Email encontrado: ${foundEmail}`);
+    logger.info('[WebScraper] Email encontrado', { emailFound: true });
   }
   
   return foundEmail;

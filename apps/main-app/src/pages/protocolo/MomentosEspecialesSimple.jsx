@@ -1,5 +1,6 @@
 import { ChevronRight, Check, Music, Plus, Trash2, Radio } from 'lucide-react';
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import PageWrapper from '../../components/PageWrapper';
@@ -114,7 +115,7 @@ const MomentosEspecialesSimple = () => {
   const handleDescriptionChange = useCallback(
     (newDescription) => {
       if (!songPickerState.momentId) return;
-      
+
       // Actualizar descripción en el momento
       updateMoment(activeBlockId, songPickerState.momentId, {
         musicDescription: newDescription,
@@ -167,14 +168,17 @@ const MomentosEspecialesSimple = () => {
     [activeMoments, activeBlockId, updateMoment]
   );
 
-  const handleOpenSpecialSongModal = useCallback((moment, song) => {
-    setSpecialSongModal({
-      isOpen: true,
-      song,
-      momentId: moment.id,
-      blockId: activeBlockId,
-    });
-  }, [activeBlockId]);
+  const handleOpenSpecialSongModal = useCallback(
+    (moment, song) => {
+      setSpecialSongModal({
+        isOpen: true,
+        song,
+        momentId: moment.id,
+        blockId: activeBlockId,
+      });
+    },
+    [activeBlockId]
+  );
 
   const handleSaveSpecialSong = useCallback(
     (specialData) => {
@@ -188,9 +192,7 @@ const MomentosEspecialesSimple = () => {
       );
 
       toast.success(
-        specialData.isSpecial
-          ? 'Canción marcada como especial'
-          : 'Configuración actualizada',
+        specialData.isSpecial ? 'Canción marcada como especial' : 'Configuración actualizada',
         { position: 'bottom-right', autoClose: 2000 }
       );
 
@@ -225,7 +227,7 @@ const MomentosEspecialesSimple = () => {
   );
 
   const handleOpenBackgroundPlaylist = useCallback(() => {
-    const block = blocks.find(b => b.id === activeBlockId);
+    const block = blocks.find((b) => b.id === activeBlockId);
     if (block) {
       setBackgroundPlaylistModal({ isOpen: true, block });
     }
@@ -235,11 +237,17 @@ const MomentosEspecialesSimple = () => {
     (config) => {
       updateBlock(activeBlockId, { backgroundPlaylist: config });
       setBackgroundPlaylistModal({ isOpen: false, block: null });
-      
+
       if (config.enabled) {
-        toast.success('🎵 Playlist de ambiente configurada', { position: 'bottom-right', autoClose: 2000 });
+        toast.success('🎵 Playlist de ambiente configurada', {
+          position: 'bottom-right',
+          autoClose: 2000,
+        });
       } else {
-        toast.success('🚫 Playlist de ambiente desactivada', { position: 'bottom-right', autoClose: 2000 });
+        toast.success('🚫 Playlist de ambiente desactivada', {
+          position: 'bottom-right',
+          autoClose: 2000,
+        });
       }
     },
     [activeBlockId, updateBlock]
@@ -285,6 +293,7 @@ const MomentosEspecialesSimple = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline font-medium"
+                  placeholder={t('specialMoments.descriptionPlaceholder')}
                 >
                   Spotify.com
                 </a>{' '}
@@ -378,10 +387,11 @@ const MomentosEspecialesSimple = () => {
                   )}
                 </div>
                 <p className="text-sm text-gray-600 mt-1">
-                  {currentProgress?.completed || 0} de {currentProgress?.total || 0} momentos configurados
+                  {currentProgress?.completed || 0} de {currentProgress?.total || 0} momentos
+                  configurados
                 </p>
               </div>
-              
+
               <Button
                 onClick={handleOpenBackgroundPlaylist}
                 className="bg-green-600 hover:bg-green-700 text-white"
@@ -441,6 +451,7 @@ const MomentosEspecialesSimple = () => {
                 <Button
                   onClick={handleAddMoment}
                   className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md"
+                  placeholder={t('specialMoments.searchPlaceholder')}
                 >
                   <Plus size={18} className="mr-2" />
                   Añadir nuevo momento
@@ -466,7 +477,9 @@ const MomentosEspecialesSimple = () => {
       {/* Modal de configuración de canción especial */}
       <SpecialSongModal
         isOpen={specialSongModal.isOpen}
-        onClose={() => setSpecialSongModal({ isOpen: false, song: null, momentId: null, blockId: null })}
+        onClose={() =>
+          setSpecialSongModal({ isOpen: false, song: null, momentId: null, blockId: null })
+        }
         song={specialSongModal.song}
         momentId={specialSongModal.momentId}
         onSave={handleSaveSpecialSong}

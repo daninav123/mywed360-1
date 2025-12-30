@@ -26,6 +26,8 @@ const AdminRevolut = lazy(() => import('./pages/admin/AdminRevolut'));
 const AdminDebugPayments = lazy(() => import('./pages/admin/AdminDebugPayments'));
 const AdminAITraining = lazy(() => import('./pages/admin/AdminAITraining'));
 const AdminSpecsManager = lazy(() => import('./pages/admin/AdminSpecsManager'));
+const SupplierOptionsReview = lazy(() => import('./pages/SupplierOptionsReview'));
+const SupplierCatalog = lazy(() => import('./pages/SupplierCatalog'));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -66,7 +68,10 @@ function App() {
                 <Route path="finance/revolut" element={<AdminRevolut />} />
                 <Route path="debug/payments" element={<AdminDebugPayments />} />
                 <Route path="ai-training" element={<AdminAITraining />} />
-                <Route path="specs" element={<AdminSpecsManager />} />
+                <Route path="supplier-catalog" element={<SupplierCatalog />} />
+                {/* Legacy routes - redirect to unified catalog */}
+                <Route path="specs" element={<Navigate to="/admin/supplier-catalog" replace />} />
+                <Route path="supplier-options" element={<Navigate to="/admin/supplier-catalog" replace />} />
               </Route>
               
               {/* Legacy redirects */}

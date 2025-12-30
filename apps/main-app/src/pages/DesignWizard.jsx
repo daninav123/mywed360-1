@@ -3,6 +3,7 @@
  * FASE 1.3 del WORKFLOW-USUARIO.md
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useWedding } from '../context/WeddingContext';
@@ -63,10 +64,10 @@ const ReviewStep = ({ designData, onBack, onSave, saving }) => {
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-800 mb-2">
-          Resumen de tu Diseño
+          {t('designWizard.summaryTitle')}
         </h2>
         <p className="text-gray-600">
-          Revisa y confirma tu visión antes de guardar
+          {t('designWizard.visionPlaceholder')} antes de guardar
         </p>
       </div>
 
@@ -74,7 +75,7 @@ const ReviewStep = ({ designData, onBack, onSave, saving }) => {
       {designData.style && (
         <div className="bg-white border border-gray-200 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-3">
-            🎨 Estilo Principal
+            🎨 {t('designWizard.styleTitle')} {designData.style.name}
           </h3>
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4">
             <h4 className="text-xl font-bold text-gray-800 mb-2">
@@ -96,7 +97,7 @@ const ReviewStep = ({ designData, onBack, onSave, saving }) => {
       {designData.palette && (
         <div className="bg-white border border-gray-200 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-3">
-            🎨 Paleta de Colores
+            🎨 {t('designWizard.colorsTitle')} {designData.palette.name}
           </h3>
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="font-semibold text-gray-800 mb-3">{designData.palette.name}</h4>
@@ -121,7 +122,7 @@ const ReviewStep = ({ designData, onBack, onSave, saving }) => {
       {designData.moodBoard && designData.moodBoard.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-3">
-            📌 Mood Board ({designData.moodBoard.length} elementos)
+            📌 {t('designWizard.moodboardTitle')} ({designData.moodBoard.length} elementos)
           </h3>
           <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
             {designData.moodBoard.slice(0, 8).map((item, idx) => (
@@ -170,6 +171,7 @@ const ReviewStep = ({ designData, onBack, onSave, saving }) => {
 };
 
 export default function DesignWizard() {
+  const { t } = useTranslation();
   const { activeWedding } = useWedding();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -303,9 +305,9 @@ export default function DesignWizard() {
     <PageWrapper>
       <div className="max-w-5xl mx-auto py-8 px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Wizard de Diseño</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('designWizard.title')}</h1>
           <p className="text-gray-600">
-            Define el estilo visual de tu boda en 4 pasos
+            {t('designWizard.stylePlaceholder')} de tu boda en 4 pasos
           </p>
         </div>
 

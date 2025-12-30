@@ -607,9 +607,9 @@ export default function SupplierRequestDetail() {
                           className="w-full px-3 py-2 border rounded-lg"
                           style={{ borderColor: 'var(--color-border)' }}
                         >
-                          <option value="EUR">EUR</option>
-                          <option value="USD">USD</option>
-                          <option value="GBP">GBP</option>
+                          <option value="EUR">{t('common.currencies.eur')}</option>
+                          <option value="USD">{t('common.currencies.usd')}</option>
+                          <option value="GBP">{t('common.currencies.gbp')}</option>
                         </select>
                       </div>
                     </div>

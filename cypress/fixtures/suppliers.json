@@ -1,0 +1,101 @@
+{
+  "suppliers": [
+    {
+      "id": "test-supplier-001",
+      "name": "Jardín Botánico Madrid",
+      "category": "venue",
+      "email": "eventos@jardinbotanico.test.com",
+      "phone": "+34911234567",
+      "address": "Plaza de Murillo 2, 28014 Madrid",
+      "website": "https://jardinbotanico.test.com",
+      "rating": 4.8,
+      "reviewCount": 125,
+      "priceRange": "€€€",
+      "status": "contracted",
+      "contractAmount": 8000,
+      "createdAt": "2025-01-10T00:00:00.000Z"
+    },
+    {
+      "id": "test-supplier-002",
+      "name": "Catering Gourmet Premium",
+      "category": "catering",
+      "email": "info@cateringgourmet.test.com",
+      "phone": "+34911234568",
+      "address": "Calle Gran Vía 50, 28013 Madrid",
+      "website": "https://cateringgourmet.test.com",
+      "rating": 4.7,
+      "reviewCount": 98,
+      "priceRange": "€€€",
+      "status": "contracted",
+      "contractAmount": 7000,
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "test-supplier-003",
+      "name": "Fotógrafos Artísticos SA",
+      "category": "photography",
+      "email": "contacto@fotografosartisticos.test.com",
+      "phone": "+34911234569",
+      "address": "Calle Serrano 100, 28006 Madrid",
+      "website": "https://fotografosartisticos.test.com",
+      "rating": 4.9,
+      "reviewCount": 156,
+      "priceRange": "€€",
+      "status": "contracted",
+      "contractAmount": 3000,
+      "createdAt": "2025-01-20T00:00:00.000Z"
+    },
+    {
+      "id": "test-supplier-004",
+      "name": "Floristería Las Rosas",
+      "category": "flowers",
+      "email": "pedidos@floristerialasrosas.test.com",
+      "phone": "+34911234570",
+      "address": "Calle Alcalá 200, 28028 Madrid",
+      "website": "https://floristerialasrosas.test.com",
+      "rating": 4.6,
+      "reviewCount": 78,
+      "priceRange": "€€",
+      "status": "pending",
+      "quotedAmount": 2000,
+      "createdAt": "2025-02-01T00:00:00.000Z"
+    },
+    {
+      "id": "test-supplier-005",
+      "name": "DJ Master Music",
+      "category": "music",
+      "email": "booking@djmastermusic.test.com",
+      "phone": "+34911234571",
+      "address": "Calle Bravo Murillo 50, 28003 Madrid",
+      "website": "https://djmastermusic.test.com",
+      "rating": 4.5,
+      "reviewCount": 65,
+      "priceRange": "€",
+      "status": "contacted",
+      "quotedAmount": 1500,
+      "createdAt": "2025-02-10T00:00:00.000Z"
+    }
+  ],
+  "quoteRequests": [
+    {
+      "id": "test-quote-001",
+      "supplierId": "test-supplier-004",
+      "weddingId": "test-wedding-001",
+      "category": "flowers",
+      "message": "Necesitamos arreglos florales para ceremonia y recepción (120 personas)",
+      "status": "pending",
+      "createdAt": "2025-02-01T00:00:00.000Z"
+    },
+    {
+      "id": "test-quote-002",
+      "supplierId": "test-supplier-005",
+      "weddingId": "test-wedding-001",
+      "category": "music",
+      "message": "Buscamos DJ para recepción de 6 horas, música variada",
+      "status": "responded",
+      "quotedAmount": 1500,
+      "createdAt": "2025-02-10T00:00:00.000Z",
+      "respondedAt": "2025-02-12T00:00:00.000Z"
+    }
+  ]
+}

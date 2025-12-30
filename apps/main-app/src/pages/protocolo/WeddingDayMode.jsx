@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play, CheckCircle, Clock, Music, AlertCircle, ArrowRight, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageWrapper from '../../components/PageWrapper';

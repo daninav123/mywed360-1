@@ -186,7 +186,7 @@ const AdminSupport = () => {
                     <textarea
                       value={responseMessage}
                       onChange={(e) => setResponseMessage(e.target.value)}
-                      placeholder="Escribe tu respuesta..."
+                      placeholder={t('admin.support.responsePlaceholder')}
                       className="w-full px-3 py-2 border border-soft rounded-md text-sm"
                       rows="4"
                       disabled={responding}

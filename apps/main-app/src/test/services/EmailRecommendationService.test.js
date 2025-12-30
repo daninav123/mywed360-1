@@ -4,11 +4,13 @@ import EmailRecommendationService from '../../services/EmailRecommendationServic
 // Mock del servicio de tracking
 vi.mock('../../services/AIEmailTrackingService', () => {
   return {
-    default: vi.fn().mockImplementation(() => ({
-      getActivities: vi.fn(),
-      getMetrics: vi.fn(),
-      getComparisonData: vi.fn(),
-    })),
+    default: class MockAIEmailTrackingService {
+      constructor() {
+        this.getActivities = vi.fn();
+        this.getMetrics = vi.fn();
+        this.getComparisonData = vi.fn();
+      }
+    },
   };
 });
 

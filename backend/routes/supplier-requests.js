@@ -2,6 +2,8 @@ import express from 'express';
 import { db, FieldValue } from '../config/firebase.js';
 import logger from '../utils/logger.js';
 import { sendEmail } from '../services/mailgunService.js';
+import { sanitizers } from '../utils/logSanitizer.js';
+import { requireSupplierAuth, verifySupplierId } from '../middleware/supplierAuth.js';
 
 const router = express.Router();
 
@@ -210,7 +212,7 @@ router.post('/:supplierId/request-quote', express.json(), async (req, res) => {
           html: emailHTML,
         });
 
-        logger.info(`Email enviado a ${supplierEmail} para solicitud ${requestId}`);
+        logger.info(`Email enviado a ${sanitizers.email(supplierEmail)} para solicitud ${requestId}`);
       } catch (emailError) {
         logger.error('Error enviando email al proveedor:', emailError);
         // No fallar la request por error de email
@@ -259,7 +261,7 @@ router.post('/:supplierId/request-quote', express.json(), async (req, res) => {
         html: clientEmailHTML,
       });
 
-      logger.info(`Email de confirmación enviado a ${contactEmail}`);
+      logger.info(`Email de confirmación enviado a ${sanitizers.email(contactEmail)}`);
     } catch (emailError) {
       logger.error('Error enviando email de confirmación:', emailError);
       // No fallar la request por error de email
@@ -284,12 +286,10 @@ router.post('/:supplierId/request-quote', express.json(), async (req, res) => {
  * GET /api/supplier-requests/:supplierId
  * Obtener solicitudes de un proveedor
  */
-router.get('/:supplierId', async (req, res) => {
+router.get('/:supplierId', requireSupplierAuth, verifySupplierId, async (req, res) => {
   try {
     const { supplierId } = req.params;
     const { status, limit = 20, page = 1 } = req.query;
-
-    // TODO: Verificar autenticación del proveedor con middleware
 
     // Para evitar índice compuesto, obtenemos todos y filtramos en memoria si hay status
     let query = db
@@ -344,12 +344,10 @@ router.get('/:supplierId', async (req, res) => {
  * PATCH /api/supplier-requests/:supplierId/:requestId
  * Actualizar estado de solicitud
  */
-router.patch('/:supplierId/:requestId', express.json(), async (req, res) => {
+router.patch('/:supplierId/:requestId', requireSupplierAuth, verifySupplierId, express.json(), async (req, res) => {
   try {
     const { supplierId, requestId } = req.params;
     const { status, response } = req.body;
-
-    // TODO: Verificar autenticación del proveedor
 
     const updateData = {
       updatedAt: FieldValue.serverTimestamp(),

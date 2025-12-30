@@ -1,6 +1,7 @@
 import mailgun from 'mailgun-js';
 import dotenv from 'dotenv';
 import logger from '../utils/logger.js';
+import { sanitizers } from '../utils/logSanitizer.js';
 
 dotenv.config();
 
@@ -79,7 +80,7 @@ export async function sendEmail({ to, subject, html, from, text }) {
   }
 
   try {
-    logger.info(`[mailgunService] Enviando email a ${to}: ${subject}`);
+    logger.info(`[mailgunService] Enviando email a ${sanitizers.email(to)}: ${subject}`);
     const result = await client.messages().send(messageData);
     logger.info(`[mailgunService] Email enviado exitosamente. ID: ${result.id}`);
     return { success: true, messageId: result.id, result };

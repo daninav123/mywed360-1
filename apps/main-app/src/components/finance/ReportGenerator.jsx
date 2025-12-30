@@ -166,49 +166,47 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
   };
 
   const generateExcelReport = async (data) => {
-    // Importar xlsx dinámicamente
-    const XLSX = await import('xlsx');
+    // Importar exceljs dinámicamente
+    const ExcelJS = await import('exceljs');
+    const Excel = ExcelJS.default || ExcelJS;
 
     // Crear workbook
-    const wb = XLSX.utils.book_new();
+    const workbook = new Excel.Workbook();
 
     // Hoja 1: Resumen
-    const summaryData = [
-      [t('finance.reports.pdf.title')],
-      [weddingInfo.name || t('finance.reports.pdf.weddingFallback')],
-      [],
-      [t('finance.reports.pdf.summaryTitle')],
-      [
-        t('finance.reports.pdf.totalExpenses'),
+    const wsResumen = workbook.addWorksheet(t('finance.reports.excel.sheetSummary'));
+    wsResumen.addRow([t('finance.reports.pdf.title')]);
+    wsResumen.addRow([weddingInfo.name || t('finance.reports.pdf.weddingFallback')]);
+    wsResumen.addRow([]);
+    wsResumen.addRow([t('finance.reports.pdf.summaryTitle')]);
+    wsResumen.addRow([
+      t('finance.reports.pdf.totalExpenses'),
+      data.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0),
+    ]);
+    wsResumen.addRow([
+      t('finance.reports.pdf.totalIncome'),
+      data.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0),
+    ]);
+    wsResumen.addRow([
+      t('finance.reports.pdf.balance'),
+      data.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) -
         data.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0),
-      ],
-      [
-        t('finance.reports.pdf.totalIncome'),
-        data.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0),
-      ],
-      [
-        t('finance.reports.pdf.balance'),
-        data.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) -
-          data.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0),
-      ],
-      [],
-      [t('finance.reports.excel.generatedAt'), formatDate(new Date(), 'short')],
-    ];
-
-    const wsResumen = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(wb, wsResumen, t('finance.reports.excel.sheetSummary'));
+    ]);
+    wsResumen.addRow([]);
+    wsResumen.addRow([t('finance.reports.excel.generatedAt'), formatDate(new Date(), 'short')]);
 
     // Hoja 2: Transacciones
-    const transactionsData = [
-      [
-        t('finance.reports.excel.transactionsHeaders.date'),
-        t('finance.reports.excel.transactionsHeaders.concept'),
-        t('finance.reports.excel.transactionsHeaders.supplier'),
-        t('finance.reports.excel.transactionsHeaders.type'),
-        t('finance.reports.excel.transactionsHeaders.amount'),
-        t('finance.reports.excel.transactionsHeaders.category'),
-      ],
-      ...data.map((t) => [
+    const wsTransactions = workbook.addWorksheet(t('finance.reports.excel.sheetTransactions'));
+    wsTransactions.addRow([
+      t('finance.reports.excel.transactionsHeaders.date'),
+      t('finance.reports.excel.transactionsHeaders.concept'),
+      t('finance.reports.excel.transactionsHeaders.supplier'),
+      t('finance.reports.excel.transactionsHeaders.type'),
+      t('finance.reports.excel.transactionsHeaders.amount'),
+      t('finance.reports.excel.transactionsHeaders.category'),
+    ]);
+    data.forEach((t) => {
+      wsTransactions.addRow([
         formatDate(t.date, 'short'),
         t.concept || t.description || '-',
         t.supplier || '-',
@@ -217,36 +215,37 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
           : t('finance.reports.pdf.table.type.income'),
         t.amount,
         t.category || '-',
-      ]),
-    ];
-
-    const wsTransactions = XLSX.utils.aoa_to_sheet(transactionsData);
-    XLSX.utils.book_append_sheet(wb, wsTransactions, t('finance.reports.excel.sheetTransactions'));
+      ]);
+    });
 
     // Hoja 3: Por Proveedor (si hay datos)
     if (reportType === 'supplier' || suppliers.length > 0) {
-      const supplierSummary = suppliers.map((supplier) => {
+      const wsSuppliers = workbook.addWorksheet(t('finance.reports.excel.sheetSuppliers'));
+      wsSuppliers.addRow([
+        t('finance.reports.excel.supplierHeaders.supplier'),
+        t('finance.reports.excel.supplierHeaders.transactions'),
+        t('finance.reports.excel.supplierHeaders.total'),
+      ]);
+      
+      suppliers.forEach((supplier) => {
         const supplierTransactions = data.filter(
           (t) => t.supplier === supplier || t.concept === supplier
         );
         const total = supplierTransactions.reduce((sum, t) => sum + t.amount, 0);
-        return [supplier, supplierTransactions.length, total];
+        wsSuppliers.addRow([supplier, supplierTransactions.length, total]);
       });
-
-      const wsSuppliers = XLSX.utils.aoa_to_sheet([
-        [
-          t('finance.reports.excel.supplierHeaders.supplier'),
-          t('finance.reports.excel.supplierHeaders.transactions'),
-          t('finance.reports.excel.supplierHeaders.total'),
-        ],
-        ...supplierSummary,
-      ]);
-      XLSX.utils.book_append_sheet(wb, wsSuppliers, t('finance.reports.excel.sheetSuppliers'));
     }
 
     // Descargar
     const fileName = `${t('finance.reports.excel.fileNamePrefix')}-${new Date().getTime()}.xlsx`;
-    XLSX.writeFile(wb, fileName);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   return (

@@ -62,9 +62,10 @@ const logger = winston.createLogger({
       datePattern: 'YYYY-MM-DD',
       level: 'error',
       format: combine(timestamp(), json()),
-      maxSize: '100m', // Rotación automática cuando alcance 100MB
-      maxFiles: '14d', // Mantener logs de los últimos 14 días
-      zippedArchive: true, // Comprimir logs antiguos
+      maxSize: '5m',
+      maxFiles: '7d',
+      zippedArchive: true,
+      auditFile: 'logs/.audit-error.json',
       handleExceptions: true,
       handleRejections: true,
     }),
@@ -73,9 +74,10 @@ const logger = winston.createLogger({
       filename: 'logs/combined-%DATE%.log',
       datePattern: 'YYYY-MM-DD',
       format: combine(timestamp(), json()),
-      maxSize: '100m',
-      maxFiles: '7d', // Mantener logs combinados de los últimos 7 días
+      maxSize: '10m',
+      maxFiles: '3d',
       zippedArchive: true,
+      auditFile: 'logs/.audit-combined.json',
     }),
   ],
   exitOnError: false,

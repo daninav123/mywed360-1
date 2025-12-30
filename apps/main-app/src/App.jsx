@@ -28,6 +28,8 @@ const DevEnsureFinance = React.lazy(() => import('./pages/DevEnsureFinance'));
 const DevSeedGuests = React.lazy(() => import('./pages/DevSeedGuests'));
 const Finance = React.lazy(() => import('./pages/Finance'));
 const HomeUser = React.lazy(() => import('./pages/HomeUser.jsx'));
+const Home2 = React.lazy(() => import('./pages/Home2.jsx'));
+const Landing2 = React.lazy(() => import('./pages/Landing2.jsx'));
 const Invitaciones = React.lazy(() => import('./pages/Invitaciones'));
 const More = React.lazy(() => import('./pages/More'));
 const Perfil = React.lazy(() => import('./pages/Perfil'));
@@ -60,6 +62,7 @@ const SupplierPayments = React.lazy(() => import('./pages/suppliers/SupplierPaym
 const SupplierDebug = React.lazy(() => import('./pages/suppliers/SupplierDebug'));
 const SupplierPublicPage = React.lazy(() => import('./pages/SupplierPublicPage'));
 const Tasks = React.lazy(() => import('./pages/Tasks'));
+const TasksAI = React.lazy(() => import('./pages/TasksAI'));
 const Checklist = React.lazy(() => import('./pages/Checklist'));
 const PhotoShotListPage = React.lazy(() => import('./pages/PhotoShotListPage'));
 const PruebasEnsayos = React.lazy(() => import('./pages/PruebasEnsayos'));
@@ -156,6 +159,7 @@ const MenuCatering = React.lazy(() => import('./pages/disenos/MenuCatering'));
 const PapelesNombres = React.lazy(() => import('./pages/disenos/PapelesNombres'));
 const DisenosVectorEditor = React.lazy(() => import('./pages/disenos/VectorEditor'));
 const MisDisenos = React.lazy(() => import('./pages/disenos/MisDisenos'));
+const DesignEditor = React.lazy(() => import('./pages/design-editor/DesignEditor'));
 const Ideas = React.lazy(() => import('./pages/Ideas'));
 const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
@@ -170,6 +174,7 @@ const RoleUpgradeHarness = React.lazy(() => import('./pages/test/RoleUpgradeHarn
 const CreateWeddingAI = React.lazy(() => import('./pages/CreateWeddingAI.jsx'));
 const CreateWeddingAssistant = React.lazy(() => import('./pages/CreateWeddingAssistant.jsx'));
 const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
+const StyleDemo = React.lazy(() => import('./pages/StyleDemo'));
 
 import UserProvider from './context/UserContext';
 
@@ -315,6 +320,7 @@ function App() {
                           <Route path="/blog/:slug" element={<BlogPost />} />
                           <Route path="/payment/success" element={<PaymentSuccess />} />
                           <Route path="/payment/cancel" element={<PaymentCancel />} />
+                          <Route path="/landing2" element={<Landing2 />} />
                           <Route path="/login" element={<Login />} />
                           <Route path="/signup" element={<Signup />} />
                           <Route path="/registro" element={<Navigate to="/signup" replace />} />
@@ -392,7 +398,10 @@ function App() {
                           <Route path="p/:slug" element={<PublicWedding />} />
                           <Route path="web/:slug" element={<PublicWeb />} />
                           <Route path="rsvp/:slug" element={<PublicRSVP />} />
-                          <Route path="dj-downloads/:weddingId/:token" element={<DJDownloadsPage />} />
+                          <Route
+                            path="dj-downloads/:weddingId/:token"
+                            element={<DJDownloadsPage />}
+                          />
 
                           {/* Respuesta pública de presupuestos (proveedores responden por email) */}
                           <Route
@@ -464,12 +473,19 @@ function App() {
                           {/* Dev tools públicas */}
                           <Route path="dev/seed-guests" element={<DevSeedGuests />} />
                           <Route path="dev/ensure-finance" element={<DevEnsureFinance />} />
+                          
+                          {/* Style Demo */}
+                          <Route path="style-demo" element={<StyleDemo />} />
 
                           {/* Rutas protegidas */}
                           <Route element={<ProtectedRoute />}>
+                            {/* Home2 fuera de MainLayout para diseño full-screen */}
+                            <Route path="home2" element={<Home2 />} />
+                            
                             <Route element={<MainLayout />}>
                               <Route path="home" element={<HomeUser />} />
                               <Route path="tasks" element={<Tasks />} />
+                              <Route path="tareas-ia" element={<TasksAI />} />
                               <Route path="checklist" element={<Checklist />} />
                               <Route path="shot-list" element={<PhotoShotListPage />} />
                               <Route path="pruebas-ensayos" element={<PruebasEnsayos />} />
@@ -477,9 +493,15 @@ function App() {
                               <Route path="transporte" element={<TransporteLogistica />} />
                               <Route path="gestion-ninos" element={<GestionNinos />} />
                               <Route path="wedding-team" element={<WeddingTeam />} />
-                              <Route path="eventos-relacionados" element={<EventosRelacionados />} />
+                              <Route
+                                path="eventos-relacionados"
+                                element={<EventosRelacionados />}
+                              />
                               <Route path="tramites-legales" element={<TramitesLegales />} />
-                              <Route path="invitados-especiales" element={<InvitadosEspeciales />} />
+                              <Route
+                                path="invitados-especiales"
+                                element={<InvitadosEspeciales />}
+                              />
                               <Route path="dia-de-boda" element={<DiaDeBoda />} />
                               <Route path="post-boda" element={<PostBoda />} />
                               <Route path="bodas" element={<Bodas />} />
@@ -498,7 +520,10 @@ function App() {
                               <Route path="proveedores/favoritos" element={<SavedSuppliers />} />
                               <Route path="proveedores/comparar" element={<SupplierCompare />} />
                               <Route path="proveedores/contratos" element={<Contratos />} />
-                              <Route path="proveedores/presupuestos" element={<QuoteResponsesPage />} />
+                              <Route
+                                path="proveedores/presupuestos"
+                                element={<QuoteResponsesPage />}
+                              />
                               {/* Redirect /servicios to /proveedores (unified page) */}
                               <Route
                                 path="servicios"
@@ -535,7 +560,10 @@ function App() {
                                 />
                               </Route>
 
-                              {/* Diseños */}
+                              {/* Diseños - Nuevo Editor Unificado */}
+                              <Route path="editor-disenos" element={<DesignEditor />} />
+
+                              {/* Diseños Legacy (mantener temporalmente) */}
                               <Route path="disenos" element={<DisenosLayout />}>
                                 <Route index element={<Navigate to="invitaciones" replace />} />
                                 <Route path="invitaciones" element={<DisenosInvitaciones />} />

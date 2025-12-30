@@ -1,8 +1,8 @@
 {
-  "id": "/?app=malove-email",
-  "name": "MaLove.App Email",
-  "short_name": "MaLove.App",
-  "description": "Correo unificado para tus bodas y proveedores en MaLove.App.",
+  "id": "/?app=planivia-email",
+  "name": "Planivia Email",
+  "short_name": "Planivia",
+  "description": "Correo unificado para tus bodas y proveedores en Planivia.",
   "lang": "es",
   "dir": "ltr",
   "start_url": "/",
@@ -40,7 +40,7 @@
     {
       "name": "Configurar correo",
       "short_name": "Setup",
-      "description": "Configurar dirección MaLove.APP",
+      "description": "Configurar dirección Planivia",
       "url": "/email/setup",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }

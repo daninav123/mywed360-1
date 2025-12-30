@@ -1,8 +1,10 @@
 ﻿import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUserContext } from '../context/UserContext';
 import { listEmailTemplates, saveEmailTemplate } from '../services/emailTemplatesService';
 
 export default function EmailTemplatesPage() {
+  const { t } = useTranslation('pages');
   const { user } = useUserContext();
   const [items, setItems] = useState([]);
   const [form, setForm] = useState({ id: '', name: '', subject: '', body: '', category: 'custom' });
@@ -34,14 +36,14 @@ export default function EmailTemplatesPage() {
     } finally { setSaving(false); }
   };
 
-  if (loading) return <div className="p-4">Cargando plantillas?</div>;
+  if (loading) return <div className="p-4">{t('emailTemplates.loading', 'Loading templates...')}</div>;
 
   return (
     <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-lg font-semibold">Plantillas</h2>
-          <button className="text-sm text-blue-600" onClick={onNew}>Nueva</button>
+          <h2 className="text-lg font-semibold">{t('emailTemplates.title')}</h2>
+          <button className="text-sm text-blue-600" onClick={onNew}>{t('emailTemplates.add')}</button>
         </div>
         <ul className="divide-y border rounded">
           {items.map(t => (
@@ -55,13 +57,13 @@ export default function EmailTemplatesPage() {
         </ul>
       </div>
       <div>
-        <h2 className="text-lg font-semibold mb-2">{form.id ?'Editar' : 'Nueva'} plantilla</h2>
+        <h2 className="text-lg font-semibold mb-2">{form.id ? t('app.edit', 'Edit') : t('app.add', 'New')} {t('emailTemplates.title')}</h2>
         <div className="space-y-2">
-          <input className="w-full border rounded px-2 py-1" placeholder="Nombre" value={form.name} onChange={(e)=>setForm({ ...form, name: e.target.value })} />
-          <input className="w-full border rounded px-2 py-1" placeholder="Asunto" value={form.subject} onChange={(e)=>setForm({ ...form, subject: e.target.value })} />
-          <textarea className="w-full border rounded px-2 py-1 h-40" placeholder="Cuerpo (texto)" value={form.body} onChange={(e)=>setForm({ ...form, body: e.target.value })} />
+          <input className="w-full border rounded px-2 py-1" placeholder={t('emailTemplates.name')} value={form.name} onChange={(e)=>setForm({ ...form, name: e.target.value })} />
+          <input className="w-full border rounded px-2 py-1" placeholder={t('emailTemplates.subject')} value={form.subject} onChange={(e)=>setForm({ ...form, subject: e.target.value })} />
+          <textarea className="w-full border rounded px-2 py-1 h-40" placeholder={t('emailTemplates.body')} value={form.body} onChange={(e)=>setForm({ ...form, body: e.target.value })} />
           <div>
-            <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={onSave} disabled={saving}>{saving ?'Guardando?' : 'Guardar'}</button>
+            <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={onSave} disabled={saving}>{saving ? t('app.saving') : t('emailTemplates.save')}</button>
             {msg && <span className="ml-3 text-sm text-gray-600">{msg}</span>}
           </div>
         </div>

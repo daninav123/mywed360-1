@@ -2,9 +2,10 @@ import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, addDoc,
 import { db } from '../firebaseConfig';
 import defaultWeddingTasks from './defaultWeddingTasks';
 import errorLogger from '../utils/errorLogger';
+import { getBackendBase } from '../utils/backendBase';
 
 const COLLECTION_NAME = 'adminTaskTemplates';
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://maloveapp-backend.onrender.com';
+const BACKEND_URL = getBackendBase();
 
 /**
  * Obtiene la plantilla de tareas actualmente publicada

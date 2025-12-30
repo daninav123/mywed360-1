@@ -60,8 +60,11 @@ export default function InspirationGallery({
   const [favorites, setFavorites] = useState([]); // ids de favoritos
   const [lightbox, setLightbox] = useState(null); // id
 
+  console.log('[InspirationGallery] 📸 Props recibidas - images.length:', images.length, 'activeTag:', activeTag);
+
   // Mantener filtro sincronizado con prop activeTag
   useEffect(() => {
+    console.log('[InspirationGallery] 🔄 Actualizando filter a:', activeTag);
     setFilter(activeTag);
   }, [activeTag]);
 
@@ -86,6 +89,7 @@ export default function InspirationGallery({
   }, [storageKey]);
 
   const DATA = images.length ? images : DEFAULT_IMAGES;
+  console.log('[InspirationGallery] 📊 DATA.length:', DATA.length, 'images.length:', images.length);
 
   const allTags = useMemo(() => {
     const tags = new Map();
@@ -106,16 +110,50 @@ export default function InspirationGallery({
 
   const filtered = useMemo(() => {
     const eff = activeTag || filter;
-    if (eff === 'all') return DATA;
+    console.log('[InspirationGallery] 🔍 Filtrando - eff:', eff, 'DATA.length:', DATA.length);
+    
+    // Log para ver los tags de las primeras imágenes
+    if (DATA.length > 0) {
+      console.log('[InspirationGallery] 🏷️ Tags de primera imagen:', DATA[0].tags);
+      console.log('[InspirationGallery] 📦 Primera imagen completa:', DATA[0]);
+    }
+    
+    if (eff === 'all') {
+      console.log('[InspirationGallery] ✅ Mostrando todos:', DATA.length);
+      return DATA;
+    }
     if (eff === 'favs') {
       // Si el padre ya nos pasa solo favoritos (activeTag==='favs'), no filtres de nuevo
-      if (activeTag === 'favs') return DATA;
-      return DATA.filter((img) => favorites.includes(img.id));
+      if (activeTag === 'favs') {
+        console.log('[InspirationGallery] ⭐ Mostrando favoritos (desde padre):', DATA.length);
+        return DATA;
+      }
+      const favs = DATA.filter((img) => favorites.includes(img.id));
+      console.log('[InspirationGallery] ⭐ Favoritos filtrados:', favs.length);
+      return favs;
     }
     const normalizedEff = normalizeTag(eff);
-    return DATA.filter((img) =>
+    console.log('[InspirationGallery] 🏷️ Filtrando por tag normalizado:', normalizedEff);
+    
+    // Si las imágenes vienen de una búsqueda específica (ej: decoracion), mostrarlas todas
+    // porque ya están filtradas por el backend
+    if (activeTag && activeTag !== 'all' && activeTag !== 'favs') {
+      console.log('[InspirationGallery] ✨ Mostrando todas las imágenes porque ya vienen filtradas del backend');
+      return DATA;
+    }
+    
+    const result = DATA.filter((img) =>
       (img.tags || []).some((tag) => normalizeTag(tag) === normalizedEff)
     );
+    console.log('[InspirationGallery] 📋 Items después de filtrar:', result.length);
+    
+    // Si no hay resultados pero hay data, mostrar todo (fallback)
+    if (result.length === 0 && DATA.length > 0) {
+      console.log('[InspirationGallery] ⚠️ No hay matches, mostrando todas las imágenes como fallback');
+      return DATA;
+    }
+    
+    return result;
   }, [filter, activeTag, DATA, favorites]);
 
   const toggleFav = (id) => {
@@ -161,6 +199,7 @@ export default function InspirationGallery({
       )}
       {DATA.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {console.log('[InspirationGallery] 🖼️ Renderizando', filtered.length, 'imágenes filtradas')}
           {filtered.map((img, idx) => (
             <div
               key={`${img.id}_${idx}`}
@@ -172,7 +211,7 @@ export default function InspirationGallery({
               }}
             >
               <img
-                src={img.thumb || img.url}
+                src={img.thumb || img.url || img.media_url}
                 onError={(e) => {
                   // Manejo robusto de errores de carga de imagen
                   const attempted = e.target.getAttribute('data-attempt') || 'thumb';
@@ -182,6 +221,13 @@ export default function InspirationGallery({
                     e.target.src = img.url;
                   } else if (
                     attempted === 'url' &&
+                    img.media_url &&
+                    e.target.src !== img.media_url
+                  ) {
+                    e.target.setAttribute('data-attempt', 'media_url');
+                    e.target.src = img.media_url;
+                  } else if (
+                    attempted === 'media_url' &&
                     img.original_url &&
                     e.target.src !== img.original_url
                   ) {

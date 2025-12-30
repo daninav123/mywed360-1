@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Marco esquinero floral ornamental -->
+  
+  <!-- Líneas decorativas -->
+  <path d="M 10 10 L 100 10" stroke="#C9A959" stroke-width="2" fill="none"/>
+  <path d="M 10 10 L 10 100" stroke="#C9A959" stroke-width="2" fill="none"/>
+  <path d="M 10 15 L 95 15" stroke="#C9A959" stroke-width="1" fill="none" opacity="0.6"/>
+  <path d="M 15 10 L 15 95" stroke="#C9A959" stroke-width="1" fill="none" opacity="0.6"/>
+  
+  <!-- Flores esquineras -->
+  <g transform="translate(25, 25)">
+    <!-- Flor principal -->
+    <circle cx="0" cy="0" r="8" fill="#E8D5B7"/>
+    <ellipse cx="0" cy="-10" rx="4" ry="7" fill="#F5E6D3" transform="rotate(0 0 0)"/>
+    <ellipse cx="0" cy="-10" rx="4" ry="7" fill="#F5E6D3" transform="rotate(72 0 0)"/>
+    <ellipse cx="0" cy="-10" rx="4" ry="7" fill="#F5E6D3" transform="rotate(144 0 0)"/>
+    <ellipse cx="0" cy="-10" rx="4" ry="7" fill="#F5E6D3" transform="rotate(216 0 0)"/>
+    <ellipse cx="0" cy="-10" rx="4" ry="7" fill="#F5E6D3" transform="rotate(288 0 0)"/>
+    <circle cx="0" cy="0" r="3" fill="#C9A959"/>
+  </g>
+  
+  <!-- Hojas -->
+  <ellipse cx="45" cy="18" rx="8" ry="4" fill="#A8C69F" transform="rotate(20 45 18)"/>
+  <ellipse cx="18" cy="45" rx="4" ry="8" fill="#A8C69F" transform="rotate(20 18 45)"/>
+  
+  <!-- Flores secundarias -->
+  <g transform="translate(60, 15)">
+    <circle cx="0" cy="0" r="5" fill="#F5E6D3"/>
+    <circle cx="0" cy="0" r="2" fill="#C9A959"/>
+  </g>
+  
+  <g transform="translate(15, 60)">
+    <circle cx="0" cy="0" r="5" fill="#F5E6D3"/>
+    <circle cx="0" cy="0" r="2" fill="#C9A959"/>
+  </g>
+  
+  <!-- Detalles ornamentales -->
+  <circle cx="80" cy="12" r="2" fill="#C9A959" opacity="0.7"/>
+  <circle cx="12" cy="80" r="2" fill="#C9A959" opacity="0.7"/>
+  
+  <!-- Volutas decorativas -->
+  <path d="M 100 12 Q 110 12 115 17 Q 120 22 120 30" 
+        stroke="#C9A959" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M 12 100 Q 12 110 17 115 Q 22 120 30 120" 
+        stroke="#C9A959" stroke-width="1.5" fill="none" opacity="0.5"/>
+</svg>

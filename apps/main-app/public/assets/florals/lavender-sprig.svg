@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 200" fill="none">
+  <!-- Lavender sprig -->
+  <g id="lavender">
+    <!-- Stem -->
+    <line x1="40" y1="180" x2="40" y2="20" stroke="#7D8F69" stroke-width="2"/>
+    
+    <!-- Lavender buds - top to bottom -->
+    <!-- Top cluster -->
+    <ellipse cx="40" cy="25" rx="5" ry="8" fill="#9B86BD" opacity="0.9"/>
+    <ellipse cx="35" cy="30" rx="4" ry="7" fill="#A896C8" opacity="0.85"/>
+    <ellipse cx="45" cy="30" rx="4" ry="7" fill="#8E7AAA" opacity="0.85"/>
+    
+    <!-- Second cluster -->
+    <ellipse cx="38" cy="40" rx="5" ry="8" fill="#9B86BD" opacity="0.9"/>
+    <ellipse cx="42" cy="40" rx="5" ry="8" fill="#A896C8" opacity="0.9"/>
+    <ellipse cx="33" cy="45" rx="4" ry="7" fill="#8E7AAA" opacity="0.85"/>
+    <ellipse cx="47" cy="45" rx="4" ry="7" fill="#9B86BD" opacity="0.85"/>
+    
+    <!-- Third cluster -->
+    <ellipse cx="37" cy="55" rx="5" ry="9" fill="#A896C8" opacity="0.9"/>
+    <ellipse cx="43" cy="55" rx="5" ry="9" fill="#9B86BD" opacity="0.9"/>
+    <ellipse cx="32" cy="60" rx="4" ry="7" fill="#8E7AAA" opacity="0.85"/>
+    <ellipse cx="48" cy="60" rx="4" ry="7" fill="#A896C8" opacity="0.85"/>
+    <ellipse cx="40" cy="62" rx="4" ry="8" fill="#9B86BD" opacity="0.9"/>
+    
+    <!-- Fourth cluster -->
+    <ellipse cx="36" cy="72" rx="5" ry="9" fill="#9B86BD" opacity="0.9"/>
+    <ellipse cx="44" cy="72" rx="5" ry="9" fill="#A896C8" opacity="0.9"/>
+    <ellipse cx="31" cy="77" rx="4" ry="7" fill="#8E7AAA" opacity="0.85"/>
+    <ellipse cx="49" cy="77" rx="4" ry="7" fill="#9B86BD" opacity="0.85"/>
+    <ellipse cx="40" cy="80" rx="4" ry="8" fill="#A896C8" opacity="0.9"/>
+    
+    <!-- Fifth cluster -->
+    <ellipse cx="35" cy="90" rx="5" ry="9" fill="#A896C8" opacity="0.9"/>
+    <ellipse cx="45" cy="90" rx="5" ry="9" fill="#9B86BD" opacity="0.9"/>
+    <ellipse cx="30" cy="95" rx="4" ry="7" fill="#8E7AAA" opacity="0.85"/>
+    <ellipse cx="50" cy="95" rx="4" ry="7" fill="#A896C8" opacity="0.85"/>
+    
+    <!-- Lower buds - smaller -->
+    <ellipse cx="38" cy="105" rx="4" ry="7" fill="#9B86BD" opacity="0.85"/>
+    <ellipse cx="42" cy="105" rx="4" ry="7" fill="#A896C8" opacity="0.85"/>
+    <ellipse cx="40" cy="115" rx="3" ry="6" fill="#8E7AAA" opacity="0.8"/>
+    
+    <!-- Small leaves at base -->
+    <ellipse cx="35" cy="150" rx="3" ry="8" fill="#7D8F69" opacity="0.6" transform="rotate(-30 35 150)"/>
+    <ellipse cx="45" cy="150" rx="3" ry="8" fill="#8FA67C" opacity="0.6" transform="rotate(30 45 150)"/>
+    <ellipse cx="33" cy="165" rx="3" ry="7" fill="#9DB88D" opacity="0.5" transform="rotate(-35 33 165)"/>
+    <ellipse cx="47" cy="165" rx="3" ry="7" fill="#7D8F69" opacity="0.5" transform="rotate(35 47 165)"/>
+  </g>
+</svg>

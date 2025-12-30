@@ -434,7 +434,7 @@ function generateRandomTopic(language = 'es') {
     'Cómo personalizar tu ceremonia de boda',
     'Ideas sostenibles para bodas ecológicas',
   ];
-  
+
   const randomIndex = Math.floor(Math.random() * topics.length);
   return topics[randomIndex];
 }
@@ -450,7 +450,7 @@ export async function runBlogAutomationCycle({
 } = {}) {
   try {
     const topic = generateRandomTopic(language);
-    
+
     const generationInput = {
       topic,
       tone: 'inspirador',

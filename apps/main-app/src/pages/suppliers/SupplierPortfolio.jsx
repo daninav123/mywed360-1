@@ -290,8 +290,19 @@ export default function SupplierPortfolio() {
                 <p className="text-xs text-muted">
                   {t('suppliers.portfolio.dashboard.filters.label')}:&nbsp;
                   {t(`common.suppliers.portfolio.lightbox.categories.${photo.category}`, {
-                    defaultValue: photo.category,
+                    placeholder: t('supplier.portfolio.titlePlaceholder'),
                   })}
+                </p>
+              )}
+              {photo.hashtags && (
+                <p className="text-xs text-muted">
+                  {t('suppliers.portfolio.lightbox.view.hashtags')}:&nbsp;
+                  {photo.hashtags.map((hashtag, index) => (
+                    <span key={index}>
+                      <span className="text-foreground">{hashtag}</span>
+                      {index < photo.hashtags.length - 1 && <span>,&nbsp;</span>}
+                    </span>
+                  ))}
                 </p>
               )}
             </div>

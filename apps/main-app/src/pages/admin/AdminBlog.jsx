@@ -26,7 +26,6 @@ const STATUS_BADGE = {
   failed: 'bg-danger-soft text-danger',
 };
 
-
 const emptyEditorState = {
   id: null,
   title: '',
@@ -71,7 +70,6 @@ const AdminBlog = () => {
     () => posts.find((post) => post.id === selectedId) || null,
     [posts, selectedId]
   );
-
 
   const loadPosts = async (status = listStatusFilter) => {
     setLoadingList(true);
@@ -287,11 +285,10 @@ const AdminBlog = () => {
                   <p className="font-semibold text-body">{latestPost.title}</p>
                   <div className="flex items-center gap-3 mt-2 text-xs text-muted">
                     <span>
-                      Estado: <span className="font-semibold">{STATUS_LABELS[latestPost.status]}</span>
+                      Estado:{' '}
+                      <span className="font-semibold">{STATUS_LABELS[latestPost.status]}</span>
                     </span>
-                    {latestPost.scheduledAt && (
-                      <span>• {formatDate(latestPost.scheduledAt)}</span>
-                    )}
+                    {latestPost.scheduledAt && <span>• {formatDate(latestPost.scheduledAt)}</span>}
                     {latestPost.availableLanguages && (
                       <span>• Idiomas: {latestPost.availableLanguages.length}</span>
                     )}
@@ -317,7 +314,7 @@ const AdminBlog = () => {
                   type="search"
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
-                  placeholder="Buscar por título, tags o contenido…"
+                  placeholder={t('admin.blog.searchPlaceholder')}
                   className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary sm:min-w-[220px]"
                 />
               </div>
@@ -535,11 +532,11 @@ const AdminBlog = () => {
                       setEditor((prev) => ({ ...prev, status: event.target.value }))
                     }
                   >
-                    <option value="draft">Borrador</option>
-                    <option value="scheduled">Programado</option>
-                    <option value="published">Publicado</option>
-                    <option value="archived">Archivado</option>
-                    <option value="failed">Fallido</option>
+                    <option value="draft">{t('admin.blog.statuses.draft')}</option>
+                    <option value="scheduled">{t('admin.blog.statuses.scheduled')}</option>
+                    <option value="published">{t('admin.blog.statuses.published')}</option>
+                    <option value="archived">{t('admin.blog.statuses.archived')}</option>
+                    <option value="failed">{t('admin.blog.statuses.failed')}</option>
                   </select>
                 </div>
                 <div>

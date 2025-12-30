@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../hooks/useTranslations';
 
@@ -497,7 +498,7 @@ export default function SupplierRegistration() {
                 onChange={handleChange}
                 rows={5}
                 className={`w-full border rounded-md px-3 py-2 ${errors.description ? 'border-red-500' : ''}`}
-                placeholder={t('suppliers.publicRegistration.form.description.placeholder')}
+                placeholder={t('supplier.registration.emailPlaceholder')}
               />
               {errors.description && (
                 <p className="text-red-600 text-sm mt-1">{errors.description}</p>

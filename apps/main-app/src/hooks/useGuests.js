@@ -405,6 +405,7 @@ const useGuests = () => {
       pending: p2,
       declined: d2,
       totalAttendees: c2 + totalCompanions,
+      totalInvited: guests.length + totalCompanions,
       withDietaryRestrictions,
     };
   }, [guests]);

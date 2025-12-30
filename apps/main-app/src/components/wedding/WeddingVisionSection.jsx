@@ -116,45 +116,6 @@ const WeddingVisionSection = ({
         </div>
       </Card>
 
-      {/* Lo que SÍ queremos */}
-      <Card className="bg-green-50 border-green-200">
-        <h3 className="text-lg font-bold text-gray-900 mb-3">
-          ✅ Lo que SÍ queremos
-        </h3>
-        <textarea
-          value={weddingDesign.vision?.inspiration?.likes || ''}
-          onChange={(e) => updateVision('vision.inspiration.likes', e.target.value)}
-          placeholder="Ej: Flores naturales, luz cálida, ambiente relajado, detalles personalizados..."
-          className="w-full min-h-[100px] px-3 py-2 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-        />
-      </Card>
-
-      {/* Lo que NO queremos */}
-      <Card className="bg-red-50 border-red-200">
-        <h3 className="text-lg font-bold text-gray-900 mb-3">
-          ❌ Lo que NO queremos
-        </h3>
-        <textarea
-          value={weddingDesign.vision?.inspiration?.dislikes || ''}
-          onChange={(e) => updateVision('vision.inspiration.dislikes', e.target.value)}
-          placeholder="Ej: Colores muy llamativos, decoración recargada, música muy alta..."
-          className="w-full min-h-[100px] px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-        />
-      </Card>
-
-      {/* Imprescindibles */}
-      <Card className="bg-yellow-50 border-yellow-200">
-        <h3 className="text-lg font-bold text-gray-900 mb-3">
-          ⭐ Elementos Imprescindibles
-        </h3>
-        <textarea
-          value={weddingDesign.vision?.inspiration?.mustHave || ''}
-          onChange={(e) => updateVision('vision.inspiration.mustHave', e.target.value)}
-          placeholder="Ej: Ceremonia al aire libre, pista de baile grande, photocall personalizado..."
-          className="w-full min-h-[80px] px-3 py-2 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-        />
-      </Card>
-
       {/* Descripción libre */}
       <Card>
         <h3 className="text-lg font-bold text-gray-900 mb-3">

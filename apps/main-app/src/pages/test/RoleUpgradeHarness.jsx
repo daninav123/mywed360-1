@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const ROLE_OPTIONS = [
   { id: 'owner', label: 'Owner', tier: 'free' },

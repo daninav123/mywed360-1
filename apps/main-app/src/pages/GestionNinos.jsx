@@ -3,6 +3,7 @@
  * FASE 6.4 del WORKFLOW-USUARIO.md
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Baby, Users, Utensils, Gamepad2, Clock, Plus, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -10,30 +11,30 @@ import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
 
-const ACTIVITY_TYPES = [
-  { id: 'juegos', name: 'Juegos de mesa', icon: '🎲', ageRange: '3-12' },
-  { id: 'manualidades', name: 'Manualidades', icon: '🎨', ageRange: '4-12' },
-  { id: 'pintacaras', name: 'Pintacaras', icon: '🎭', ageRange: '3-10' },
-  { id: 'globoflexia', name: 'Globoflexia', icon: '🎈', ageRange: '2-10' },
-  { id: 'cuentacuentos', name: 'Cuentacuentos', icon: '📚', ageRange: '3-8' },
-  { id: 'disfraces', name: 'Rincón de disfraces', icon: '👗', ageRange: '3-10' },
-  { id: 'videojuegos', name: 'Videojuegos', icon: '🎮', ageRange: '6-14' },
-  { id: 'castillo', name: 'Castillo hinchable', icon: '🏰', ageRange: '2-10' },
-  { id: 'magia', name: 'Show de magia', icon: '🪄', ageRange: '4-12' },
-  { id: 'animacion', name: 'Animación infantil', icon: '🤹', ageRange: '2-12' },
+const getActivityTypes = (t) => [
+  { id: 'juegos', name: t('children.types.games'), icon: '🎲', ageRange: '3-12' },
+  { id: 'manualidades', name: t('children.types.crafts'), icon: '🎨', ageRange: '4-12' },
+  { id: 'pintacaras', name: t('children.types.facepainting'), icon: '🎭', ageRange: '3-10' },
+  { id: 'globoflexia', name: t('children.types.balloons'), icon: '🎈', ageRange: '2-10' },
+  { id: 'cuentacuentos', name: t('children.types.storytelling'), icon: '📚', ageRange: '3-8' },
+  { id: 'disfraces', name: t('children.types.costumes'), icon: '👗', ageRange: '3-10' },
+  { id: 'videojuegos', name: t('children.types.videogames'), icon: '🎮', ageRange: '6-14' },
+  { id: 'castillo', name: t('children.types.castle'), icon: '🏰', ageRange: '2-10' },
+  { id: 'magia', name: t('children.types.magic'), icon: '🪄', ageRange: '4-12' },
+  { id: 'animacion', name: t('children.types.animation'), icon: '🤹', ageRange: '2-12' },
 ];
 
-const MENU_OPTIONS = [
-  { id: 'nuggets', name: 'Nuggets de pollo', icon: '🍗' },
-  { id: 'pasta', name: 'Pasta con tomate', icon: '🍝' },
-  { id: 'pizza', name: 'Mini pizzas', icon: '🍕' },
-  { id: 'hamburguesa', name: 'Mini hamburguesas', icon: '🍔' },
-  { id: 'ensalada', name: 'Ensalada', icon: '🥗' },
-  { id: 'fruta', name: 'Fruta fresca', icon: '🍓' },
-  { id: 'verduras', name: 'Verduras crudas', icon: '🥕' },
-  { id: 'helado', name: 'Helado', icon: '🍦' },
-  { id: 'zumo', name: 'Zumos naturales', icon: '🧃' },
-  { id: 'agua', name: 'Agua', icon: '💧' },
+const getMenuOptions = (t) => [
+  { id: 'nuggets', name: t('children.menuOptions.nuggets'), icon: '🍗' },
+  { id: 'pasta', name: t('children.menuOptions.pasta'), icon: '🍝' },
+  { id: 'pizza', name: t('children.menuOptions.pizza'), icon: '🍕' },
+  { id: 'hamburguesa', name: t('children.menuOptions.burger'), icon: '🍔' },
+  { id: 'ensalada', name: t('children.menuOptions.salad'), icon: '🥗' },
+  { id: 'fruta', name: t('children.menuOptions.fruit'), icon: '🍓' },
+  { id: 'verduras', name: t('children.menuOptions.vegetables'), icon: '🥕' },
+  { id: 'helado', name: t('children.menuOptions.icecream'), icon: '🍦' },
+  { id: 'zumo', name: t('children.menuOptions.juice'), icon: '🧃' },
+  { id: 'agua', name: t('children.menuOptions.water'), icon: '💧' },
 ];
 
 const ActivityCard = ({ activity, onEdit, onDelete, onToggle }) => {
@@ -221,20 +222,20 @@ const ActivityModal = ({ activity, onSave, onClose }) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Horario
+                {t('children.schedule')}
               </label>
               <input
                 type="text"
                 value={formData.time}
                 onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                placeholder="Ej: 18:00 - 20:00"
+                placeholder={t('children.searchPlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Rango de edad
+                {t('children.ageRange')}
               </label>
               <input
                 type="text"
@@ -247,13 +248,13 @@ const ActivityModal = ({ activity, onSave, onClose }) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Proveedor / Responsable
+                {t('children.provider')}
               </label>
               <input
                 type="text"
                 value={formData.provider}
                 onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
-                placeholder="Nombre del proveedor"
+                placeholder={t('children.namePlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>
@@ -265,7 +266,7 @@ const ActivityModal = ({ activity, onSave, onClose }) => {
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Detalles adicionales..."
+                placeholder={t('children.notesPlaceholder')}
                 rows={3}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
@@ -333,7 +334,7 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nombre completo"
+                placeholder={t('children.notesPlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 required
               />
@@ -360,7 +361,7 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
                 type="text"
                 value={formData.contact}
                 onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                placeholder="Teléfono o email"
+                placeholder={t('childrenManagement.contactPlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>
@@ -385,7 +386,7 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Información adicional..."
+                placeholder={t('childrenManagement.needsPlaceholder')}
                 rows={3}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />

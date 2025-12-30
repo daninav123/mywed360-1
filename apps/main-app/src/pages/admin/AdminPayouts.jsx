@@ -138,7 +138,7 @@ const AdminPayouts = () => {
           <label className="flex flex-col text-sm font-medium text-slate-700">
             Periodo
             <input
-              type="month"
+              placeholder={t('admin.payouts.periodPlaceholder')}
               value={period}
               onChange={(event) => setPeriod(event.target.value)}
               className="mt-1 rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200"
@@ -158,7 +158,7 @@ const AdminPayouts = () => {
             onClick={handleCommit}
             disabled={loading || saving || !data}
           >
-            {saving ? 'Guardando...' : 'Guardar liquidación'}
+            {saving ? 'Guardando...' : t('admin.payouts.savePlaceholder')}
           </button>
         </form>
       </div>

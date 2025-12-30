@@ -194,7 +194,7 @@ const TramiteModal = ({ tramite, onSave, onClose }) => {
               <textarea
                 value={formData.notas}
                 onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
-                placeholder="Añade notas, números de referencia, etc..."
+                placeholder={t('legalProcedures.namePlaceholder')}
                 rows={4}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
@@ -208,7 +208,7 @@ const TramiteModal = ({ tramite, onSave, onClose }) => {
                 type="url"
                 value={formData.documentoUrl}
                 onChange={(e) => setFormData({ ...formData, documentoUrl: e.target.value })}
-                placeholder="https://..."
+                placeholder={t('legalProcedures.searchPlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
               <p className="text-xs text-gray-500 mt-1">

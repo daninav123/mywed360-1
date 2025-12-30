@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../components/PageWrapper';
 import Spinner from '../components/Spinner';
@@ -181,15 +182,22 @@ const BlogAuthor = () => {
           <>
             <header className="flex flex-col gap-4 rounded-2xl border border-soft bg-white p-6 shadow-sm md:flex-row md:items-center">
               <div className="flex-shrink-0">
-                <div className="h-24 w-24 overflow-hidden rounded-full border border-soft bg-[var(--color-primary)]">
+                <div className="h-24 w-24 overflow-hidden rounded-full border border-soft bg-[var(--color-primary)] flex items-center justify-center text-white text-3xl font-bold">
                   {authorAvatar ? (
                     <img
                       src={authorAvatar}
                       alt={author.name}
                       className="h-full w-full object-cover"
                       loading="lazy"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                      }}
                     />
                   ) : null}
+                  <span style={{ display: authorAvatar ? 'none' : 'flex' }}>
+                    {author?.name?.charAt(0)?.toUpperCase() || '?'}
+                  </span>
                 </div>
               </div>
               <div className="flex-1 space-y-2">

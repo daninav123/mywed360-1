@@ -1,0 +1,66 @@
+{
+  "wedding001": {
+    "id": "test-wedding-001",
+    "name": "Boda Ana y Luis",
+    "date": "2025-10-15",
+    "location": "Jardín Botánico Madrid",
+    "ownerIds": ["test-user-owner-001"],
+    "plannerIds": ["test-user-planner-001"],
+    "assistantIds": ["test-user-assistant-001"],
+    "eventType": "boda",
+    "guestCount": 120,
+    "budget": 25000,
+    "status": "planning",
+    "ceremonyInfo": {
+      "type": "civil",
+      "time": "18:00",
+      "venue": "Jardín Botánico",
+      "address": "Plaza de Murillo 2, 28014 Madrid"
+    },
+    "receptionInfo": {
+      "time": "20:00",
+      "venue": "Salón Real Jardín",
+      "address": "Plaza de Murillo 2, 28014 Madrid"
+    },
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  "wedding002": {
+    "id": "test-wedding-002",
+    "name": "Boda María y Carlos",
+    "date": "2025-11-20",
+    "location": "Casa de Campo",
+    "ownerIds": ["test-user-owner-001"],
+    "plannerIds": ["test-user-planner-001"],
+    "assistantIds": [],
+    "eventType": "boda",
+    "guestCount": 80,
+    "budget": 18000,
+    "status": "planning",
+    "ceremonyInfo": {
+      "type": "religious",
+      "time": "17:00",
+      "venue": "Iglesia San Francisco",
+      "address": "Calle Mayor 1, 28013 Madrid"
+    },
+    "receptionInfo": {
+      "time": "19:30",
+      "venue": "Restaurante Casa de Campo",
+      "address": "Paseo Puerta del Ángel, 28011 Madrid"
+    },
+    "createdAt": "2025-01-02T00:00:00.000Z"
+  },
+  "weddingMinimal": {
+    "id": "test-wedding-minimal",
+    "name": "Boda Mínima Test",
+    "date": "2025-12-01",
+    "location": "Test Location",
+    "ownerIds": ["test-user-owner-001"],
+    "plannerIds": [],
+    "assistantIds": [],
+    "eventType": "boda",
+    "guestCount": 10,
+    "budget": 5000,
+    "status": "draft",
+    "createdAt": "2025-01-03T00:00:00.000Z"
+  }
+}

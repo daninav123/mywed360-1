@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Brain, 
   Plus, 
@@ -239,7 +240,7 @@ const AdminAITraining = () => {
                   value={formData.supplierName}
                   onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ej: ReSona Events"
+                  placeholder={t('admin.aiTraining.questionPlaceholder')}
                 />
               </div>
 
@@ -266,7 +267,7 @@ const AdminAITraining = () => {
                   value={formData.deliveryTime}
                   onChange={(e) => setFormData({ ...formData, deliveryTime: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ej: 2 semanas después del evento"
+                  placeholder={t('admin.aiTraining.searchPlaceholder')} del evento"
                 />
               </div>
             </div>
@@ -280,7 +281,7 @@ const AdminAITraining = () => {
                 onChange={(e) => setFormData({ ...formData, emailBody: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 rows={6}
-                placeholder="Pega aquí el texto completo del presupuesto..."
+                placeholder={t('admin.aiTraining.searchPlaceholder')} completo del presupuesto..."
                 required
               />
             </div>
@@ -307,7 +308,7 @@ const AdminAITraining = () => {
                 value={formData.paymentTerms}
                 onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: 50% reserva, 50% día del evento"
+                placeholder={t('admin.aiTraining.responsePlaceholder')}, 50% día del evento"
               />
             </div>
 

@@ -1,5 +1,6 @@
 import { Mail, CheckCircle, AlertCircle, ArrowLeft, Loader2, RefreshCw, ShieldAlert, ShieldCheck, Copy, ExternalLink } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import EmailSetupForm from '../components/email/EmailSetupForm';

@@ -222,151 +222,24 @@ export default function SupplierPlans() {
               ) : (
                 <X size={20} className="text-gray-300 flex-shrink-0 mt-0.5" />
               )}
-              <span className="text-sm">{feature.text}</span>
+              <span className="text-sm">{t(`supplier.plans.${feature.text.toLowerCase().replace(' ', '_')}`)}</span>
             </li>
           ))}
         </ul>
 
-        {/* CTA Button */}
-        <button
-          onClick={() => handleUpgrade(planKey)}
-          disabled={isCurrentPlan || loading}
-          className={`w-full py-3 rounded-lg font-semibold transition-colors ${
-            isCurrentPlan
-              ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-              : plan.popular
-                ? 'bg-[var(--color-primary)] text-white hover:from-indigo-700 hover:to-purple-700'
-                : 'bg-gray-900 text-white hover:bg-gray-800'
-          }`}
-        >
-          {isCurrentPlan ? plan.cta : loading ? 'Cargando...' : plan.cta}
-        </button>
-      </div>
-    );
-  };
+        {/* ... */}
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-white py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Back button */}
-        <button
-          onClick={() => navigate(`/supplier/dashboard/${id}`)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
-        >
-          <ArrowLeft size={20} />
-          Volver al Dashboard
-        </button>
-
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">Elige el plan perfecto para ti</h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Crece tu negocio con las herramientas que necesitas
-          </p>
-
-          {/* Billing toggle */}
-          <div className="inline-flex items-center gap-4 bg-white p-2 rounded-full shadow-md">
-            <button
-              onClick={() => setBillingPeriod('monthly')}
-              className={`px-6 py-2 rounded-full font-medium transition-colors ${
-                billingPeriod === 'monthly'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Mensual
-            </button>
-            <button
-              onClick={() => setBillingPeriod('yearly')}
-              className={`px-6 py-2 rounded-full font-medium transition-colors ${
-                billingPeriod === 'yearly'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Anual
-              <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                -15%
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Plans Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {renderPlanCard('free')}
-          {renderPlanCard('basic')}
-          {renderPlanCard('pro')}
-        </div>
-
-        {/* FAQ Section */}
-        <div className="bg-white rounded-2xl shadow-md p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-            Preguntas Frecuentes
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
-                ¿Puedo cambiar de plan en cualquier momento?
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Sí, puedes mejorar o reducir tu plan cuando quieras. Si mejoras, los cambios son
-                inmediatos. Si reduces, se aplicarán al final del período de facturación actual.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">¿Qué métodos de pago aceptan?</h3>
-              <p className="text-gray-600 text-sm">
-                Aceptamos tarjetas de crédito y débito (Visa, Mastercard, American Express) a través
-                de Stripe. Todos los pagos son seguros y encriptados.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">¿Hay compromiso de permanencia?</h3>
-              <p className="text-gray-600 text-sm">
-                No, todos los planes son sin compromiso. Puedes cancelar en cualquier momento y
-                seguirás teniendo acceso hasta el final del período pagado.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
-                ¿Qué pasa si supero el límite del plan FREE?
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Si alcanzas el límite de solicitudes o fotos, te notificaremos y podrás mejorar a
-                BASIC para continuar sin límites. Tus datos se mantienen seguros.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Benefits Banner */}
-        <div className="bg-[var(--color-primary)] rounded-2xl shadow-md p-8 text-white">
-          <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold mb-2">¿Por qué mejorar tu plan?</h2>
-            <p className="text-indigo-100">
-              Los proveedores con plan BASIC+ reciben 3x más contactos
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <TrendingUp size={48} className="mx-auto mb-3" />
-              <h3 className="font-bold mb-2">Más Visibilidad</h3>
+              <h3 className="font-bold mb-2">{t('supplier.plans.moreVisibility')}</h3>
               <p className="text-sm text-indigo-100">
-                Aparece destacado en los primeros resultados de búsqueda
+                {t('supplier.plans.firstResults', { results: 'los primeros resultados de búsqueda' })}
               </p>
             </div>
             <div className="text-center">
               <Zap size={48} className="mx-auto mb-3" />
-              <h3 className="font-bold mb-2">Sin Límites</h3>
+              <h3 className="font-bold mb-2">{t('supplier.plans.noLimits')}</h3>
               <p className="text-sm text-indigo-100">
                 Recibe y gestiona solicitudes ilimitadas de clientes potenciales
               </p>

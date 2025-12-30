@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken';
 import logger from '../utils/logger.js';
 import multer from 'multer';
 import { notifyNewQuoteRequest, notifyNewReview } from '../services/supplierNotifications.js';
+import { sendEmail } from '../services/mailgunService.js';
 
 const router = express.Router();
 
@@ -486,8 +487,47 @@ router.post(
         response,
       });
 
-      // TODO: Enviar email a la pareja
-      // await sendEmailToCouple(requestData.contactEmail, response);
+      // Enviar email a la pareja
+      if (requestData.contactEmail) {
+        try {
+          const clientName = requestData.contactName || 'Cliente';
+          const supplierName = req.supplier.name || 'El proveedor';
+          
+          await sendEmail({
+            to: requestData.contactEmail,
+            subject: `${supplierName} ha respondido a tu solicitud`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #2563eb;">Nueva respuesta de ${supplierName}</h2>
+                <p>Hola ${clientName},</p>
+                <p><strong>${supplierName}</strong> ha respondido a tu solicitud de presupuesto.</p>
+                
+                <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h3 style="margin-top: 0;">Mensaje del proveedor:</h3>
+                  <p style="white-space: pre-wrap;">${message}</p>
+                  ${quotedPrice ? `<p style="font-size: 18px; font-weight: bold; color: #2563eb; margin-top: 15px;">Precio estimado: €${quotedPrice}</p>` : ''}
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${process.env.PUBLIC_APP_BASE_URL || 'http://localhost:5173'}/requests/${requestId}" 
+                     style="background-color: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                    Ver Solicitud Completa
+                  </a>
+                </div>
+                
+                <p style="color: #666; font-size: 14px;">Puedes responder directamente al proveedor desde tu panel de solicitudes.</p>
+                
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+                <p style="color: #999; font-size: 12px;">MyWed360 - Plataforma de gestión de bodas</p>
+              </div>
+            `,
+            text: `${supplierName} ha respondido a tu solicitud: ${message}${quotedPrice ? ` Precio estimado: €${quotedPrice}` : ''}`
+          });
+          logger.info('✅ Email de respuesta enviado a la pareja', { email: requestData.contactEmail });
+        } catch (emailError) {
+          logger.error('⚠️ Error enviando email a la pareja', emailError);
+        }
+      }
 
       return res.json({
         success: true,

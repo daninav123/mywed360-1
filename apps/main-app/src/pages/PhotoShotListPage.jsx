@@ -3,6 +3,7 @@
  * FASE 3.1.5 del WORKFLOW-USUARIO.md
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useWedding } from '../context/WeddingContext';
@@ -78,7 +79,7 @@ export default function PhotoShotListPage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Cargando shot list...</p>
+            <p className="text-gray-600">{t('photoShots.descriptionPlaceholder')}</p>
           </div>
         </div>
       </PageWrapper>
@@ -92,6 +93,7 @@ export default function PhotoShotListPage() {
           completedShots={completedShots}
           onToggleShot={handleToggleShot}
           weddingCouple={weddingCouple}
+          placeholder={t('photoShots.searchPlaceholder')}
         />
       </div>
     </PageWrapper>

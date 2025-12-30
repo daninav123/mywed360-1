@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { toast } from 'react-toastify';
 import DOMPurify from 'dompurify';
@@ -41,17 +42,17 @@ const generatePostId = () => {
   return `post-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 };
 
-const normalizePosts = (items = []) =>
+const normalizePosts = (items = [], t) =>
   items
     .filter((item) => item && typeof item === 'object')
     .map((item) => ({
       id: item.id || generatePostId(),
-      title: item.title || 'Entrada sin título',
+      title: item.title || t('ideas.untitledPost'),
       content: item.content || '',
       createdAt: item.createdAt || new Date().toISOString(),
       updatedAt: item.updatedAt || item.createdAt || new Date().toISOString(),
       authorId: item.authorId || 'anon',
-      authorName: item.authorName || 'Equipo',
+      authorName: item.authorName || t('ideas.team'),
     }));
 
 const simpleMarkdownToHtml = (markdown = '') => {
@@ -86,6 +87,7 @@ const simpleMarkdownToHtml = (markdown = '') => {
 };
 
 export default function Ideas() {
+  const { t } = useTranslation('pages');
   const { currentUser } = useAuth();
   const uid = currentUser?.uid || 'guest';
   const useFirestore = !!currentUser;

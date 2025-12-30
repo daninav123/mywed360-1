@@ -4,7 +4,7 @@ const IS_BROWSER = typeof window !== 'undefined';
 const IS_CYPRESS = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
 
 export const BASE = import.meta.env.VITE_BACKEND_BASE_URL || '';
-export const MAILGUN_DOMAIN = import.meta.env.VITE_MAILGUN_DOMAIN || 'malove.app';
+export const MAILGUN_DOMAIN = import.meta.env.VITE_MAILGUN_DOMAIN || 'planivia.net';
 export const USE_MAILGUN = import.meta.env.VITE_USE_MAILGUN === 'true';
 export const USE_BACKEND =
   import.meta.env.VITE_USE_EMAIL_BACKEND !== 'false' &&
@@ -14,10 +14,10 @@ export const MAX_ATTACHMENT_SIZE_MB = Number(import.meta.env.VITE_MAX_ATTACHMENT
 export let CURRENT_USER = null;
 export let CURRENT_USER_EMAIL = '';
 
-const MAIL_STORAGE_KEY = 'malove_mails';
-const TEMPLATE_STORAGE_KEY = 'malove_email_templates';
-const DRAFT_STORAGE_KEY = 'malove_email_drafts';
-const INIT_MARKER_KEY = 'malove.email.init';
+const MAIL_STORAGE_KEY = 'planivia_mails';
+const TEMPLATE_STORAGE_KEY = 'planivia_email_templates';
+const DRAFT_STORAGE_KEY = 'planivia_email_drafts';
+const INIT_MARKER_KEY = 'planivia.email.init';
 
 let authContextRef = null;
 const HAS_FILE = typeof File !== 'undefined';
@@ -38,7 +38,11 @@ function buildEmailFromProfile(profile = {}) {
     return `usuario@${MAILGUN_DOMAIN}`;
   }
 
-  // Prioridad 1: Si ya tiene maLoveEmail configurado, usarlo
+  // Prioridad 1: Si ya tiene planiviaEmail configurado, usarlo
+  if (profile.planiviaEmail && profile.planiviaEmail.includes('@')) {
+    return profile.planiviaEmail;
+  }
+  // Compatibilidad con campo legacy
   if (profile.maLoveEmail && profile.maLoveEmail.includes('@')) {
     return profile.maLoveEmail;
   }

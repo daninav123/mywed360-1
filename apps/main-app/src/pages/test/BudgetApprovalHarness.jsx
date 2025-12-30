@@ -1,4 +1,5 @@
 ﻿import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Test harness para probar el flujo de aprobación de presupuestos

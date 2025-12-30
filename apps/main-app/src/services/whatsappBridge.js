@@ -22,7 +22,7 @@ export function sendBroadcastMessages(numbers = [], message = '', options = {}) 
       };
       window.addEventListener('message', onMsg);
       window.postMessage(
-        { source: 'maloveapp', type: 'MALOVEAPP_WHATSAPP_BROADCAST', id, numbers, message, options },
+        { source: 'planivia', type: 'PLANIVIA_WHATSAPP_BROADCAST', id, numbers, message, options },
         '*'
       );
       setTimeout(() => {

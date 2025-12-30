@@ -58,6 +58,48 @@
   "weddingName": {
     "connector": " and "
   },
+  "home2": {
+    "header": {
+      "greeting": "Hi {{name}} & {{partner}}!",
+      "greetingSingle": "Hi {{name}}!",
+      "subtitle": "Let's Plan Your Dream Wedding",
+      "guest": "Guest"
+    },
+    "countdown": {
+      "title": "Countdown",
+      "daysToGo": "Days to Go",
+      "noDate": "Set your wedding date",
+      "past": "Wedding day passed!"
+    },
+    "budget": {
+      "title": "Budget",
+      "of": "of",
+      "spent": "Spent"
+    },
+    "guestList": {
+      "title": "Guest List",
+      "confirmed": "Confirmed",
+      "pending": "Pending"
+    },
+    "tasks": {
+      "title": "Upcoming Tasks",
+      "noTasks": "No pending tasks. Great job!",
+      "untitled": "Untitled task"
+    },
+    "budgetChart": {
+      "title": "Budget Overview",
+      "spent": "Spent",
+      "total": "Total",
+      "venue": "Venue",
+      "catering": "Catering",
+      "flowers": "Flowers",
+      "noData": "No budget data yet"
+    },
+    "inspiration": {
+      "title": "Inspiration Board",
+      "viewAll": "View all inspirations"
+    }
+  },
   "modals": {
     "shared": {
       "cancel": "Cancel",

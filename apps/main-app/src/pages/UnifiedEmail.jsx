@@ -362,7 +362,7 @@ const UnifiedEmail = () => {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar asunto, remitente o texto"
+            placeholder={t('Buscar correos')} // Cambio realizado
             className="w-full rounded border px-3 py-2 text-sm pr-8"
           />
           <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">

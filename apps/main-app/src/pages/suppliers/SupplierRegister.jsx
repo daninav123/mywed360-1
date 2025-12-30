@@ -176,7 +176,7 @@ export default function SupplierRegister() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder={t('suppliers.register.form.confirmPassword.placeholder')}
+                  placeholder={t('supplier.register.confirmPasswordPlaceholder')}
                 />
               </div>
             </div>

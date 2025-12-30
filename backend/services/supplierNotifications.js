@@ -15,7 +15,7 @@ export async function notifyNewQuoteRequest(supplier, request) {
       return { success: false, reason: 'no_email' };
     }
 
-    const subject = '🎉 Nueva solicitud de presupuesto - MaLove.App';
+    const subject = '🎉 Nueva solicitud de presupuesto - Planivia';
     const html = `
       <!DOCTYPE html>
       <html>
@@ -55,7 +55,7 @@ export async function notifyNewQuoteRequest(supplier, request) {
             </a>
           </div>
           <div class="footer">
-            <p>MaLove.App - Tu plataforma de servicios para bodas</p>
+            <p>Planivia - Tu plataforma de servicios para bodas</p>
             <p>
               <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/supplier/dashboard/${supplier.id}/settings">Gestionar notificaciones</a>
             </p>
@@ -91,7 +91,7 @@ export async function notifyNewReview(supplier, review) {
     }
 
     const stars = '⭐'.repeat(review.rating);
-    const subject = `${stars} Nueva reseña recibida - MaLove.App`;
+    const subject = `${stars} Nueva reseña recibida - Planivia`;
 
     const html = `
       <!DOCTYPE html>
@@ -130,7 +130,7 @@ export async function notifyNewReview(supplier, review) {
             </a>
           </div>
           <div class="footer">
-            <p>MaLove.App - Tu plataforma de servicios para bodas</p>
+            <p>Planivia - Tu plataforma de servicios para bodas</p>
             <p>
               <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/supplier/dashboard/${supplier.id}/settings">Gestionar notificaciones</a>
             </p>
@@ -164,7 +164,7 @@ export async function sendWeeklySummary(supplier, stats) {
       return { success: false, reason: 'no_email' };
     }
 
-    const subject = '📊 Tu resumen semanal - MaLove.App';
+    const subject = '📊 Tu resumen semanal - Planivia';
     const html = `
       <!DOCTYPE html>
       <html>
@@ -183,7 +183,7 @@ export async function sendWeeklySummary(supplier, stats) {
       <body>
         <div class="container">
           <div class="header">
-            <h1 style="margin: 0;">Tu semana en MaLove.App</h1>
+            <h1 style="margin: 0;">Tu semana en Planivia</h1>
           </div>
           <div class="content">
             <p>Hola <strong>${supplier.name}</strong>,</p>
@@ -212,7 +212,7 @@ export async function sendWeeklySummary(supplier, stats) {
             <p>Sigue mejorando tu perfil para atraer más clientes.</p>
           </div>
           <div class="footer">
-            <p>MaLove.App - Tu plataforma de servicios para bodas</p>
+            <p>Planivia - Tu plataforma de servicios para bodas</p>
             <p>
               <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/supplier/dashboard/${supplier.id}/settings">Gestionar notificaciones</a>
             </p>

@@ -224,7 +224,7 @@ export async function sendMailAndPersist({
   } else if (!recordOnly && testMode) {
     // Modo test: generar messageId falso pero válido
     messageId = `<test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@malove.app>`;
-    console.log('[mailSendService] TEST MODE: Email no enviado realmente, messageId mockeado:', messageId);
+    logger.info('[mailSendService] TEST MODE: Email no enviado realmente, messageId mockeado');
   }
 
   const docPayload = {

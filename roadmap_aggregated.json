@@ -58,45 +58,32 @@
         {
           "ref": "Signup.jsx",
           "basename": "Signup.jsx",
-          "matches": [
-            "apps/main-app/src/pages/Signup.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/Signup.jsx"]
         },
         {
           "ref": "Login.jsx",
           "basename": "Login.jsx",
-          "matches": [
-            "apps/main-app/src/pages/Login.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/Login.jsx"]
         },
         {
           "ref": "ResetPassword.jsx",
           "basename": "ResetPassword.jsx",
-          "matches": [
-            "apps/main-app/src/pages/ResetPassword.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/ResetPassword.jsx"]
         },
         {
           "ref": "VerifyEmail.jsx",
           "basename": "VerifyEmail.jsx",
-          "matches": [
-            "apps/main-app/src/pages/VerifyEmail.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/VerifyEmail.jsx"]
         },
         {
           "ref": "useAuth.jsx",
           "basename": "useAuth.jsx",
-          "matches": [
-            "apps/admin-app/src/hooks/useAuth.jsx",
-            "apps/main-app/src/hooks/useAuth.jsx"
-          ]
+          "matches": ["apps/admin-app/src/hooks/useAuth.jsx", "apps/main-app/src/hooks/useAuth.jsx"]
         },
         {
           "ref": "SessionManager.jsx",
           "basename": "SessionManager.jsx",
-          "matches": [
-            "apps/main-app/src/components/auth/SessionManager.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/auth/SessionManager.jsx"]
         },
         {
           "ref": "src/context/UserContext.jsx",
@@ -109,23 +96,17 @@
         {
           "ref": "SocialLoginButtons.jsx",
           "basename": "SocialLoginButtons.jsx",
-          "matches": [
-            "apps/main-app/src/components/auth/SocialLoginButtons.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/auth/SocialLoginButtons.jsx"]
         },
         {
           "ref": "RegisterForm.jsx",
           "basename": "RegisterForm.jsx",
-          "matches": [
-            "apps/main-app/src/components/auth/RegisterForm.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/auth/RegisterForm.jsx"]
         },
         {
           "ref": "PasswordStrengthMeter.jsx",
           "basename": "PasswordStrengthMeter.jsx",
-          "matches": [
-            "apps/main-app/src/components/auth/PasswordStrengthMeter.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/auth/PasswordStrengthMeter.jsx"]
         }
       ],
       "conclusion": "parcial"
@@ -295,23 +276,17 @@
         {
           "ref": "Notificaciones.jsx",
           "basename": "Notificaciones.jsx",
-          "matches": [
-            "apps/main-app/src/pages/Notificaciones.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/Notificaciones.jsx"]
         },
         {
           "ref": "NotificationPreferences.jsx",
           "basename": "NotificationPreferences.jsx",
-          "matches": [
-            "apps/main-app/src/pages/NotificationPreferences.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/NotificationPreferences.jsx"]
         },
         {
           "ref": "NotificationWatcher.jsx",
           "basename": "NotificationWatcher.jsx",
-          "matches": [
-            "apps/main-app/src/components/notifications/NotificationWatcher.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/notifications/NotificationWatcher.jsx"]
         },
         {
           "ref": "NotificationCenter.jsx",
@@ -341,9 +316,7 @@
         {
           "ref": "/api/notification-preferences",
           "basename": "notification-preferences",
-          "matches": [
-            "backend/routes/notification-preferences.js"
-          ]
+          "matches": ["backend/routes/notification-preferences.js"]
         }
       ],
       "conclusion": "parcial"
@@ -419,9 +392,7 @@
         {
           "ref": "TaskSidePanel.jsx",
           "basename": "TaskSidePanel.jsx",
-          "matches": [
-            "apps/main-app/src/components/tasks/TaskSidePanel.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/tasks/TaskSidePanel.jsx"]
         },
         {
           "ref": "useWeddingTasksHierarchy",
@@ -434,9 +405,7 @@
         {
           "ref": "automationService.js",
           "basename": "automationService.js",
-          "matches": [
-            "backend/services/automationService.js"
-          ]
+          "matches": ["backend/services/automationService.js"]
         }
       ],
       "conclusion": "parcial"
@@ -463,16 +432,12 @@
         {
           "ref": "Contratos.jsx",
           "basename": "Contratos.jsx",
-          "matches": [
-            "apps/main-app/src/pages/Contratos.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/Contratos.jsx"]
         },
         {
           "ref": "contractTemplates.js",
           "basename": "contractTemplates.js",
-          "matches": [
-            "apps/main-app/src/data/templates/contractTemplates.js"
-          ]
+          "matches": ["apps/main-app/src/data/templates/contractTemplates.js"]
         },
         {
           "ref": "SignatureService.js",
@@ -622,16 +587,12 @@
         {
           "ref": "InvitationDesigner.jsx",
           "basename": "InvitationDesigner.jsx",
-          "matches": [
-            "apps/main-app/src/pages/InvitationDesigner.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/InvitationDesigner.jsx"]
         },
         {
           "ref": "MisDisenos.jsx",
           "basename": "MisDisenos.jsx",
-          "matches": [
-            "apps/main-app/src/pages/disenos/MisDisenos.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/disenos/MisDisenos.jsx"]
         },
         {
           "ref": "VectorEditor.jsx",
@@ -644,16 +605,12 @@
         {
           "ref": "MenuCatering.jsx",
           "basename": "MenuCatering.jsx",
-          "matches": [
-            "apps/main-app/src/pages/disenos/MenuCatering.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/disenos/MenuCatering.jsx"]
         },
         {
           "ref": "PapelesNombres.jsx",
           "basename": "PapelesNombres.jsx",
-          "matches": [
-            "apps/main-app/src/pages/disenos/PapelesNombres.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/disenos/PapelesNombres.jsx"]
         },
         {
           "ref": "pdfExport.js",
@@ -692,9 +649,7 @@
         {
           "ref": "src/pages/CreateWeddingAI.jsx",
           "basename": "CreateWeddingAI.jsx",
-          "matches": [
-            "apps/main-app/src/pages/CreateWeddingAI.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/CreateWeddingAI.jsx"]
         },
         {
           "ref": "src/pages/AyudaCeremonia.jsx",
@@ -707,16 +662,12 @@
         {
           "ref": "src/pages/BodaDetalle.jsx",
           "basename": "BodaDetalle.jsx",
-          "matches": [
-            "apps/main-app/src/pages/BodaDetalle.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/BodaDetalle.jsx"]
         },
         {
           "ref": "src/context/WeddingContext.jsx",
           "basename": "WeddingContext.jsx",
-          "matches": [
-            "apps/main-app/src/context/WeddingContext.jsx"
-          ]
+          "matches": ["apps/main-app/src/context/WeddingContext.jsx"]
         },
         {
           "ref": "src/services/WeddingService.js",
@@ -729,9 +680,7 @@
         {
           "ref": "src/config/eventStyles.js",
           "basename": "eventStyles.js",
-          "matches": [
-            "apps/main-app/src/config/eventStyles.js"
-          ]
+          "matches": ["apps/main-app/src/config/eventStyles.js"]
         }
       ],
       "conclusion": "parcial"
@@ -803,9 +752,7 @@
         {
           "ref": "Buzon_fixed_complete.jsx",
           "basename": "Buzon_fixed_complete.jsx",
-          "matches": [
-            "apps/main-app/src/pages/Buzon_fixed_complete.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/Buzon_fixed_complete.jsx"]
         },
         {
           "ref": "EmailInbox.jsx",
@@ -818,30 +765,22 @@
         {
           "ref": "EmailStatistics.jsx",
           "basename": "EmailStatistics.jsx",
-          "matches": [
-            "apps/main-app/src/pages/user/EmailStatistics.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/user/EmailStatistics.jsx"]
         },
         {
           "ref": "UnifiedInbox/InboxContainer.jsx",
           "basename": "InboxContainer.jsx",
-          "matches": [
-            "apps/main-app/src/components/email/UnifiedInbox/InboxContainer.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/email/UnifiedInbox/InboxContainer.jsx"]
         },
         {
           "ref": "EmailComposer.jsx",
           "basename": "EmailComposer.jsx",
-          "matches": [
-            "apps/main-app/src/components/email/EmailComposer.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/email/EmailComposer.jsx"]
         },
         {
           "ref": "EmailSetupForm.jsx",
           "basename": "EmailSetupForm.jsx",
-          "matches": [
-            "apps/main-app/src/components/email/EmailSetupForm.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/email/EmailSetupForm.jsx"]
         }
       ],
       "conclusion": "parcial"
@@ -876,30 +815,22 @@
         {
           "ref": "WeddingSite.jsx",
           "basename": "WeddingSite.jsx",
-          "matches": [
-            "apps/main-app/src/pages/WeddingSite.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/WeddingSite.jsx"]
         },
         {
           "ref": "PublicWedding.jsx",
           "basename": "PublicWedding.jsx",
-          "matches": [
-            "apps/main-app/src/pages/PublicWedding.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/PublicWedding.jsx"]
         },
         {
           "ref": "SeatingPlanPost.jsx",
           "basename": "SeatingPlanPost.jsx",
-          "matches": [
-            "apps/main-app/src/pages/disenos/SeatingPlanPost.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/disenos/SeatingPlanPost.jsx"]
         },
         {
           "ref": "MomentosEspecialesSimple.jsx",
           "basename": "MomentosEspecialesSimple.jsx",
-          "matches": [
-            "apps/main-app/src/pages/protocolo/MomentosEspecialesSimple.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/protocolo/MomentosEspecialesSimple.jsx"]
         },
         {
           "ref": "websiteService",
@@ -929,9 +860,7 @@
         {
           "ref": "HomeUser.jsx",
           "basename": "HomeUser.jsx",
-          "matches": [
-            "apps/main-app/src/pages/HomeUser.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/HomeUser.jsx"]
         },
         {
           "ref": "Dashboard.jsx",
@@ -944,37 +873,27 @@
         {
           "ref": "More.jsx",
           "basename": "More.jsx",
-          "matches": [
-            "apps/main-app/src/pages/More.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/More.jsx"]
         },
         {
           "ref": "Perfil.jsx",
           "basename": "Perfil.jsx",
-          "matches": [
-            "apps/main-app/src/pages/Perfil.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/Perfil.jsx"]
         },
         {
           "ref": "WidgetContent.jsx",
           "basename": "WidgetContent.jsx",
-          "matches": [
-            "apps/main-app/src/components/dashboard/WidgetContent.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/dashboard/WidgetContent.jsx"]
         },
         {
           "ref": "DevEnsureFinance.jsx",
           "basename": "DevEnsureFinance.jsx",
-          "matches": [
-            "apps/main-app/src/pages/DevEnsureFinance.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/DevEnsureFinance.jsx"]
         },
         {
           "ref": "DevSeedGuests.jsx",
           "basename": "DevSeedGuests.jsx",
-          "matches": [
-            "apps/main-app/src/pages/DevSeedGuests.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/DevSeedGuests.jsx"]
         }
       ],
       "conclusion": "parcial"
@@ -1063,9 +982,7 @@
         {
           "ref": "docs/planes-suscripcion.md",
           "basename": "planes-suscripcion.md",
-          "matches": [
-            "docs/planes-suscripcion.md"
-          ]
+          "matches": ["docs/planes-suscripcion.md"]
         }
       ],
       "conclusion": "parcial"
@@ -1135,30 +1052,22 @@
         {
           "ref": "HomePage.jsx",
           "basename": "HomePage.jsx",
-          "matches": [
-            "apps/main-app/src/components/HomePage.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/HomePage.jsx"]
         },
         {
           "ref": "PlannerDashboard.jsx",
           "basename": "PlannerDashboard.jsx",
-          "matches": [
-            "apps/main-app/src/components/PlannerDashboard.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/PlannerDashboard.jsx"]
         },
         {
           "ref": "PlannerDashboard.jsx",
           "basename": "PlannerDashboard.jsx",
-          "matches": [
-            "apps/main-app/src/components/PlannerDashboard.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/PlannerDashboard.jsx"]
         },
         {
           "ref": "WeddingContext.jsx",
           "basename": "WeddingContext.jsx",
-          "matches": [
-            "apps/main-app/src/context/WeddingContext.jsx"
-          ]
+          "matches": ["apps/main-app/src/context/WeddingContext.jsx"]
         },
         {
           "ref": "useFirestoreCollection.js",
@@ -1179,16 +1088,12 @@
         {
           "ref": "Nav.jsx",
           "basename": "Nav.jsx",
-          "matches": [
-            "apps/main-app/src/components/Nav.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/Nav.jsx"]
         },
         {
           "ref": "Bodas.jsx",
           "basename": "Bodas.jsx",
-          "matches": [
-            "apps/main-app/src/pages/Bodas.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/Bodas.jsx"]
         }
       ],
       "conclusion": "parcial"
@@ -1215,47 +1120,32 @@
         {
           "ref": "src/components/auth/RegisterForm.jsx:56",
           "basename": "RegisterForm.jsx:56",
-          "matches": [
-            "apps/main-app/src/components/auth/RegisterForm.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/auth/RegisterForm.jsx"]
         },
         {
           "ref": "useAuth",
           "basename": "useAuth",
-          "matches": [
-            "apps/admin-app/src/hooks/useAuth.jsx",
-            "apps/main-app/src/hooks/useAuth.jsx"
-          ]
+          "matches": ["apps/admin-app/src/hooks/useAuth.jsx", "apps/main-app/src/hooks/useAuth.jsx"]
         },
         {
           "ref": "src/hooks/useAuth.jsx:180",
           "basename": "useAuth.jsx:180",
-          "matches": [
-            "apps/admin-app/src/hooks/useAuth.jsx",
-            "apps/main-app/src/hooks/useAuth.jsx"
-          ]
+          "matches": ["apps/admin-app/src/hooks/useAuth.jsx", "apps/main-app/src/hooks/useAuth.jsx"]
         },
         {
           "ref": "src/hooks/useAuth.jsx:593",
           "basename": "useAuth.jsx:593",
-          "matches": [
-            "apps/admin-app/src/hooks/useAuth.jsx",
-            "apps/main-app/src/hooks/useAuth.jsx"
-          ]
+          "matches": ["apps/admin-app/src/hooks/useAuth.jsx", "apps/main-app/src/hooks/useAuth.jsx"]
         },
         {
           "ref": "src/components/Nav.jsx:29",
           "basename": "Nav.jsx:29",
-          "matches": [
-            "apps/main-app/src/components/Nav.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/Nav.jsx"]
         },
         {
           "ref": "src/components/HomePage.jsx:77",
           "basename": "HomePage.jsx:77",
-          "matches": [
-            "apps/main-app/src/components/HomePage.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/HomePage.jsx"]
         },
         {
           "ref": "WeddingService",
@@ -1292,16 +1182,12 @@
         {
           "ref": "WeddingAccountLink.jsx:59",
           "basename": "WeddingAccountLink.jsx:59",
-          "matches": [
-            "apps/main-app/src/components/settings/WeddingAccountLink.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/settings/WeddingAccountLink.jsx"]
         },
         {
           "ref": "WeddingAccountLink.jsx:79",
           "basename": "WeddingAccountLink.jsx:79",
-          "matches": [
-            "apps/main-app/src/components/settings/WeddingAccountLink.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/settings/WeddingAccountLink.jsx"]
         }
       ],
       "conclusion": "parcial"
@@ -1340,23 +1226,17 @@
         {
           "ref": "src/pages/CreateWeddingAssistant.jsx",
           "basename": "CreateWeddingAssistant.jsx",
-          "matches": [
-            "apps/main-app/src/pages/CreateWeddingAssistant.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/CreateWeddingAssistant.jsx"]
         },
         {
           "ref": "src/context/WeddingContext.jsx",
           "basename": "WeddingContext.jsx",
-          "matches": [
-            "apps/main-app/src/context/WeddingContext.jsx"
-          ]
+          "matches": ["apps/main-app/src/context/WeddingContext.jsx"]
         },
         {
           "ref": "src/config/eventStyles.js",
           "basename": "eventStyles.js",
-          "matches": [
-            "apps/main-app/src/config/eventStyles.js"
-          ]
+          "matches": ["apps/main-app/src/config/eventStyles.js"]
         },
         {
           "ref": "src/services/WeddingService.js",
@@ -1416,23 +1296,17 @@
         {
           "ref": "Invitados.jsx",
           "basename": "Invitados.jsx",
-          "matches": [
-            "apps/main-app/src/pages/Invitados.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/Invitados.jsx"]
         },
         {
           "ref": "RSVPDashboard.jsx",
           "basename": "RSVPDashboard.jsx",
-          "matches": [
-            "apps/main-app/src/pages/RSVPDashboard.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/RSVPDashboard.jsx"]
         },
         {
           "ref": "AcceptInvitation.jsx",
           "basename": "AcceptInvitation.jsx",
-          "matches": [
-            "apps/main-app/src/pages/AcceptInvitation.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/AcceptInvitation.jsx"]
         },
         {
           "ref": "GuestEventBridge.jsx",
@@ -1445,72 +1319,52 @@
         {
           "ref": "GuestList",
           "basename": "GuestList",
-          "matches": [
-            "apps/main-app/src/components/guests/GuestList.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/guests/GuestList.jsx"]
         },
         {
           "ref": "GuestFilters",
           "basename": "GuestFilters",
-          "matches": [
-            "apps/main-app/src/components/guests/GuestFilters.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/guests/GuestFilters.jsx"]
         },
         {
           "ref": "GuestForm",
           "basename": "GuestForm",
-          "matches": [
-            "apps/main-app/src/components/guests/GuestForm.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/guests/GuestForm.jsx"]
         },
         {
           "ref": "GuestBulkGrid",
           "basename": "GuestBulkGrid",
-          "matches": [
-            "apps/main-app/src/components/guests/GuestBulkGrid.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/guests/GuestBulkGrid.jsx"]
         },
         {
           "ref": "ContactsImporter",
           "basename": "ContactsImporter",
-          "matches": [
-            "apps/main-app/src/components/guests/ContactsImporter.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/guests/ContactsImporter.jsx"]
         },
         {
           "ref": "GroupManager",
           "basename": "GroupManager",
-          "matches": [
-            "apps/main-app/src/components/guests/GroupManager.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/guests/GroupManager.jsx"]
         },
         {
           "ref": "WhatsAppModal",
           "basename": "WhatsAppModal",
-          "matches": [
-            "apps/main-app/src/components/whatsapp/WhatsAppModal.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/whatsapp/WhatsAppModal.jsx"]
         },
         {
           "ref": "WhatsAppSender",
           "basename": "WhatsAppSender",
-          "matches": [
-            "apps/main-app/src/components/whatsapp/WhatsAppSender.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/whatsapp/WhatsAppSender.jsx"]
         },
         {
           "ref": "SaveTheDateModal",
           "basename": "SaveTheDateModal",
-          "matches": [
-            "apps/main-app/src/components/whatsapp/SaveTheDateModal.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/whatsapp/SaveTheDateModal.jsx"]
         },
         {
           "ref": "InviteTemplateModal",
           "basename": "InviteTemplateModal",
-          "matches": [
-            "apps/main-app/src/components/whatsapp/InviteTemplateModal.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/whatsapp/InviteTemplateModal.jsx"]
         },
         {
           "ref": "useGuests",
@@ -1586,30 +1440,22 @@
         {
           "ref": "src/pages/HomeUser.jsx",
           "basename": "HomeUser.jsx",
-          "matches": [
-            "apps/main-app/src/pages/HomeUser.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/HomeUser.jsx"]
         },
         {
           "ref": "src/components/HomePage.jsx",
           "basename": "HomePage.jsx",
-          "matches": [
-            "apps/main-app/src/components/HomePage.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/HomePage.jsx"]
         },
         {
           "ref": "Nav.jsx",
           "basename": "Nav.jsx",
-          "matches": [
-            "apps/main-app/src/components/Nav.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/Nav.jsx"]
         },
         {
           "ref": "ProviderSearchModal.jsx",
           "basename": "ProviderSearchModal.jsx",
-          "matches": [
-            "apps/main-app/src/components/ProviderSearchModal.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/ProviderSearchModal.jsx"]
         },
         {
           "ref": "useFinance",
@@ -1661,9 +1507,7 @@
       "filePath": "docs/flujos-especificos/flujo-4-invitados-operativa.md",
       "title": "4. Invitados – Plan de Asientos (estado 2025-10-12)",
       "implementedLines": [],
-      "pendingLines": [
-        ""
-      ],
+      "pendingLines": [""],
       "roadmapSection": "- Panel lateral inteligente con recomendaciones autónomas y resolución de conflictos por IA.  \n- Colaboración en tiempo real: evolucionar hacia versionado avanzado (locks y merge multi-editor) sobre la presencia y sincronización actuales.  \n- Integración con proveedores/venues (ingesta automática de planos y configuraciones).  \n- Exportaciones con presets guardados y envío directo a stakeholders.\n- Reestructurar el PDF avanzado en secciones dedicadas (mapa de ceremonia, plano de banquete, lista global, invitados por mesa, dietas especiales, VIP de Momentos Especiales).",
       "checklistSection": "- Revisar reglas Firestore (`seating`, `seatingHistory`, `seatingLocks`, `seatingPresence`).\n- Validar seeds y límites (mesas, invitados) para rendimiento y uso de auto-assign.\n- Testear exportes (PDF/SVG/CSV/PNG) con presets y tamaño de archivos.\n- Verificar experiencia móvil/desktop: márgenes, paneles, persistencia de toggles, contraste.\n- Automatizar backups periódicos de `seating` + `seatingHistory` para auditoría.",
       "e2eSection": "",
@@ -1734,9 +1578,7 @@
         {
           "ref": "TaskSidePanel.jsx",
           "basename": "TaskSidePanel.jsx",
-          "matches": [
-            "apps/main-app/src/components/tasks/TaskSidePanel.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/tasks/TaskSidePanel.jsx"]
         },
         {
           "ref": "Checklist.jsx",
@@ -1749,30 +1591,22 @@
         {
           "ref": "TaskList.jsx",
           "basename": "TaskList.jsx",
-          "matches": [
-            "apps/main-app/src/components/tasks/TaskList.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/tasks/TaskList.jsx"]
         },
         {
           "ref": "EventsCalendar.jsx",
           "basename": "EventsCalendar.jsx",
-          "matches": [
-            "apps/main-app/src/components/tasks/EventsCalendar.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/tasks/EventsCalendar.jsx"]
         },
         {
           "ref": "LongTermTasksGantt.jsx",
           "basename": "LongTermTasksGantt.jsx",
-          "matches": [
-            "apps/main-app/src/components/tasks/LongTermTasksGantt.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/tasks/LongTermTasksGantt.jsx"]
         },
         {
           "ref": "CalendarSync.jsx",
           "basename": "CalendarSync.jsx",
-          "matches": [
-            "apps/main-app/src/components/tasks/CalendarSync.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/tasks/CalendarSync.jsx"]
         },
         {
           "ref": "TaskEventBridge.jsx",
@@ -1793,9 +1627,7 @@
         {
           "ref": "TasksRefactored.jsx",
           "basename": "TasksRefactored.jsx",
-          "matches": [
-            "apps/main-app/src/components/tasks/TasksRefactored.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/tasks/TasksRefactored.jsx"]
         },
         {
           "ref": "useWeddingTasksHierarchy.js",
@@ -1808,23 +1640,17 @@
         {
           "ref": "CalendarComponents.jsx",
           "basename": "CalendarComponents.jsx",
-          "matches": [
-            "apps/main-app/src/components/tasks/CalendarComponents.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/tasks/CalendarComponents.jsx"]
         },
         {
           "ref": "apps/main-app/src/data/tasks/masterTimelineTemplate.json",
           "basename": "masterTimelineTemplate.json",
-          "matches": [
-            "apps/main-app/src/data/tasks/masterTimelineTemplate.json"
-          ]
+          "matches": ["apps/main-app/src/data/tasks/masterTimelineTemplate.json"]
         },
         {
           "ref": "TaskSidePanel.jsx",
           "basename": "TaskSidePanel.jsx",
-          "matches": [
-            "apps/main-app/src/components/tasks/TaskSidePanel.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/tasks/TaskSidePanel.jsx"]
         }
       ],
       "conclusion": "parcial"
@@ -1920,37 +1746,27 @@
         {
           "ref": "src/components/finance/BudgetManager.jsx",
           "basename": "BudgetManager.jsx",
-          "matches": [
-            "apps/main-app/src/components/finance/BudgetManager.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/finance/BudgetManager.jsx"]
         },
         {
           "ref": "FinanceOverview.jsx",
           "basename": "FinanceOverview.jsx",
-          "matches": [
-            "apps/main-app/src/components/finance/FinanceOverview.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/finance/FinanceOverview.jsx"]
         },
         {
           "ref": "FinanceCharts.jsx",
           "basename": "FinanceCharts.jsx",
-          "matches": [
-            "apps/main-app/src/components/finance/FinanceCharts.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/finance/FinanceCharts.jsx"]
         },
         {
           "ref": "PaymentSuggestions.jsx",
           "basename": "PaymentSuggestions.jsx",
-          "matches": [
-            "apps/main-app/src/components/finance/PaymentSuggestions.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/finance/PaymentSuggestions.jsx"]
         },
         {
           "ref": "TransactionManager.jsx",
           "basename": "TransactionManager.jsx",
-          "matches": [
-            "apps/main-app/src/components/finance/TransactionManager.jsx"
-          ]
+          "matches": ["apps/main-app/src/components/finance/TransactionManager.jsx"]
         },
         {
           "ref": "useFinance",
@@ -2127,23 +1943,17 @@
         {
           "ref": "RSVPConfirm.jsx",
           "basename": "RSVPConfirm.jsx",
-          "matches": [
-            "apps/main-app/src/pages/RSVPConfirm.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/RSVPConfirm.jsx"]
         },
         {
           "ref": "AcceptInvitation.jsx",
           "basename": "AcceptInvitation.jsx",
-          "matches": [
-            "apps/main-app/src/pages/AcceptInvitation.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/AcceptInvitation.jsx"]
         },
         {
           "ref": "RSVPDashboard.jsx",
           "basename": "RSVPDashboard.jsx",
-          "matches": [
-            "apps/main-app/src/pages/RSVPDashboard.jsx"
-          ]
+          "matches": ["apps/main-app/src/pages/RSVPDashboard.jsx"]
         },
         {
           "ref": "useGuests",
