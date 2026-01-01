@@ -57,3 +57,6 @@ cypress/videos/
 
 .env*
 !.env.example
+
+MIGRACION/
+MIGRACION_PLANIVIA.zip
