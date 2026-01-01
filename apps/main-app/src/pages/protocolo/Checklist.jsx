@@ -22,7 +22,6 @@
   Plus,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
@@ -405,7 +404,7 @@ export default function Checklist() {
                     : ITEM_STATUS.PENDING;
                 handleStatusChange(item.id, nextStatus);
               }}
-              className="mt-1 flex-shrink-0 rounded-full p-1 transition hover:bg-gray-100"
+              className="mt-1 flex-shrink-0 rounded-full p-1 transition hover:" style={{ backgroundColor: 'var(--color-bg)' }}
             >
               {renderStatusBadge(item.status)}
             </button>
@@ -439,7 +438,7 @@ export default function Checklist() {
               </div>
 
               {item.dueDate && (
-                <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
+                <div className="mt-1 flex items-center gap-2 text-xs " style={{ color: 'var(--color-text-secondary)' }}>
                   <Calendar size={13} />
                   <span>
                     {t('protocol.checklist.labels.due')} {formatDate(item.dueDate, 'short')}
@@ -462,7 +461,7 @@ export default function Checklist() {
                     rows={3}
                   />
                   <div className="flex flex-wrap items-center gap-2">
-                    <label className="text-xs font-medium text-gray-600">
+                    <label className="text-xs font-medium " style={{ color: 'var(--color-text-secondary)' }}>
                       {t('protocol.checklist.labels.due')}
                     </label>
                     <input
@@ -476,7 +475,7 @@ export default function Checklist() {
                         variant="ghost"
                         size="xs"
                         onClick={() => setItemDueDate(item.id, null)}
-                        className="text-xs text-gray-500 hover:text-rose-500"
+                        className="text-xs  hover:text-rose-500" style={{ color: 'var(--color-muted)' }}
                       >
                         {translate('common.protocol.checklist.labels.clearDue', 'Limpiar fecha')}
                       </Button>
@@ -485,7 +484,7 @@ export default function Checklist() {
                 </div>
               ) : (
                 item.notes && (
-                  <p className="mt-2 text-sm text-gray-600">
+                  <p className="mt-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                     {item.notes}
                   </p>
                 )
@@ -493,12 +492,12 @@ export default function Checklist() {
 
               {itemDocs.length > 0 && (
                 <div className="mt-3">
-                  <div className="text-xs font-medium text-gray-500">
+                  <div className="text-xs font-medium " style={{ color: 'var(--color-muted)' }}>
                     {t('protocol.checklist.labels.documents')}
                   </div>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {itemDocs.map((doc) => (
-                      <span key={doc.id} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs">
+                      <span key={doc.id} className="rounded-full  px-2 py-0.5 text-xs" style={{ backgroundColor: 'var(--color-bg)' }}>
                         {doc.name || doc.type}
                       </span>
                     ))}
@@ -519,7 +518,7 @@ export default function Checklist() {
               </button>
               <button
                 onClick={() => setEditingItem(isEditing ? null : item.id)}
-                className="rounded p-1 text-gray-400 transition hover:text-blue-600"
+                className="rounded p-1  transition hover:" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-muted)' }}
                 title={
                   isEditing
                     ? t('protocol.checklist.tooltips.save')
@@ -531,7 +530,7 @@ export default function Checklist() {
               {item.custom && (
                 <button
                   onClick={() => handleRemoveCustomItem(item.id)}
-                  className="rounded p-1 text-gray-400 transition hover:text-rose-600"
+                  className="rounded p-1  transition hover:text-rose-600" style={{ color: 'var(--color-muted)' }}
                   title={t('protocol.checklist.tooltips.delete')}
                 >
                   <Trash2 size={16} />
@@ -576,7 +575,7 @@ export default function Checklist() {
     >
       <div className="space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
+          <label className="mb-1 block text-sm font-medium " style={{ color: 'var(--color-text)' }}>
             {t('protocol.checklist.addModal.nameLabel')}
           </label>
           <input
@@ -588,7 +587,7 @@ export default function Checklist() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
+          <label className="mb-1 block text-sm font-medium " style={{ color: 'var(--color-text)' }}>
             {t('protocol.checklist.addModal.notesLabel')}
           </label>
           <textarea
@@ -693,7 +692,7 @@ export default function Checklist() {
       <AddCheckpointModal />
 
       <div className="space-y-6">
-        <header className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <header className="rounded-2xl border   p-6 shadow-sm" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-center gap-3">
@@ -713,23 +712,23 @@ export default function Checklist() {
                       : translate('common.protocol.checklist.countdown.future', 'Cuenta atrás al gran día') + ` · ${countdown.days}d ${countdown.hours}h`}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 rounded-full  px-4 py-2 text-sm " style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
                     <Clock size={16} />
                     {translate('common.protocol.checklist.countdown.missing', 'Añade la fecha del evento para ver la cuenta atrás.')}
                   </div>
                 )}
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-muted)' }}>
                   <Calendar size={16} />
                   {eventDate ? formatDate(eventDate, 'long') : translate('common.protocol.checklist.labels.noDate', 'Sin fecha definida')}
                 </div>
               </div>
               <div>
-                <p className="text-base font-semibold text-gray-900">
+                <p className="text-base font-semibold " style={{ color: 'var(--color-text)' }}>
                   {readiness.isReady
                     ? translate('common.protocol.checklist.readiness.ready', 'Checklist completa y lista para el evento.')
                     : translate('common.protocol.checklist.readiness.pending', 'Revisa los puntos críticos antes de la boda.')}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                   {t('protocol.checklist.description')}
                 </p>
               </div>
@@ -771,15 +770,15 @@ export default function Checklist() {
             </div>
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
               <CheckCircle className="text-emerald-500" size={18} />
               {translate('common.protocol.checklist.stats.completion', 'Completado:')} {summary.completionPercentage || 0}%
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
               <AlertTriangle className="text-amber-500" size={18} />
               {translate('common.protocol.checklist.stats.critical', 'Críticos abiertos:')} {summary.criticalPending.length}
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
               <AlertCircle className="text-rose-500" size={18} />
               {translate('common.protocol.checklist.stats.overdue', 'Atrasados:')} {summary.overdueItems.length}
             </div>
@@ -788,7 +787,7 @@ export default function Checklist() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={translate('common.protocol.checklist.labels.search', 'Buscar en el checklist')}
-                className="w-64 rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-[color:var(--color-primary)] focus:outline-none"
+                className="w-64 rounded-md border  px-3 py-2 text-sm focus:border-[color:var(--color-primary)] focus:outline-none" style={{ borderColor: 'var(--color-border)' }}
               />
             </div>
           </div>
@@ -796,13 +795,13 @@ export default function Checklist() {
 
         <div className="grid gap-6 lg:grid-cols-[320px,1fr]">
           <aside className="space-y-6 lg:sticky lg:top-24">
-            <Card className="space-y-4 border border-gray-200 bg-white p-4 shadow-sm">
+            <Card className="space-y-4 border   p-4 shadow-sm" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">
+                  <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
                     {translate('common.protocol.checklist.readiness.title', 'Estado del evento')}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
                     {readiness.isReady
                       ? translate(
                           'common.protocol.checklist.readiness.subtitleReady',
@@ -859,9 +858,9 @@ export default function Checklist() {
               )}
             </Card>
 
-            <Card className="space-y-4 border border-gray-200 bg-white p-4 shadow-sm">
+            <Card className="space-y-4 border   p-4 shadow-sm" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-gray-800">
+                <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
                   {translate('common.protocol.checklist.manual.title', 'Extras personales')}
                 </p>
                 <Button
@@ -874,7 +873,7 @@ export default function Checklist() {
                 </Button>
               </div>
               {manualChecks.length === 0 ? (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
                   {t('protocol.checklist.manual.empty', {
                     button: t('protocol.checklist.buttons.addCheckpoint'),
                   })}
@@ -905,7 +904,7 @@ export default function Checklist() {
                           {item.title}
                         </p>
                         {item.notes && (
-                          <p className="mt-0.5 text-[11px] text-gray-500">{item.notes}</p>
+                          <p className="mt-0.5 text-[11px] " style={{ color: 'var(--color-muted)' }}>{item.notes}</p>
                         )}
                       </div>
                       <button
@@ -914,7 +913,7 @@ export default function Checklist() {
                             prev.filter((checkpoint) => checkpoint.id !== item.id)
                           )
                         }
-                        className="text-gray-400 transition hover:text-rose-500"
+                        className=" transition hover:text-rose-500" style={{ color: 'var(--color-muted)' }}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -941,15 +940,15 @@ export default function Checklist() {
                 >
                   <button
                     onClick={() => toggleSection(section.key)}
-                    className="flex w-full items-center justify-between gap-3 border-b border-gray-100 bg-gray-50 px-5 py-4 text-left"
+                    className="flex w-full items-center justify-between gap-3 border-b border-gray-100  px-5 py-4 text-left" style={{ backgroundColor: 'var(--color-bg)' }}
                   >
                     <div className="flex flex-1 items-center gap-3">
-                      <div className="rounded-full bg-gray-200 p-2 text-gray-700">
+                      <div className="rounded-full bg-gray-200 p-2 " style={{ color: 'var(--color-text)' }}>
                         <section.icon size={18} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">{section.title}</p>
-                        <p className="text-xs text-gray-500">{section.summary}</p>
+                        <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{section.title}</p>
+                        <p className="text-xs " style={{ color: 'var(--color-muted)' }}>{section.summary}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -962,7 +961,7 @@ export default function Checklist() {
                   {isExpanded && (
                     <div className="space-y-4 px-5 py-4">
                       {visibleItems.length === 0 ? (
-                        <div className="rounded-lg border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500">
+                        <div className="rounded-lg border border-dashed  p-6 text-center text-sm " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-muted)' }}>
                           {searchTerm
                             ? translate(
                                 'common.protocol.checklist.labels.searchEmpty',
@@ -990,18 +989,18 @@ export default function Checklist() {
               const isExpanded = expandedSections.has(section.key);
 
               return (
-                <Card key={section.key} className="border bg-white shadow-sm">
+                <Card key={section.key} className="border  shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
                   <button
                     onClick={() => toggleSection(section.key)}
-                    className="flex w-full items-center justify-between gap-2 border-b border-gray-100 bg-gray-50 px-5 py-4 text-left"
+                    className="flex w-full items-center justify-between gap-2 border-b border-gray-100  px-5 py-4 text-left" style={{ backgroundColor: 'var(--color-bg)' }}
                   >
-                    <p className="text-sm font-semibold text-gray-900">{section.title}</p>
+                    <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{section.title}</p>
                     {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
                   {isExpanded && (
                     <div className="space-y-4 px-5 py-4">
                       {visibleItems.length === 0 ? (
-                        <div className="rounded-lg border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500">
+                        <div className="rounded-lg border border-dashed  p-6 text-center text-sm " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-muted)' }}>
                           {searchTerm
                             ? translate(
                                 'common.protocol.checklist.labels.searchEmpty',
@@ -1023,7 +1022,7 @@ export default function Checklist() {
               );
             })}
 
-            <Card className="flex flex-col gap-3 border border-dashed border-gray-300 bg-gray-50 p-5 text-sm text-gray-700">
+            <Card className="flex flex-col gap-3 border border-dashed   p-5 text-sm " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
               <div className="flex items-center gap-2">
                 <Plus size={18} />
                 <p className="font-semibold">
@@ -1033,7 +1032,7 @@ export default function Checklist() {
                   )}
                 </p>
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
                 {translate(
                   'common.protocol.checklist.customItems.subtitle',
                   `Personaliza el checklist con recordatorios propios (máximo ${MAX_CUSTOM_ITEMS} ítems).`

@@ -1,0 +1,389 @@
+{
+  "title": "Tareas",
+  "newTask": "Nueva tarea",
+  "editTask": "Editar tarea",
+  "deleteTask": "Eliminar tarea",
+  "viewTask": "Ver tarea",
+  "searchPlaceholder": "Buscar tareas...",
+  "noTasks": "No hay tareas",
+  "createFirst": "Crear primera tarea",
+  "status": {
+    "pending": "Pendiente",
+    "in_progress": "En progreso",
+    "completed": "Completada",
+    "cancelled": "Cancelada",
+    "all": "Todos",
+    "new": "Nueva"
+  },
+  "priority": {
+    "low": "Baja",
+    "medium": "Media",
+    "high": "Alta",
+    "urgent": "Urgente"
+  },
+  "categories": {
+    "LUGAR": "Lugar",
+    "INVITADOS": "Invitados",
+    "COMIDA": "Catering",
+    "DECORACION": "Decoración",
+    "PAPELERIA": "Papelería",
+    "MUSICA": "Música",
+    "FOTOGRAFO": "Fotografía",
+    "VESTUARIO": "Vestuario",
+    "OTROS": "Otros",
+    "decoration": "Decoración",
+    "cocktail": "Cóctel",
+    "banquet": "Banquete",
+    "ceremony": "Ceremonia",
+    "flowers": "Flores",
+    "dress": "Vestimenta",
+    "cake": "Tarta",
+    "photography": "Fotografía",
+    "reception": "Recepción"
+  },
+  "form": {
+    "title": "Título",
+    "description": "Descripción",
+    "assignee": "Asignado a",
+    "dueDate": "Fecha límite",
+    "category": "Categoría",
+    "tags": "Etiquetas",
+    "status": "Estado",
+    "priority": "Prioridad"
+  },
+  "messages": {
+    "created": "Tarea creada correctamente",
+    "updated": "Tarea actualizada correctamente",
+    "deleted": "Tarea eliminada correctamente",
+    "error": "Error al procesar la tarea",
+    "completed": "Tarea completada",
+    "assigned": "Tarea asignada",
+    "overdue": "Tarea atrasada",
+    "dueToday": "Vence hoy",
+    "dueTomorrow": "Vence mañana",
+    "noDueDate": "Sin fecha límite",
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "saved": "Guardado correctamente"
+  },
+  "filters": {
+    "all": "Todas",
+    "active": "Activas",
+    "completed": "Completadas",
+    "overdue": "Atrasadas",
+    "today": "Hoy",
+    "thisWeek": "Esta semana",
+    "thisMonth": "Este mes",
+    "categoryAll": "Todas las categorías",
+    "assigneeAll": "Todos"
+  },
+  "calendar": {
+    "month": "Mes",
+    "week": "Semana",
+    "day": "Día",
+    "list": "Lista",
+    "today": "Hoy"
+  },
+  "templates": {
+    "confirmMenu": "Confirmar menú final con el catering",
+    "reviewDecoration": "Revisar decoración floral",
+    "confirmPlaylist": "Confirmar playlist con DJ",
+    "coordinatePhotographer": "Coordinar horarios con fotógrafo",
+    "verifyTransport": "Verificar transporte para invitados",
+    "confirmSeating": "Confirmar asientos para ceremonia",
+    "reviewTableSetup": "Revisar montaje de mesas",
+    "soundCheck": "Prueba de sonido",
+    "confirmKidsMenu": "Confirmar menú infantil",
+    "prepareEmergencyKit": "Preparar kit de emergencia"
+  },
+  "confirmDelete": "¿Eliminar esta tarea?",
+  "page": {
+    "header": {
+      "title": "Gestión de Tareas",
+      "viewAll": "Ver todas las tareas",
+      "newTask": "Nueva tarea"
+    },
+    "calendarSync": {
+      "button": "Añadir a tu calendario",
+      "title": "Añadir a tu calendario",
+      "loading": "Preparando tu enlace de suscripción...",
+      "labels": {
+        "ics": "URL de suscripción (ICS)"
+      },
+      "actions": {
+        "subscribe": "Suscribirse (Apple/Outlook)",
+        "addGoogle": "Añadir a Google Calendar",
+        "copyUrl": "Copiar URL",
+        "close": "Cerrar"
+      },
+      "errors": {
+        "auth": "Debes iniciar sesión para generar tu enlace de calendario",
+        "fetch": "No se pudo obtener el enlace. Inténtalo de nuevo."
+      },
+      "footnote": "Tras suscribirte, las actualizaciones pueden tardar unos minutos según la app."
+    },
+    "list": {
+      "defaults": {
+        "parent": "Bloque"
+      },
+      "labels": {
+        "assigned": "Asignado a {{name}}"
+      },
+      "badges": {
+        "overdue": "Vencida",
+        "blocked": "Tarea bloqueada por dependencias"
+      },
+      "sectionTitle": "Tareas críticas de esta semana",
+      "filters": {
+        "categoryAll": "Todas las categorías",
+        "assigneeAll": "Todos",
+        "status": {
+          "all": "Todos",
+          "pending": "Pendientes",
+          "completed": "Completadas"
+        },
+        "clear": "Limpiar"
+      },
+      "actions": {
+        "viewInGantt": "Ver en Gantt"
+      },
+      "results": {
+        "label": "Resultados: {{count}}"
+      },
+      "pagination": {
+        "page": "Página {{current}} de {{total}}",
+        "prev": "Anterior",
+        "next": "Siguiente"
+      },
+      "empty": {
+        "upcoming": "No hay próximas tareas programadas",
+        "filters": "No hay tareas para los filtros seleccionados",
+        "columns": "Sin columnas"
+      },
+      "dependencies": {
+        "blocked_one": "Bloqueada ({{count}} pendiente)",
+        "blocked_other": "Bloqueada ({{count}} pendientes)",
+        "resolved": "Dependencias OK ({{count}})",
+        "pendingTitle": "Tareas pendientes para desbloquear:",
+        "completedTitle": "Tareas completadas:"
+      }
+    },
+    "allTasks": {
+      "title": "Todas las tareas",
+      "orphans": "Sin padre",
+      "searchPlaceholder": "Buscar tareas...",
+      "filters": {
+        "categoryAll": "Todas las categorías",
+        "assigneeAll": "Todos",
+        "status": {
+          "all": "Todos",
+          "pending": "Pendientes",
+          "completed": "Completadas"
+        },
+        "clear": "Limpiar filtros",
+        "results": "Resultados: {{count}}"
+      },
+      "empty": {
+        "columns": "Sin columnas",
+        "filters": "No hay tareas para los filtros seleccionados"
+      },
+      "badges": {
+        "noDate": "Sin fecha programada",
+        "assigned": "Responsable: {{name}}"
+      },
+      "defaults": {
+        "task": "Tarea"
+      }
+    },
+    "form": {
+      "title": {
+        "create": "Crear nueva tarea",
+        "edit": "Editar tarea"
+      },
+      "fields": {
+        "title": "Título",
+        "description": "Descripción",
+        "assignee": "Responsable (nombre o ID)",
+        "category": "Categoría",
+        "start": "Inicio",
+        "end": "Fin",
+        "startTime": "Hora de inicio",
+        "endTime": "Hora de fin",
+        "long": "Proceso (Gantt)",
+        "parent": "Tarea padre (opcional)",
+        "rootOption": "— Tarea raíz (sin padre) —",
+        "unscheduled": "Subtarea sin fecha (aún)",
+        "rangeHeading": "Rango automático del bloque",
+        "rangeMode": {
+          "auto": "Automático",
+          "manual": "Manual"
+        },
+        "autoAdjust": {
+          "expand_only": "Expandir solo",
+          "expand_and_shrink": "Expandir y contraer",
+          "none": "Sin ajustar"
+        },
+        "bufferDays": "Margen (días)",
+        "completed": "Completada"
+      },
+      "buttons": {
+        "delete": "Eliminar",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "saving": "Guardando..."
+      },
+      "validation": {
+        "titleRequired": "Por favor ingresa un título.",
+        "startRequired": "Por favor selecciona una fecha de inicio.",
+        "endRequired": "Por favor selecciona una fecha de fin.",
+        "invalidDates": "Las fechas proporcionadas no son válidas.",
+        "endAfterStart": "La fecha de fin debe ser posterior a la de inicio."
+      },
+      "errors": {
+        "saveFailed": "Hubo un error al guardar la tarea."
+      }
+    },
+    "dependencies": {
+      "blocked": "No puedes completar esta tarea aún.\n\nDebes completar primero: {{tasks}}"
+    },
+    "sidePanel": {
+      "close": "Cerrar panel",
+      "editStart": "Editar inicio",
+      "editEnd": "Editar fin",
+      "noDate": "Sin fecha programada",
+      "noSubtasks": "No hay subtareas.",
+      "addSubtask": "Agregar subtarea",
+      "subtaskPlaceholder": "Título de la subtarea",
+      "add": "Agregar",
+      "clear": "Limpiar",
+      "assigned": "Responsable: {{name}}",
+      "parentCategory": "Bloque padre: {{category}}",
+      "comments": "Comentarios",
+      "commentsCount": "{{count}}",
+      "loadingComments": "Cargando comentarios...",
+      "noComments": "Aún no hay comentarios en este bloque. Usa @ para mencionar responsables.",
+      "commentPlaceholder": "Escribe un comentario... Usa @ para mencionar a alguien",
+      "commentShortcut": "Ctrl/Cmd + Enter para enviar",
+      "publish": "Publicar",
+      "publishing": "Publicando...",
+      "deleteComment": "Eliminar comentario",
+      "deleteSubtask": "Eliminar subtarea",
+      "relative": {
+        "justNow": "hace instantes",
+        "minutes": "hace {{value}} min",
+        "hours": "hace {{value}} h",
+        "days": "hace {{value}} d"
+      },
+      "authorFallback": "Equipo",
+      "notifications": {
+        "logWithMentions": "Nuevo comentario en {{block}} con menciones a {{mentions}}",
+        "logWithoutMentions": "Nuevo comentario en {{block}}",
+        "toastTitle": "Comentario agregado",
+        "toastWithRecipients": "Notificaremos a: {{recipients}}",
+        "toastWithoutRecipients": "El comentario queda registrado para el equipo"
+      },
+      "errors": {
+        "process": "No se pudieron procesar los comentarios.",
+        "load": "No se pudieron cargar los comentarios.",
+        "create": "No se pudo guardar tu comentario. Inténtalo de nuevo.",
+        "delete": "No se pudo eliminar el comentario."
+      },
+      "subtasks": {
+        "section": "Subtareas",
+        "unscheduled": "Subtarea sin fecha",
+        "label": "Responsable",
+        "default": "Subtarea",
+        "markPending": "Marcar como pendiente",
+        "markDone": "Marcar como realizada",
+        "count": "{{count}} ítems"
+      },
+      "actions": {
+        "save": "Guardar",
+        "cancel": "Cancelar"
+      }
+    },
+    "calendar": {
+      "zoom": {
+        "less": "Reducir zoom del cronograma",
+        "more": "Aumentar zoom del cronograma",
+        "reset": "Ajustar el zoom para mostrar todo el Gantt",
+        "label": "Zoom horizontal del Gantt"
+      },
+      "title": "Calendario de eventos",
+      "errors": {
+        "title": "Error al cargar el calendario",
+        "description": "Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a través de la lista inferior."
+      },
+      "empty": "No hay tareas disponibles",
+      "fallback": {
+        "eventUntitled": "Evento sin título"
+      }
+    },
+    "gantt": {
+      "title": "Planificación a largo plazo",
+      "controls": {
+        "showSubtasks": "Mostrar subtareas",
+        "zoomLabel": "Zoom",
+        "fit": "Ajustar vista",
+        "clearFilters": "Limpiar filtros"
+      },
+      "filters": {
+        "categoryAll": "Todas las categorías",
+        "categoryNone": "Sin categoría",
+        "assigneeAll": "Todos los responsables",
+        "assigneeUnassigned": "Sin responsable",
+        "statusAll": "Todos los estados",
+        "statusCritical": "Solo riesgo",
+        "statusWarning": "Solo atención",
+        "statusOk": "Solo en curso"
+      },
+      "empty": {
+        "noScheduled": "Aún no hay bloques planificados en el cronograma. Importa una plantilla o crea una tarea padre desde la checklist para empezar."
+      }
+    },
+    "common": {
+      "noWeddingTitle": "Selecciona o crea una boda para ver tareas",
+      "noWeddingDescription": "No hay una boda activa en este momento. Dirígete a la sección \"Bodas\" para elegir una existente o crear una nueva.",
+      "errors": {
+        "generic": "Algo salió mal."
+      },
+      "fallbacks": {
+        "task": "Tarea",
+        "untitled": "Sin título",
+        "untitledTask": "Tarea sin título"
+      }
+    },
+    "notifications": {
+      "overdueTitle": "Tarea vencida",
+      "upcomingTitle": "Tarea próxima a vencer",
+      "overdueMessage": "{{name}} venció ({{date}})",
+      "upcomingMessage": "{{name}} vence en menos de 24 h ({{date}})",
+      "blocks": {
+        "delayed": "Bloque atrasado y sin finalizar",
+        "overdueSubtasks": "{{count}} subtareas vencidas",
+        "progressBehind": "Progreso por debajo del ritmo esperado",
+        "completed": "Bloque completado"
+      }
+    }
+  },
+  "buttons": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "next": "Siguiente"
+  },
+  "tasks": {
+    "page": {
+      "calendar": {
+        "fallback": {
+          "eventUntitled": "Event Untitled"
+        }
+      }
+    }
+  }
+}

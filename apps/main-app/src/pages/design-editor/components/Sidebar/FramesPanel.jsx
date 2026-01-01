@@ -28,8 +28,8 @@ export default function FramesPanel({ onAddElement }) {
   return (
     <div className="p-4 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-gray-900">Marcos Decorativos</h3>
-        <p className="text-xs text-gray-600">
+        <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Marcos Decorativos</h3>
+        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
           {filteredFrames.length} marcos disponibles
         </p>
       </div>
@@ -60,7 +60,7 @@ export default function FramesPanel({ onAddElement }) {
             onClick={() => handleAddFrame(frame)}
             onMouseEnter={() => setHoveredFrame(frame.id)}
             onMouseLeave={() => setHoveredFrame(null)}
-            className="group relative aspect-square rounded-lg border-2 border-gray-200 hover:border-blue-500 transition-all bg-white overflow-hidden"
+            className="group relative aspect-square rounded-lg border-2  hover:border-blue-500 transition-all  overflow-hidden" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}
           >
             {/* Preview visual del marco */}
             <div className="w-full h-full p-4 flex items-center justify-center">
@@ -110,7 +110,7 @@ export default function FramesPanel({ onAddElement }) {
 
             {/* Badge de categoría */}
             <div className="absolute top-2 right-2">
-              <span className="inline-block bg-white/90 text-gray-700 text-[10px] px-2 py-0.5 rounded-full font-medium">
+              <span className="inline-block /90  text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
                 {frame.category}
               </span>
             </div>
@@ -119,7 +119,7 @@ export default function FramesPanel({ onAddElement }) {
       </div>
 
       {filteredFrames.length === 0 && (
-        <div className="text-center py-8 text-gray-500 text-sm">
+        <div className="text-center py-8  text-sm" style={{ color: 'var(--color-muted)' }}>
           No hay marcos en esta categoría
         </div>
       )}

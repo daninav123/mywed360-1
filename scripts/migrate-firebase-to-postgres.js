@@ -1,351 +1,331 @@
 /**
  * Script de migración de Firebase a PostgreSQL
- * Migra usuarios, bodas, invitados, proveedores, etc.
+ * 
+ * Migra datos de:
+ * - Usuarios
+ * - Bodas
+ * - Invitados
+ * - Proveedores
+ * - Seating Plans
+ * - Presupuestos
+ * 
+ * Uso:
+ *   node scripts/migrate-firebase-to-postgres.js
+ *   node scripts/migrate-firebase-to-postgres.js --dry-run
+ *   node scripts/migrate-firebase-to-postgres.js --collection=users
  */
 
 import admin from 'firebase-admin';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '.env.migration' });
+dotenv.config();
 
 const prisma = new PrismaClient();
+const isDryRun = process.argv.includes('--dry-run');
+const specificCollection = process.argv.find(arg => arg.startsWith('--collection='))?.split('=')[1];
+
+// Inicializar Firebase Admin
+if (!admin.apps.length) {
+  const serviceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  if (!serviceAccount) {
+    console.error('❌ Error: GOOGLE_APPLICATION_CREDENTIALS no está configurado');
+    process.exit(1);
+  }
+  
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
+
+const db = admin.firestore();
 
 // Estadísticas de migración
 const stats = {
-  users: 0,
-  weddings: 0,
-  guests: 0,
-  suppliers: 0,
-  craftWebs: 0,
-  errors: [],
+  users: { total: 0, migrated: 0, errors: 0 },
+  weddings: { total: 0, migrated: 0, errors: 0 },
+  guests: { total: 0, migrated: 0, errors: 0 },
+  suppliers: { total: 0, migrated: 0, errors: 0 },
 };
 
 /**
- * Migra usuarios
+ * Migrar usuarios
  */
 async function migrateUsers() {
-  console.log('\n👤 Migrando usuarios...');
-
-  const usersSnapshot = await admin.firestore().collection('users').get();
-
-  for (const doc of usersSnapshot.docs) {
+  console.log('\n📊 Migrando usuarios...');
+  
+  const snapshot = await db.collection('users').get();
+  stats.users.total = snapshot.size;
+  
+  for (const doc of snapshot.docs) {
     try {
       const data = doc.data();
-
-      await prisma.user.upsert({
-        where: { id: doc.id },
-        update: {
-          email: data.email,
-          displayName: data.displayName || null,
-          photoURL: data.photoURL || null,
-          phoneNumber: data.phoneNumber || null,
-          emailVerified: data.emailVerified || false,
-          provider: data.provider || 'email',
-          lastLogin: data.lastLogin?.toDate() || null,
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        },
-        create: {
-          id: doc.id,
-          email: data.email,
-          displayName: data.displayName || null,
-          photoURL: data.photoURL || null,
-          phoneNumber: data.phoneNumber || null,
-          emailVerified: data.emailVerified || false,
-          provider: data.provider || 'email',
-          lastLogin: data.lastLogin?.toDate() || null,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        },
-      });
-
-      stats.users++;
+      
+      if (isDryRun) {
+        console.log(`  [DRY-RUN] Usuario: ${data.email || doc.id}`);
+      } else {
+        await prisma.user.upsert({
+          where: { id: doc.id },
+          create: {
+            id: doc.id,
+            email: data.email,
+            displayName: data.displayName || data.name || null,
+            photoURL: data.photoURL || null,
+            phoneNumber: data.phoneNumber || data.phone || null,
+            emailVerified: data.emailVerified || false,
+            provider: data.provider || 'email',
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+          },
+          update: {
+            email: data.email,
+            displayName: data.displayName || data.name || null,
+            photoURL: data.photoURL || null,
+            phoneNumber: data.phoneNumber || data.phone || null,
+            emailVerified: data.emailVerified || false,
+            updatedAt: new Date(),
+          },
+        });
+        console.log(`  ✅ Usuario migrado: ${data.email || doc.id}`);
+      }
+      
+      stats.users.migrated++;
     } catch (error) {
-      stats.errors.push({ type: 'user', id: doc.id, error: error.message });
-      console.error(`✗ Error migrando usuario ${doc.id}:`, error.message);
+      console.error(`  ❌ Error migrando usuario ${doc.id}:`, error.message);
+      stats.users.errors++;
     }
   }
-
-  console.log(`✓ ${stats.users} usuarios migrados`);
 }
 
 /**
- * Migra bodas
+ * Migrar bodas
  */
 async function migrateWeddings() {
   console.log('\n💒 Migrando bodas...');
-
-  const weddingsSnapshot = await admin.firestore().collection('weddings').get();
-
-  for (const doc of weddingsSnapshot.docs) {
+  
+  const snapshot = await db.collection('weddings').get();
+  stats.weddings.total = snapshot.size;
+  
+  for (const doc of snapshot.docs) {
     try {
       const data = doc.data();
-
-      await prisma.wedding.upsert({
-        where: { id: doc.id },
-        update: {
-          userId: data.userId,
-          coupleName: data.coupleName || '',
-          weddingDate: data.weddingDate?.toDate() || new Date(),
-          celebrationPlace: data.celebrationPlace || null,
-          celebrationAddress: data.celebrationAddress || null,
-          banquetPlace: data.banquetPlace || null,
-          receptionAddress: data.receptionAddress || null,
-          schedule: data.schedule || null,
-          numGuests: data.numGuests || 0,
-          weddingStyle: data.weddingStyle || null,
-          colorScheme: data.colorScheme || null,
-          rsvpDeadline: data.rsvpDeadline?.toDate() || null,
-          giftAccount: data.giftAccount || null,
-          transportation: data.transportation || null,
-          importantInfo: data.importantInfo || null,
-          status: data.status || 'active',
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        },
-        create: {
-          id: doc.id,
-          userId: data.userId,
-          coupleName: data.coupleName || '',
-          weddingDate: data.weddingDate?.toDate() || new Date(),
-          celebrationPlace: data.celebrationPlace || null,
-          celebrationAddress: data.celebrationAddress || null,
-          banquetPlace: data.banquetPlace || null,
-          receptionAddress: data.receptionAddress || null,
-          schedule: data.schedule || null,
-          numGuests: data.numGuests || 0,
-          weddingStyle: data.weddingStyle || null,
-          colorScheme: data.colorScheme || null,
-          rsvpDeadline: data.rsvpDeadline?.toDate() || null,
-          giftAccount: data.giftAccount || null,
-          transportation: data.transportation || null,
-          importantInfo: data.importantInfo || null,
-          status: data.status || 'active',
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        },
-      });
-
-      stats.weddings++;
-
-      // Migrar invitados de esta boda
-      await migrateGuestsForWedding(doc.id);
+      
+      if (isDryRun) {
+        console.log(`  [DRY-RUN] Boda: ${data.coupleName || doc.id}`);
+      } else {
+        await prisma.wedding.upsert({
+          where: { id: doc.id },
+          create: {
+            id: doc.id,
+            userId: data.userId,
+            coupleName: data.coupleName || data.couple || 'Sin nombre',
+            weddingDate: data.weddingDate?.toDate() || new Date(),
+            celebrationPlace: data.celebrationPlace || data.venue || null,
+            celebrationAddress: data.celebrationAddress || data.address || null,
+            banquetPlace: data.banquetPlace || null,
+            receptionAddress: data.receptionAddress || null,
+            schedule: data.schedule || null,
+            numGuests: data.numGuests || data.guestCount || 0,
+            weddingStyle: data.weddingStyle || data.style || null,
+            colorScheme: data.colorScheme || data.colors || null,
+            rsvpDeadline: data.rsvpDeadline?.toDate() || null,
+            giftAccount: data.giftAccount || null,
+            transportation: data.transportation || null,
+            importantInfo: data.importantInfo || null,
+            status: data.status || 'active',
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+          },
+          update: {
+            coupleName: data.coupleName || data.couple || 'Sin nombre',
+            weddingDate: data.weddingDate?.toDate() || new Date(),
+            updatedAt: new Date(),
+          },
+        });
+        console.log(`  ✅ Boda migrada: ${data.coupleName || doc.id}`);
+      }
+      
+      stats.weddings.migrated++;
     } catch (error) {
-      stats.errors.push({ type: 'wedding', id: doc.id, error: error.message });
-      console.error(`✗ Error migrando boda ${doc.id}:`, error.message);
+      console.error(`  ❌ Error migrando boda ${doc.id}:`, error.message);
+      stats.weddings.errors++;
     }
   }
-
-  console.log(`✓ ${stats.weddings} bodas migradas`);
 }
 
 /**
- * Migra invitados de una boda
+ * Migrar invitados
  */
-async function migrateGuestsForWedding(weddingId) {
-  const guestsSnapshot = await admin
-    .firestore()
-    .collection('weddings')
-    .doc(weddingId)
-    .collection('guests')
-    .get();
-
-  for (const doc of guestsSnapshot.docs) {
-    try {
-      const data = doc.data();
-
-      await prisma.guest.upsert({
-        where: { id: doc.id },
-        update: {
-          weddingId,
-          userId: data.userId || null,
-          name: data.name,
-          email: data.email || null,
-          phone: data.phone || null,
-          confirmed: data.confirmed || false,
-          status: data.status || 'pending',
-          companions: data.companions || 0,
-          dietaryRestrictions: data.dietaryRestrictions || null,
-          notes: data.notes || null,
-          tableNumber: data.tableNumber || null,
-          seatNumber: data.seatNumber || null,
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        },
-        create: {
-          id: doc.id,
-          weddingId,
-          userId: data.userId || null,
-          name: data.name,
-          email: data.email || null,
-          phone: data.phone || null,
-          confirmed: data.confirmed || false,
-          status: data.status || 'pending',
-          companions: data.companions || 0,
-          dietaryRestrictions: data.dietaryRestrictions || null,
-          notes: data.notes || null,
-          tableNumber: data.tableNumber || null,
-          seatNumber: data.seatNumber || null,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        },
-      });
-
-      stats.guests++;
-    } catch (error) {
-      stats.errors.push({ type: 'guest', id: doc.id, error: error.message });
+async function migrateGuests() {
+  console.log('\n👥 Migrando invitados...');
+  
+  const weddings = await db.collection('weddings').get();
+  
+  for (const weddingDoc of weddings.docs) {
+    const guestsSnapshot = await db
+      .collection('weddings')
+      .doc(weddingDoc.id)
+      .collection('guests')
+      .get();
+    
+    stats.guests.total += guestsSnapshot.size;
+    
+    for (const doc of guestsSnapshot.docs) {
+      try {
+        const data = doc.data();
+        
+        if (isDryRun) {
+          console.log(`  [DRY-RUN] Invitado: ${data.name || doc.id} (Boda: ${weddingDoc.id})`);
+        } else {
+          await prisma.guest.upsert({
+            where: { id: doc.id },
+            create: {
+              id: doc.id,
+              weddingId: weddingDoc.id,
+              name: data.name || 'Sin nombre',
+              email: data.email || null,
+              phone: data.phone || null,
+              confirmed: data.confirmed || false,
+              status: data.status || 'pending',
+              companions: data.companions || data.plusOnes || 0,
+              dietaryRestrictions: data.dietaryRestrictions || data.dietary || null,
+              notes: data.notes || null,
+              tableNumber: data.tableNumber || data.table || null,
+              seatNumber: data.seatNumber || data.seat || null,
+              createdAt: data.createdAt?.toDate() || new Date(),
+              updatedAt: data.updatedAt?.toDate() || new Date(),
+            },
+            update: {
+              name: data.name || 'Sin nombre',
+              confirmed: data.confirmed || false,
+              status: data.status || 'pending',
+              updatedAt: new Date(),
+            },
+          });
+          console.log(`  ✅ Invitado migrado: ${data.name || doc.id}`);
+        }
+        
+        stats.guests.migrated++;
+      } catch (error) {
+        console.error(`  ❌ Error migrando invitado ${doc.id}:`, error.message);
+        stats.guests.errors++;
+      }
     }
   }
 }
 
 /**
- * Migra proveedores
+ * Migrar proveedores
  */
 async function migrateSuppliers() {
   console.log('\n🏢 Migrando proveedores...');
-
-  const suppliersSnapshot = await admin.firestore().collection('suppliers').get();
-
-  for (const doc of suppliersSnapshot.docs) {
+  
+  const snapshot = await db.collection('suppliers').get();
+  stats.suppliers.total = snapshot.size;
+  
+  for (const doc of snapshot.docs) {
     try {
       const data = doc.data();
-
-      await prisma.supplier.upsert({
-        where: { id: doc.id },
-        update: {
-          userId: data.userId,
-          businessName: data.businessName || data.name || '',
-          category: data.category || '',
-          description: data.description || null,
-          email: data.email || '',
-          phone: data.phone || null,
-          website: data.website || null,
-          address: data.address || null,
-          city: data.city || null,
-          country: data.country || null,
-          instagram: data.instagram || null,
-          facebook: data.facebook || null,
-          services: data.services || null,
-          priceRange: data.priceRange || null,
-          rating: data.rating || 0,
-          reviewCount: data.reviewCount || 0,
-          verified: data.verified || false,
-          featured: data.featured || false,
-          active: data.active !== false,
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        },
-        create: {
-          id: doc.id,
-          userId: data.userId,
-          businessName: data.businessName || data.name || '',
-          category: data.category || '',
-          description: data.description || null,
-          email: data.email || '',
-          phone: data.phone || null,
-          website: data.website || null,
-          address: data.address || null,
-          city: data.city || null,
-          country: data.country || null,
-          instagram: data.instagram || null,
-          facebook: data.facebook || null,
-          services: data.services || null,
-          priceRange: data.priceRange || null,
-          rating: data.rating || 0,
-          reviewCount: data.reviewCount || 0,
-          verified: data.verified || false,
-          featured: data.featured || false,
-          active: data.active !== false,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        },
-      });
-
-      stats.suppliers++;
+      
+      if (isDryRun) {
+        console.log(`  [DRY-RUN] Proveedor: ${data.businessName || doc.id}`);
+      } else {
+        await prisma.supplier.upsert({
+          where: { id: doc.id },
+          create: {
+            id: doc.id,
+            userId: data.userId || data.ownerId,
+            businessName: data.businessName || data.name || 'Sin nombre',
+            category: data.category || 'general',
+            description: data.description || null,
+            email: data.email || data.contactEmail || 'no-email@example.com',
+            phone: data.phone || data.contactPhone || null,
+            website: data.website || null,
+            address: data.address || null,
+            city: data.city || null,
+            country: data.country || null,
+            instagram: data.instagram || data.social?.instagram || null,
+            facebook: data.facebook || data.social?.facebook || null,
+            services: data.services || null,
+            priceRange: data.priceRange || null,
+            rating: data.rating || 0,
+            reviewCount: data.reviewCount || 0,
+            verified: data.verified || false,
+            featured: data.featured || false,
+            active: data.active !== false,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+          },
+          update: {
+            businessName: data.businessName || data.name || 'Sin nombre',
+            updatedAt: new Date(),
+          },
+        });
+        console.log(`  ✅ Proveedor migrado: ${data.businessName || doc.id}`);
+      }
+      
+      stats.suppliers.migrated++;
     } catch (error) {
-      stats.errors.push({ type: 'supplier', id: doc.id, error: error.message });
-      console.error(`✗ Error migrando proveedor ${doc.id}:`, error.message);
+      console.error(`  ❌ Error migrando proveedor ${doc.id}:`, error.message);
+      stats.suppliers.errors++;
     }
   }
-
-  console.log(`✓ ${stats.suppliers} proveedores migrados`);
 }
 
 /**
- * Migra webs Craft
- */
-async function migrateCraftWebs() {
-  console.log('\n🌐 Migrando webs Craft...');
-
-  const websSnapshot = await admin.firestore().collection('craft-webs').get();
-
-  for (const doc of websSnapshot.docs) {
-    try {
-      const data = doc.data();
-
-      await prisma.craftWeb.upsert({
-        where: { id: doc.id },
-        update: {
-          weddingId: data.weddingId,
-          userId: data.userId,
-          slug: data.slug,
-          title: data.title || '',
-          published: data.published || false,
-          structure: data.structure || {},
-          theme: data.theme || {},
-          publishedAt: data.publishedAt?.toDate() || null,
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        },
-        create: {
-          id: doc.id,
-          weddingId: data.weddingId,
-          userId: data.userId,
-          slug: data.slug,
-          title: data.title || '',
-          published: data.published || false,
-          structure: data.structure || {},
-          theme: data.theme || {},
-          publishedAt: data.publishedAt?.toDate() || null,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        },
-      });
-
-      stats.craftWebs++;
-    } catch (error) {
-      stats.errors.push({ type: 'craftWeb', id: doc.id, error: error.message });
-      console.error(`✗ Error migrando web ${doc.id}:`, error.message);
-    }
-  }
-
-  console.log(`✓ ${stats.craftWebs} webs migradas`);
-}
-
-/**
- * Función principal
+ * Ejecutar migración
  */
 async function main() {
-  console.log('🚀 Iniciando migración de Firebase a PostgreSQL...\n');
-  console.log('⚠️  ADVERTENCIA: Este proceso puede tardar varios minutos\n');
-
+  console.log('\n🚀 Iniciando migración de Firebase a PostgreSQL\n');
+  console.log(`Modo: ${isDryRun ? 'DRY-RUN (sin cambios)' : 'PRODUCCIÓN (migrando datos)'}\n`);
+  
+  if (specificCollection) {
+    console.log(`📋 Colección específica: ${specificCollection}\n`);
+  }
+  
   try {
-    await migrateUsers();
-    await migrateWeddings();
-    await migrateSuppliers();
-    await migrateCraftWebs();
-
-    console.log('\n✅ Migración completada');
-    console.log('\n📊 Resumen:');
-    console.log(`   Usuarios: ${stats.users}`);
-    console.log(`   Bodas: ${stats.weddings}`);
-    console.log(`   Invitados: ${stats.guests}`);
-    console.log(`   Proveedores: ${stats.suppliers}`);
-    console.log(`   Webs: ${stats.craftWebs}`);
-    console.log(`   Errores: ${stats.errors.length}`);
-
-    if (stats.errors.length > 0) {
-      console.log('\n⚠️  Errores encontrados:');
-      stats.errors.forEach((err) => {
-        console.log(`   ${err.type} ${err.id}: ${err.error}`);
-      });
+    // Verificar conexión a PostgreSQL
+    await prisma.$connect();
+    console.log('✅ Conectado a PostgreSQL\n');
+    
+    // Migrar según parámetros
+    if (!specificCollection || specificCollection === 'users') {
+      await migrateUsers();
     }
+    
+    if (!specificCollection || specificCollection === 'weddings') {
+      await migrateWeddings();
+    }
+    
+    if (!specificCollection || specificCollection === 'guests') {
+      await migrateGuests();
+    }
+    
+    if (!specificCollection || specificCollection === 'suppliers') {
+      await migrateSuppliers();
+    }
+    
+    // Mostrar estadísticas
+    console.log('\n\n📊 RESUMEN DE MIGRACIÓN');
+    console.log('========================\n');
+    
+    Object.entries(stats).forEach(([collection, data]) => {
+      if (data.total > 0) {
+        console.log(`${collection.toUpperCase()}:`);
+        console.log(`  Total:    ${data.total}`);
+        console.log(`  Migrados: ${data.migrated}`);
+        console.log(`  Errores:  ${data.errors}`);
+        console.log();
+      }
+    });
+    
+    if (isDryRun) {
+      console.log('⚠️  DRY-RUN: No se realizaron cambios en la base de datos');
+      console.log('💡 Ejecuta sin --dry-run para migrar los datos\n');
+    } else {
+      console.log('✅ Migración completada exitosamente\n');
+    }
+    
   } catch (error) {
     console.error('\n❌ Error durante la migración:', error);
     process.exit(1);

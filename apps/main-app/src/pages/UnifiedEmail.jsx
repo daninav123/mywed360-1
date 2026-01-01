@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Mail, Send, Trash2, Archive, Star, Clock, CheckCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { onAuthStateChanged } from 'firebase/auth';
 import useTranslations from '../hooks/useTranslations';
 
 import ChipToggle from '../components/email/ChipToggle';
@@ -12,6 +13,7 @@ import Alert from '../components/ui/Alert';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 import UsernameWizard from '../components/UsernameWizard';
+import ComposeEmailModal from '../components/email/ComposeEmailModal';
 import { useWedding } from '../context/WeddingContext';
 import useEmailUsername from '../hooks/useEmailUsername';
 import useWeddingCollection from '../hooks/useWeddingCollection';
@@ -47,7 +49,6 @@ import {
 } from '../services/tagService';
 import sanitizeHtml from '../utils/sanitizeHtml';
 import { ensureContractFromEmail } from '../services/contractEmailService';
-
 /**
  * P)gina principal de Buz)n (correo interno @maloveapp.com)
  * Incluye: Sidebar de carpetas, lista de correos, visor del correo y modal para redactar.
@@ -56,6 +57,7 @@ import { ensureContractFromEmail } from '../services/contractEmailService';
  *  - POST /sendEmail        -> env)a correo (funci)n Cloud)
  */
 const UnifiedEmail = () => {
+  const { t } = useTranslations();
   const { getCurrentUsername } = useEmailUsername();
   const [myEmail, setMyEmail] = useState(null);
   const [emails, setEmails] = useState([]);
@@ -345,7 +347,7 @@ const UnifiedEmail = () => {
       {/* Wizard para elegir nombre si es la primera vez */}
       <UsernameWizard />
       {/* B)squeda y filtros r)pidos */}
-      <div className="flex flex-col gap-2 border-b bg-gray-50/50 p-3 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-2 border-b /50 p-3 md:flex-row md:items-center md:justify-between" style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="flex items-center gap-2">
           <ChipToggle
             active={onlyUnread}
@@ -362,11 +364,11 @@ const UnifiedEmail = () => {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('Buscar correos')} // Cambio realizado
+            placeholder="Buscar correos"
             className="w-full rounded border px-3 py-2 text-sm pr-8"
           />
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
-            ??
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" style={{ color: 'var(--color-muted)' }}>
+            🔍
           </span>
         </div>
         {/* Filtro por etiqueta */}
@@ -374,7 +376,7 @@ const UnifiedEmail = () => {
           <select
             value={activeTagId || ''}
             onChange={(e) => setActiveTagId(e.target.value || null)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-2 border  rounded-lg text-sm" style={{ borderColor: 'var(--color-border)' }}
           >
             <option value="">Todas las etiquetas</option>
             {allTags.map((t) => (
@@ -410,7 +412,7 @@ const UnifiedEmail = () => {
       {/* Contenido principal */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar de carpetas */}
-        <aside className="w-64 border-r bg-gray-50 p-4">
+        <aside className="w-64 border-r  p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
           <nav className="space-y-2">
             <button
               className={`block w-full rounded px-3 py-2 text-left text-sm ${
@@ -447,10 +449,10 @@ const UnifiedEmail = () => {
 
             {/* Carpetas personalizadas */}
             <div className="mt-4">
-              <div className="mb-2 flex items-center justify-between text-xs font-semibold text-gray-600">
+              <div className="mb-2 flex items-center justify-between text-xs font-semibold " style={{ color: 'var(--color-text-secondary)' }}>
                 <span>Carpetas</span>
                 <button
-                  className="text-blue-600 hover:underline"
+                  className=" hover:underline" style={{ color: 'var(--color-primary)' }}
                   onClick={() => {
                     try {
                       const name = prompt('Nombre de la carpeta');
@@ -478,7 +480,7 @@ const UnifiedEmail = () => {
                     >
                       {f.name}
                     </button>
-                    <div className="ml-2 flex items-center gap-1 text-xs text-gray-500">
+                    <div className="ml-2 flex items-center gap-1 text-xs " style={{ color: 'var(--color-muted)' }}>
                       <button
                         title="Renombrar"
                         onClick={() => {
@@ -490,7 +492,7 @@ const UnifiedEmail = () => {
                           } catch (_) {}
                         }}
                       >
-                        ??
+                        ✏️
                       </button>
                       <button
                         title="Eliminar"
@@ -503,7 +505,7 @@ const UnifiedEmail = () => {
                           } catch (_) {}
                         }}
                       >
-                        ???
+                        🗑️
                       </button>
                     </div>
                   </div>
@@ -516,8 +518,8 @@ const UnifiedEmail = () => {
         {/* Lista de correos */}
         <div className="w-80 border-r">
           {/* Acciones masivas */}
-          <div className="flex items-center justify-between p-2 border-b bg-white text-xs">
-            <div className="text-gray-600">Seleccionados: {selectedIds.size}</div>
+          <div className="flex items-center justify-between p-2 border-b  text-xs" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="" style={{ color: 'var(--color-text-secondary)' }}>Seleccionados: {selectedIds.size}</div>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -545,7 +547,7 @@ const UnifiedEmail = () => {
                   setSelectedIds(new Set());
                 }}
               >
-                Marcar le)do
+                Marcar leído
               </Button>
               <Button
                 variant="ghost"
@@ -620,8 +622,8 @@ const UnifiedEmail = () => {
               userId={userId}
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-gray-500">
-              Selecciona un correo para verlo aquí)
+            <div className="flex h-full items-center justify-center" style={{ color: 'var(--color-muted)' }}>
+              Selecciona un correo para verlo aquí
             </div>
           )}
         </main>
@@ -629,7 +631,7 @@ const UnifiedEmail = () => {
 
       {/* Modal de redactar */}
       {showCompose && (
-        <EmailComposeModal
+        <ComposeEmailModal
           onClose={() => setShowCompose(false)}
           from={myEmail}
           userId={userId}

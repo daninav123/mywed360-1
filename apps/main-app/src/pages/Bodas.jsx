@@ -1,4 +1,4 @@
-import {
+﻿import {
   deleteField,
   doc,
   getDoc,
@@ -28,7 +28,6 @@ import { useAuth } from '../hooks/useAuth';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import { createWedding } from '../services/WeddingService';
 import { bulkSyncWeddings, syncWeddingWithCRM } from '../services/crmSyncService';
-
 const getStatusTabOptions = (t) => [
   { value: 'active', label: t('weddings.tabs.active') },
   { value: 'archived', label: t('weddings.tabs.archived') },
@@ -408,10 +407,8 @@ export default function Bodas() {
   }
 
   return (
-    <PageWrapper
-      title="Mis Bodas"
-      actions={
-        userProfile?.role === 'planner' ? (
+    <PageWrapper>
+        <div className="flex justify-between items-center mb-4">
           <div className="flex gap-2">
             <Button size="sm" onClick={() => setShowCreateModal(true)}>
               + Crear nueva boda
@@ -421,13 +418,10 @@ export default function Bodas() {
               variant={viewMode === 'portfolio' ? 'primary' : 'outline'}
               onClick={() => setViewMode('portfolio')}
             >
-              Resumen multi boda
+              Vista Portfolio
             </Button>
           </div>
-        ) : null
-      }
-      className="max-w-7xl mx-auto"
-    >
+        </div>
       <PageTabs value={viewMode} onChange={setViewMode} options={STATUS_TAB_OPTIONS} className="mb-4" />
 
       {viewMode === 'portfolio' ? (

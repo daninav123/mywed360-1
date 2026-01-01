@@ -71,13 +71,13 @@ export default function PapelesNombres() {
     <div className="space-y-6">
       <Card className="p-6 space-y-4">
         <h1 className="text-2xl font-semibold">Marcadores de Mesa</h1>
-        <p className="text-gray-600">
+        <p className="" style={{ color: 'var(--color-text-secondary)' }}>
           Crea elegantes marcadores con los nombres de tus invitados para identificar su lugar en la
           mesa. Selecciona un estilo o personaliza tu propio diseño.
         </p>
 
         <div className="mt-2">
-          <p className="text-sm text-blue-600">
+          <p className="text-sm " style={{ color: 'var(--color-primary)' }}>
             <span className="font-medium">Consejo:</span> Para mejores resultados, añade primero a
             {t('design.nameCards.searchPlaceholder')} en la sección de Invitados.
           </p>

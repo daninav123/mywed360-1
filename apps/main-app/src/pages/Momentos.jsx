@@ -301,31 +301,64 @@ export default function Momentos() {
 
   if (!weddingsReady) {
     return (
-      <PageWrapper title="Galería de recuerdos">
-        <div className="border border-gray-200 rounded-lg p-6 text-center text-gray-500">
-          Cargando bodas...
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        <div className="mx-auto my-8" style={{ 
+          maxWidth: '1024px',
+          width: '100%',
+          backgroundColor: '#FFFBF7',
+          borderRadius: '32px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          overflow: 'hidden'
+        }}>
+          <div className="px-6 py-6">
+            <div className="border  rounded-lg p-6 text-center " style={{ borderColor: 'var(--color-border)', color: 'var(--color-muted)' }}>
+              Cargando bodas...
+            </div>
+          </div>
         </div>
-      </PageWrapper>
+      </div>
     );
   }
 
   if (!activeWedding) {
     return (
-      <PageWrapper title="Galería de recuerdos">
-        <div className="border border-gray-200 rounded-lg p-6 text-center text-gray-500">
-          Selecciona una boda para gestionar la galería de recuerdos.
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        <div className="mx-auto my-8" style={{ 
+          maxWidth: '1024px',
+          width: '100%',
+          backgroundColor: '#FFFBF7',
+          borderRadius: '32px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          overflow: 'hidden'
+        }}>
+          <div className="px-6 py-6">
+            <div className="border  rounded-lg p-6 text-center " style={{ borderColor: 'var(--color-border)', color: 'var(--color-muted)' }}>
+              Selecciona una boda para gestionar la galería de recuerdos.
+            </div>
+          </div>
         </div>
-      </PageWrapper>
+      </div>
     );
   }
 
   if (loadingAlbum && !album) {
     return (
-      <PageWrapper title="Galería de recuerdos">
-        <div className="border border-gray-200 rounded-lg p-6 text-center text-gray-500">
-          Preparando tu álbum colaborativo...
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        <div className="mx-auto my-8" style={{ 
+          maxWidth: '1024px',
+          width: '100%',
+          backgroundColor: '#FFFBF7',
+          borderRadius: '32px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          overflow: 'hidden'
+        }}>
+          <div className="px-6 py-6">
+            <div className="border  rounded-lg p-6 text-center " style={{ borderColor: 'var(--color-border)', color: 'var(--color-muted)' }}>
+              Preparando tu álbum colaborativo...
+            </div>
+          </div>
         </div>
-      </PageWrapper>
+      </div>
     );
   }
 
@@ -379,12 +412,12 @@ export default function Momentos() {
         <div className="space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800">Presentación en vivo</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Presentación en vivo</h3>
+              <p className="text-sm " style={{ color: 'var(--color-muted)' }}>
                 Conecta una pantalla secundaria y deja que los recuerdos fluyan automáticamente.
               </p>
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm " style={{ color: 'var(--color-muted)' }}>
               {approvedPhotos.length} fotos aprobadas ·{' '}
               {sceneSummary?.scenes ? Object.keys(sceneSummary.scenes).length : scenes.length}{' '}
               escenas cubiertas

@@ -33,11 +33,11 @@ export function migrateLocalStorageToPlanivia() {
     { old: 'maloveapp_profile', new: 'planivia_profile' },
     
     // Providers
-    { old: 'lovendaProviders', new: 'planivia_providers' },
+    { old: 'lovendaProviders', new: 'planivia_providers' }, // legacy // legacy
     { old: 'maloveapp_providers', new: 'planivia_providers' },
     
     // Notes
-    { old: 'lovendaNotes', new: 'planivia_notes' },
+    { old: 'lovendaNotes', new: 'planivia_notes' }, // legacy // legacy
     { old: 'maloveapp_notes', new: 'planivia_notes' },
     
     // Mails

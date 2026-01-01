@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port 5174",
+    "dev": "vite --port 5175",
     "build": "vite build",
-    "preview": "vite preview --port 5174",
+    "preview": "vite preview --port 5175",
     "lint": "eslint src --max-warnings 0",
     "lint:fix": "eslint src --fix"
   },
@@ -34,6 +34,8 @@
     "recharts": "^2.15.4"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/typography": "^0.5.19",
     "@vitejs/plugin-react": "^4.5.2",
     "autoprefixer": "^10.4.21",
     "eslint": "^8.57.1",

@@ -257,7 +257,7 @@ export const useAISearch = () => {
   const [lastQuery, setLastQuery] = useState('');
   const [usedFallback, setUsedFallback] = useState(false);
   const { user } = useAuth();
-  const { info: weddingDoc } = useActiveWeddingInfo();
+  const { weddingData: weddingDoc } = useWeddingData();
   const { reportFallback } = useFallbackReporting();
   const { t } = useTranslations();
 

@@ -26,8 +26,8 @@ export default function ShapesPanel({ onAdd }) {
   return (
     <div className="p-4 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-gray-900">Formas</h3>
-        <p className="text-xs text-gray-600">
+        <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Formas</h3>
+        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
           Añade formas geométricas a tu diseño
         </p>
       </div>
@@ -39,17 +39,17 @@ export default function ShapesPanel({ onAdd }) {
             <button
               key={shape.id}
               onClick={() => onAdd({ type: 'shape', shape: shape.shape, fill: selectedColor })}
-              className="aspect-square bg-gray-50 rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-gray-100 transition-colors group"
+              className="aspect-square  rounded-lg flex flex-col items-center justify-center gap-2 hover: transition-colors group" style={{ backgroundColor: 'var(--color-bg)' }} style={{ backgroundColor: 'var(--color-bg)' }}
             >
-              <Icon className="w-8 h-8 text-gray-600 group-hover:text-gray-900" />
-              <span className="text-xs text-gray-600">{shape.label}</span>
+              <Icon className="w-8 h-8  group-hover:" style={{ color: 'var(--color-text-secondary)' }} style={{ color: 'var(--color-text)' }} />
+              <span className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{shape.label}</span>
             </button>
           );
         })}
       </div>
 
-      <div className="pt-4 border-t border-gray-200">
-        <div className="text-xs text-gray-600 mb-2">Color</div>
+      <div className="pt-4 border-t " style={{ borderColor: 'var(--color-border)' }}>
+        <div className="text-xs  mb-2" style={{ color: 'var(--color-text-secondary)' }}>Color</div>
         <div className="grid grid-cols-8 gap-2">
           {colors.map((color) => (
             <button

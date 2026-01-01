@@ -1,0 +1,83 @@
+{
+  "title": "Chat IA",
+  "close": "Fermer le chat",
+  "open": "Ouvrir le chat",
+  "sendMessage": "Envoyer un message",
+  "messagePlaceholder": "Écrire...",
+  "send": "Envoyer",
+  "connecting": "Connexion à l'IA...",
+  "loading": "Chargement...",
+  "markImportant": "Marquer comme important",
+  "markedImportant": "Marqué comme important",
+  "noteMarked": "Note marquée comme importante",
+  "messages": {
+    "user": "Utilisateur",
+    "assistant": "IA",
+    "greeting": "Bonjour! Je suis en mode hors ligne temporaire, mais je peux vous guider à travers les sections de l'application pour que vous puissiez continuer à avancer avec {{subject}}.",
+    "emptyPrompt": "Je peux vous orienter avec les tâches, invités, budget ou fournisseurs pour {{subject}}. Dites-moi ce dont vous avez besoin.",
+    "offlineMode": "L'assistant distant ne répond pas, mais je suis toujours disponible en mode guide. Demandez-moi à propos des tâches, invités, budget ou fournisseurs et je vous indiquerai où les gérer pour {{subject}}.",
+    "offlineTemporary": "L'assistant IA utilise le mode hors ligne temporaire.",
+    "noDataExtracted": "Aucune donnée détectée à extraire. Pouvez-vous me donner plus de détails?",
+    "dataExtracted": "Données extraites:",
+    "changesApplied": "Changements appliqués.",
+    "connectionIssue": "Il semble y avoir des problèmes de connexion avec le serveur. Je peux vous aider avec des questions de base sur votre mariage pendant que la connexion est rétablie. Que souhaitez-vous savoir?",
+    "connectionError": "Impossible de se connecter au serveur IA. Veuillez vérifier votre connexion et réessayer.",
+    "genericError": "Une erreur s'est produite: {{error}}"
+  },
+  "guides": {
+    "suppliers": "Gérez les fournisseurs pour {{subject}} depuis la section Fournisseurs: ajoutez des fiches, marquez les favoris et comparez les budgets. Voulez-vous que je vous indique les étapes?",
+    "finance": "Le panneau Finance vous permet d'enregistrer les dépenses et revenus et de voir les alertes si vous dépassez votre budget de {{subject}}. Ouvrez Finance et cliquez sur \"Ajouter une transaction\".",
+    "guests": "Depuis Invités, vous pouvez importer des listes, enregistrer les confirmations et organiser les accompagnants pour {{subject}}. Vous pouvez également envoyer des rappels par email.",
+    "seating": "Organisez les tables de {{subject}} depuis le Plan de Tables: faites glisser les invités, détectez les espaces vides et exportez le plan en PDF pour vos fournisseurs.",
+    "tasks": "Le panneau Tâches vous permet de marquer les éléments en attente, créer des rappels et les coordonner avec le calendrier de {{subject}}. Consultez l'onglet des tâches pour tout maintenir à jour."
+  },
+  "commands": {
+    "meetingRescheduled": "Réunion {{title}} reprogrammée au {{date}} {{time}}.",
+    "taskAdded": "Tâche ajoutée",
+    "meetingAdded": "Réunion ajoutée",
+    "taskUpdated": "Tâche mise à jour",
+    "taskDeleted": "Tâche supprimée",
+    "taskCompleted": "Tâche marquée comme terminée",
+    "guestAdded": "Invité ajouté",
+    "guestUpdated": "Invité mis à jour",
+    "guestDeleted": "Invité supprimé",
+    "movementAdded": "Transaction ajoutée",
+    "movementUpdated": "Transaction mise à jour",
+    "movementDeleted": "Transaction supprimée",
+    "supplierAdded": "Fournisseur ajouté",
+    "supplierUpdated": "Fournisseur mis à jour",
+    "supplierDeleted": "Fournisseur supprimé",
+    "suppliersFound": "{{count}} fournisseurs trouvés",
+    "suppliersNotFound": "Aucun fournisseur trouvé",
+    "suppliersSearchError": "Erreur lors de la recherche de fournisseurs",
+    "guestMoved": "Invité déplacé à la table {{table}}",
+    "configUpdated": "Configuration mise à jour"
+  },
+  "plurals": {
+    "guestsAdded_one": "{{count}} invité ajouté",
+    "guestsAdded_other": "{{count}} invités ajoutés",
+    "tasksAdded_one": "{{count}} tâche ajoutée",
+    "tasksAdded_other": "{{count}} tâches ajoutées",
+    "meetingsAdded_one": "{{count}} réunion ajoutée",
+    "meetingsAdded_other": "{{count}} réunions ajoutées",
+    "movementsAdded_one": "{{count}} transaction ajoutée",
+    "movementsAdded_other": "{{count}} transactions ajoutées"
+  },
+  "errors": {
+    "timeout": "Délai d'attente dépassé",
+    "connection": "Erreur de connexion",
+    "communication": "Erreur de communication",
+    "noToken": "Impossible de générer le jeton d'authentification"
+  },
+  "defaults": {
+    "task": "Tâche",
+    "meeting": "Réunion",
+    "guest": "Invité",
+    "movement": "Transaction",
+    "supplier": "Fournisseur",
+    "pending": "En attente",
+    "event": "événement",
+    "wedding": "mariage",
+    "yourPlanning": "votre planification"
+  }
+}

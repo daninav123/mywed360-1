@@ -25,23 +25,27 @@ export default function useSupplierGroups() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (!activeWedding) return;
-    const col = collection(db, 'weddings', activeWedding, 'supplierGroups');
-    const unsub = onSnapshot(
-      col,
-      (snap) => {
-        setGroups(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-        setLoading(false);
-      },
-      (err) => {
-        // console.error('Error leyendo supplierGroups:', err);
-        setError(err.message);
-        setLoading(false);
-      }
-    );
-    return () => unsub();
+  const loadGroups = useCallback(async () => {
+    if (!activeWedding) {
+      setGroups([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await supplierGroupsAPI.getAll(activeWedding);
+      setGroups(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error loading supplier groups:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, [activeWedding]);
+
+  useEffect(() => {
+    loadGroups();
+  }, [loadGroups]);
 
   const createGroup = useCallback(
     async ({ name, memberIds = [], notes = '' }) => {
@@ -75,24 +79,11 @@ export default function useSupplierGroups() {
     async (groupId) => {
       if (!activeWedding || !groupId) return { success: false, error: 'Missing params' };
       try {
-        const gRef = doc(db, 'weddings', activeWedding, 'supplierGroups', groupId);
-        const gSnap = await getDoc(gRef);
-        const data = gSnap.exists() ? gSnap.data() : null;
-        const memberIds = Array.isArray(data?.memberIds) ? data.memberIds : [];
-        // limpiar groupId en proveedores
-        await Promise.all(
-          memberIds.map((pid) =>
-            updateDoc(doc(db, 'weddings', activeWedding, 'suppliers', pid), {
-              groupId: null,
-              groupName: null,
-              updated: serverTimestamp(),
-            }).catch(() => {})
-          )
-        );
-        await deleteDoc(gRef);
+        await supplierGroupsAPI.delete(activeWedding, groupId);
+        setGroups(prev => prev.filter(g => g.id !== groupId));
         return { success: true };
       } catch (e) {
-        // console.error('Error disolviendo grupo proveedores:', e);
+        console.error('Error disolviendo grupo proveedores:', e);
         return { success: false, error: e.message };
       }
     },

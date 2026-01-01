@@ -87,12 +87,12 @@ export default function SeatingPlanPost() {
     <div className="space-y-6">
       <Card className="p-6 space-y-4">
         <h1 className="text-2xl font-semibold">Diseño del Seating Plan</h1>
-        <p className="text-gray-600">
+        <p className="" style={{ color: 'var(--color-text-secondary)' }}>
           Crea carteles para que tus invitados encuentren su mesa asignada. Selecciona un estilo {t('seatingPlan.capacityPlaceholder')} tu propio diseño.
         </p>
 
         <div className="mt-2">
-          <p className="text-sm text-blue-600">
+          <p className="text-sm " style={{ color: 'var(--color-primary)' }}>
             <span className="font-medium">Consejo:</span> Para mejores resultados, primero asigna a tus invitados en mesas usando la página de Seating Plan. {t('seatingPlan.searchPlaceholder')} {t('seatingPlan.tableNamePlaceholder')}s.
           </p>
         </div>

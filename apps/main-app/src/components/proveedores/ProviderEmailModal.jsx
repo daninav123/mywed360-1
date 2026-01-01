@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
+import useWeddingData from '../../hooks/useWeddingData';
 import { useAuth } from '../../hooks/useAuth';
 import useTranslations from '../../hooks/useTranslations';
 import * as EmailService from '../../services/emailService';
@@ -21,7 +21,7 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
     generateDefaultEmailBody,
   } = useProviderEmail();
   const { profile } = useAuth();
-  const { info: weddingInfo } = useActiveWeddingInfo();
+  const { weddingData: weddingInfo } = useWeddingData();
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [templates, setTemplates] = useState([]);

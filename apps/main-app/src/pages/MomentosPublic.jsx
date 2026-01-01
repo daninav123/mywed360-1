@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -14,7 +14,6 @@ import {
 } from '@/services/momentosService';
 import { firebaseReady } from '@/firebaseConfig';
 import useTranslations from '@/hooks/useTranslations';
-
 const ALBUM_ID = 'momentos';
 
 const formatDateLocal = (value) => {
@@ -221,7 +220,7 @@ export default function MomentosPublic() {
   if (status === 'error') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white px-6">
-        <div className="bg-white/5  border border-white/10 rounded-3xl px-6 py-8 max-w-md text-center space-y-3">
+        <div className="/5  border border-white/10 rounded-3xl px-6 py-8 max-w-md text-center space-y-3" style={{ backgroundColor: 'var(--color-surface)' }}>
           <h1 className="text-xl font-semibold text-white">
             {t('public.moments.public.errorTitle')}
           </h1>
@@ -278,7 +277,7 @@ export default function MomentosPublic() {
         )}
       </header>
 
-      <main className="flex-1 bg-white text-slate-900 rounded-t-[32px] -mt-4 relative z-10">
+      <main className="flex-1  text-slate-900 rounded-t-[32px] -mt-4 relative z-10" style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="px-5 py-6 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-800">
@@ -295,10 +294,10 @@ export default function MomentosPublic() {
                 key={scene.id}
                 type="button"
                 onClick={() => handleSceneSelect(scene)}
-                className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-[0.99]"
+                className="flex items-center justify-between rounded-2xl border border-slate-200  px-4 py-4 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-[0.99]" style={{ backgroundColor: 'var(--color-surface)' }}
               >
                 <div className="flex items-center gap-3 text-left">
-                  <div className="h-12 w-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full bg-blue-50  flex items-center justify-center" style={{ color: 'var(--color-primary)' }}>
                     {scene.emoji ? (
                       <span className="text-xl" aria-hidden="true">{scene.emoji}</span>
                     ) : (
@@ -333,7 +332,7 @@ export default function MomentosPublic() {
                 {recentUploads.map((item, index) => (
                   <div
                     key={`${item.name}-${index}`}
-                    className="flex items-center justify-between text-xs text-slate-200 border border-white/10 rounded-xl px-3 py-2 bg-white/5"
+                    className="flex items-center justify-between text-xs text-slate-200 border border-white/10 rounded-xl px-3 py-2 /5" style={{ backgroundColor: 'var(--color-surface)' }}
                   >
                     <div className="min-w-0">
                       <p className="truncate font-medium">{item.name}</p>
@@ -365,7 +364,7 @@ export default function MomentosPublic() {
 
       {selectedScene && (
         <div className="fixed inset-0 z-40 flex flex-col bg-black/60">
-          <div className="mt-auto bg-white rounded-t-3xl px-5 py-6 shadow-md">
+          <div className="mt-auto  rounded-t-3xl px-5 py-6 shadow-md" style={{ backgroundColor: 'var(--color-surface)' }}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-400">
@@ -429,7 +428,7 @@ export default function MomentosPublic() {
 
                 <button
                   type="submit"
-                  className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow hover:bg-blue-700 transition"
+                  className="w-full rounded-xl  py-3 text-sm font-semibold text-white shadow hover:bg-blue-700 transition" style={{ backgroundColor: 'var(--color-primary)' }}
                 >
                   {t('public.moments.public.overlay.start')}
                 </button>
@@ -460,5 +459,7 @@ export default function MomentosPublic() {
         </div>
       )}
     </div>
+      
+    
   );
 }

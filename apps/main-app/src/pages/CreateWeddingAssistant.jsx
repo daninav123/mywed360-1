@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -108,15 +108,17 @@ const BASE_STEPS = [
   },
 ];
 
+let OPTION_SETS = {};
+
 const INITIAL_FORM = {
-  eventType: EVENT_TYPE_OPTIONS[0].value,
+  eventType: 'boda',
   coupleName: '',
   weddingDate: '',
   location: '',
-  style: EVENT_STYLE_OPTIONS[0].value,
-  guestCountRange: GUEST_COUNT_OPTIONS[0].value,
-  formalityLevel: FORMALITY_OPTIONS[0].value,
-  ceremonyType: CEREMONY_TYPE_OPTIONS[0].value,
+  style: 'clasico',
+  guestCountRange: '50-100',
+  formalityLevel: 'formal',
+  ceremonyType: 'religiosa',
   budget: '',
   timeAvailable: '',
   priorities: '',
@@ -184,7 +186,7 @@ const stepParsers = {
   coupleName: (input) => {
     const value = input.trim();
     if (!value) {
-      return { ok: false, message: 'Necesito alg�n nombre, aunque sea provisional.' };
+      return { ok: false, message: t('weddingAssistant.validation.nameRequired') };
     }
     return { ok: true, value, display: value };
   },
@@ -193,7 +195,7 @@ const stepParsers = {
     if (!formatted) {
       return {
         ok: false,
-        message: 'No pude entender la fecha. Usa el formato 2025-05-17.',
+        message: t('weddingAssistant.validation.dateInvalid'),
       };
     }
     return { ok: true, value: formatted, display: formatted };
@@ -203,7 +205,7 @@ const stepParsers = {
     if (!value) {
       return {
         ok: false,
-        message: 'Indica al menos una ciudad o zona aproximada.',
+        message: t('weddingAssistant.validation.locationRequired'),
       };
     }
     return { ok: true, value, display: value };
@@ -211,7 +213,7 @@ const stepParsers = {
   budget: (input) => {
     const value = input.trim();
     if (!value) {
-      return { ok: false, message: 'Por favor indica un presupuesto aproximado o escribe "flexible".' };
+      return { ok: false, message: t('weddingAssistant.validation.budgetRequired') };
     }
     return { ok: true, value, display: value };
   },
@@ -219,7 +221,7 @@ const stepParsers = {
     const value = input.trim();
     const months = parseInt(value, 10);
     if (isNaN(months) || months < 1) {
-      return { ok: false, message: 'Indica cuántos meses aproximados (ejemplo: 6, 12, 18).' };
+      return { ok: false, message: t('weddingAssistant.validation.timeInvalid') };
     }
     return { ok: true, value: `${months}`, display: `${months} meses` };
   },
@@ -227,21 +229,21 @@ const stepParsers = {
     const value = input.trim();
     const pattern = /^\d,\d,\d$/;
     if (!pattern.test(value)) {
-      return { ok: false, message: 'Escribe 3 números separados por comas (ejemplo: 1,3,2).' };
+      return { ok: false, message: t('weddingAssistant.validation.prioritiesInvalid') };
     }
     return { ok: true, value, display: value };
   },
   concerns: (input) => {
     const value = input.trim();
     if (!value) {
-      return { ok: true, value: '', display: 'Sin preocupaciones específicas' };
+      return { ok: true, value: '', display: t('weddingAssistant.validation.noConcerns') };
     }
     return { ok: true, value, display: value };
   },
   notes: (input) => {
     const value = input.trim();
     if (!value) {
-      return { ok: true, value: '', display: 'Sin notas adicionales' };
+      return { ok: true, value: '', display: t('weddingAssistant.validation.noNotes') };
     }
     return { ok: true, value, display: value };
   },
@@ -268,6 +270,8 @@ const firstActiveStepIndex = (form) => {
 const initialStepIndex = firstActiveStepIndex(INITIAL_FORM);
 
 export default function CreateWeddingAssistant() {
+  const { t } = useTranslation();
+  OPTION_SETS = getOptionSets(t);
   const { currentUser, userProfile, hasRole, isLoading } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState(INITIAL_FORM);
@@ -275,8 +279,7 @@ export default function CreateWeddingAssistant() {
     {
       id: 'welcome',
       role: roles.assistant,
-      content:
-        '�Hola! Soy tu asistente para crear el evento. Te ir� haciendo algunas preguntas y con tus respuestas preparar� la base del proyecto.',
+      content: t('weddingAssistant.welcome'),
     },
     {
       id: `step-${BASE_STEPS[initialStepIndex].id}`,
@@ -328,8 +331,7 @@ export default function CreateWeddingAssistant() {
       {
         id: 'welcome',
         role: roles.assistant,
-        content:
-          'Perfecto, volvamos a empezar. Te har� de nuevo las preguntas clave para preparar el evento.',
+        content: t('weddingAssistant.restart'),
       },
       {
         id: `step-${BASE_STEPS[firstIndex].id}`,
@@ -345,8 +347,7 @@ export default function CreateWeddingAssistant() {
       setSummaryVisible(true);
       appendMessage({
         role: roles.assistant,
-        content:
-          'Genial, ya tengo toda la informaci�n. Aqu� tienes un resumen. Si todo est� correcto, creamos el evento.',
+        content: t('weddingAssistant.allInfoCollected'),
       });
     } else {
       setCurrentStepIndex(nextIndex);
@@ -364,7 +365,7 @@ export default function CreateWeddingAssistant() {
     if (!parsed.ok) {
       appendMessage({
         role: roles.assistant,
-        content: parsed.message || 'No me ha quedado claro, �puedes decirlo de otra forma?',
+        content: parsed.message || t('weddingAssistant.parseError'),
       });
       return;
     }
@@ -490,38 +491,34 @@ export default function CreateWeddingAssistant() {
     }
   };
 
-  const renderLayout = (content) => (
-    <PageWrapper
-      title="Asistente conversacional"
-      className="layout-container max-w-3xl space-y-6 pb-12"
-    >
-      {content}
-    </PageWrapper>
-  );
-
   if (isLoading) {
-    return renderLayout(
-      <Card className="p-6 text-center text-sm text-[color:var(--color-muted)]">Cargando...</Card>
+    return (
+      <div className="p-6 max-w-3xl mx-auto">
+        <Card className="p-6 text-center text-sm text-[color:var(--color-muted)]">Cargando...</Card>
+      </div>
     );
   }
 
   if (forbiddenRole) {
-    return renderLayout(
-      <Card className="space-y-3 text-sm">
-        <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Acceso restringido</h2>
-        <p className="text-[color:var(--color-muted)]">
-          Este asistente est� reservado para propietarios del evento. Solicita acceso al owner o al
-          administrador si necesitas crear un nuevo evento.
-        </p>
-        <Button type="button" onClick={() => navigate('/home')}>
-          Volver al panel
-        </Button>
-      </Card>
+    return (
+      <div className="p-6 max-w-3xl mx-auto">
+        <Card className="space-y-3 text-sm">
+          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Acceso restringido</h2>
+          <p className="text-[color:var(--color-muted)]">
+            Este asistente está reservado para propietarios del evento. Solicita acceso al owner o al
+            administrador si necesitas crear un nuevo evento.
+          </p>
+          <Button type="button" onClick={() => navigate('/home')}>
+            Volver al panel
+          </Button>
+        </Card>
+      </div>
     );
   }
 
-  return renderLayout(
-    <Card className="flex h-[70vh] flex-col gap-4 p-6 md:h-[75vh]">
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      <Card className="flex h-[70vh] flex-col gap-4 p-6 md:h-[75vh]">
       <header className="space-y-2">
         <h2 className="text-lg font-semibold text-[color:var(--color-text)]">
           Configuraci�n r�pida con IA
@@ -570,17 +567,26 @@ export default function CreateWeddingAssistant() {
               ))}
             </div>
           )}
-          <div className="flex gap-2">
-          {activeStep.optional && (
+          <div className="flex gap-2 mt-4">
+            {activeStep.optional && (
+              <button
+                type="button"
+                onClick={() => submitAnswer('')}
+                className="text-xs text-[color:var(--color-primary)] hover:underline"
+                disabled={creating}
+              >
+                Saltar este detalle
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => submitAnswer('')}
-              className="text-xs text-[color:var(--color-primary)] hover:underline"
+              onClick={handleSend}
+              className="px-4 py-2  text-white rounded-lg hover:bg-blue-700" style={{ backgroundColor: 'var(--color-primary)' }}
               disabled={creating}
             >
-              Saltar este detalle
+              Continuar
             </button>
-          )}
+          </div>
         </form>
       ) : (
         <div className="space-y-4">
@@ -629,6 +635,7 @@ export default function CreateWeddingAssistant() {
           </div>
         </div>
       )}
-    </Card>
+      </Card>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+﻿import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -56,7 +56,7 @@ export default function Notificaciones() {
   const filtered = items.filter((n) => (filter === 'unread' ? !n.read : true));
 
   return (
-    <PageWrapper title={t('notifications.title')} className="max-w-4xl mx-auto">
+    <div className="p-6">
       {/* Ajustes de notificaciones */}
       <NotificationSettings />
 
@@ -86,7 +86,7 @@ export default function Notificaciones() {
                 toast.error(t('notifications.push.enableError'));
               }
             }}
-            className="px-3 py-1 rounded bg-green-600 text-white"
+            className="px-3 py-1 rounded  text-white" style={{ backgroundColor: 'var(--color-success)' }}
           >
             {t('notifications.push.enable')}
           </button>
@@ -108,7 +108,7 @@ export default function Notificaciones() {
               const ok = await pushTest();
               ok ? toast.success(t('notifications.push.testSuccess')) : toast.error(t('notifications.push.testError'));
             }}
-            className="px-3 py-1 rounded bg-blue-600 text-white"
+            className="px-3 py-1 rounded  text-white" style={{ backgroundColor: 'var(--color-primary)' }}
           >
             {t('notifications.push.test')}
           </button>
@@ -158,7 +158,6 @@ export default function Notificaciones() {
           </div>
         ))}
       </div>
-    </PageWrapper>
+    </div>
   );
 }
-

@@ -67,8 +67,8 @@ export default function SpecialElementsPanel({ onAdd }) {
   return (
     <div className="p-4 space-y-4">
       <div>
-        <h3 className="text-sm font-semibold text-gray-900 mb-2">Elementos Especiales</h3>
-        <p className="text-xs text-gray-600 mb-4">
+        <h3 className="text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>Elementos Especiales</h3>
+        <p className="text-xs  mb-4" style={{ color: 'var(--color-text-secondary)' }}>
           Elementos temáticos para invitaciones creativas
         </p>
       </div>
@@ -80,11 +80,11 @@ export default function SpecialElementsPanel({ onAdd }) {
             <button
               key={element.id}
               onClick={() => addElement(element)}
-              className="aspect-square bg-gray-50 rounded-lg hover:bg-gray-100 transition-all hover:ring-2 hover:ring-blue-500 p-3 flex flex-col items-center justify-center gap-1"
+              className="aspect-square  rounded-lg hover: transition-all hover:ring-2 hover:ring-blue-500 p-3 flex flex-col items-center justify-center gap-1" style={{ backgroundColor: 'var(--color-bg)' }} style={{ backgroundColor: 'var(--color-bg)' }}
               title={element.name}
             >
-              <Icon className="w-8 h-8 text-gray-700" />
-              <span className="text-xs text-gray-600 text-center">{element.name}</span>
+              <Icon className="w-8 h-8 " style={{ color: 'var(--color-text)' }} />
+              <span className="text-xs  text-center" style={{ color: 'var(--color-text-secondary)' }}>{element.name}</span>
             </button>
           );
         })}

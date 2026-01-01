@@ -1,4 +1,4 @@
-/**
+﻿/**
  * PruebasEnsayos - Gestión de pruebas y ensayos pre-boda
  * FASE 2.6 del WORKFLOW-USUARIO.md
  */
@@ -10,7 +10,6 @@ import { db } from '../firebaseConfig';
 import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
-
 const getAppointmentTypes = (t) => [
   { id: 'dress', name: t('appointments.types.dress'), icon: '👗', color: 'pink' },
   { id: 'suit', name: t('appointments.types.suit'), icon: '🤵', color: 'blue' },
@@ -69,7 +68,7 @@ const AppointmentCard = ({ appointment, onEdit, onDelete, onToggleComplete }) =>
               </h3>
             </div>
             {appointment.notes && (
-              <p className="text-sm text-gray-600 mt-1">{appointment.notes}</p>
+              <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>{appointment.notes}</p>
             )}
           </div>
         </div>
@@ -77,13 +76,13 @@ const AppointmentCard = ({ appointment, onEdit, onDelete, onToggleComplete }) =>
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(appointment)}
-            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-white rounded transition-colors"
+            className="p-2  hover: hover: rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-surface)' }}
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(appointment.id)}
-            className="p-2 text-gray-600 hover:text-red-600 hover:bg-white rounded transition-colors"
+            className="p-2  hover: hover: rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-surface)' }}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -91,7 +90,7 @@ const AppointmentCard = ({ appointment, onEdit, onDelete, onToggleComplete }) =>
       </div>
 
       <div className="space-y-2 text-sm">
-        <div className="flex items-center gap-2 text-gray-700">
+        <div className="flex items-center gap-2 " style={{ color: 'var(--color-text)' }}>
           <Calendar className="w-4 h-4" />
           <span>{date.toLocaleDateString('es-ES', { 
             weekday: 'long', 
@@ -107,21 +106,21 @@ const AppointmentCard = ({ appointment, onEdit, onDelete, onToggleComplete }) =>
         </div>
 
         {appointment.time && (
-          <div className="flex items-center gap-2 text-gray-700">
+          <div className="flex items-center gap-2 " style={{ color: 'var(--color-text)' }}>
             <Clock className="w-4 h-4" />
             <span>{appointment.time}</span>
           </div>
         )}
 
         {appointment.location && (
-          <div className="flex items-center gap-2 text-gray-700">
+          <div className="flex items-center gap-2 " style={{ color: 'var(--color-text)' }}>
             <MapPin className="w-4 h-4" />
             <span>{appointment.location}</span>
           </div>
         )}
 
         {appointment.provider && (
-          <div className="flex items-center gap-2 text-gray-700">
+          <div className="flex items-center gap-2 " style={{ color: 'var(--color-text)' }}>
             <FileText className="w-4 h-4" />
             <span>Proveedor: {appointment.provider}</span>
           </div>
@@ -129,8 +128,8 @@ const AppointmentCard = ({ appointment, onEdit, onDelete, onToggleComplete }) =>
       </div>
 
       {appointment.photos && appointment.photos.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-gray-200">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="mt-3 pt-3 border-t " style={{ borderColor: 'var(--color-border)' }}>
+          <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
             <Camera className="w-4 h-4" />
             <span>{appointment.photos.length} foto{appointment.photos.length > 1 ? 's' : ''} de referencia</span>
           </div>
@@ -166,15 +165,15 @@ const AppointmentModal = ({ appointment, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className=" rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-800">
+            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
               {appointment ? 'Editar cita' : 'Nueva cita'}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}
             >
               ✕
             </button>
@@ -182,7 +181,7 @@ const AppointmentModal = ({ appointment, onSave, onClose }) => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                 Tipo de cita
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -198,39 +197,39 @@ const AppointmentModal = ({ appointment, onSave, onClose }) => {
                     }`}
                   >
                     <span className="text-2xl mb-1 block">{type.icon}</span>
-                    <span className="text-xs text-gray-700">{type.name}</span>
+                    <span className="text-xs " style={{ color: 'var(--color-text)' }}>{type.name}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                 Fecha *
               </label>
               <input
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                 Hora
               </label>
               <input
                 type="time"
                 value={formData.time}
                 onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                 Ubicación
               </label>
               <input
@@ -238,11 +237,12 @@ const AppointmentModal = ({ appointment, onSave, onClose }) => {
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 placeholder={t('Dirección del lugar')}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
               />
             </div>
 
             <div>
+              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                 Notas
               </label>
               <textarea
@@ -250,20 +250,20 @@ const AppointmentModal = ({ appointment, onSave, onClose }) => {
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder={t('Notas o recordatorios...')}
                 rows={3}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
               />
             </div>
             <div className="flex gap-2 pt-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex-1 px-4 py-2  text-white rounded-lg hover:bg-blue-700 transition-colors" style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 {appointment ? 'Guardar' : 'Crear'}
               </button>
@@ -385,8 +385,8 @@ export default function PruebasEnsayos() {
       <PageWrapper>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Cargando citas...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2  mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
+            <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando citas...</p>
           </div>
         </div>
       </PageWrapper>
@@ -401,8 +401,8 @@ export default function PruebasEnsayos() {
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-800 mb-1">Pruebas y Ensayos</h1>
-                <p className="text-sm text-gray-600">
+                <h1 className="text-2xl font-bold  mb-1" style={{ color: 'var(--color-text)' }}>Pruebas y Ensayos</h1>
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                   Organiza todas tus citas pre-boda
                 </p>
               </div>
@@ -411,7 +411,7 @@ export default function PruebasEnsayos() {
                   setEditingAppointment(null);
                   setShowModal(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2  text-white rounded-lg hover:bg-blue-700 transition-colors" style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 <Plus className="w-5 h-5" />
                 Nueva cita
@@ -419,17 +419,17 @@ export default function PruebasEnsayos() {
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <div className="text-2xl font-bold text-gray-800">{stats.total}</div>
-                <div className="text-xs text-gray-600">Total citas</div>
+              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{stats.total}</div>
+                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Total citas</div>
               </div>
-              <div className="bg-white rounded-lg p-3 border border-orange-200">
+              <div className=" rounded-lg p-3 border border-orange-200" style={{ backgroundColor: 'var(--color-surface)' }}>
                 <div className="text-2xl font-bold text-orange-600">{stats.upcoming}</div>
-                <div className="text-xs text-gray-600">Próximas</div>
+                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Próximas</div>
               </div>
-              <div className="bg-white rounded-lg p-3 border border-green-200">
-                <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
-                <div className="text-xs text-gray-600">Completadas</div>
+              <div className=" rounded-lg p-3 border border-green-200" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="text-2xl font-bold " style={{ color: 'var(--color-success)' }}>{stats.completed}</div>
+                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Completadas</div>
               </div>
             </div>
           </div>
@@ -437,7 +437,7 @@ export default function PruebasEnsayos() {
           {/* Upcoming Appointments */}
           {upcomingAppointments.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              <h2 className="text-lg font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>
                 Próximas citas ({upcomingAppointments.length})
               </h2>
               <div className="space-y-3">
@@ -457,7 +457,7 @@ export default function PruebasEnsayos() {
           {/* Past/Completed Appointments */}
           {pastAppointments.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              <h2 className="text-lg font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>
                 Completadas/Pasadas ({pastAppointments.length})
               </h2>
               <div className="space-y-3">
@@ -476,17 +476,17 @@ export default function PruebasEnsayos() {
 
           {/* Empty State */}
           {appointments.length === 0 && (
-            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-12 text-center">
-              <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+            <div className=" border border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <Calendar className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
+              <h3 className="text-lg font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                 No tienes citas programadas
               </h3>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm  mb-4" style={{ color: 'var(--color-muted)' }}>
                 Comienza añadiendo tus pruebas de vestido, menú, maquillaje y más
               </p>
               <button
                 onClick={() => setShowModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2  text-white rounded-lg hover:bg-blue-700 transition-colors" style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 <Plus className="w-5 h-5" />
                 Crear primera cita

@@ -13,7 +13,7 @@ export default function LiveDimensions({ dimensions, position }) {
         top: `${y - 30}px`,
       }}
     >
-      <div className="bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg font-mono whitespace-nowrap">
+      <div className=" text-white text-xs px-2 py-1 rounded shadow-lg font-mono whitespace-nowrap" style={{ backgroundColor: 'var(--color-primary)' }}>
         {Math.round(width)} × {Math.round(height)} px
       </div>
     </div>

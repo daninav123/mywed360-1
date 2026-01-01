@@ -2,8 +2,8 @@ const { GoogleAuth } = require('google-auth-library');
 const fs = require('fs');
 const path = require('path');
 
-const PROJECT_ID = 'lovenda-98c77';
-const BUCKET_NAME = 'lovenda-98c77.firebasestorage.app';
+const PROJECT_ID = 'planivia-98c77';
+const BUCKET_NAME = 'planivia-98c77.firebasestorage.app';
 
 async function deployStorageRules() {
   try {

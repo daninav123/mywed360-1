@@ -266,10 +266,10 @@ const MomentosEspecialesSimple = () => {
         />
         {/* Header compacto */}
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+          <h1 className="text-2xl font-bold  mb-1" style={{ color: 'var(--color-text)' }}>
             Elige la canción perfecta para cada momento
           </h1>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
             Busca, escucha y selecciona la música ideal para tu día especial
           </p>
         </div>
@@ -279,7 +279,7 @@ const MomentosEspecialesSimple = () => {
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <Music className="text-blue-600" size={20} />
+                <Music className="" style={{ color: 'var(--color-primary)' }} size={20} />
               </div>
             </div>
             <div className="flex-1">
@@ -304,7 +304,7 @@ const MomentosEspecialesSimple = () => {
         </div>
 
         {/* Navegación de bloques */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <div className=" rounded-2xl shadow-sm border  p-6" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {blockProgress.map((block, index) => {
               const isActive = block.id === activeBlockId;
@@ -342,7 +342,7 @@ const MomentosEspecialesSimple = () => {
                         {block.name}
                       </span>
                       {isComplete && (
-                        <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-full  flex items-center justify-center" style={{ backgroundColor: 'var(--color-success)' }}>
                           <Check size={14} className="text-white" strokeWidth={3} />
                         </div>
                       )}
@@ -350,7 +350,7 @@ const MomentosEspecialesSimple = () => {
 
                     {/* Progreso */}
                     <div className="space-y-1">
-                      <div className="flex items-center justify-between text-xs text-gray-600">
+                      <div className="flex items-center justify-between text-xs " style={{ color: 'var(--color-text-secondary)' }}>
                         <span>Progreso</span>
                         <span className="font-semibold">
                           {block.completed}/{block.total}
@@ -378,7 +378,7 @@ const MomentosEspecialesSimple = () => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-2xl font-bold text-gray-900">{activeBlock.name}</h2>
+                  <h2 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{activeBlock.name}</h2>
                   {activeBlock.backgroundPlaylist?.enabled && (
                     <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
                       <Radio size={12} />
@@ -386,7 +386,7 @@ const MomentosEspecialesSimple = () => {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                   {currentProgress?.completed || 0} de {currentProgress?.total || 0} momentos
                   configurados
                 </p>
@@ -394,7 +394,7 @@ const MomentosEspecialesSimple = () => {
 
               <Button
                 onClick={handleOpenBackgroundPlaylist}
-                className="bg-green-600 hover:bg-green-700 text-white"
+                className=" hover:bg-green-700 text-white" style={{ backgroundColor: 'var(--color-success)' }}
               >
                 <Radio size={18} className="mr-2" />
                 {activeBlock.backgroundPlaylist?.enabled ? 'Editar Ambiente' : 'Añadir Ambiente'}
@@ -402,10 +402,10 @@ const MomentosEspecialesSimple = () => {
 
               {currentProgress && currentProgress.percentage > 0 && (
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-blue-600">
+                  <div className="text-3xl font-bold " style={{ color: 'var(--color-primary)' }}>
                     {currentProgress.percentage}%
                   </div>
-                  <div className="text-xs text-gray-500">Completado</div>
+                  <div className="text-xs " style={{ color: 'var(--color-muted)' }}>Completado</div>
                 </div>
               )}
             </div>
@@ -413,9 +413,9 @@ const MomentosEspecialesSimple = () => {
             {/* Lista de momentos */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {activeMoments.length === 0 ? (
-                <div className="col-span-full text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                  <Music size={48} className="mx-auto text-gray-400 mb-3" />
-                  <p className="text-gray-600">No hay momentos en esta sección</p>
+                <div className="col-span-full text-center py-12  rounded-xl border-2 border-dashed " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <Music size={48} className="mx-auto  mb-3" style={{ color: 'var(--color-muted)' }} />
+                  <p className="" style={{ color: 'var(--color-text-secondary)' }}>No hay momentos en esta sección</p>
                 </div>
               ) : (
                 activeMoments.map((moment) => (

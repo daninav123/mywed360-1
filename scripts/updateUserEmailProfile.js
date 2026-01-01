@@ -13,7 +13,7 @@ const serviceAccount = require(serviceAccountPath);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  projectId: 'lovenda-98c77'
+  projectId: 'planivia-98c77'
 });
 
 const db = admin.firestore();

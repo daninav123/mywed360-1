@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 import WeddingTeamModal from '../../components/weddings/WeddingTeamModal.jsx';
-
 export default function WeddingTeamHarness() {
   const [open, setOpen] = useState(true);
   const [weddingId, setWeddingId] = useState('w-harness');
@@ -58,5 +57,7 @@ export default function WeddingTeamHarness() {
         weddingName="Boda Demo Cypress"
       />
     </div>
+      
+    
   );
 }

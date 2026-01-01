@@ -47,10 +47,10 @@ const PaymentSuccess = () => {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center " style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="text-center">
           <Loader2 className="h-12 w-12 text-[color:var(--color-primary)] animate-spin mx-auto" />
-          <p className="mt-4 text-gray-600">
+          <p className="mt-4 " style={{ color: 'var(--color-text-secondary)' }}>
             {t('public.payment.success.loadingMessage')}
           </p>
         </div>
@@ -60,15 +60,15 @@ const PaymentSuccess = () => {
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+      <div className="min-h-screen flex items-center justify-center  px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <div className="max-w-md w-full  rounded-2xl shadow-lg p-8 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100">
-            <AlertCircle className="h-8 w-8 text-red-600" />
+            <AlertCircle className="h-8 w-8 " style={{ color: 'var(--color-danger)' }} />
           </div>
-          <h2 className="mt-6 text-2xl font-semibold text-gray-900">
+          <h2 className="mt-6 text-2xl font-semibold " style={{ color: 'var(--color-text)' }}>
             {t('public.payment.success.errorTitle')}
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 " style={{ color: 'var(--color-text-secondary)' }}>
             {t('public.payment.success.errorDescription')}
           </p>
           <div className="mt-8 space-y-3">
@@ -80,7 +80,7 @@ const PaymentSuccess = () => {
             </Link>
             <Link
               to="/contact"
-              className="block w-full rounded-md border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2"
+              className="block w-full rounded-md border  px-4 py-3 text-sm font-semibold  hover: focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
             >
               {t('public.payment.success.buttons.contactSupport')}
             </Link>
@@ -91,38 +91,38 @@ const PaymentSuccess = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+    <div className="min-h-screen flex items-center justify-center  px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="max-w-md w-full  rounded-2xl shadow-lg p-8 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-          <CheckCircle2 className="h-8 w-8 text-green-600" />
+          <CheckCircle2 className="h-8 w-8 " style={{ color: 'var(--color-success)' }} />
         </div>
 
-        <h2 className="mt-6 text-2xl font-semibold text-gray-900">
+        <h2 className="mt-6 text-2xl font-semibold " style={{ color: 'var(--color-text)' }}>
           {t('public.payment.success.title')}
         </h2>
 
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 " style={{ color: 'var(--color-text-secondary)' }}>
           {t('public.payment.success.description')}
         </p>
 
         {sessionData && (
-          <div className="mt-6 bg-gray-50 rounded-lg p-4 text-left">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">
+          <div className="mt-6  rounded-lg p-4 text-left" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <h3 className="text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
               {t('public.payment.success.detailsHeading')}
             </h3>
             <dl className="space-y-1 text-sm">
               <div className="flex justify-between">
-                <dt className="text-gray-500">
+                <dt className="" style={{ color: 'var(--color-muted)' }}>
                   {t('public.payment.success.statusLabel')}
                 </dt>
-                <dd className="font-medium text-gray-900">{statusLabel}</dd>
+                <dd className="font-medium " style={{ color: 'var(--color-text)' }}>{statusLabel}</dd>
               </div>
               {sessionData.amount_total && (
                 <div className="flex justify-between">
-                  <dt className="text-gray-500">
+                  <dt className="" style={{ color: 'var(--color-muted)' }}>
                     {t('public.payment.success.totalLabel')}
                   </dt>
-                  <dd className="font-medium text-gray-900">
+                  <dd className="font-medium " style={{ color: 'var(--color-text)' }}>
                     {(sessionData.amount_total / 100).toFixed(2)} EUR
                   </dd>
                 </div>
@@ -138,13 +138,13 @@ const PaymentSuccess = () => {
           >
             {t('public.payment.success.buttons.goDashboard')}
           </Link>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
             {t('public.payment.success.redirectNotice')}
           </p>
         </div>
 
-        <div className="mt-6 border-t border-gray-200 pt-6">
-          <p className="text-sm text-gray-500">
+        <div className="mt-6 border-t  pt-6" style={{ borderColor: 'var(--color-border)' }}>
+          <p className="text-sm " style={{ color: 'var(--color-muted)' }}>
             {t('public.payment.success.emailNotice')}
           </p>
         </div>

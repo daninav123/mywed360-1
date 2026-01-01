@@ -2,7 +2,6 @@
 import { useTranslation } from 'react-i18next';
 import { Card } from '../components/ui/Card';
 import jsPDF from 'jspdf';
-
 export default function DocumentosLegales() {
   const { t } = useTranslation('pages');
   const [form, setForm] = useState({
@@ -69,12 +68,14 @@ export default function DocumentosLegales() {
           </div>
         </div>
         <div className="flex justify-end">
-          <button onClick={generarPDF} disabled={generating} className="px-4 py-2 bg-blue-600 text-white rounded">
+          <button onClick={generarPDF} disabled={generating} className="px-4 py-2  text-white rounded" style={{ backgroundColor: 'var(--color-primary)' }}>
             {generating ? t('legalDocuments.generating') : t('legalDocuments.generate')}
           </button>
         </div>
       </Card>
     </div>
+      
+    
   );
 }
 

@@ -50,34 +50,34 @@ export default function ColorPicker({ value, onChange, label = 'Color' }) {
 
   return (
     <div className="space-y-2">
-      <label className="text-xs font-medium text-gray-700">{label}</label>
+      <label className="text-xs font-medium " style={{ color: 'var(--color-text)' }}>{label}</label>
       
       {/* Color actual + input */}
       <div className="flex gap-2">
         <button
           onClick={() => setShowPicker(!showPicker)}
-          className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 border  rounded-md hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
           style={{ backgroundColor: value }}
         >
           <div 
-            className="w-6 h-6 rounded border border-gray-300" 
+            className="w-6 h-6 rounded border " style={{ borderColor: 'var(--color-border)' }} 
             style={{ backgroundColor: value }}
           />
-          <Palette className="w-4 h-4 text-gray-600" />
+          <Palette className="w-4 h-4 " style={{ color: 'var(--color-text-secondary)' }} />
         </button>
         
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+          className="flex-1 px-3 py-2 text-xs border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono" style={{ borderColor: 'var(--color-border)' }}
           placeholder="#000000"
         />
       </div>
 
       {/* Paleta expandible */}
       {showPicker && (
-        <div className="border border-gray-200 rounded-lg p-3 bg-white shadow-lg">
+        <div className="border  rounded-lg p-3  shadow-lg" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
           {/* Categorías */}
           <div className="flex gap-1 mb-3 overflow-x-auto">
             {Object.keys(WEDDING_PALETTE).map((category) => (
@@ -122,7 +122,7 @@ export default function ColorPicker({ value, onChange, label = 'Color' }) {
           </div>
 
           {/* Input HTML5 color picker */}
-          <div className="mt-3 pt-3 border-t border-gray-200">
+          <div className="mt-3 pt-3 border-t " style={{ borderColor: 'var(--color-border)' }}>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="color"
@@ -130,7 +130,7 @@ export default function ColorPicker({ value, onChange, label = 'Color' }) {
                 onChange={(e) => onChange(e.target.value)}
                 className="w-8 h-8 rounded cursor-pointer"
               />
-              <span className="text-xs text-gray-600">Selector personalizado</span>
+              <span className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Selector personalizado</span>
             </label>
           </div>
         </div>

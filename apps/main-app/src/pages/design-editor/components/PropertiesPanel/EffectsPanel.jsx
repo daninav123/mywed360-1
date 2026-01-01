@@ -80,7 +80,7 @@ export default function EffectsPanel({ selectedElement, canvasRef }) {
 
   if (!selectedElement) {
     return (
-      <div className="p-4 text-center text-gray-500 text-sm">
+      <div className="p-4 text-center  text-sm" style={{ color: 'var(--color-muted)' }}>
         Selecciona un elemento para ver efectos
       </div>
     );
@@ -90,7 +90,7 @@ export default function EffectsPanel({ selectedElement, canvasRef }) {
     <div className="p-4 space-y-4">
       {/* Opacidad */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
           Opacidad: {opacity}%
         </label>
         <input
@@ -106,7 +106,7 @@ export default function EffectsPanel({ selectedElement, canvasRef }) {
       {/* Sombra */}
       <div className="border-t pt-4">
         <div className="flex items-center justify-between mb-3">
-          <label className="text-sm font-medium text-gray-700">Sombra</label>
+          <label className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>Sombra</label>
           <input
             type="checkbox"
             checked={shadow.enabled}
@@ -118,7 +118,7 @@ export default function EffectsPanel({ selectedElement, canvasRef }) {
         {shadow.enabled && (
           <div className="space-y-3 pl-2">
             <div>
-              <label className="text-xs text-gray-600">Color</label>
+              <label className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Color</label>
               <input
                 type="color"
                 value={shadow.color}
@@ -128,7 +128,7 @@ export default function EffectsPanel({ selectedElement, canvasRef }) {
             </div>
 
             <div>
-              <label className="text-xs text-gray-600">Desenfoque: {shadow.blur}px</label>
+              <label className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Desenfoque: {shadow.blur}px</label>
               <input
                 type="range"
                 min="0"
@@ -141,7 +141,7 @@ export default function EffectsPanel({ selectedElement, canvasRef }) {
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-xs text-gray-600">Offset X: {shadow.offsetX}px</label>
+                <label className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Offset X: {shadow.offsetX}px</label>
                 <input
                   type="range"
                   min="-20"
@@ -152,7 +152,7 @@ export default function EffectsPanel({ selectedElement, canvasRef }) {
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-600">Offset Y: {shadow.offsetY}px</label>
+                <label className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Offset Y: {shadow.offsetY}px</label>
                 <input
                   type="range"
                   min="-20"
@@ -170,7 +170,7 @@ export default function EffectsPanel({ selectedElement, canvasRef }) {
       {/* Borde */}
       <div className="border-t pt-4">
         <div className="flex items-center justify-between mb-3">
-          <label className="text-sm font-medium text-gray-700">Borde</label>
+          <label className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>Borde</label>
           <input
             type="checkbox"
             checked={stroke.enabled}
@@ -182,7 +182,7 @@ export default function EffectsPanel({ selectedElement, canvasRef }) {
         {stroke.enabled && (
           <div className="space-y-3 pl-2">
             <div>
-              <label className="text-xs text-gray-600">Color</label>
+              <label className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Color</label>
               <input
                 type="color"
                 value={stroke.color}
@@ -192,7 +192,7 @@ export default function EffectsPanel({ selectedElement, canvasRef }) {
             </div>
 
             <div>
-              <label className="text-xs text-gray-600">Grosor: {stroke.width}px</label>
+              <label className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Grosor: {stroke.width}px</label>
               <input
                 type="range"
                 min="1"

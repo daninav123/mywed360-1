@@ -175,7 +175,7 @@ export default function AdminSpecsManager() {
   if (loading) {
     return (
       <div className="p-8 text-center">
-        <p className="text-gray-600">Cargando especificaciones...</p>
+        <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando especificaciones...</p>
       </div>
     );
   }
@@ -188,8 +188,8 @@ export default function AdminSpecsManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">⚙️ Gestión de Especificaciones</h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold " style={{ color: 'var(--color-text)' }}>⚙️ Gestión de Especificaciones</h1>
+          <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
             Personaliza los campos de especificaciones para cada categoría de proveedor
           </p>
         </div>
@@ -216,7 +216,7 @@ export default function AdminSpecsManager() {
       {specs._customized && (
         <Card className="bg-blue-50 border-blue-200">
           <div className="flex items-start gap-3">
-            <AlertCircle className="text-blue-600 flex-shrink-0 mt-0.5" size={20} />
+            <AlertCircle className=" flex-shrink-0 mt-0.5" style={{ color: 'var(--color-primary)' }} size={20} />
             <div>
               <p className="text-sm font-medium text-blue-900">
                 Usando especificaciones personalizadas
@@ -233,7 +233,7 @@ export default function AdminSpecsManager() {
         {/* Selector de categorías */}
         <div className="col-span-3">
           <Card>
-            <h3 className="font-semibold text-gray-900 mb-3">Categorías</h3>
+            <h3 className="font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>Categorías</h3>
             <div className="space-y-1 max-h-[600px] overflow-y-auto">
               {SUPPLIER_CATEGORIES.map(cat => {
                 const fieldCount = Object.keys(specs[cat.id]?.specs || {}).length;
@@ -249,7 +249,7 @@ export default function AdminSpecsManager() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-sm">{cat.name}</span>
-                      <span className="text-xs text-gray-500">{fieldCount}</span>
+                      <span className="text-xs " style={{ color: 'var(--color-muted)' }}>{fieldCount}</span>
                     </div>
                   </button>
                 );
@@ -263,8 +263,8 @@ export default function AdminSpecsManager() {
           <Card>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{selectedCat?.name}</h2>
-                <p className="text-sm text-gray-600">{selectedCat?.description}</p>
+                <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>{selectedCat?.name}</h2>
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{selectedCat?.description}</p>
               </div>
               <Button
                 leftIcon={<Plus size={16} />}
@@ -277,15 +277,15 @@ export default function AdminSpecsManager() {
 
             {/* Formulario añadir campo */}
             {showAddField && (
-              <Card className="mb-4 bg-gray-50">
-                <h4 className="font-semibold text-gray-900 mb-3">Nuevo campo</h4>
+              <Card className="mb-4 " style={{ backgroundColor: 'var(--color-bg)' }}>
+                <h4 className="font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>Nuevo campo</h4>
                 <div className="grid grid-cols-3 gap-3 mb-3">
                   <input
                     type="text"
                     placeholder={t('admin.specs.fieldNamePlaceholder')}
                     value={newField.name}
                     onChange={(e) => setNewField({ ...newField, name: e.target.value })}
-                    className="px-3 py-2 border border-gray-300 rounded-lg"
+                    className="px-3 py-2 border  rounded-lg" style={{ borderColor: 'var(--color-border)' }}
                   />
                   <select
                     value={newField.type}
@@ -297,7 +297,7 @@ export default function AdminSpecsManager() {
                       if (type === 'array') defaultValue = [];
                       setNewField({ ...newField, type, defaultValue });
                     }}
-                    className="px-3 py-2 border border-gray-300 rounded-lg"
+                    className="px-3 py-2 border  rounded-lg" style={{ borderColor: 'var(--color-border)' }}
                   >
                     <option value="boolean">Boolean (sí/no)</option>
                     <option value="number">Number (número)</option>
@@ -324,18 +324,18 @@ export default function AdminSpecsManager() {
             {/* Lista de campos */}
             <div className="space-y-2">
               {Object.keys(categorySpecs).length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-8">
+                <p className="text-sm  text-center py-8" style={{ color: 'var(--color-muted)' }}>
                   No hay campos definidos. Añade el primero.
                 </p>
               ) : (
                 Object.entries(categorySpecs).map(([fieldName, fieldValue]) => (
                   <div
                     key={fieldName}
-                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+                    className="flex items-center justify-between p-3 border  rounded-lg hover:" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
                   >
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">{fieldName}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="font-medium " style={{ color: 'var(--color-text)' }}>{fieldName}</p>
+                      <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
                         Tipo: {typeof fieldValue === 'boolean' ? 'Boolean' :
                               typeof fieldValue === 'number' ? 'Number' :
                               Array.isArray(fieldValue) ? 'Array' : 'String'} 
@@ -346,7 +346,7 @@ export default function AdminSpecsManager() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleRemoveField(fieldName)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2  hover:bg-red-50 rounded-lg transition-colors" style={{ color: 'var(--color-danger)' }}
                       >
                         <Trash2 size={16} />
                       </button>

@@ -17,7 +17,6 @@ export default function LatestBlogPosts() {
         const result = await fetchBlogPosts({ limit: 4 });
         setPosts(result.posts || []);
       } catch (error) {
-        console.error('[LatestBlogPosts] Error loading posts:', error);
         setPosts([]);
       } finally {
         setLoading(false);
@@ -42,7 +41,7 @@ export default function LatestBlogPosts() {
       <div 
         className="rounded-xl p-8"
         style={{
-          backgroundColor: 'transparent',
+          backgroundColor: 'white',
           border: '1px solid var(--color-border-soft)',
           boxShadow: 'var(--shadow-card)',
         }}
@@ -62,7 +61,7 @@ export default function LatestBlogPosts() {
     <div 
       className="rounded-xl p-6"
       style={{
-        backgroundColor: 'transparent',
+        backgroundColor: 'white',
         border: '1px solid var(--color-border-soft)',
         boxShadow: 'var(--shadow-card)',
       }}
@@ -75,7 +74,7 @@ export default function LatestBlogPosts() {
             fontFamily: "'Playfair Display', serif" 
           }}
         >
-          {t('home2.blog.sectionTitle', { defaultValue: 'Últimas del Blog' })}
+          {t('home2.blog.sectionTitle')}
         </h2>
         <button
           onClick={handleViewAll}
@@ -84,7 +83,7 @@ export default function LatestBlogPosts() {
           onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
           onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
         >
-          {t('home2.blog.viewAll', { defaultValue: 'Ver todo →' })}
+          {t('home2.blog.viewAll')}
         </button>
       </div>
 

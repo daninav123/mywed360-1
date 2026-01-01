@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { TrendingUp, Users, CreditCard, Calendar, ExternalLink, DollarSign, Link2, Copy } from 'lucide-react';
 import { db } from '../firebaseConfig';
 import { formatDate as formatDateUtil } from '../utils/formatUtils';
-
 const PartnerStats = () => {
   const { token } = useParams();
   const [data, setData] = useState(null);
@@ -65,10 +64,10 @@ const PartnerStats = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando estadísticas...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 mx-auto" style={{ borderColor: 'var(--color-primary)' }}></div>
+          <p className="mt-4" style={{ color: 'var(--color-text-secondary)' }}>Cargando estadísticas...</p>
         </div>
       </div>
     );
@@ -76,13 +75,13 @@ const PartnerStats = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <ExternalLink className="w-8 h-8 text-red-600" />
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--color-primary)' }}>
+        <div className="rounded-2xl shadow-2xl p-8 max-w-md text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--color-danger-10)' }}>
+            <ExternalLink className="w-8 h-8" style={{ color: 'var(--color-danger)' }} />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Error</h1>
-          <p className="text-gray-600">{error}</p>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>Error</h1>
+          <p style={{ color: 'var(--color-text-secondary)' }}>{error}</p>
         </div>
       </div>
     );
@@ -108,85 +107,76 @@ const PartnerStats = () => {
   const commissionBreakdown = Array.isArray(commissionTotal?.breakdown) ? commissionTotal.breakdown : [];
 
   return (
-    <div className="min-h-screen bg-white py-12 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-          <div className="flex items-center justify-between mb-4">
+    <div className="max-w-[1280px] mx-auto p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold mb-2">📊 Panel de Partner</h1>
+        <p className="text-muted">Código: {data.code}</p>
+      </div>
+      {/* Info del Partner */}
+        <div className="rounded-2xl p-6 mb-6" style={{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-lg)' }}>
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Panel de Partner
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Código: <span className="font-mono font-semibold text-indigo-600">{data.code}</span>
-              </p>
-            </div>
-            <div className="text-right">
               {data.assignedTo?.name && (
-                <p className="text-lg font-semibold text-gray-900">{data.assignedTo.name}</p>
+                <p className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>{data.assignedTo.name}</p>
               )}
               {data.assignedTo?.email && (
-                <p className="text-sm text-gray-600">{data.assignedTo.email}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{data.assignedTo.email}</p>
               )}
             </div>
-          </div>
-          
-          {/* Fechas de validez */}
-          {(data.validFrom || data.validUntil) && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
+            {(data.validFrom || data.validUntil) && (
               <div className="flex items-center gap-4 text-sm flex-wrap">
                 {data.validFrom && (
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-green-600" />
-                    <span className="text-gray-600">
-                      Válido desde: <span className="font-semibold text-gray-900">{formatDate(data.validFrom)}</span>
+                    <Calendar className="w-4 h-4" style={{ color: 'var(--color-success)' }} />
+                    <span style={{ color: 'var(--color-text-secondary)' }}>
+                      Desde: <span className="font-semibold" style={{ color: 'var(--color-text)' }}>{formatDate(data.validFrom)}</span>
                     </span>
                   </div>
                 )}
                 {data.validUntil && (
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-red-600" />
-                    <span className="text-gray-600">
-                      Válido hasta: <span className="font-semibold text-gray-900">{formatDate(data.validUntil)}</span>
+                    <Calendar className="w-4 h-4" style={{ color: 'var(--color-danger)' }} />
+                    <span style={{ color: 'var(--color-text-secondary)' }}>
+                      Hasta: <span className="font-semibold" style={{ color: 'var(--color-text)' }}>{formatDate(data.validUntil)}</span>
                     </span>
                   </div>
                 )}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           {/* Commission */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
+          <div className="rounded-xl p-6 border-l-4" style={{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-lg)', borderColor: 'var(--color-primary)' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Comision Generada</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>Comision Generada</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
                   {formatCurrency(commissionTotal?.amount || 0, commissionCurrency)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>
                   {hasCommissionRules ? 'Incluye porcentajes y bonus activos.' : 'Sin reglas configuradas desde el panel administrador.'}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-indigo-600" />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary-10)' }}>
+                <DollarSign className="w-6 h-6" style={{ color: 'var(--color-primary)' }} />
               </div>
             </div>
           </div>
 
           {/* Código y Enlace */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+          <div className="rounded-xl p-6 border-l-4" style={{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-lg)', borderColor: 'var(--color-success)' }}>
             <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Tu Código</p>
-                <p className="text-xl font-bold text-gray-900 font-mono">
+                <p className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>Tu Código</p>
+                <p className="text-xl font-bold font-mono" style={{ color: 'var(--color-text)' }}>
                   {data.code}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <Link2 className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-success-10)' }}>
+                <Link2 className="w-6 h-6" style={{ color: 'var(--color-success)' }} />
               </div>
             </div>
             <button
@@ -194,7 +184,10 @@ const PartnerStats = () => {
                 navigator.clipboard.writeText(window.location.href);
                 alert('Enlace copiado al portapapeles');
               }}
-              className="w-full mt-2 flex items-center justify-center gap-2 text-xs bg-green-50 hover:bg-green-100 text-green-700 px-3 py-2 rounded-lg transition-colors"
+              className="w-full mt-2 flex items-center justify-center gap-2 text-xs px-3 py-2 rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--color-success-10)', color: 'var(--color-success)' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-success-10)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-success-10)'}
             >
               <Copy className="w-3 h-3" />
               Copiar enlace de estadísticas
@@ -202,136 +195,136 @@ const PartnerStats = () => {
           </div>
 
           {/* Last Month Revenue */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+          <div className="rounded-xl p-6 border-l-4" style={{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-lg)', borderColor: 'var(--color-info)' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Ultimo Mes</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>Ultimo Mes</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
                   {formatCurrency(data.stats.lastMonth.revenue, data.stats.lastMonth.currency)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>
                   Comision: {formatCurrency(commissionLastMonth?.amount || 0, commissionLastMonth?.currency || commissionCurrency)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-info-10)' }}>
+                <Calendar className="w-6 h-6" style={{ color: 'var(--color-info)' }} />
               </div>
             </div>
           </div>
 
           {/* Total Users */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+          <div className="rounded-xl p-6 border-l-4" style={{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-lg)', borderColor: '#A855F7' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Usuarios Unicos</p>
-                <p className="text-2xl font-bold text-gray-900">{data.stats.total.users}</p>
+                <p className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>Usuarios Unicos</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>{data.stats.total.users}</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                <Users className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(168, 85, 247, 0.1)' }}>
+                <Users className="w-6 h-6" style={{ color: '#A855F7' }} />
               </div>
             </div>
           </div>
 
           {/* Total Uses */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+          <div className="rounded-xl p-6 border-l-4" style={{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-lg)', borderColor: '#F97316' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Usos Totales</p>
-                <p className="text-2xl font-bold text-gray-900">{data.stats.total.uses}</p>
+                <p className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>Usos Totales</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>{data.stats.total.uses}</p>
               </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                <ExternalLink className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(249, 115, 22, 0.1)' }}>
+                <ExternalLink className="w-6 h-6" style={{ color: '#F97316' }} />
               </div>
             </div>
           </div>
         </div>
 
         {/* Commission Breakdown */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
-          <div className="px-8 py-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">Detalle de comisiones</h2>
-            <p className="text-sm text-gray-600 mt-1">Periodos y tramos aplicados sobre la facturacion generada.</p>
+        <div className="rounded-2xl overflow-hidden mb-8" style={{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-xl)' }}>
+          <div className="px-8 py-6 border-b" style={{ borderColor: 'var(--color-border)' }}>
+            <h2 className="text-xl font-bold" style={{ color: 'var(--color-text)' }}>Detalle de comisiones</h2>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>Periodos y tramos aplicados sobre la facturacion generada.</p>
           </div>
           {hasCommissionRules ? (
             commissionBreakdown.length ? (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y" style={{ borderColor: 'var(--color-border)' }}>
+                  <thead style={{ backgroundColor: 'var(--color-bg)' }}>
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Periodo</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Facturacion evaluada</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% aplicado</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bonus fijo</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comision</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pagos</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>Periodo</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>Facturacion evaluada</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>% aplicado</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>Bonus fijo</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>Comision</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>Pagos</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="divide-y" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
                     {commissionBreakdown.map((item) => (
-                      <tr key={item.periodId} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-sm text-gray-900">
+                      <tr key={item.periodId} className="transition-colors" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                        <td className="px-6 py-4 text-sm" style={{ color: 'var(--color-text)' }}>
                           <div className="font-medium">{item.label}</div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs" style={{ color: 'var(--color-muted)' }}>
                             {(item.tierLabel || 'Tramo base')} - desde {formatCurrency(item.minRevenue || 0, commissionCurrency)}
                             {item.maxRevenue !== null ? ` hasta ${formatCurrency(item.maxRevenue, commissionCurrency)}` : ' sin limite'}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{formatCurrency(item.revenue, commissionCurrency)}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{formatPercentage(item.percentageApplied || 0)}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{formatCurrency(item.fixedApplied || 0, commissionCurrency)}</td>
-                        <td className="px-6 py-4 text-sm font-semibold text-gray-900">{formatCurrency(item.commission, commissionCurrency)}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{item.paymentCount || 0}</td>
+                        <td className="px-6 py-4 text-sm" style={{ color: 'var(--color-text)' }}>{formatCurrency(item.revenue, commissionCurrency)}</td>
+                        <td className="px-6 py-4 text-sm" style={{ color: 'var(--color-text)' }}>{formatPercentage(item.percentageApplied || 0)}</td>
+                        <td className="px-6 py-4 text-sm" style={{ color: 'var(--color-text)' }}>{formatCurrency(item.fixedApplied || 0, commissionCurrency)}</td>
+                        <td className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{formatCurrency(item.commission, commissionCurrency)}</td>
+                        <td className="px-6 py-4 text-sm" style={{ color: 'var(--color-text)' }}>{item.paymentCount || 0}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             ) : (
-              <div className="px-8 py-10 text-center text-sm text-gray-500">Aun no hay pagos dentro de los periodos definidos.</div>
+              <div className="px-8 py-10 text-center text-sm" style={{ color: 'var(--color-muted)' }}>Aun no hay pagos dentro de los periodos definidos.</div>
             )
           ) : (
-            <div className="px-8 py-10 text-center text-sm text-gray-500">Configura reglas de comision desde el panel administrador para mostrar este detalle.</div>
+            <div className="px-8 py-10 text-center text-sm" style={{ color: 'var(--color-muted)' }}>Configura reglas de comision desde el panel administrador para mostrar este detalle.</div>
           )}
           {hasCommissionRules && commissionTotal?.unassignedRevenue > 0 && (
-            <div className="px-8 py-4 bg-gray-50 text-xs text-gray-500">
+            <div className="px-8 py-4 text-xs" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-muted)' }}>
               {formatCurrency(commissionTotal.unassignedRevenue, commissionCurrency)} fuera de periodos definidos (no suma a la comision).
             </div>
           )}
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="px-8 py-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">Usuarios que usaron tu código</h2>
-            <p className="text-sm text-gray-600 mt-1">Últimos 50 usuarios registrados</p>
+        <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-xl)' }}>
+          <div className="px-8 py-6 border-b" style={{ borderColor: 'var(--color-border)' }}>
+            <h2 className="text-xl font-bold" style={{ color: 'var(--color-text)' }}>Usuarios que usaron tu código</h2>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>Últimos 50 usuarios registrados</p>
           </div>
           
           {data.users && data.users.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="" style={{ backgroundColor: 'var(--color-bg)' }}>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
                       Importe
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
                       Fecha
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
                   {data.users.map((user, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <tr key={idx} className="transition-colors" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--color-text)' }}>
                         {user.email}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: 'var(--color-success)' }}>
                         {formatCurrency(user.amount, data.stats.total.currency)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--color-muted)' }}>
                         {user.date}
                       </td>
                     </tr>
@@ -341,18 +334,17 @@ const PartnerStats = () => {
             </div>
           ) : (
             <div className="px-8 py-12 text-center">
-              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Aún no hay usuarios que hayan usado este código</p>
+              <Users className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
+              <p style={{ color: 'var(--color-text-secondary)' }}>Aún no hay usuarios que hayan usado este código</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-600">
-          <p>MaLoveApp - Panel de Estadísticas para Partners - MaLoveApp - MaLoveApp</p>
+        <div className="mt-8 text-center text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+          <p>MaLoveApp - Panel de Estadísticas para Partners</p>
           <p className="mt-1">Este enlace es privado, no lo compartas con terceros</p>
         </div>
-      </div>
     </div>
   );
 };

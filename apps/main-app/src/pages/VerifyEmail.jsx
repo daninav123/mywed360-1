@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { sendEmailVerification } from 'firebase/auth';
 
 import { getFirebaseAuth } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
 import { performanceMonitor } from '../services/PerformanceMonitor';
-
 const STATUS_ID = 'verify-email-status';
 const ERROR_ID = 'verify-email-error';
 

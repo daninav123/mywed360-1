@@ -205,7 +205,7 @@ const AdminUsers = () => {
                       type="button"
                       data-testid="admin-user-reactivate"
                       onClick={() => openReactivateModal(user)}
-                      className="rounded-md border border-green-500 bg-green-50 px-3 py-1 text-xs text-green-700 hover:bg-green-100"
+                      className="rounded-md border  bg-green-50 px-3 py-1 text-xs text-green-700 hover:bg-green-100" style={{ borderColor: 'var(--color-success)' }}
                     >
                       Reactivar
                     </button>
@@ -461,7 +461,7 @@ const AdminUsers = () => {
                 data-testid="admin-user-reactivate-confirm"
                 onClick={confirmReactivate}
                 disabled={isReactivating}
-                className="rounded-md bg-green-600 px-3 py-2 text-white hover:bg-green-700 disabled:opacity-60"
+                className="rounded-md  px-3 py-2 text-white hover:bg-green-700 disabled:opacity-60" style={{ backgroundColor: 'var(--color-success)' }}
               >
                 {isReactivating ? 'Reactivando...' : 'Reactivar Usuario'}
               </button>

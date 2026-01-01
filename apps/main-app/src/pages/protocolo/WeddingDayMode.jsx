@@ -134,13 +134,13 @@ const WeddingDayMode = () => {
         </div>
 
         {/* Progreso general */}
-        <div className="bg-white rounded-lg border-2 border-gray-200 p-4">
+        <div className=" rounded-lg border-2  p-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>
                 {timelineStatus.completed} / {timelineStatus.total}
               </div>
-              <div className="text-sm text-gray-600">Momentos completados</div>
+              <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>Momentos completados</div>
             </div>
             <div className="text-3xl font-bold text-purple-600">{timelineStatus.percentage}%</div>
           </div>
@@ -154,14 +154,14 @@ const WeddingDayMode = () => {
 
         {/* Momento actual */}
         {timelineStatus.currentMoment && (
-          <div className="bg-white border-2 border-green-300 rounded-lg overflow-hidden">
-            <div className="bg-green-600 text-white px-4 py-2 flex items-center gap-2">
+          <div className=" border-2 border-green-300 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className=" text-white px-4 py-2 flex items-center gap-2" style={{ backgroundColor: 'var(--color-success)' }}>
               <Play size={20} />
               <span className="font-bold">MOMENTO ACTUAL</span>
             </div>
             <div className="p-6">
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
+                <div className="w-16 h-16  rounded-full flex items-center justify-center text-white text-2xl font-bold flex-shrink-0" style={{ backgroundColor: 'var(--color-success)' }}>
                   {timelineStatus.currentIndex + 1}
                 </div>
                 <div className="flex-1">
@@ -169,12 +169,12 @@ const WeddingDayMode = () => {
                     <span className="px-2 py-1 bg-green-200 text-green-800 text-xs font-bold rounded">
                       {timelineStatus.currentMoment.blockName}
                     </span>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                       <Clock size={14} className="inline mr-1" />
                       {timelineStatus.currentMoment.time}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-2xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>
                     {timelineStatus.currentMoment.title}
                   </h2>
                   {(() => {
@@ -189,8 +189,8 @@ const WeddingDayMode = () => {
                     ) : null;
                   })()}
                   {timelineStatus.currentMoment.notes && (
-                    <div className="bg-white border border-green-200 rounded-lg p-3 mb-3">
-                      <p className="text-sm text-gray-700">
+                    <div className=" border border-green-200 rounded-lg p-3 mb-3" style={{ backgroundColor: 'var(--color-surface)' }}>
+                      <p className="text-sm " style={{ color: 'var(--color-text)' }}>
                         💡 <strong>Nota:</strong> {timelineStatus.currentMoment.notes}
                       </p>
                     </div>
@@ -204,7 +204,7 @@ const WeddingDayMode = () => {
                     timelineStatus.currentMoment.id
                   )
                 }
-                className="w-full bg-green-600 hover:bg-green-700"
+                className="w-full  hover:bg-green-700" style={{ backgroundColor: 'var(--color-success)' }}
               >
                 <CheckCircle size={20} className="mr-2" />
                 Marcar como Completado
@@ -215,8 +215,8 @@ const WeddingDayMode = () => {
 
         {/* Siguiente momento */}
         {timelineStatus.nextMoment && (
-          <div className="bg-white border-2 border-blue-300 rounded-lg overflow-hidden">
-            <div className="bg-blue-600 text-white px-4 py-2 flex items-center justify-between">
+          <div className=" border-2 border-blue-300 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className=" text-white px-4 py-2 flex items-center justify-between" style={{ backgroundColor: 'var(--color-primary)' }}>
               <div className="flex items-center gap-2">
                 <ArrowRight size={20} />
                 <span className="font-bold">SIGUIENTE</span>
@@ -229,7 +229,7 @@ const WeddingDayMode = () => {
             </div>
             <div className="p-6">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                <div className="w-12 h-12  rounded-full flex items-center justify-center text-white text-xl font-bold flex-shrink-0" style={{ backgroundColor: 'var(--color-primary)' }}>
                   {timelineStatus.currentIndex + 2}
                 </div>
                 <div className="flex-1">
@@ -237,12 +237,12 @@ const WeddingDayMode = () => {
                     <span className="px-2 py-1 bg-blue-200 text-blue-800 text-xs font-bold rounded">
                       {timelineStatus.nextMoment.blockName}
                     </span>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                       <Clock size={14} className="inline mr-1" />
                       {timelineStatus.nextMoment.time}
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>
                     {timelineStatus.nextMoment.title}
                   </h3>
                   {(() => {
@@ -263,8 +263,8 @@ const WeddingDayMode = () => {
         )}
 
         {/* Lista completa (colapsable) */}
-        <details className="bg-white border-2 border-gray-200 rounded-lg overflow-hidden">
-          <summary className="cursor-pointer bg-gray-50 px-4 py-3 font-semibold text-gray-900 hover:bg-gray-100 transition-colors">
+        <details className=" border-2  rounded-lg overflow-hidden" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+          <summary className="cursor-pointer  px-4 py-3 font-semibold  hover: transition-colors" style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
             Ver cronograma completo ({timelineStatus.pending} pendientes)
           </summary>
           <div className="divide-y divide-gray-100">
@@ -287,10 +287,10 @@ const WeddingDayMode = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs px-2 py-0.5 bg-gray-200 text-gray-700 rounded">
+                        <span className="text-xs px-2 py-0.5 bg-gray-200  rounded" style={{ color: 'var(--color-text)' }}>
                           {moment.blockName}
                         </span>
-                        <span className="text-xs text-gray-500">{moment.time}</span>
+                        <span className="text-xs " style={{ color: 'var(--color-muted)' }}>{moment.time}</span>
                       </div>
                       <div
                         className={`font-medium ${isCompleted ? 'line-through text-gray-500' : 'text-gray-900'}`}
@@ -298,7 +298,7 @@ const WeddingDayMode = () => {
                         {moment.title}
                       </div>
                       {song && moment.isDefinitive && (
-                        <div className="text-xs text-gray-600 mt-1">
+                        <div className="text-xs  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                           🎵 {song.title} - {song.artist}
                         </div>
                       )}

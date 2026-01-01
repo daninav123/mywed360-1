@@ -17,9 +17,9 @@ Esta guía define el estilo visual oficial del proyecto basado en las páginas *
 - **Sombras sutiles** (shadow-md)
 
 ### ❌ NUNCA USAR
-- Degradados (`bg-gradient-to-*`)
+- Degradados (`bg-gradient-to-*`) excepto en headers
 - Efectos blur (`blur-3xl`)
-- Colores hardcodeados (#fff, #000, etc.)
+- Colores hardcodeados (#fff, #000, etc.) - usar variables CSS
 - Efectos hover excesivos (scale, translate grandes)
 - Fondos de colores vivos en cards principales
 
@@ -76,29 +76,76 @@ Usa los tokens derivados: `--color-primary-10`, `--color-text-60`, `--color-surf
 
 ---
 
-### 2. **Layout de Página**
+### 2. **Layout de Página Full-Screen (Finance, Home, etc.)**
+
+**⚠️ IMPORTANTE: Páginas principales deben estar FUERA de MainLayout**
+
+Las páginas con diseño full-screen (Finance, Home) deben declararse como rutas independientes en `App.jsx`:
+
 ```jsx
-// Patrón estándar (como Dashboard y Tasks)
-<div className="layout-container-wide space-y-6 pt-4 md:pt-6">
-  {/* Header */}
-  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-    <div>
-      <h1 className="page-title">Título</h1>
-      <p className="text-muted mt-1">Subtítulo descriptivo</p>
-    </div>
-  </div>
+// App.jsx
+<Route element={<ProtectedRoute />}>
+  {/* Páginas full-screen FUERA de MainLayout */}
+  <Route path="finance" element={<Finance />} />
+  <Route path="home" element={<Home />} />
   
-  {/* Contenido */}
-  <div className="space-y-6">
-    {/* Cards y componentes */}
-  </div>
-</div>
+  <Route element={<MainLayout />}>
+    {/* Otras páginas */}
+  </Route>
+</Route>
+```
+
+**Estructura del componente:**
+
+```jsx
+return (
+  <>
+    <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+      {/* Botones superiores derechos (idioma + usuario) */}
+      <div className="absolute top-4 right-4 flex items-center space-x-3" style={{ zIndex: 100 }}>
+        <LanguageSelector variant="minimal" />
+        <UserMenuButton />
+      </div>
+
+      {/* Contenedor blanco centrado */}
+      <div className="mx-auto my-8" style={{
+        maxWidth: '1024px',
+        width: '100%',
+        backgroundColor: '#FFFBF7',
+        borderRadius: '32px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        overflow: 'hidden'
+      }}>
+        {/* Header con gradiente */}
+        <header style={{
+          background: 'linear-gradient(135deg, #FFF4E6 0%, #F8EFE3 50%, #E8D5C4 100%)',
+          padding: '48px 32px 32px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div className="max-w-4xl mx-auto" style={{ textAlign: 'center' }}>
+            {/* Título */}
+          </div>
+        </header>
+        
+        {/* Contenido */}
+        <div className="px-6 py-6">
+          {/* Cards individuales */}
+        </div>
+      </div>
+    </div>
+    <Nav />
+  </>
+);
 ```
 
 **Características:**
-- ✅ `layout-container` / `layout-container-wide` - Ancho centrado
-- ✅ `pt-4 md:pt-6` - Padding vertical responsivo
-- ✅ `space-y-6` - Espaciado vertical entre elementos
+- ✅ **FUERA de MainLayout** para evitar capas extra
+- ✅ Fondo beige exterior `#EDE8E0`
+- ✅ Botones flotantes (idioma/usuario) en `absolute top-4 right-4`
+- ✅ Contenedor blanco centrado `maxWidth: 1024px` con `my-8`
+- ✅ Sombra: `0 8px 32px rgba(0,0,0,0.12)`
+- ✅ Header con gradiente beige-dorado
+- ✅ Nav en wrapper `<>...</>` fuera del contenedor
 
 ---
 

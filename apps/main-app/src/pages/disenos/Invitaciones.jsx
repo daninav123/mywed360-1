@@ -108,7 +108,7 @@ export default function Invitaciones() {
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Diseña tus invitaciones</h2>
-        <p className="text-gray-600">
+        <p className="" style={{ color: 'var(--color-text-secondary)' }}>
           Genera una invitación completa con IA a partir de tus datos de Perfil. Lista para imprimir
           y exportable a PDF.
         </p>
@@ -122,7 +122,7 @@ export default function Invitaciones() {
         onImageGenerated={() => {}}
       />
 
-      {loading && <div className="text-sm text-gray-500 mt-3">Cargando datos de perfil…</div>}
+      {loading && <div className="text-sm  mt-3" style={{ color: 'var(--color-muted)' }}>Cargando datos de perfil…</div>}
     </div>
   );
 }

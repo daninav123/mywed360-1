@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 import { useFavorites } from '../../contexts/FavoritesContext';
 import useTranslations from '../../hooks/useTranslations';
-import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
+import useWeddingData from '../../hooks/useWeddingData';
 import SupplierCard from './SupplierCard';
 import SupplierDetailModal from './SupplierDetailModal';
 import RequestQuoteModal from './RequestQuoteModal';

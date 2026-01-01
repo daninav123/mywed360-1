@@ -35,7 +35,7 @@ import Card from '../components/ui/Card';
 import PageWrapper from '../components/PageWrapper';
 
 import { useWedding } from '../context/WeddingContext';
-import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
+import useWeddingData from '../hooks/useWeddingData';
 import useAISearch from '../hooks/useAISearch';
 import useProveedores from '../hooks/useProveedores';
 import useSupplierShortlist from '../hooks/useSupplierShortlist';
@@ -1175,16 +1175,66 @@ const Proveedores = () => {
   }, []);
 
   return (
-    <>
-      <PageWrapper
-        title={t('suppliers.overview.title')}
-        actions={headerActions}
-        className="layout-container space-y-6"
-      >
-        {error && <Card className="border border-danger bg-danger-soft text-danger">{error}</Card>}
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        <div className="mx-auto my-8" style={{
+          maxWidth: '1024px',
+          width: '100%',
+          backgroundColor: '#FFFBF7',
+          borderRadius: '32px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          overflow: 'hidden'
+        }}>
+          
+          {/* Hero con degradado beige-dorado */}
+          <header className="relative overflow-hidden" style={{
+            background: 'linear-gradient(135deg, #FFF4E6 0%, #F8EFE3 50%, #E8D5C4 100%)',
+            padding: '48px 32px 32px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          }}>
+            <div className="max-w-4xl mx-auto" style={{ textAlign: 'center' }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '16px',
+                marginBottom: '12px'
+              }}>
+                <div style={{
+                  width: '60px',
+                  height: '1px',
+                  background: 'linear-gradient(to right, transparent, #D4A574)',
+                }} />
+                <h1 style={{
+                  fontFamily: "'Playfair Display', 'Cormorant Garamond', serif",
+                  fontSize: '40px',
+                  fontWeight: 400,
+                  color: '#1F2937',
+                  letterSpacing: '-0.01em',
+                  margin: 0,
+                }}>{t('suppliers.overview.title')}</h1>
+                <div style={{
+                  width: '60px',
+                  height: '1px',
+                  background: 'linear-gradient(to left, transparent, #D4A574)',
+                }} />
+              </div>
+              
+              {/* Subtítulo como tag uppercase */}
+              <p style={{
+                fontFamily: "'DM Sans', 'Inter', sans-serif",
+                fontSize: '11px',
+                fontWeight: 600,
+                color: '#9CA3AF',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: 0,
+              }}>Servicios de Boda</p>
+            </div>
+          </header>
+          {error && <Card className="border border-danger bg-danger-soft text-danger">{error}</Card>}
 
-        {/* Barra de Progreso - Siempre visible */}
-        <ServicesProgressBar serviceCards={serviceCards} />
+          {/* Barra de Progreso - Siempre visible */}
+          <ServicesProgressBar serviceCards={serviceCards} />
 
         {/* Tabs */}
         <Card className="p-1">
@@ -1268,7 +1318,6 @@ const Proveedores = () => {
           onApply={handleApplyFilters}
           initialFilters={advancedFilters}
         />
-      </PageWrapper>
 
       <ServiceOptionsModal
         open={serviceModal.open}
@@ -1374,8 +1423,9 @@ const Proveedores = () => {
 
       {/* Barra flotante de comparación */}
       <CompareBar />
-    </>
+      </div>
+    </div>
   );
-};
+}
 
 export default Proveedores;

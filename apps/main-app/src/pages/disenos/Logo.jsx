@@ -82,12 +82,12 @@ export default function Logo() {
           className="w-16 h-10 p-0 border-0 cursor-pointer"
           aria-label={t('design.logo.selectColor')}
         />
-        <p className="text-sm text-gray-600">{t('design.logo.colorCode')}: {hex}</p>
+        <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{t('design.logo.colorCode')}: {hex}</p>
       </Card>
 
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">{t('design.logo.designLogo')}</h2>
-        <p className="text-gray-600">
+        <p className="" style={{ color: 'var(--color-text-secondary)' }}>
           {t('design.logo.createCustomLogo')}
         </p>
       </div>

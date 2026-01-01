@@ -1,3 +1,8 @@
+/**
+ * @deprecated Este hook usa Firebase y está duplicado.
+ * USA EN SU LUGAR: useWeddingData() que usa PostgreSQL
+ * Este hook se eliminará en futuras versiones.
+ */
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { doc, onSnapshot, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';

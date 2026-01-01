@@ -281,7 +281,7 @@ const AdminLogin = () => {
         </button>
 
         {isBlocked && (
-          <p className="text-xs text-red-600">
+          <p className="text-xs " style={{ color: 'var(--color-danger)' }}>
             Bloqueo temporal activo ({Math.ceil(blockRemainingSeconds / 60)} min restantes). Si necesitas ayuda,
             escríbenos a <a href={`mailto:${supportEmail}`} className="underline">{supportEmail}</a>.
           </p>

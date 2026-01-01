@@ -1,0 +1,581 @@
+{
+  "migrated": [
+    {
+      "file": "AcceptInvitation.jsx",
+      "status": "migrated",
+      "title": "Accept Invitation",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "AyudaCeremonia.jsx",
+      "status": "migrated",
+      "title": "Ayuda Ceremonia",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "BankConnect.jsx",
+      "status": "migrated",
+      "title": "Bank Connect",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Blog.jsx",
+      "status": "migrated",
+      "title": "Blog",
+      "subtitle": "",
+      "icon": "\ud83c"
+    },
+    {
+      "file": "BlogAuthor.jsx",
+      "status": "migrated",
+      "title": "{author.name}",
+      "subtitle": "{profile.title}",
+      "icon": ""
+    },
+    {
+      "file": "BlogPost.jsx",
+      "status": "migrated",
+      "title": "{post.title}",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "BodaDetalle.jsx",
+      "status": "migrated",
+      "title": "Boda Detalle",
+      "subtitle": "Invitados",
+      "icon": ""
+    },
+    {
+      "file": "Bodas.jsx",
+      "status": "migrated",
+      "title": "Bodas",
+      "subtitle": "Cargando bodas...",
+      "icon": ""
+    },
+    {
+      "file": "BudgetApprovalHarness.jsx",
+      "status": "migrated",
+      "title": "{t('BudgetApprovalHarness')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Buzon_fixed_complete.jsx",
+      "status": "migrated",
+      "title": "Buzón Legacy",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Checklist.jsx",
+      "status": "migrated",
+      "title": "Lista de tareas",
+      "subtitle": "Vamos paso a paso 👰",
+      "icon": "\ud83c"
+    },
+    {
+      "file": "Contratos.jsx",
+      "status": "migrated",
+      "title": "Contratos",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "CreateWeddingAI.jsx",
+      "status": "migrated",
+      "title": "Acceso restringido",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "CreateWeddingAssistant.jsx",
+      "status": "migrated",
+      "title": "Create Wedding Assistant",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Dashboard.jsx",
+      "status": "migrated",
+      "title": "Dashboard",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "DesignWizard.jsx",
+      "status": "migrated",
+      "title": "{t('designWizard.title')}",
+      "subtitle": "",
+      "icon": "\ud83c"
+    },
+    {
+      "file": "DevEnsureFinance.jsx",
+      "status": "migrated",
+      "title": "Dev Ensure Finance",
+      "subtitle": "",
+      "icon": "✅"
+    },
+    {
+      "file": "DevSeedGuests.jsx",
+      "status": "migrated",
+      "title": "Dev Seed Guests",
+      "subtitle": "",
+      "icon": "✅"
+    },
+    {
+      "file": "DiaDeBoda.jsx",
+      "status": "migrated",
+      "title": "Día de la Boda",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "DisenoWeb.jsx",
+      "status": "migrated",
+      "title": "Diseño web",
+      "subtitle": "",
+      "icon": "\ud83c"
+    },
+    {
+      "file": "DocumentosLegales.jsx",
+      "status": "migrated",
+      "title": "{t('legalDocuments.title')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "EmailTemplates.jsx",
+      "status": "migrated",
+      "title": "Email Templates",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "EventosRelacionados.jsx",
+      "status": "migrated",
+      "title": "Eventos Relacionados",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "Finance.backup.jsx",
+      "status": "migrated",
+      "title": "{t('navigation.finance', { defaultValue: 'Finanzas' })}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "GestionNinos.jsx",
+      "status": "migrated",
+      "title": "Gestión de Niños",
+      "subtitle": "",
+      "icon": "\ud83c"
+    },
+    {
+      "file": "HomeUser.jsx",
+      "status": "migrated",
+      "title": "Home User",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Ideas.jsx",
+      "status": "migrated",
+      "title": "$1",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "InfoBoda.jsx",
+      "status": "migrated",
+      "title": "{t('navigation.weddingInfo', { defaultValue: 'Información de la Boda' })}",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "Inspiration.jsx",
+      "status": "migrated",
+      "title": "Inspiración",
+      "subtitle": "",
+      "icon": "\ud83c"
+    },
+    {
+      "file": "Invitaciones.jsx",
+      "status": "migrated",
+      "title": "{t('invitations.title')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Invitados.jsx",
+      "status": "migrated",
+      "title": "${title}",
+      "subtitle": "{checkInGuest.email || 'Sin email'} � {checkInGuest.phone || 'Sin tel�fono'}",
+      "icon": ""
+    },
+    {
+      "file": "InvitationDesigner.jsx",
+      "status": "migrated",
+      "title": "Selecciona una plantilla",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Landing2.jsx",
+      "status": "migrated",
+      "title": "Landing2",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Login.jsx",
+      "status": "migrated",
+      "title": "{t('authLogin.title')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Momentos.jsx",
+      "status": "migrated",
+      "title": "Momentos",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "MomentosGuest.jsx",
+      "status": "migrated",
+      "title": "{t('public.moments.guest.errorTitle')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "MomentosPublic.jsx",
+      "status": "migrated",
+      "title": "{t('public.moments.public.errorTitle')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "More.jsx",
+      "status": "migrated",
+      "title": "{t('pages.more.title')}",
+      "subtitle": "{t('pages.more.sections.weddingInfo.description', {\n              defaultValue: 'Configura fecha, lugar, menú, FAQs y más',\n            })}",
+      "icon": ""
+    },
+    {
+      "file": "Notificaciones.jsx",
+      "status": "migrated",
+      "title": "Notificaciones",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "NotificationPreferences.jsx",
+      "status": "migrated",
+      "title": "Notification Preferences",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Perfil.jsx",
+      "status": "migrated",
+      "title": "{t('navigation.profile')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "PhotoShotListPage.jsx",
+      "status": "migrated",
+      "title": "Photo Shot List Page",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "PostBoda.jsx",
+      "status": "migrated",
+      "title": "Post-Boda",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "Protocolo.jsx",
+      "status": "migrated",
+      "title": "{t('protocol.title')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "PruebasEnsayos.jsx",
+      "status": "migrated",
+      "title": "Pruebas y Ensayos",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "PublicQuoteResponse.jsx",
+      "status": "migrated",
+      "title": "Responder Solicitud de Presupuesto",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "PublicWedding.jsx",
+      "status": "migrated",
+      "title": "{w.name || t('public.publicWedding.defaults.title')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "QuoteResponsesPage.jsx",
+      "status": "migrated",
+      "title": "Presupuestos Recibidos",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "ResetPassword.jsx",
+      "status": "migrated",
+      "title": "Reset Password",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "RoleUpgradeHarness.jsx",
+      "status": "migrated",
+      "title": "Harness · Upgrade de roles",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "RSVPConfirm.jsx",
+      "status": "migrated",
+      "title": "{t('public.rsvp.thanksTitle', { name: guest.name })}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "RSVPDashboard.jsx",
+      "status": "migrated",
+      "title": "Dashboard de RSVP",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "SavedSuppliers.jsx",
+      "status": "migrated",
+      "title": "Saved Suppliers",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "SeatingPlan.jsx",
+      "status": "migrated",
+      "title": "Seating Plan",
+      "subtitle": "",
+      "icon": "\ud83c"
+    },
+    {
+      "file": "Signup.jsx",
+      "status": "migrated",
+      "title": "{t('authSignup.title')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "StyleDemo.jsx",
+      "status": "migrated",
+      "title": "Planivia",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "SupplierPortal.jsx",
+      "status": "migrated",
+      "title": "{t('public.supplierPortal.thanksTitle')}",
+      "subtitle": "",
+      "icon": "️"
+    },
+    {
+      "file": "SupplierPublicPage.jsx",
+      "status": "migrated",
+      "title": "{supplier.name}",
+      "subtitle": "No hay fotos en esta categoría",
+      "icon": ""
+    },
+    {
+      "file": "SupplierRegistration.jsx",
+      "status": "migrated",
+      "title": "{t('suppliers.publicRegistration.success.title')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "Tasks.jsx",
+      "status": "migrated",
+      "title": "Tasks",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "TasksAI.jsx",
+      "status": "migrated",
+      "title": "Tasks A I",
+      "subtitle": "",
+      "icon": "\ud83c"
+    },
+    {
+      "file": "Timing.jsx",
+      "status": "migrated",
+      "title": "Timing",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "TramitesLegales.jsx",
+      "status": "migrated",
+      "title": "Trámites Legales",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "TransporteLogistica.jsx",
+      "status": "migrated",
+      "title": "Transporte y Logística",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "UnifiedEmail.jsx",
+      "status": "migrated",
+      "title": "Buzón",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "VerifyEmail.jsx",
+      "status": "migrated",
+      "title": "Verify Email",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "WebEditor.jsx",
+      "status": "migrated",
+      "title": "Editor de mi web",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "WeddingServices.jsx",
+      "status": "migrated",
+      "title": "Wedding Services",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "WeddingSite.jsx",
+      "status": "migrated",
+      "title": "{profile.coupleName || t('public.weddingSite.defaults.title')}",
+      "subtitle": "",
+      "icon": ""
+    },
+    {
+      "file": "WeddingTeam.jsx",
+      "status": "migrated",
+      "title": "Wedding Team",
+      "subtitle": "",
+      "icon": "\ud83d"
+    },
+    {
+      "file": "WeddingTeamHarness.jsx",
+      "status": "migrated",
+      "title": "Harness - Gestion de equipo",
+      "subtitle": "",
+      "icon": ""
+    }
+  ],
+  "alreadyMigrated": [],
+  "errors": [],
+  "noFunction": [
+    {
+      "file": "AdminAITraining.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "DJDownloadsPage.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "EmailSetup.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "FinanceRediseñada.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "GestionProveedores.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "Home.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "InvitadosEspeciales.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "PartnerStats.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "Proveedores.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "ProveedoresNuevo.backup.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "ProveedoresNuevo.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "PublicRSVP.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "PublicWeb.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "SubscriptionDashboard.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "SupplierCompare.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "WebBuilderDashboard.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "WebBuilderPage.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "WebBuilderPageCraft.jsx",
+      "status": "no_function_found"
+    },
+    {
+      "file": "WebPreview.jsx",
+      "status": "no_function_found"
+    }
+  ]
+}

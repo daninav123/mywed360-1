@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
@@ -15,7 +15,6 @@ import {
   X,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
-
 export default function SupplierPublicPage() {
   const { slug } = useParams(); // URL: /p/nombre-proveedor
   const navigate = useNavigate();
@@ -365,7 +364,7 @@ export default function SupplierPublicPage() {
                 )}
               </div>
             )}
-            <div className="mt-4 text-gray-400 text-sm">
+            <div className="mt-4  text-sm" style={{ color: 'var(--color-muted)' }}>
               {lightboxIndex + 1} / {filteredPortfolio.length}
             </div>
           </div>

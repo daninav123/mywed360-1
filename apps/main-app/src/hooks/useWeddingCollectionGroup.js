@@ -1,3 +1,8 @@
+/**
+ * @deprecated Este hook usa Firebase Firestore.
+ * Este hook se eliminará en futuras versiones.
+ * Considera usar APIs específicas de PostgreSQL en su lugar.
+ */
 import { collectionGroup, onSnapshot, query as fQuery } from 'firebase/firestore';
 import { useEffect, useMemo, useState } from 'react';
 

@@ -1,9 +1,8 @@
-import { collection, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+﻿import { collection, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { db } from '../firebaseConfig';
-
 export default function DevEnsureFinance() {
   const { t } = useTranslation();
   const [status, setStatus] = useState('');

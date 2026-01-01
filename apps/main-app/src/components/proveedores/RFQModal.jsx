@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
-import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
+import useWeddingData from '../../hooks/useWeddingData';
 import { formatDate } from '../../utils/formatUtils';
 import useRFQTemplates from '../../hooks/useRFQTemplates';
 import { post as apiPost } from '../../services/apiClient';

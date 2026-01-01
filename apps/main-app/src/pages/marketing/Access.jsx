@@ -138,13 +138,13 @@ const Access = ({ defaultMode = 'login' }) => {
   );
 
   const heroCopy = t(`marketingAccess.hero.${mode}`, { returnObjects: true });
-  const heroBadge = t('marketingAccess.hero.badge', { defaultValue: 'MaLoveApp Access' });
+  const heroBadge = t('marketingAccess.hero.badge');
   const heroFeatures = Array.isArray(heroCopy?.features) ? heroCopy.features : [];
   const heroTitle =
     heroCopy?.title ||
     (mode === 'signup'
-      ? t('marketingAccess.hero.signup.title', { defaultValue: 'Welcome to MaLoveApp' })
-      : t('marketingAccess.hero.login.title', { defaultValue: 'Manage everything from one place' }));
+      ? t('marketingAccess.hero.signup.title')
+      : t('marketingAccess.hero.login.title'));
   const heroDescription =
     heroCopy?.description ||
     (mode === 'signup'
@@ -312,13 +312,13 @@ const Access = ({ defaultMode = 'login' }) => {
       <div className="layout-container space-y-6">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 rounded-full border border-soft bg-white/95 px-3 py-1 text-xs font-medium text-muted transition hover:text-body"
+          className="inline-flex items-center gap-2 rounded-full border border-soft /95 px-3 py-1 text-xs font-medium text-muted transition hover:text-body" style={{ backgroundColor: 'var(--color-surface)' }}
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           {t('marketingAccess.backLink', { defaultValue: 'Back to home' })}
         </Link>
 
-        <section className="overflow-hidden rounded-3xl border border-soft bg-white/95 shadow-lg">
+        <section className="overflow-hidden rounded-3xl border border-soft /95 shadow-lg" style={{ backgroundColor: 'var(--color-surface)' }}>
           <div className="grid gap-10 p-8 lg:grid-cols-[1fr,0.85fr] lg:items-start lg:p-12">
             <div className="space-y-5">
               <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
@@ -329,7 +329,7 @@ const Access = ({ defaultMode = 'login' }) => {
               {heroFeatures.length > 0 ? (
                 <div className="flex flex-wrap gap-2 text-xs text-muted">
                   {heroFeatures.map((feature) => (
-                    <span key={feature} className="rounded-full border border-soft bg-white/95 px-3 py-1">
+                    <span key={feature} className="rounded-full border border-soft /95 px-3 py-1" style={{ backgroundColor: 'var(--color-surface)' }}>
                       {feature}
                     </span>
                   ))}
@@ -337,7 +337,7 @@ const Access = ({ defaultMode = 'login' }) => {
               ) : null}
             </div>
 
-            <div className="rounded-3xl border border-soft bg-white p-6 shadow-lg">
+            <div className="rounded-3xl border border-soft  p-6 shadow-lg" style={{ backgroundColor: 'var(--color-surface)' }}>
               {alreadyLoggedIn ? (
                 <div className="space-y-6 text-center">
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-[color:var(--color-primary)]">
@@ -384,7 +384,7 @@ const Access = ({ defaultMode = 'login' }) => {
                             : 'bg-transparent text-muted hover:text-body'
                         }`}
                       >
-                        {t('marketingAccess.toggle.login', { defaultValue: 'Sign in' })}
+                        {t('marketingAccess.toggle.login')}
                       </button>
                       <button
                         type="button"
@@ -395,7 +395,7 @@ const Access = ({ defaultMode = 'login' }) => {
                             : 'bg-transparent text-muted hover:text-body'
                         }`}
                       >
-                        {t('marketingAccess.toggle.signup', { defaultValue: 'Create account' })}
+                        {t('marketingAccess.toggle.signup')}
                       </button>
                     </div>
                   </div>
@@ -404,7 +404,7 @@ const Access = ({ defaultMode = 'login' }) => {
                     <form onSubmit={handleLoginSubmit} className="space-y-4 text-left" noValidate>
                       <div className="space-y-2">
                         <label htmlFor="access-login-email" className="text-sm font-medium text-body">
-                          {t('marketingAccess.loginForm.emailLabel', { defaultValue: 'Email' })}
+                          {t('marketingAccess.loginForm.emailLabel')}
                         </label>
                         <input
                           id="access-login-email"
@@ -413,7 +413,7 @@ const Access = ({ defaultMode = 'login' }) => {
                           value={loginEmail}
                           onChange={(event) => setLoginEmail(event.target.value)}
                           autoComplete="email"
-                          placeholder={t('marketingAccess.loginForm.emailPlaceholder', { defaultValue: 'your@email.com' })}
+                          placeholder={t('marketingAccess.loginForm.emailPlaceholder')}
                           className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                           aria-invalid={loginError ? 'true' : 'false'}
                         />
@@ -421,7 +421,7 @@ const Access = ({ defaultMode = 'login' }) => {
 
                       <div className="space-y-2">
                         <label htmlFor="access-login-password" className="text-sm font-medium text-body">
-                          {t('marketingAccess.loginForm.passwordLabel', { defaultValue: 'Password' })}
+                          {t('marketingAccess.loginForm.passwordLabel')}
                         </label>
                         <input
                           id="access-login-password"
@@ -430,7 +430,7 @@ const Access = ({ defaultMode = 'login' }) => {
                           value={loginPassword}
                           onChange={(event) => setLoginPassword(event.target.value)}
                           autoComplete="current-password"
-                          placeholder={t('marketingAccess.loginForm.passwordPlaceholder', { defaultValue: 'Your password' })}
+                          placeholder={t('marketingAccess.loginForm.passwordPlaceholder')}
                           className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
                           aria-invalid={loginError ? 'true' : 'false'}
                         />
@@ -444,10 +444,10 @@ const Access = ({ defaultMode = 'login' }) => {
                             checked={rememberLogin}
                             onChange={(event) => setRememberLogin(event.target.checked)}
                           />
-                          {t('marketingAccess.loginForm.rememberMe', { defaultValue: 'Remember me' })}
+                          {t('marketingAccess.loginForm.rememberMe')}
                         </label>
                         <Link to="/reset-password" className="text-[color:var(--color-primary)] hover:brightness-110">
-                          {t('marketingAccess.loginForm.forgotPassword', { defaultValue: 'Forgot password?' })}
+                          {t('marketingAccess.loginForm.forgotPassword')}
                         </Link>
                       </div>
 

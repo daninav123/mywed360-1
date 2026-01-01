@@ -11,19 +11,22 @@ if (import.meta.env.DEV) {
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-
 export default function BudgetApprovalHarnessGuardRail() {
   const { t } = useTranslation();
 
   if (import.meta.env.DEV) {
     return (
-      <div style={{ padding: '2rem' }}>
+    
+      
+<div style={{ padding: '2rem' }}>
         <h1>{t('BudgetApprovalHarness')}</h1>
         <p>
           {t('Este componente ahora vive en')} <code>src/pages/test/BudgetApprovalHarness.jsx</code>.
         </p>
       </div>
-    );
+      
+    
+  );
   }
 
   return null;

@@ -1,3 +1,8 @@
+/**
+ * @deprecated Este hook usa Firebase Firestore.
+ * USA EN SU LUGAR: Hooks específicos de PostgreSQL (useGuests, useChecklist, etc.)
+ * Este hook se eliminará en futuras versiones.
+ */
 import { useWeddingCollection } from './useWeddingCollection';
 import { useWedding } from '../context/WeddingContext';
 

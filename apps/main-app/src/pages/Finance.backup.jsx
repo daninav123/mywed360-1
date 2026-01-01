@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import BudgetManager from '../components/finance/BudgetManager';
@@ -22,7 +22,6 @@ import Modal from '../components/Modal';
 import TransactionForm from '../components/finance/TransactionForm';
 import { normalizeBudgetCategoryKey } from '../utils/budgetCategories';
 import Card from '../components/ui/Card';
-
 function Finance() {
   const { t } = useTranslations();
   const { providers: supplierProviders = [] } = useProveedores();
@@ -400,7 +399,8 @@ function Finance() {
         benchmarks={benchmarkData}
         onApplyBenchmark={handleApplyBenchmark}
       />
-    </div>
+    
+    
   );
 }
 

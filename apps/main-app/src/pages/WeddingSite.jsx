@@ -1,4 +1,4 @@
-import { differenceInSeconds } from 'date-fns';
+﻿import { differenceInSeconds } from 'date-fns';
 import { doc, getDoc, collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,6 @@ import ExternalImage from '@/components/ExternalImage';
 import useTranslations from '../hooks/useTranslations';
 import { db } from '../firebaseConfig';
 import sanitizeHtml from '../utils/sanitizeHtml';
-
 /*
   P�gina p�blica one-page con la informaci�n de la boda.
   Ruta: /w/:uid  (ej. https://example.com/w/abc123)
@@ -87,7 +86,7 @@ export default function WeddingSite() {
     );
 
   return (
-    <div className="font-sans text-gray-800">
+    <div className="font-sans " style={{ color: 'var(--color-text)' }}>
       {/* Hero */}
       <section
         className="min-h-[80vh] bg-cover bg-center flex flex-col items-center justify-center text-center text-white"
@@ -99,7 +98,7 @@ export default function WeddingSite() {
         <p className="text-2xl mb-6 drop-shadow">
           {profile.date} " {profile.celebrationPlace}
         </p>
-        <div className="flex gap-4 text-xl bg-white/20 backdrop-blur-sm px-6 py-2 rounded">
+        <div className="flex gap-4 text-xl /20 backdrop-blur-sm px-6 py-2 rounded" style={{ backgroundColor: 'var(--color-surface)' }}>
           <span>{t('public.weddingSite.countdown.days', { value: countdown.days })}</span>
           <span>{t('public.weddingSite.countdown.hours', { value: countdown.hours })}</span>
           <span>
@@ -123,7 +122,7 @@ export default function WeddingSite() {
 
       {/* Programa */}
       {schedule.length > 0 && (
-        <section className="bg-gray-100 py-8">
+        <section className=" py-8" style={{ backgroundColor: 'var(--color-bg)' }}>
           <h2 className="text-3xl font-semibold text-center mb-6">
             {t('public.weddingSite.defaults.timelineTitle')}
           </h2>
@@ -214,7 +213,7 @@ export default function WeddingSite() {
 
       {/* Mapa / alojamiento */}
       {profile.celebrationPlace && (
-        <section className="py-8 bg-gray-100 px-4">
+        <section className="py-8  px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
           <h2 className="text-3xl font-semibold text-center mb-6">
             {t('public.weddingSite.defaults.mapTitle')}
           </h2>
@@ -230,9 +229,82 @@ export default function WeddingSite() {
         </section>
       )}
 
-      <footer className="py-6 text-center text-sm text-gray-500">
-        � {new Date().getFullYear()} {profile.coupleName || ''}
-      </footer>
-    </div>
+    {/* RSVP */}
+    <section className="py-8 bg-pink-50 px-4">
+      <h2 className="text-3xl font-semibold text-center mb-6">
+        {t('public.weddingSite.defaults.rsvpTitle')}
+      </h2>
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
+        <input
+          required
+          placeholder={t('public.weddingSite.rsvp.placeholders.name')}
+          className="border w-full px-3 py-2 rounded"
+          value={rsvp.name}
+          onChange={(e) => setRsvp({ ...rsvp, name: e.target.value })}
+        />
+        <input
+          type="number"
+          min="1"
+          className="border w-full px-3 py-2 rounded"
+          value={rsvp.guests}
+          onChange={(e) => setRsvp({ ...rsvp, guests: +e.target.value })}
+          placeholder={t('public.weddingSite.rsvp.placeholders.guests')}
+        />
+        <select
+          className="border w-full px-3 py-2 rounded"
+          value={rsvp.response}
+          onChange={(e) => setRsvp({ ...rsvp, response: e.target.value })}
+        >
+          <option value="yes">{t('public.weddingSite.rsvp.options.yes')}</option>
+          <option value="no">{t('public.weddingSite.rsvp.options.no')}</option>
+        </select>
+        <textarea
+          placeholder={t('public.weddingSite.rsvp.placeholders.message')}
+          className="border w-full px-3 py-2 rounded"
+          rows="3"
+          value={rsvp.message}
+          onChange={(e) => setRsvp({ ...rsvp, message: e.target.value })}
+        />
+        <button className="bg-pink-600 text-white px-4 py-2 rounded w-full">
+          {t('public.weddingSite.rsvp.button')}
+        </button>
+      </form>
+    </section>
+
+    {/* Regalos */}
+    {profile.giftAccount && (
+      <section className="py-8 text-center px-4">
+        <h2 className="text-3xl font-semibold mb-4">
+          {t('public.weddingSite.defaults.giftsTitle')}
+        </h2>
+        <p className="mb-2">
+          {t('public.weddingSite.defaults.giftsDescription')}
+        </p>
+        <code className="text-lg">{profile.giftAccount}</code>
+      </section>
+    )}
+
+    {/* Mapa / alojamiento */}
+    {profile.celebrationPlace && (
+      <section className="py-8  px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <h2 className="text-3xl font-semibold text-center mb-6">
+          {t('public.weddingSite.defaults.mapTitle')}
+        </h2>
+        <div className="max-w-4xl mx-auto">
+          <iframe
+            title="Mapa"
+            className="w-full h-64 rounded"
+            loading="lazy"
+            allowFullScreen
+            src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_KEY&q=${encodeURIComponent(profile.celebrationPlace)}`}
+          />
+        </div>
+      </section>
+    )}
+
+    <footer className="py-6 text-center text-sm " style={{ color: 'var(--color-muted)' }}>
+      {new Date().getFullYear()} {profile.coupleName || ''}
+    </footer>
+  </div>
   );
 }

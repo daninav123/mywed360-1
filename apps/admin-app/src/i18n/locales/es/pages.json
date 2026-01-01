@@ -1,0 +1,324 @@
+{
+  "invitations": {
+    "title": "Diseño de Invitaciones",
+    "subtitle": "Crea hermosas invitaciones para tu boda",
+    "aiAssistant": {
+      "title": "Asistente de IA",
+      "placeholder": "Describe cómo quieres tu invitación...",
+      "generate": "Generar invitación",
+      "generating": "Generando..."
+    },
+    "templateSelection": {
+      "title": "Selección de Plantilla",
+      "allStyles": "Todos los estilos",
+      "allPalettes": "Todas las paletas",
+      "allTypographies": "Todas las tipografías",
+      "classic": "Clásico",
+      "modern": "Moderno",
+      "rustic": "Rústico",
+      "minimalist": "Minimalista",
+      "pastel": "Pastel",
+      "vibrant": "Vibrante",
+      "earth": "Tierra",
+      "monochrome": "Monocromo",
+      "serif": "Serif",
+      "sans": "Sans",
+      "handwriting": "Manuscrita"
+    },
+    "customization": {
+      "title": "Personalización",
+      "preview": "Vista previa"
+    },
+    "sending": {
+      "title": "Enviar Invitaciones",
+      "testEmail": "Enviar email de prueba",
+      "sendToAll": "Enviar a todos los invitados",
+      "sending": "Enviando...",
+      "subject": "Invitación a nuestra boda"
+    },
+    "buttons": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "finish": "Finalizar",
+      "saveDraft": "Guardar borrador",
+      "duplicate": "Duplicar diseño"
+    },
+    "toast": {
+      "generated": "Invitación generada",
+      "saved": "Borrador guardado",
+      "duplicated": "Diseño duplicado",
+      "error": "Error generando invitación"
+    }
+  },
+  "moments": {
+    "title": "Momentos",
+    "subtitle": "Comparte y gestiona los recuerdos de tu boda",
+    "tabs": {
+      "overview": "Resumen",
+      "moderation": "Moderación",
+      "slideshow": "Slideshow",
+      "downloads": "Descargas"
+    },
+    "guestShare": {
+      "title": "Compartir con invitados",
+      "shareLink": "Compartir enlace",
+      "createToken": "Crear token de acceso",
+      "copyLink": "Copiar enlace"
+    },
+    "album": {
+      "loading": "Cargando álbum...",
+      "notFound": "Álbum no encontrado",
+      "createAlbum": "Crear álbum"
+    }
+  },
+  "ideas": {
+    "title": "Ideas y Notas",
+    "subtitle": "Guarda y organiza tus ideas de boda",
+    "tabs": {
+      "notes": "Notas",
+      "inspiration": "Inspiración",
+      "diary": "Diario de Boda"
+    },
+    "notes": {
+      "title": "Notas",
+      "addNote": "Añadir nota",
+      "folder": "Carpeta",
+      "newFolder": "Nueva carpeta",
+      "delete": "Eliminar nota",
+      "confirmDelete": "¿Eliminar esta nota?"
+    },
+    "inspiration": {
+      "title": "Inspiración",
+      "addPost": "Añadir inspiración",
+      "upload": "Subir imagen",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "diary": {
+      "title": "Diario de Boda",
+      "addEntry": "Añadir entrada",
+      "date": "Fecha",
+      "mood": "Estado de ánimo",
+      "content": "¿Qué te ronda por la cabeza?"
+    }
+  },
+  "children": {
+    "title": "Gestión de Niños",
+    "subtitle": "Planifica actividades y menú para niños",
+    "activities": {
+      "title": "Actividades",
+      "addActivity": "Añadir actividad",
+      "type": "Tipo",
+      "time": "Hora",
+      "provider": "Proveedor",
+      "ageRange": "Rango de edad",
+      "notes": "Notas",
+      "completed": "Completada"
+    },
+    "menu": {
+      "title": "Menú Infantil",
+      "addItem": "Añadir elemento",
+      "item": "Elemento",
+      "quantity": "Cantidad",
+      "notes": "Notas"
+    },
+    "types": {
+      "games": "Juegos de mesa",
+      "crafts": "Manualidades",
+      "facepainting": "Pintacaras",
+      "balloons": "Globoflexia",
+      "storytelling": "Cuentacuentos",
+      "costumes": "Rincón de disfraces",
+      "videogames": "Videojuegos",
+      "castle": "Castillo hinchable",
+      "magic": "Show de magia",
+      "animation": "Animación infantil"
+    },
+    "menuOptions": {
+      "nuggets": "Nuggets de pollo",
+      "pasta": "Pasta con tomate",
+      "pizza": "Mini pizzas",
+      "burger": "Mini hamburguesas",
+      "salad": "Ensalada",
+      "fruit": "Fruta fresca",
+      "vegetables": "Verduras crudas",
+      "icecream": "Helado",
+      "juice": "Zumos naturales",
+      "water": "Agua"
+    }
+  },
+  "specialGuests": {
+    "title": "Necesidades Especiales de Invitados",
+    "subtitle": "Gestiona restricciones dietéticas y adaptaciones especiales",
+    "add": "Añadir necesidad especial",
+    "search": "Buscar por nombre...",
+    "filters": {
+      "all": "Todos",
+      "dietary": "Dietéticas",
+      "allergies": "Alergias",
+      "accessibility": "Accesibilidad"
+    },
+    "diets": {
+      "vegetarian": "Vegetariana",
+      "vegan": "Vegana",
+      "celiac": "Celíaca / Sin gluten",
+      "lactose": "Sin lactosa",
+      "kosher": "Kosher",
+      "halal": "Halal",
+      "diabetes": "Diabética",
+      "other": "Otra"
+    },
+    "allergies": {
+      "title": "Alergias",
+      "common": ["Frutos secos", "Mariscos", "Pescado", "Huevo", "Lácteos", "Gluten", "Soja", "Sulfitos", "Mostaza", "Sésamo"]
+    },
+    "needs": {
+      "mobility": "Movilidad reducida",
+      "visual": "Discapacidad visual",
+      "hearing": "Discapacidad auditiva",
+      "pregnant": "Embarazada",
+      "baby": "Con bebé",
+      "elderly": "Persona mayor",
+      "other": "Otra"
+    },
+    "form": {
+      "name": "Nombre del invitado",
+      "table": "Mesa",
+      "diets": "Dietas",
+      "allergies": "Alergias",
+      "needs": "Necesidades especiales",
+      "notes": "Notas especiales",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "summary": {
+      "total": "Total con necesidades especiales",
+      "dietary": "Restricciones dietéticas",
+      "allergies": "Alergias",
+      "accessibility": "Necesidades de accesibilidad"
+    }
+  },
+  "legalDocuments": {
+    "title": "Generador de Documentos Legales (MVP)",
+    "subtitle": "Genera consentimientos y documentos legales",
+    "type": "Tipo",
+    "date": "Fecha",
+    "place": "Lugar",
+    "coupleName": "Nombre de los novios",
+    "thirdPartyName": "Nombre del tercero",
+    "types": {
+      "imageConsent": "Consentimiento de uso de imagen"
+    },
+    "generate": "Generar PDF",
+    "generating": "Generando..."
+  },
+  "contracts": {
+    "title": "Contratos",
+    "subtitle": "Gestiona contratos y acuerdos con proveedores",
+    "add": "Nuevo contrato",
+    "supplier": "Proveedor",
+    "service": "Servicio",
+    "amount": "Importe",
+    "date": "Fecha",
+    "status": "Estado",
+    "actions": "Acciones",
+    "statuses": {
+      "pending": "Pendiente",
+      "signed": "Firmado",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
+    }
+  },
+  "emailTemplates": {
+    "title": "Plantillas de Email",
+    "subtitle": "Crea y gestiona plantillas de correo",
+    "add": "Nueva plantilla",
+    "name": "Nombre de la plantilla",
+    "subject": "Asunto",
+    "body": "Cuerpo",
+    "save": "Guardar plantilla",
+    "delete": "Eliminar",
+    "preview": "Vista previa",
+    "variables": "Variables disponibles",
+    "variablesList": [
+      "{{guestName}} - Nombre del invitado",
+      "{{weddingDate}} - Fecha de la boda",
+      "{{venue}} - Nombre del lugar",
+      "{{rsvpLink}} - Enlace de confirmación"
+    ]
+  },
+  "relatedEvents": {
+    "title": "Eventos Relacionados",
+    "subtitle": "Gestiona eventos pre y post boda",
+    "add": "Añadir evento",
+    "name": "Nombre del evento",
+    "date": "Fecha",
+    "time": "Hora",
+    "location": "Ubicación",
+    "description": "Descripción",
+    "guestList": "Lista de invitados",
+    "types": {
+      "engagement": "Fiesta de compromiso",
+      "bridal": "Despedida de soltera",
+      "bachelor": "Despedida de soltero",
+      "rehearsal": "Cena de ensayo",
+      "welcome": "Fiesta de bienvenida",
+      "brunch": "Brunch del día después"
+    }
+  },
+  "weddingDay": {
+    "title": "Día de la Boda",
+    "subtitle": "Cronograma y coordinación para tu gran día",
+    "timeline": "Cronograma",
+    "addEvent": "Añadir evento",
+    "time": "Hora",
+    "event": "Evento",
+    "location": "Ubicación",
+    "responsible": "Responsable",
+    "notes": "Notas",
+    "status": "Estado",
+    "statuses": {
+      "pending": "Pendiente",
+      "inProgress": "En progreso",
+      "completed": "Completado"
+    }
+  },
+  "helpCeremony": {
+    "title": "Ayuda para la Ceremonia",
+    "subtitle": "Consejos y guía para tu ceremonia",
+    "sections": {
+      "preparation": "Preparación",
+      "traditions": "Tradiciones",
+      "vows": "Votos",
+      "music": "Música",
+      "readings": "Lecturas"
+    }
+  },
+  "djDownloads": {
+    "title": "Descargas para DJ",
+    "subtitle": "Descarga tu playlist de música",
+    "playlist": "Lista de reproducción",
+    "download": "Descargar",
+    "format": "Formato",
+    "quality": "Calidad"
+  },
+  "inbox": {
+    "title": "Bandeja de Correo",
+    "subtitle": "Gestiona tus comunicaciones de boda",
+    "compose": "Redactar",
+    "folders": {
+      "inbox": "Bandeja de entrada",
+      "sent": "Enviados",
+      "drafts": "Borradores",
+      "trash": "Papelera"
+    },
+    "filters": {
+      "all": "Todos",
+      "unread": "No leídos",
+      "important": "Importantes",
+      "suppliers": "Proveedores",
+      "guests": "Invitados"
+    },
+    "search": "Buscar correos..."
+  }
+}

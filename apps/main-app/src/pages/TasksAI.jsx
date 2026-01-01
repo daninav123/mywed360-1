@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { useWedding } from '../context/WeddingContext';
 import { collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -16,7 +16,6 @@ import NextStepHero from '../components/tasks/NextStepHero';
 import RoadmapView from '../components/tasks/RoadmapView';
 import { personalizeTaskTemplate, buildWeddingContext } from '../services/taskPersonalizationService';
 import { seedWeddingTasksFromTemplate } from '../services/taskTemplateSeeder';
-
 /**
  * Nueva página de tareas con IA - Rediseño completo
  * Vista Kanban moderna con análisis IA integrado
@@ -601,7 +600,7 @@ export default function TasksAI() {
                       />
                     ))}
                     {organizedTasks.pending.length === 0 && (
-                      <div className="text-center py-8 text-gray-400">
+                      <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
                         <p className="text-sm">No hay tareas pendientes</p>
                       </div>
                     )}
@@ -652,7 +651,7 @@ export default function TasksAI() {
                       />
                     ))}
                     {organizedTasks.inProgress.length === 0 && (
-                      <div className="text-center py-8 text-gray-400">
+                      <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
                         <p className="text-sm">No hay tareas en progreso</p>
                       </div>
                     )}
@@ -703,7 +702,7 @@ export default function TasksAI() {
                       />
                     ))}
                     {organizedTasks.blocked.length === 0 && (
-                      <div className="text-center py-8 text-gray-400">
+                      <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
                         <p className="text-sm">No hay tareas bloqueadas</p>
                       </div>
                     )}
@@ -753,7 +752,7 @@ export default function TasksAI() {
                       />
                     ))}
                     {organizedTasks.completed.length === 0 && (
-                      <div className="text-center py-8 text-gray-400">
+                      <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
                         <p className="text-sm">¡Aún no has completado ninguna tarea!</p>
                       </div>
                     )}
@@ -771,12 +770,12 @@ export default function TasksAI() {
 
           {/* Vista Estadísticas (placeholder) */}
           {viewMode === 'stats' && (
-            <div className="bg-white rounded-xl p-8 text-center border border-gray-200 shadow-sm">
-              <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className=" rounded-xl p-8 text-center border  shadow-sm" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <BarChart3 className="w-16 h-16 mx-auto mb-4 " style={{ color: 'var(--color-muted)' }} />
+              <h3 className="text-xl font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                 Estadísticas Avanzadas
               </h3>
-              <p className="text-gray-600">
+              <p className="" style={{ color: 'var(--color-text-secondary)' }}>
                 Próximamente: Dashboard con análisis profundo y predicciones IA
               </p>
             </div>

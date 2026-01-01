@@ -1,4 +1,4 @@
-import { doc, onSnapshot, collection, query, where, orderBy, limit } from 'firebase/firestore';
+﻿import { doc, onSnapshot, collection, query, where, orderBy, limit } from 'firebase/firestore';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -10,7 +10,6 @@ import { db } from '../firebaseConfig';
 import { post as apiPost } from '../services/apiClient';
 import { evaluateTrigger } from '../services/AutomationRulesService';
 import { addNotification } from '../services/notificationService';
-
 const formatTimestamp = (value) => {
   if (!value) return '';
   try {
@@ -234,28 +233,28 @@ export default function RSVPDashboard() {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-semibold">Dashboard de RSVP</h1>
       {!stats ?(
-        <div className="text-gray-600">Sin datos de respuestas todavía.</div>
+        <div className="" style={{ color: 'var(--color-text-secondary)' }}>Sin datos de respuestas todavía.</div>
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="border rounded p-4 bg-surface">
-              <div className="text-sm text-gray-500">Invitaciones</div>
+              <div className="text-sm " style={{ color: 'var(--color-muted)' }}>Invitaciones</div>
               <div className="text-2xl font-bold">{stats.totalInvitations || 0}</div>
             </div>
             <div className="border rounded p-4 bg-surface">
-              <div className="text-sm text-gray-500">Respuestas</div>
+              <div className="text-sm " style={{ color: 'var(--color-muted)' }}>Respuestas</div>
               <div className="text-2xl font-bold">{stats.totalResponses || 0}</div>
             </div>
             <div className="border rounded p-4 bg-surface">
-              <div className="text-sm text-gray-500">Asistentes Confirmados</div>
+              <div className="text-sm " style={{ color: 'var(--color-muted)' }}>Asistentes Confirmados</div>
               <div className="text-2xl font-bold">{stats.confirmedAttendees || 0}</div>
             </div>
             <div className="border rounded p-4 bg-surface">
-              <div className="text-sm text-gray-500">Rechazadas</div>
+              <div className="text-sm " style={{ color: 'var(--color-muted)' }}>Rechazadas</div>
               <div className="text-2xl font-bold">{stats.declinedInvitations || 0}</div>
             </div>
             <div className="border rounded p-4 bg-surface">
-              <div className="text-sm text-gray-500">Pendientes</div>
+              <div className="text-sm " style={{ color: 'var(--color-muted)' }}>Pendientes</div>
               <div className="text-2xl font-bold">{stats.pendingResponses || 0}</div>
             </div>
           </div>
@@ -263,25 +262,25 @@ export default function RSVPDashboard() {
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <div className="border rounded p-4 bg-surface">
               <h2 className="font-semibold mb-2">Embudo de respuestas</h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                 Tasa de respuesta:{' '}
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold " style={{ color: 'var(--color-text)' }}>
                   {computedMetrics.responseRate}%
                 </span>
               </p>
               <div className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-green-500"
+                  className="h-full " style={{ backgroundColor: 'var(--color-success)' }}
                   style={{ width: `${Math.min(computedMetrics.responseRate, 100)}%` }}
                 />
               </div>
-              <div className="flex justify-between text-xs text-gray-500 mt-2">
+              <div className="flex justify-between text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
                 <span>Confirmados {computedMetrics.confirmRate}%</span>
                 <span>Pendientes {computedMetrics.pendingRate}%</span>
                 <span>Rechazos {computedMetrics.declineRate}%</span>
               </div>
               {computedMetrics.avgMinutes != null && (
-                <p className="text-xs text-gray-500 mt-3">
+                <p className="text-xs  mt-3" style={{ color: 'var(--color-muted)' }}>
                   Tiempo medio de respuesta: {Math.round(computedMetrics.avgMinutes)} min
                 </p>
               )}
@@ -290,21 +289,21 @@ export default function RSVPDashboard() {
             <div className="border rounded p-4 bg-surface lg:col-span-2">
               <h2 className="font-semibold mb-2">Evolución últimos días</h2>
               {timelineData.length === 0 ? (
-                <div className="text-sm text-gray-600">
+                <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                   Aún no hay suficientes datos históricos.
                 </div>
               ) : (
                 <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-3">
                   {timelineData.map((point) => (
                     <div key={point.label} className="flex flex-col items-center">
-                      <div className="w-full h-24 bg-gray-100 rounded relative overflow-hidden">
+                      <div className="w-full h-24  rounded relative overflow-hidden" style={{ backgroundColor: 'var(--color-bg)' }}>
                         <div
-                          className="absolute bottom-0 left-0 right-0 bg-green-500"
+                          className="absolute bottom-0 left-0 right-0 " style={{ backgroundColor: 'var(--color-success)' }}
                           style={{ height: `${Math.min(point.confirmedRate, 100)}%` }}
                         />
                       </div>
-                      <div className="text-xs text-gray-500 mt-1 text-center">{point.label}</div>
-                      <div className="text-xs font-medium text-gray-700">
+                      <div className="text-xs  mt-1 text-center" style={{ color: 'var(--color-muted)' }}>{point.label}</div>
+                      <div className="text-xs font-medium " style={{ color: 'var(--color-text)' }}>
                         {point.confirmed} confirmados
                       </div>
                     </div>
@@ -316,13 +315,13 @@ export default function RSVPDashboard() {
             <div className="border rounded p-4 bg-surface">
               <h2 className="font-semibold mb-2">Canales principales</h2>
               {channelBreakdown.length === 0 ? (
-                <div className="text-sm text-gray-600">Sin datos por canal todavía.</div>
+                <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>Sin datos por canal todavía.</div>
               ) : (
                 <ul className="space-y-1 text-sm">
                   {channelBreakdown.map((item) => (
                     <li key={item.channel} className="flex justify-between">
-                      <span className="capitalize text-gray-600">{item.channel}</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="capitalize " style={{ color: 'var(--color-text-secondary)' }}>{item.channel}</span>
+                      <span className="font-medium " style={{ color: 'var(--color-text)' }}>
                         {item.count} ({item.rate}%)
                       </span>
                     </li>
@@ -335,7 +334,7 @@ export default function RSVPDashboard() {
           {stats.dietaryRestrictions && (
             <div className="border rounded p-4 bg-surface">
               <h2 className="font-semibold mb-3">Restricciones dietéticas</h2>
-              <ul className="text-sm text-gray-700 space-y-1">
+              <ul className="text-sm  space-y-1" style={{ color: 'var(--color-text)' }}>
                 <li>Vegetarianos: {stats.dietaryRestrictions.vegetarian || 0}</li>
                 <li>Veganos: {stats.dietaryRestrictions.vegan || 0}</li>
                 <li>Sin gluten: {stats.dietaryRestrictions.glutenFree || 0}</li>
@@ -379,7 +378,7 @@ export default function RSVPDashboard() {
                   Simular recordatorios
                 </button>
                 <button
-                  className="px-3 py-1 border rounded bg-blue-600 text-white text-sm"
+                  className="px-3 py-1 border rounded  text-white text-sm" style={{ backgroundColor: 'var(--color-primary)' }}
                   disabled={!activeWedding || sending}
                   onClick={async () => {
                     if (!activeWedding) return;
@@ -412,13 +411,13 @@ export default function RSVPDashboard() {
               </div>
             </div>
             {loadingPending ?(
-              <div className="text-gray-600">Cargando pendientes…</div>
+              <div className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando pendientes…</div>
             ) : pendingGuests.length === 0 ?(
-              <div className="text-gray-600">Sin pendientes ahora mismo.</div>
+              <div className="" style={{ color: 'var(--color-text-secondary)' }}>Sin pendientes ahora mismo.</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
-                  <thead className="bg-gray-50">
+                  <thead className="" style={{ backgroundColor: 'var(--color-bg)' }}>
                     <tr>
                       <th className="px-3 py-2 text-left">Nombre</th>
                       <th className="px-3 py-2 text-left">Email</th>
@@ -475,7 +474,7 @@ export default function RSVPDashboard() {
                         <span>
                           {label}{count ? ` · ${count}` : ''}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs " style={{ color: 'var(--color-muted)' }}>
                           {formatTimestamp(log.timestamp)}
                         </span>
                       </li>

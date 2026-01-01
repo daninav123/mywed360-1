@@ -25,7 +25,7 @@ import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useSupplierContacts } from '../../contexts/SupplierContactsContext';
-import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
+import useWeddingData from '../../hooks/useWeddingData';
 import RequestQuoteModal from './RequestQuoteModal';
 import ImageGalleryModal from './ImageGalleryModal';
 

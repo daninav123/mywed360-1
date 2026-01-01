@@ -102,7 +102,12 @@ const LanguageSelector = ({
       <div className={`relative language-selector ${className}`}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-full transition-all"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            border: '2px solid rgba(255,255,255,0.8)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          }}
           title={t('navigation.settings', { defaultValue: 'Ajustes' })}
           disabled={isChanging}
         >

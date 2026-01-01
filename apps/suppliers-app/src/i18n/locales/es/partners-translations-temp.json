@@ -1,0 +1,104 @@
+{
+  "partners": {
+    "hero": {
+      "title": "Gana Comisiones Ayudando a Parejas a Organizar Su Boda Perfecta",
+      "subtitle": "Únete a nuestro programa de partners y recibe comisiones recurrentes por cada cliente que refieras. Sin inversión inicial. Comisiones atractivas. Material de marketing incluido.",
+      "cta": "Solicitar Acceso al Programa",
+      "secondary": "Contáctanos"
+    },
+    "benefits": {
+      "title": "Por Qué Ser Partner",
+      "subtitle": "Beneficios diseñados para maximizar tu potencial de ingresos",
+      "commissions": {
+        "title": "Comisiones Atractivas",
+        "description": "Gana comisiones recurrentes por cada suscripción que vendas"
+      },
+      "dashboard": {
+        "title": "Dashboard de Seguimiento",
+        "description": "Monitorea tus conversiones, comisiones y estadísticas en tiempo real"
+      },
+      "materials": {
+        "title": "Material de Marketing",
+        "description": "Acceso a presentaciones, demos y recursos para facilitar tus ventas"
+      },
+      "support": {
+        "title": "Soporte Dedicado",
+        "description": "Equipo de soporte disponible para ayudarte con tus clientes"
+      },
+      "training": {
+        "title": "Formación Incluida",
+        "description": "Capacitación completa sobre la plataforma y mejores prácticas de venta"
+      },
+      "unlimited": {
+        "title": "Sin Límites",
+        "description": "No hay techo en tus comisiones. Cuanto más vendas, más ganas"
+      }
+    },
+    "process": {
+      "title": "Cómo Funciona",
+      "subtitle": "Empieza a generar ingresos en 4 simples pasos",
+      "step1": {
+        "title": "Únete al Programa",
+        "description": "Completa el formulario de solicitud y espera nuestra aprobación"
+      },
+      "step2": {
+        "title": "Recibe Formación",
+        "description": "Accede a materiales y sesiones de capacitación sobre la plataforma"
+      },
+      "step3": {
+        "title": "Comparte tu Link",
+        "description": "Recibe tu enlace único de afiliado para rastrear tus conversiones"
+      },
+      "step4": {
+        "title": "Gana Comisiones",
+        "description": "Recibe comisiones recurrentes por cada cliente que se suscriba"
+      }
+    },
+    "profiles": {
+      "title": "¿Eres un Buen Candidato?",
+      "subtitle": "Buscamos profesionales con conexiones en el sector nupcial",
+      "consultants": {
+        "title": "Consultores de Bodas",
+        "description": "Asesores que trabajan con parejas y pueden recomendar herramientas profesionales"
+      },
+      "influencers": {
+        "title": "Influencers del Sector",
+        "description": "Creadores de contenido con audiencia interesada en organización de bodas"
+      },
+      "eventPros": {
+        "title": "Profesionales de Eventos",
+        "description": "Organizadores de eventos que pueden introducir nuestra plataforma a su red de contactos"
+      }
+    },
+    "form": {
+      "badge": "Solicitud de Acceso",
+      "title": "Únete al Programa de Partners",
+      "description": "Completa el formulario y nuestro equipo revisará tu solicitud. Te contactaremos en menos de 48 horas.",
+      "name": "Nombre Completo *",
+      "namePlaceholder": "Tu nombre",
+      "email": "Email *",
+      "emailPlaceholder": "tu@email.com",
+      "experienceLabel": "Experiencia en el Sector",
+      "experiencePlaceholder": "Selecciona una opción",
+      "experience": {
+        "consultant": "Consultor/a de Bodas",
+        "influencer": "Influencer / Creador de Contenido",
+        "eventPro": "Profesional de Eventos",
+        "supplier": "Proveedor de Servicios de Boda",
+        "other": "Otro"
+      },
+      "about": "Cuéntanos Sobre Ti",
+      "aboutPlaceholder": "Describe tu experiencia, tu red de contactos y por qué quieres ser partner...",
+      "submit": "Enviar Solicitud",
+      "submitting": "Enviando...",
+      "success": "¡Gracias por tu interés! Revisaremos tu solicitud y te contactaremos pronto.",
+      "error": "Por favor completa todos los campos obligatorios.",
+      "consent": "Al enviar este formulario aceptas que revisemos tu perfil y nos pongamos en contacto contigo. No compartimos tu información con terceros."
+    },
+    "cta": {
+      "title": "¿Listo Para Empezar a Generar Ingresos Recurrentes?",
+      "subtitle": "Únete a nuestro programa de partners y empieza a ganar comisiones hoy mismo",
+      "primary": "Solicitar Acceso Ahora"
+    }
+  }
+}

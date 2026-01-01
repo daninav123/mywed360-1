@@ -99,7 +99,7 @@ const AdminAITraining = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <Sparkles className="w-12 h-12 mx-auto mb-4 text-blue-500 animate-pulse" />
-          <p className="text-gray-600">Cargando estadísticas de IA...</p>
+          <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando estadísticas de IA...</p>
         </div>
       </div>
     );
@@ -115,8 +115,8 @@ const AdminAITraining = () => {
               <Brain className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Entrenamiento de IA</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className="text-3xl font-bold " style={{ color: 'var(--color-text)' }}>Entrenamiento de IA</h1>
+              <p className=" mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                 Mejora continua del análisis de presupuestos
               </p>
             </div>
@@ -137,16 +137,16 @@ const AdminAITraining = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Precisión General</p>
-              <p className="text-3xl font-bold text-green-600">
+              <p className="text-sm  mb-1" style={{ color: 'var(--color-text-secondary)' }}>Precisión General</p>
+              <p className="text-3xl font-bold " style={{ color: 'var(--color-success)' }}>
                 {stats?.overallAccuracy || 0}%
               </p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-green-600" />
+              <TrendingUp className="w-6 h-6 " style={{ color: 'var(--color-success)' }} />
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
             {stats?.perfect || 0} presupuestos perfectos
           </p>
         </Card>
@@ -154,16 +154,16 @@ const AdminAITraining = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Validados</p>
-              <p className="text-3xl font-bold text-blue-600">
+              <p className="text-sm  mb-1" style={{ color: 'var(--color-text-secondary)' }}>Total Validados</p>
+              <p className="text-3xl font-bold " style={{ color: 'var(--color-primary)' }}>
                 {stats?.total || 0}
               </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-blue-600" />
+              <CheckCircle className="w-6 h-6 " style={{ color: 'var(--color-primary)' }} />
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
             Presupuestos revisados por usuarios
           </p>
         </Card>
@@ -171,7 +171,7 @@ const AdminAITraining = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Con Correcciones</p>
+              <p className="text-sm  mb-1" style={{ color: 'var(--color-text-secondary)' }}>Con Correcciones</p>
               <p className="text-3xl font-bold text-amber-600">
                 {stats?.withCorrections || 0}
               </p>
@@ -180,7 +180,7 @@ const AdminAITraining = () => {
               <AlertCircle className="w-6 h-6 text-amber-600" />
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
             La IA está aprendiendo de estos
           </p>
         </Card>
@@ -188,14 +188,14 @@ const AdminAITraining = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Objetivo</p>
+              <p className="text-sm  mb-1" style={{ color: 'var(--color-text-secondary)' }}>Objetivo</p>
               <p className="text-3xl font-bold text-purple-600">95%</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-lg">
               <Sparkles className="w-6 h-6 text-purple-600" />
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
             Meta de precisión automática
           </p>
         </Card>
@@ -204,21 +204,21 @@ const AdminAITraining = () => {
       {/* Formulario de Añadir Ejemplo */}
       {showAddForm && (
         <Card className="p-6 mb-8 border-2 border-blue-200">
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-blue-600" />
+          <h3 className="text-xl font-bold  mb-4 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+            <FileText className="w-5 h-5 " style={{ color: 'var(--color-primary)' }} />
             Añadir Ejemplo Manual de Presupuesto
           </h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                   Categoría *
                 </label>
                 <select
                   value={formData.categoryName}
                   onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500" style={{ borderColor: 'var(--color-border)' }}
                   required
                 >
                   <option value="">Seleccionar categoría</option>
@@ -232,54 +232,54 @@ const AdminAITraining = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                   Nombre del Proveedor
                 </label>
                 <input
                   type="text"
                   value={formData.supplierName}
                   onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500" style={{ borderColor: 'var(--color-border)' }}
                   placeholder={t('admin.aiTraining.questionPlaceholder')}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                   Precio Total (€)
                 </label>
                 <input
                   type="number"
                   value={formData.totalPrice}
                   onChange={(e) => setFormData({ ...formData, totalPrice: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500" style={{ borderColor: 'var(--color-border)' }}
                   placeholder="1500"
                   step="0.01"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                   Tiempo de Entrega
                 </label>
                 <input
                   type="text"
                   value={formData.deliveryTime}
                   onChange={(e) => setFormData({ ...formData, deliveryTime: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500" style={{ borderColor: 'var(--color-border)' }}
                   placeholder={t('admin.aiTraining.searchPlaceholder')} del evento"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                 Texto del Email / Presupuesto *
               </label>
               <textarea
                 value={formData.emailBody}
                 onChange={(e) => setFormData({ ...formData, emailBody: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500" style={{ borderColor: 'var(--color-border)' }}
                 rows={6}
                 placeholder={t('admin.aiTraining.searchPlaceholder')} completo del presupuesto..."
                 required
@@ -287,27 +287,27 @@ const AdminAITraining = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                 Servicios Incluidos (uno por línea)
               </label>
               <textarea
                 value={formData.servicesIncluded}
                 onChange={(e) => setFormData({ ...formData, servicesIncluded: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500" style={{ borderColor: 'var(--color-border)' }}
                 rows={4}
                 placeholder="DJ 4 horas&#10;Equipo de sonido&#10;Luces LED"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                 Condiciones de Pago
               </label>
               <input
                 type="text"
                 value={formData.paymentTerms}
                 onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500" style={{ borderColor: 'var(--color-border)' }}
                 placeholder={t('admin.aiTraining.responsePlaceholder')}, 50% día del evento"
               />
             </div>
@@ -330,8 +330,8 @@ const AdminAITraining = () => {
 
       {/* Precisión por Campo */}
       <Card className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-blue-600" />
+        <h3 className="text-xl font-bold  mb-6 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+          <BarChart3 className="w-5 h-5 " style={{ color: 'var(--color-primary)' }} />
           Precisión por Campo
         </h3>
 
@@ -344,7 +344,7 @@ const AdminAITraining = () => {
               return (
                 <div key={field}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-gray-700 capitalize">
+                    <span className="text-sm font-semibold  capitalize" style={{ color: 'var(--color-text)' }}>
                       {field.replace(/([A-Z])/g, ' $1').trim()}
                     </span>
                     <span className={`text-sm font-bold ${
@@ -367,7 +367,7 @@ const AdminAITraining = () => {
                       style={{ width: `${accuracy}%` }}
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
                     {count} correcciones de {stats.total} presupuestos
                   </p>
                 </div>
@@ -375,7 +375,7 @@ const AdminAITraining = () => {
             })}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
             <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p>Aún no hay suficientes datos para mostrar estadísticas por campo.</p>
             <p className="text-sm mt-1">Los usuarios deben validar más presupuestos.</p>

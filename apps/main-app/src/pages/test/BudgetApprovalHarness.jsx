@@ -50,12 +50,12 @@ function BudgetApprovalHarness() {
           <div
             key={budget.id}
             data-testid={`budget-${budget.id}`}
-            className="border rounded-lg p-4 bg-white shadow"
+            className="border rounded-lg p-4  shadow" style={{ backgroundColor: 'var(--color-surface)' }}
           >
             <div className="flex justify-between items-start mb-2">
               <div>
                 <h3 className="font-semibold text-lg">{budget.supplierName}</h3>
-                <p className="text-sm text-gray-600">{budget.service}</p>
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{budget.service}</p>
               </div>
               <div className="text-right">
                 <p className="font-bold text-lg">{budget.amount}€</p>
@@ -77,21 +77,21 @@ function BudgetApprovalHarness() {
               </div>
             </div>
             
-            <p className="text-sm text-gray-700 mb-4">{budget.description}</p>
+            <p className="text-sm  mb-4" style={{ color: 'var(--color-text)' }}>{budget.description}</p>
             
             {budget.status === 'pending' && (
               <div className="flex gap-2">
                 <button
                   data-testid={`accept-${budget.id}`}
                   onClick={() => handleAccept(budget.id)}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                  className="px-4 py-2  text-white rounded hover:bg-green-700" style={{ backgroundColor: 'var(--color-success)' }}
                 >
                   Aceptar
                 </button>
                 <button
                   data-testid={`reject-${budget.id}`}
                   onClick={() => handleReject(budget.id)}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  className="px-4 py-2  text-white rounded hover:bg-red-700" style={{ backgroundColor: 'var(--color-danger)' }}
                 >
                   Rechazar
                 </button>
@@ -101,7 +101,7 @@ function BudgetApprovalHarness() {
         ))}
       </div>
       
-      <div className="mt-8 p-4 bg-gray-100 rounded">
+      <div className="mt-8 p-4  rounded" style={{ backgroundColor: 'var(--color-bg)' }}>
         <h2 className="font-semibold mb-2">Resumen</h2>
         <p data-testid="summary-pending">
           Pendientes: {budgets.filter((b) => b.status === 'pending').length}

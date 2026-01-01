@@ -315,7 +315,7 @@ function buildTemplatePrefill(info) {
 
 export default function DocumentosLegales() {
   const { activeWedding } = useWedding();
-  const { info: weddingInfo } = useActiveWeddingInfo();
+  const { weddingData: weddingInfo } = useWeddingData();
   const { t } = useTranslations();
   const { currentUser } = useAuth();
   const tr = (key, def) => {
@@ -603,7 +603,7 @@ export default function DocumentosLegales() {
   // Handler para generar tareas automáticas
   const handleGenerateTasks = async () => {
     if (!activeWedding || !activeCountry || !currentUser?.uid) {
-      toast.error('Faltan datos necesarios para generar tareas');
+      toast.error(tr('documents.tasksGenerateError', 'Faltan datos necesarios para generar tareas'));
       return;
     }
 
@@ -620,7 +620,7 @@ export default function DocumentosLegales() {
 
       if (taskIds.length > 0) {
         await createLegalReminders(activeWedding, taskIds, currentUser.uid);
-        toast.success(`✅ ${taskIds.length} tareas creadas automáticamente en tu lista de tareas`, {
+        toast.success(tr('documents.tasksCreated', '✅ {count} tareas creadas automáticamente en tu lista de tareas').replace('{count}', taskIds.length), {
           autoClose: 5000,
         });
         performanceMonitor.logEvent('legal_tasks_auto_generated', {
@@ -630,11 +630,11 @@ export default function DocumentosLegales() {
           tasksCount: taskIds.length,
         });
       } else {
-        toast.info('No se pudieron generar tareas para esta selección');
+        toast.info(tr('documents.noTasksGenerated', 'No se pudieron generar tareas para esta selección'));
       }
     } catch (error) {
       console.error('Error generando tareas:', error);
-      toast.error('Error al generar tareas automáticas');
+      toast.error(tr('documents.tasksGenerateErrorGeneric', 'Error al generar tareas automáticas'));
     } finally {
       setGeneratingTasks(false);
     }
@@ -644,7 +644,7 @@ export default function DocumentosLegales() {
     <PageWrapper title="Documentos">
       {!activeWedding && (
         <Card className="p-6">
-          <p className="text-gray-700">Selecciona una boda activa para gestionar documentos.</p>
+          <p className="" style={{ color: 'var(--color-text)' }}>Selecciona una boda activa para gestionar documentos.</p>
         </Card>
       )}
 
@@ -679,10 +679,21 @@ export default function DocumentosLegales() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Búsqueda de país */}
                 <div>
+                  <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                    🔍 Buscar país
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Escribe para buscar..."
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
 
                 {/* Filtro por región */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                     🌍 Región
                   </label>
                   <select
@@ -701,7 +712,7 @@ export default function DocumentosLegales() {
 
                 {/* Selector de país */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                     🗺️ País {currentCountryRegion && `(${currentCountryRegion.label})`}
                   </label>
                   <select
@@ -716,14 +727,14 @@ export default function DocumentosLegales() {
                     ))}
                   </select>
                   {filteredCountries.length === 0 && (
-                    <p className="text-xs text-red-600 mt-1">No hay países con ese criterio</p>
+                    <p className="text-xs  mt-1" style={{ color: 'var(--color-danger)' }}>No hay países con ese criterio</p>
                   )}
                 </div>
               </div>
 
               {/* Selector de tipo de matrimonio */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                   💍 Tipo de matrimonio
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -744,13 +755,17 @@ export default function DocumentosLegales() {
                 </div>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mb-3">
+          </Card>
+
+          {/* Requisitos legales */}
+          <Card className="p-6">
+            <p className="text-sm  mb-3" style={{ color: 'var(--color-text-secondary)' }}>
               Esta lista es orientativa y puede variar según municipio, Registro Civil o diócesis.
               Confirma siempre con tu oficina/parroquia.
             </p>
             <div className="space-y-2">
               {requirementsList.length === 0 && (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                   No hay requisitos configurados para este tipo en{' '}
                   {activeCountry?.name || form.region}.
                 </p>
@@ -793,7 +808,7 @@ export default function DocumentosLegales() {
                       />
                       <span>{label}</span>
                     </label>
-                    <div className="pl-6 flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                    <div className="pl-6 flex flex-wrap items-center gap-2 text-xs " style={{ color: 'var(--color-text-secondary)' }}>
                       <input
                         id={inputId}
                         type="file"
@@ -901,7 +916,7 @@ export default function DocumentosLegales() {
                       />
                       <label
                         htmlFor={inputId}
-                        className="px-2 py-1 border rounded cursor-pointer hover:bg-gray-50"
+                        className="px-2 py-1 border rounded cursor-pointer hover:" style={{ backgroundColor: 'var(--color-bg)' }}
                       >
                         {uploadingReq[progressKey]
                           ? 'Subiendo...'
@@ -924,7 +939,7 @@ export default function DocumentosLegales() {
                             <span>{fileMeta.filename || 'Archivo'}</span>
                           )}
                           <button
-                            className="text-red-600"
+                            className="" style={{ color: 'var(--color-danger)' }}
                             onClick={async () => {
                               let storageDeletedOk = true;
                               let firestoreDeletedOk = true;
@@ -1054,7 +1069,7 @@ export default function DocumentosLegales() {
                         href={link.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+                        className="inline-flex items-center gap-1  hover:underline" style={{ color: 'var(--color-primary)' }}
                       >
                         {link.label || link.url}
                         <span aria-hidden="true">↗</span>
@@ -1122,27 +1137,27 @@ export default function DocumentosLegales() {
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Descargables</h2>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                 {form.region === 'ES' ? 'España' : form.region}
               </div>
             </div>
             {templatesForSelection.length === 0 && (
-              <p className="text-gray-600 text-sm">No hay descargables para la selección actual.</p>
+              <p className=" text-sm" style={{ color: 'var(--color-text-secondary)' }}>No hay descargables para la selección actual.</p>
             )}
             {templatesForSelection.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {templatesForSelection.map((tpl) => (
                   <div
                     key={tpl.id}
-                    placeholder={t('protocol.documents.searchCountryPlaceholder')} className="border rounded-lg p-3 flex items-center justify-between bg-white"
+                    placeholder={t('protocol.documents.searchCountryPlaceholder')} className="border rounded-lg p-3 flex items-center justify-between " style={{ backgroundColor: 'var(--color-surface)' }}
                   >
                     <div>
                       <div className="font-medium">{tpl.title}</div>
-                      {tpl.desc && <div className="text-xs text-gray-600">{tpl.desc}</div>}
+                      {tpl.desc && <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{tpl.desc}</div>}
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:bg-gray-50"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:" style={{ backgroundColor: 'var(--color-bg)' }}
                         onClick={() => {
                           try {
                             const data = buildTemplatePrefill(weddingInfo);
@@ -1164,7 +1179,7 @@ export default function DocumentosLegales() {
                         <Download size={16} /> .DOC
                       </button>
                       <button
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:bg-gray-50"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:" style={{ backgroundColor: 'var(--color-bg)' }}
                         onClick={async () => {
                           try {
                             const data = buildTemplatePrefill(weddingInfo);

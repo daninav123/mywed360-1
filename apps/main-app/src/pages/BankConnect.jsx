@@ -1,4 +1,4 @@
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+﻿import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +8,6 @@ import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
 import useTranslations from '../hooks/useTranslations';
 import { getInstitutions, createRequisition, getRequisition } from '../services/bankConnectService';
-
 export default function BankConnect() {
   const { t } = useTranslations();
   const { activeWedding } = useWedding();
@@ -104,10 +103,7 @@ export default function BankConnect() {
   const hasAccounts = useMemo(() => accounts.length > 0, [accounts]);
 
   return (
-    <PageWrapper
-      title={t('finance.bank.title', { defaultValue: 'Vincular cuenta bancaria' })}
-      className="layout-container max-w-3xl space-y-6"
-    >
+    <PageWrapper>
       <Card className="space-y-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-6">
           <div className="w-full md:w-36">

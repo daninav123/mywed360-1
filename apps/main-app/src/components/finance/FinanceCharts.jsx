@@ -80,7 +80,7 @@ const buildExpenseDistribution = (transactions, t) => {
     .filter((tx) => tx.type === 'expense')
     .forEach((tx) => {
       const category =
-        tx.category || t('finance.transactions.noCategory', { defaultValue: 'Sin categoría' });
+        tx.category || t('finance.transactions.noCategory');
       distribution[category] = toFinite(distribution[category]) + toFinite(tx.amount);
     });
   return Object.entries(distribution)
@@ -151,7 +151,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
-                {t('finance.charts.totalTransactions', { defaultValue: 'Transacciones' })}
+                {t('finance.charts.totalTransactions')}
               </p>
               <p className="text-2xl font-black text-body">{totalTransactions}</p>
             </div>
@@ -163,7 +163,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
-                {t('finance.charts.activeCategories', { defaultValue: 'Categorías' })}
+                {t('finance.charts.activeCategories')}
               </p>
               <p className="text-2xl font-black text-[color:var(--color-success)]">{activeCategories}</p>
             </div>
@@ -175,7 +175,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
-                {t('finance.charts.budgetEfficiency', { defaultValue: 'Eficiencia' })}
+                {t('finance.charts.budgetEfficiency')}
               </p>
               <p className="text-2xl font-black text-[color:var(--color-warning)]">{efficiency}%</p>
             </div>
@@ -187,7 +187,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           <div className="flex items-center justify-between">
             <div>
               <p className={`text-xs font-bold uppercase tracking-wider ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'} mb-1`}>
-                {t('finance.charts.projectedBalance', { defaultValue: 'Balance' })}
+                {t('finance.charts.projectedBalance')}
               </p>
               <p className={`text-2xl font-black ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>
                 {formatCurrency(safeStats.currentBalance)}
@@ -204,14 +204,10 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
-                {t('finance.charts.budgetVsSpentByCategory', {
-                  defaultValue: 'Presupuesto vs Gastado',
-                })}
+                {t('finance.charts.budgetVsSpentByCategory')}
               </h3>
               <p className="text-xs text-[color:var(--color-text-60)]">
-                {t('finance.charts.budgetVsSpentDesc', {
-                  defaultValue: 'Compara lo asignado vs lo gastado por categoría',
-                })}
+                {t('finance.charts.budgetVsSpentDesc')}
               </p>
             </div>
             <div className="p-2 rounded-lg bg-[var(--color-primary-10)]">
@@ -233,18 +229,18 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
                   <Bar
                     dataKey="presupuestado"
                     fill="var(--color-primary)"
-                    name={t('finance.charts.budgeted', { defaultValue: 'Presupuestado' })}
+                    name={t('finance.charts.budgeted')}
                   />
                   <Bar
                     dataKey="gastado"
                     fill="var(--color-danger)"
-                    name={t('finance.charts.spent', { defaultValue: 'Gastado' })}
+                    name={t('finance.charts.spent')}
                   />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-[color:var(--color-text-70)]">
-                {t('finance.charts.noData', { defaultValue: 'No hay datos suficientes' })}
+                {t('finance.charts.noData')}
               </div>
             )}
           </div>
@@ -254,14 +250,10 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
-                {t('finance.charts.expenseDistributionByCategory', {
-                  defaultValue: 'Distribución de Gastos',
-                })}
+                {t('finance.charts.expenseDistributionByCategory')}
               </h3>
               <p className="text-xs text-[color:var(--color-text-60)]">
-                {t('finance.charts.expenseDistributionDesc', {
-                  defaultValue: 'Proporción de cada categoría en el total de gastos',
-                })}
+                {t('finance.charts.expenseDistributionDesc')}
               </p>
             </div>
             <div className="p-2 rounded-lg bg-[var(--color-danger-10)]">
@@ -297,14 +289,10 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
-                {t('finance.charts.monthlyTrend', {
-                  defaultValue: 'Tendencia Mensual',
-                })}
+                {t('finance.charts.monthlyTrend')}
               </h3>
               <p className="text-xs text-[color:var(--color-text-60)]">
-                {t('finance.charts.monthlyTrendDesc', {
-                  defaultValue: 'Evolución de ingresos, gastos y balance mes a mes',
-                })}
+                {t('finance.charts.monthlyTrendDesc')}
               </p>
             </div>
             <div className="p-2 rounded-lg bg-[var(--color-success-10)]">
@@ -328,14 +316,14 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
                     dataKey="ingresos"
                     stroke="var(--color-success)"
                     strokeWidth={2}
-                    name={t('finance.charts.income', { defaultValue: 'Ingresos' })}
+                    name={t('finance.charts.income')}
                   />
                   <Line
                     type="monotone"
                     dataKey="gastos"
                     stroke="var(--color-danger)"
                     strokeWidth={2}
-                    name={t('finance.charts.expenses', { defaultValue: 'Gastos' })}
+                    name={t('finance.charts.expenses')}
                   />
                   <Line
                     type="monotone"
@@ -343,13 +331,13 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
                     stroke="var(--color-primary)"
                     strokeWidth={2}
                     strokeDasharray="5 5"
-                    name={t('finance.charts.balance', { defaultValue: 'Balance' })}
+                    name={t('finance.charts.balance')}
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-[color:var(--color-text-70)]">
-                {t('finance.charts.noData', { defaultValue: 'No hay datos suficientes' })}
+                {t('finance.charts.noData')}
               </div>
             )}
           </div>
@@ -359,14 +347,10 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
-                {t('finance.charts.budgetProgressByCategory', {
-                  defaultValue: 'Progreso del Presupuesto',
-                })}
+                {t('finance.charts.budgetProgressByCategory')}
               </h3>
               <p className="text-xs text-[color:var(--color-text-60)]">
-                {t('finance.charts.budgetProgressDesc', {
-                  defaultValue: 'Porcentaje de uso y exceso por categoría',
-                })}
+                {t('finance.charts.budgetProgressDesc')}
               </p>
             </div>
             <div className="p-2 rounded-lg bg-[var(--color-warning-10)]">
@@ -388,26 +372,26 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
                     formatter={(value, name) => [
                       `${Number(toFinite(value)).toFixed(1)}%`,
                       name === 'porcentaje'
-                        ? t('finance.charts.used', { defaultValue: 'Usado' })
-                        : t('finance.charts.excess', { defaultValue: 'Exceso' }),
+                        ? t('finance.charts.used')
+                        : t('finance.charts.excess'),
                     ]}
                   />
                   <Legend />
                   <Bar
                     dataKey="porcentaje"
                     fill="var(--color-success)"
-                    name={t('finance.charts.used', { defaultValue: 'Usado' })}
+                    name={t('finance.charts.used')}
                   />
                   <Bar
                     dataKey="exceso"
                     fill="var(--color-danger)"
-                    name={t('finance.charts.excess', { defaultValue: 'Exceso' })}
+                    name={t('finance.charts.excess')}
                   />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-[color:var(--color-text-70)]">
-                {t('finance.charts.noData', { defaultValue: 'No hay datos suficientes' })}
+                {t('finance.charts.noData')}
               </div>
             )}
           </div>

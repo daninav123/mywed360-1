@@ -18,7 +18,7 @@ const router = express.Router();
 // LOG DE CARGA DEL MÓDULO - ACTUALIZADO CON BUCKET CORRECTO
 logger.info('[supplier-dashboard] Módulo cargado', {
   timestamp: new Date().toISOString(),
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'lovenda-98c77.firebasestorage.app',
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'planivia-98c77.firebasestorage.app',
 });
 
 // Log TODAS las peticiones que lleguen a este router
@@ -100,11 +100,15 @@ router.post('/auth/login', express.json(), async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    logger.info(`[supplier-login] Login attempt for email: ${email}`);
+
     if (!email || !password) {
+      logger.warn('[supplier-login] Missing email or password');
       return res.status(400).json({ error: 'email_password_required' });
     }
 
     // Buscar proveedor por email
+    logger.info(`[supplier-login] Searching for supplier with email: ${email.toLowerCase()}`);
     const suppliersQuery = await db
       .collection('suppliers')
       .where('contact.email', '==', email.toLowerCase())
@@ -112,8 +116,11 @@ router.post('/auth/login', express.json(), async (req, res) => {
       .get();
 
     if (suppliersQuery.empty) {
+      logger.warn(`[supplier-login] Supplier not found for email: ${email.toLowerCase()}`);
       return res.status(401).json({ error: 'invalid_credentials' });
     }
+
+    logger.info(`[supplier-login] Supplier found, checking password...`);
 
     const supplierDoc = suppliersQuery.docs[0];
     const supplierData = supplierDoc.data();
@@ -750,7 +757,7 @@ router.post('/portfolio/upload', requireSupplierAuth, upload.single('image'), as
     // Subir a Firebase Storage usando Admin SDK (sin CORS)
     // Firebase ahora usa .firebasestorage.app como bucket por defecto
     const bucketName =
-      process.env.VITE_FIREBASE_STORAGE_BUCKET || 'lovenda-98c77.firebasestorage.app';
+      process.env.VITE_FIREBASE_STORAGE_BUCKET || 'planivia-98c77.firebasestorage.app';
     logger.info(`[upload] Usando bucket: ${bucketName}`);
     const bucket = admin.storage().bucket(bucketName);
     const storagePath = `suppliers/${req.supplier.id}/portfolio/${fileName}`;

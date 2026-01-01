@@ -1,10 +1,7 @@
-import { doc, onSnapshot, setDoc, serverTimestamp, collection, getDocs } from 'firebase/firestore';
-import { useState, useEffect, useCallback, useRef } from 'react';
-
+import { useState, useEffect, useCallback } from 'react';
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
+import { tasksAPI } from '../services/apiService';
 
-// Categorías de ítems del checklist
 const CATEGORIES = {
   DOCUMENTATION: 'documentation',
   PROVIDERS: 'providers',
@@ -14,23 +11,19 @@ const CATEGORIES = {
   TECHNICAL: 'technical',
 };
 
-// Estados posibles de los ítems
 const ITEM_STATUS = {
   PENDING: 'pending',
   IN_PROGRESS: 'in-progress',
   DONE: 'done',
 };
 
-// Colores para los estados
 const STATUS_COLORS = {
   [ITEM_STATUS.PENDING]: 'gray',
   [ITEM_STATUS.IN_PROGRESS]: 'yellow',
   [ITEM_STATUS.DONE]: 'green',
 };
 
-// Ítems por defecto del checklist
 const DEFAULT_ITEMS = [
-  // Documentación
   {
     id: 'doc-marriage-certificate',
     label: 'Certificado de matrimonio',
@@ -61,8 +54,6 @@ const DEFAULT_ITEMS = [
     relatedDocType: 'witness_docs',
     critical: false,
   },
-  
-  // Proveedores
   {
     id: 'prov-catering',
     label: 'Confirmación catering',
@@ -103,8 +94,6 @@ const DEFAULT_ITEMS = [
     relatedDocType: null,
     critical: false,
   },
-  
-  // Ceremonia
   {
     id: 'cer-vows',
     label: 'Votos preparados',
@@ -145,8 +134,6 @@ const DEFAULT_ITEMS = [
     relatedDocType: null,
     critical: true,
   },
-  
-  // Contingencia
   {
     id: 'cont-weather',
     label: 'Plan B por clima',
@@ -171,162 +158,87 @@ const DEFAULT_ITEMS = [
 
 const MAX_CUSTOM_ITEMS = 50;
 
-export default function useChecklist() {
+export default function useChecklistPostgres() {
   const { activeWedding } = useWedding();
-  const [items, setItems] = useState(DEFAULT_ITEMS);
+  const [items, setItems] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [syncInProgress, setSyncInProgress] = useState(false);
-  const unsubRef = useRef(null);
-  const unsubDocsRef = useRef(null);
 
-  // Cargar documentos relacionados
-  useEffect(() => {
+  const loadTasks = useCallback(async () => {
     if (!activeWedding) return;
-
-    const loadDocuments = async () => {
-      try {
-        const docsRef = collection(db, 'weddings', activeWedding, 'documents');
-        const snapshot = await getDocs(docsRef);
-        const docs = [];
-        
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.relatedCeremonyId || data.type) {
-            docs.push({
-              id: doc.id,
-              ...data,
-            });
-          }
-        });
-        
-        setDocuments(docs);
-      } catch (error) {
-        // console.warn('Error al cargar documentos:', error);
-      }
-    };
-
-    loadDocuments();
-
-    // Suscribirse a cambios en documentos
-    const docsRef = collection(db, 'weddings', activeWedding, 'documents');
-    const unsub = onSnapshot(docsRef, (snapshot) => {
-      const docs = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.relatedCeremonyId || data.type) {
-          docs.push({
-            id: doc.id,
-            ...data,
-          });
-        }
-      });
-      setDocuments(docs);
-    }, (error) => {
-      // console.warn('Error en listener de documentos:', error);
-    });
-
-    unsubDocsRef.current = unsub;
-
-    return () => {
-      if (unsubDocsRef.current) {
-        unsubDocsRef.current();
-        unsubDocsRef.current = null;
-      }
-    };
-  }, [activeWedding]);
-
-  // Cargar y suscribirse a cambios del checklist
-  useEffect(() => {
-    if (!activeWedding) return;
-
-    setLoading(true);
-    const ref = doc(db, 'weddings', activeWedding, 'ceremonyChecklist', 'main');
     
-    const unsub = onSnapshot(ref, (snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        if (data.items && Array.isArray(data.items)) {
-          // Merge con defaults para asegurar que todos los ítems base existan
-          const existingIds = new Set(data.items.map(item => item.id));
-          const mergedItems = [
-            ...data.items,
-            ...DEFAULT_ITEMS.filter(defaultItem => !existingIds.has(defaultItem.id))
-          ];
-          setItems(mergedItems);
-        }
-      } else {
-        // Si no existe, usar defaults
+    setLoading(true);
+    try {
+      const tasks = await tasksAPI.getAll(activeWedding);
+      
+      const mappedItems = tasks.map(task => ({
+        id: task.id,
+        label: task.title,
+        category: task.category,
+        status: task.status,
+        dueDate: task.dueDate,
+        notes: task.notes || '',
+        relatedDocType: task.notes,
+        critical: task.priority === 'high',
+        custom: !DEFAULT_ITEMS.find(di => di.id === task.id),
+      }));
+      
+      if (mappedItems.length === 0) {
         setItems(DEFAULT_ITEMS);
+      } else {
+        const existingIds = new Set(mappedItems.map(item => item.id));
+        const mergedItems = [
+          ...mappedItems,
+          ...DEFAULT_ITEMS.filter(defaultItem => !existingIds.has(defaultItem.id))
+        ];
+        setItems(mergedItems);
       }
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+      setItems(DEFAULT_ITEMS);
+    } finally {
       setLoading(false);
-    }, (error) => {
-      // console.warn('Error al cargar checklist:', error);
-      setLoading(false);
-    });
-
-    unsubRef.current = unsub;
-
-    return () => {
-      if (unsubRef.current) {
-        unsubRef.current();
-        unsubRef.current = null;
-      }
-    };
+    }
   }, [activeWedding]);
 
-  // Guardar cambios en Firestore
-  const saveToFirestore = useCallback(async () => {
-    if (!activeWedding || syncInProgress) return;
-
-    setSyncInProgress(true);
-    try {
-      const ref = doc(db, 'weddings', activeWedding, 'ceremonyChecklist', 'main');
-      await setDoc(
-        ref,
-        {
-          items,
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
-    } catch (error) {
-      // console.error('Error al guardar checklist:', error);
-    } finally {
-      setSyncInProgress(false);
-    }
-  }, [activeWedding, items, syncInProgress]);
-
-  // Guardar cambios con debounce
   useEffect(() => {
-    const timer = setTimeout(() => {
-      saveToFirestore();
-    }, 1000);
+    loadTasks();
+  }, [loadTasks]);
 
-    return () => clearTimeout(timer);
-  }, [items]);
-
-  // Actualizar ítem
-  const updateItem = useCallback((itemId, updates) => {
+  const updateItem = useCallback(async (itemId, updates) => {
+    if (!activeWedding) return;
+    
     setItems((prev) =>
       prev.map((item) =>
         item.id === itemId ? { ...item, ...updates } : item
       )
     );
-  }, []);
 
-  // Añadir ítem personalizado
-  const addCustomItem = useCallback((label, category, dueDate = null) => {
-    const customItemsCount = items.filter(item => 
-      !DEFAULT_ITEMS.find(defaultItem => defaultItem.id === item.id)
-    ).length;
+    try {
+      await tasksAPI.update(itemId, {
+        title: updates.label,
+        status: updates.status,
+        dueDate: updates.dueDate,
+        notes: updates.notes,
+        priority: updates.critical ? 'high' : 'medium',
+      });
+    } catch (error) {
+      console.error('Error updating task:', error);
+      await loadTasks();
+    }
+  }, [activeWedding, loadTasks]);
+
+  const addCustomItem = useCallback(async (label, category, dueDate = null) => {
+    if (!activeWedding) return;
+    
+    const customItemsCount = items.filter(item => item.custom).length;
 
     if (customItemsCount >= MAX_CUSTOM_ITEMS) {
       throw new Error(`Máximo ${MAX_CUSTOM_ITEMS} ítems personalizados permitidos`);
     }
 
     const newItem = {
-      id: `custom-${Date.now()}`,
       label,
       category,
       status: ITEM_STATUS.PENDING,
@@ -337,39 +249,52 @@ export default function useChecklist() {
       custom: true,
     };
 
-    setItems((prev) => [...prev, newItem]);
-    return newItem;
-  }, [items]);
+    try {
+      const created = await tasksAPI.create(activeWedding, {
+        title: label,
+        category,
+        status: ITEM_STATUS.PENDING,
+        dueDate,
+        priority: 'medium',
+      });
+      
+      setItems((prev) => [...prev, { ...newItem, id: created.id }]);
+      return { ...newItem, id: created.id };
+    } catch (error) {
+      console.error('Error creating task:', error);
+      throw error;
+    }
+  }, [activeWedding, items]);
 
-  // Eliminar ítem personalizado
-  const removeCustomItem = useCallback((itemId) => {
-    // Solo permitir eliminar ítems personalizados
+  const removeCustomItem = useCallback(async (itemId) => {
     const item = items.find(i => i.id === itemId);
     if (!item?.custom) {
       throw new Error('Solo se pueden eliminar ítems personalizados');
     }
 
     setItems((prev) => prev.filter((item) => item.id !== itemId));
-  }, [items]);
 
-  // Cambiar estado de un ítem
+    try {
+      await tasksAPI.delete(itemId);
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      await loadTasks();
+    }
+  }, [items, loadTasks]);
+
   const setItemStatus = useCallback((itemId, status) => {
     if (!Object.values(ITEM_STATUS).includes(status)) return;
-
     updateItem(itemId, { status });
   }, [updateItem]);
 
-  // Añadir/actualizar notas
   const setItemNotes = useCallback((itemId, notes) => {
     updateItem(itemId, { notes });
   }, [updateItem]);
 
-  // Establecer fecha límite
   const setItemDueDate = useCallback((itemId, dueDate) => {
     updateItem(itemId, { dueDate });
   }, [updateItem]);
 
-  // Marcar/desmarcar como crítico
   const toggleItemCritical = useCallback((itemId) => {
     const item = items.find(i => i.id === itemId);
     if (item) {
@@ -377,7 +302,6 @@ export default function useChecklist() {
     }
   }, [items, updateItem]);
 
-  // Obtener documentos relacionados con un ítem
   const getItemDocuments = useCallback((itemId) => {
     const item = items.find(i => i.id === itemId);
     if (!item?.relatedDocType) return [];
@@ -388,7 +312,6 @@ export default function useChecklist() {
     );
   }, [items, documents]);
 
-  // Obtener resumen del checklist
   const getChecklistSummary = useCallback(() => {
     const byStatus = {
       [ITEM_STATUS.PENDING]: 0,
@@ -410,10 +333,8 @@ export default function useChecklist() {
     today.setHours(0, 0, 0, 0);
 
     items.forEach(item => {
-      // Por estado
       byStatus[item.status]++;
 
-      // Por categoría
       if (byCategory[item.category]) {
         byCategory[item.category].total++;
         if (item.status === ITEM_STATUS.DONE) {
@@ -421,12 +342,10 @@ export default function useChecklist() {
         }
       }
 
-      // Críticos pendientes
       if (item.critical && item.status !== ITEM_STATUS.DONE) {
         criticalPending.push(item);
       }
 
-      // Vencidos
       if (item.dueDate) {
         const dueDate = new Date(item.dueDate);
         dueDate.setHours(0, 0, 0, 0);
@@ -436,9 +355,9 @@ export default function useChecklist() {
       }
     });
 
-    const completionPercentage = Math.round(
-      (byStatus[ITEM_STATUS.DONE] / items.length) * 100
-    );
+    const completionPercentage = items.length > 0 
+      ? Math.round((byStatus[ITEM_STATUS.DONE] / items.length) * 100)
+      : 0;
 
     return {
       total: items.length,
@@ -451,12 +370,10 @@ export default function useChecklist() {
     };
   }, [items]);
 
-  // Validar si el checklist está listo para el evento
   const validateReadiness = useCallback(() => {
     const summary = getChecklistSummary();
     const issues = [];
 
-    // Verificar ítems críticos
     if (summary.criticalPending.length > 0) {
       issues.push({
         type: 'critical',
@@ -465,7 +382,6 @@ export default function useChecklist() {
       });
     }
 
-    // Verificar ítems vencidos
     if (summary.overdueItems.length > 0) {
       issues.push({
         type: 'overdue',
@@ -474,7 +390,6 @@ export default function useChecklist() {
       });
     }
 
-    // Verificar documentación
     const docCategory = summary.byCategory[CATEGORIES.DOCUMENTATION];
     if (docCategory && docCategory.done < docCategory.total) {
       issues.push({
@@ -483,7 +398,6 @@ export default function useChecklist() {
       });
     }
 
-    // Verificar proveedores
     const provCategory = summary.byCategory[CATEGORIES.PROVIDERS];
     if (provCategory && provCategory.done < provCategory.total) {
       issues.push({
@@ -502,13 +416,10 @@ export default function useChecklist() {
   }, [getChecklistSummary]);
 
   return {
-    // Datos
     items,
     documents,
     loading,
     syncInProgress,
-
-    // Gestión de ítems
     updateItem,
     addCustomItem,
     removeCustomItem,
@@ -516,13 +427,9 @@ export default function useChecklist() {
     setItemNotes,
     setItemDueDate,
     toggleItemCritical,
-
-    // Utilidades
     getItemDocuments,
     getChecklistSummary,
     validateReadiness,
-
-    // Constantes
     CATEGORIES,
     ITEM_STATUS,
     STATUS_COLORS,

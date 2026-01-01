@@ -1,18 +1,6 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc,
-} from 'firebase/firestore';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-
+import { useCallback, useEffect, useState } from 'react';
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
+import { favoritesAPI } from '../services/apiService';
 
 export default function useSupplierShortlist() {
   const { activeWedding } = useWedding();
@@ -20,71 +8,23 @@ export default function useSupplierShortlist() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const collectionRef = useMemo(() => {
-    if (!db || !activeWedding) return null;
-    return collection(db, 'weddings', activeWedding, 'supplierShortlist');
-  }, [activeWedding]);
-
-  const storageKey = useMemo(() => {
-    if (!activeWedding) return 'supplierShortlist_cache';
-    return `supplierShortlist_cache_${activeWedding}`;
-  }, [activeWedding]);
-
-  const persistLocal = useCallback(
-    (nextItems) => {
-      if (!storageKey) return;
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(nextItems));
-      } catch (err) {
-        // console.warn('[useSupplierShortlist] persistLocal failed', err);
-      }
-    },
-    [storageKey]
-  );
-
-  const loadFromCache = useCallback(() => {
-    if (!storageKey) return null;
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        setItems(parsed);
-        return parsed;
-      }
-      return null;
-    } catch (err) {
-      // console.warn('[useSupplierShortlist] loadFromCache failed', err);
-      return null;
-    }
-  }, [storageKey]);
-
   const load = useCallback(async () => {
-    if (!collectionRef) {
+    if (!activeWedding) {
       setItems([]);
-      if (storageKey) {
-        try {
-          localStorage.removeItem(storageKey);
-        } catch {}
-      }
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const q = query(collectionRef, orderBy('createdAt', 'desc'));
-      const snap = await getDocs(q);
-      const list = snap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
-      setItems(list);
-      persistLocal(list);
+      const data = await favoritesAPI.getAll(activeWedding);
+      setItems(Array.isArray(data) ? data : []);
     } catch (err) {
-      // console.warn('[useSupplierShortlist] load failed', err);
-      const cached = loadFromCache();
-      if (!cached) setError(err);
+      console.error('[useSupplierShortlist] load failed', err);
+      setError(err);
     } finally {
       setLoading(false);
     }
-  }, [collectionRef, loadFromCache, persistLocal, storageKey]);
+  }, [activeWedding]);
 
   useEffect(() => {
     load();
@@ -111,45 +51,41 @@ export default function useSupplierShortlist() {
         throw err;
       }
     },
-    [collectionRef, persistLocal]
+    [activeWedding]
   );
 
   const markReviewed = useCallback(
     async (id) => {
-      if (!collectionRef || !id) return;
+      if (!activeWedding) return;
       try {
-        const ref = doc(collectionRef, id);
-        await updateDoc(ref, { reviewedAt: serverTimestamp() });
+        await favoritesAPI.update(activeWedding, id, { reviewed: true });
         setItems((prev) => {
           const next = prev.map((item) =>
-            item.id === id ? { ...item, reviewedAt: new Date().toISOString() } : item
+            item.id === id ? { ...item, reviewed: true } : item
           );
-          persistLocal(next);
           return next;
         });
       } catch (err) {
-        // console.warn('[useSupplierShortlist] markReviewed failed', err);
+        console.error('[useSupplierShortlist] markReviewed failed', err);
       }
     },
-    [collectionRef, persistLocal]
+    [activeWedding]
   );
 
   const removeEntry = useCallback(
     async (id) => {
-      if (!collectionRef || !id) return;
+      if (!activeWedding) return;
       try {
-        const ref = doc(collectionRef, id);
-        await deleteDoc(ref);
+        await favoritesAPI.remove(activeWedding, id);
         setItems((prev) => {
           const next = prev.filter((item) => item.id !== id);
-          persistLocal(next);
           return next;
         });
       } catch (err) {
-        // console.warn('[useSupplierShortlist] removeEntry failed', err);
+        console.error('[useSupplierShortlist] removeEntry failed', err);
       }
     },
-    [collectionRef, persistLocal]
+    [activeWedding]
   );
 
   return {

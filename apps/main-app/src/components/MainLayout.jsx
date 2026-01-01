@@ -41,6 +41,7 @@ export default function MainLayout() {
   const [openMenu, setOpenMenu] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const isHomePage = location.pathname === '/home';
   const hideSelectorRoutes = ['/home', '/tasks'];
   const hideSelector =
     hideSelectorRoutes.some((r) => location.pathname.startsWith(r)) ||
@@ -129,14 +130,15 @@ export default function MainLayout() {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-[var(--color-bg)] text-[color:var(--color-text)] font-sans">
-      <div className="absolute top-6 right-6 z-50 flex items-center space-x-3">
-        {/* Watchers de notificaciones (sin icono visible aquí) */}
-        <NotificationWatcher intervalMs={3000} />
-        <TaskNotificationWatcher intervalMs={5 * 60 * 1000} />
-        {(import.meta.env.PROD || import.meta.env.VITE_SHOW_ROLE_BADGE === 'true') && <RoleBadge />}
+      {!isHomePage && (
+        <div className="absolute top-6 right-6 z-50 flex items-center space-x-3">
+          {/* Watchers de notificaciones (sin icono visible aquí) */}
+          <NotificationWatcher intervalMs={3000} />
+          <TaskNotificationWatcher intervalMs={5 * 60 * 1000} />
+          {(import.meta.env.PROD || import.meta.env.VITE_SHOW_ROLE_BADGE === 'true') && <RoleBadge />}
 
-        {/* Selector de idioma global */}
-        <LanguageSelector variant="minimal" />
+          {/* Selector de idioma global */}
+          <LanguageSelector variant="minimal" />
 
         {/* Avatar y menú de usuario */}
         <div className="relative" data-user-menu>
@@ -236,7 +238,8 @@ export default function MainLayout() {
             </div>
           )}
         </div>
-      </div>
+        </div>
+      )}
 
       <main className="container flex-grow mx-auto px-4 pt-8 pb-36">
         {showWeddingSelector && <WeddingSelector />}

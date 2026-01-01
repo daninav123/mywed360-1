@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+﻿import React, { useEffect, useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -9,12 +9,11 @@ import { formatDate } from '../utils/formatUtils';
 import { fetchBlogPosts } from '../services/blogContentService';
 import { getBlogAuthorBySlug, listBlogAuthors } from '../utils/blogAuthors';
 import useTranslations from '../hooks/useTranslations';
-
 const AuthorPostCard = ({ post, onOpen }) => {
   const published = post?.publishedAt ? new Date(post.publishedAt) : null;
   return (
     <article
-      className="border rounded-lg bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col overflow-hidden"
+      className="border rounded-lg  shadow-sm hover:shadow-md transition cursor-pointer flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--color-surface)' }}
       onClick={() => onOpen?.(post)}
     >
       {post?.coverImage?.url ? (
@@ -27,18 +26,18 @@ const AuthorPostCard = ({ post, onOpen }) => {
       ) : null}
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-gray-900">{post?.title}</h3>
+          <h3 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>{post?.title}</h3>
           {post?.excerpt ? (
-            <p className="text-sm text-gray-700 line-clamp-3">{post.excerpt}</p>
+            <p className="text-sm  line-clamp-3" style={{ color: 'var(--color-text)' }}>{post.excerpt}</p>
           ) : null}
         </div>
-        <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
+        <div className="mt-auto flex items-center justify-between text-xs " style={{ color: 'var(--color-muted)' }}>
           <span>{published ? formatDate(published, 'short') : '—'}</span>
           <div className="flex flex-wrap gap-1">
             {(post?.tags || []).slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-gray-600"
+                className="inline-flex items-center rounded-full  px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide " style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-bg)' }}
               >
                 {tag}
               </span>
@@ -155,14 +154,8 @@ const BlogAuthor = () => {
         {authorAvatar ? <meta property="og:image" content={authorAvatar} /> : null}
         {authorLd ? <script type="application/ld+json">{JSON.stringify(authorLd)}</script> : null}
       </Helmet>
-      <PageWrapper
-        title={
-          author
-            ? author.name
-            : t('blog.author.pageTitle', { defaultValue: 'Autor del blog' })
-        }
-        className="max-w-5xl mx-auto"
-      >
+      
+      
         <div className="mb-6">
           <Link
             to="/blog"
@@ -180,7 +173,7 @@ const BlogAuthor = () => {
           </div>
         ) : (
           <>
-            <header className="flex flex-col gap-4 rounded-2xl border border-soft bg-white p-6 shadow-sm md:flex-row md:items-center">
+            <header className="flex flex-col gap-4 rounded-2xl border border-soft  p-6 shadow-sm md:flex-row md:items-center" style={{ backgroundColor: 'var(--color-surface)' }}>
               <div className="flex-shrink-0">
                 <div className="h-24 w-24 overflow-hidden rounded-full border border-soft bg-[var(--color-primary)] flex items-center justify-center text-white text-3xl font-bold">
                   {authorAvatar ? (
@@ -205,15 +198,15 @@ const BlogAuthor = () => {
                   <p className="text-sm uppercase tracking-widest text-[color:var(--color-primary)]">
                     {t('blog.author.badge', { defaultValue: 'Equipo editorial Lovenda' })}
                   </p>
-                  <h1 className="text-2xl font-semibold text-gray-900">{author.name}</h1>
+                  <h1 className="text-2xl font-semibold " style={{ color: 'var(--color-text)' }}>{author.name}</h1>
                   {author.title ? (
-                    <p className="text-sm font-medium text-gray-600">{author.title}</p>
+                    <p className="text-sm font-medium " style={{ color: 'var(--color-text-secondary)' }}>{author.title}</p>
                   ) : null}
                 </div>
                 {author.signature ? (
-                  <p className="text-sm italic text-gray-600">{author.signature}</p>
+                  <p className="text-sm italic " style={{ color: 'var(--color-text-secondary)' }}>{author.signature}</p>
                 ) : null}
-                {author.bio ? <p className="text-base text-gray-700">{author.bio}</p> : null}
+                {author.bio ? <p className="text-base " style={{ color: 'var(--color-text)' }}>{author.bio}</p> : null}
                 {author.social && Object.keys(author.social).length ? (
                   <div className="flex flex-wrap gap-3 text-sm text-[color:var(--color-primary)]">
                     {Object.entries(author.social).map(([network, url]) => (
@@ -234,10 +227,10 @@ const BlogAuthor = () => {
 
             <section className="mt-10 space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>
                   {t('blog.author.latestArticles', { defaultValue: 'Artículos recientes' })}
                 </h2>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm " style={{ color: 'var(--color-muted)' }}>
                   {posts.length}{' '}
                   {posts.length === 1
                     ? t('blog.author.article', { defaultValue: 'artículo' })
@@ -266,8 +259,8 @@ const BlogAuthor = () => {
             </section>
 
             {otherAuthors.length ? (
-              <section className="mt-12 rounded-2xl border border-soft bg-white p-6 shadow-sm">
-                <h3 className="text-base font-semibold text-gray-900">
+              <section className="mt-12 rounded-2xl border border-soft  p-6 shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <h3 className="text-base font-semibold " style={{ color: 'var(--color-text)' }}>
                   {t('blog.author.discoverOthers', {
                     defaultValue: 'Descubre otros autores',
                   })}
@@ -288,7 +281,8 @@ const BlogAuthor = () => {
             ) : null}
           </>
         )}
-      </PageWrapper>
+      
+    
     </>
   );
 };

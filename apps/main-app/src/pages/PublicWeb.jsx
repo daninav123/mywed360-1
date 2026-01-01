@@ -160,10 +160,10 @@ const PublicWeb = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center " style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Cargando web...</p>
+          <p className=" text-lg" style={{ color: 'var(--color-text-secondary)' }}>Cargando web...</p>
         </div>
       </div>
     );
@@ -171,11 +171,11 @@ const PublicWeb = () => {
 
   if (error || !webData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center " style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="text-center max-w-md mx-auto p-8">
           <div className="text-6xl mb-4">😕</div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{error || 'Web no encontrada'}</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-3xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>{error || 'Web no encontrada'}</h1>
+          <p className=" mb-6" style={{ color: 'var(--color-text-secondary)' }}>
             La web que buscas no existe o no está disponible públicamente.
           </p>
           <a
@@ -241,9 +241,9 @@ const PublicWeb = () => {
         </WeddingDataProvider>
 
         {/* Footer discreto */}
-        <footer className="bg-gray-50 border-t border-gray-200 py-4">
+        <footer className=" border-t  py-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
           <div className="container mx-auto px-4 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
               Creado con{' '}
               <a href="/" className="text-purple-600 hover:text-purple-700 font-semibold">
                 MaLoveApp

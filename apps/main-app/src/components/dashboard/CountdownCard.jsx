@@ -52,7 +52,7 @@ export default function CountdownCard({ weddingDate }) {
   if (!countdown) {
     return (
       <MetricCard
-        title={t('home2.countdown.title', { defaultValue: 'Countdown' })}
+        title={t('home2.countdown.title')}
         bgColor="#FFF4E6"
         textColor="#D4A574"
         valueColor="#D4A574"
@@ -60,7 +60,7 @@ export default function CountdownCard({ weddingDate }) {
       >
         <p className="text-2xl font-bold" style={{ color: '#D4A574' }}>---</p>
         <p className="text-xs opacity-70 mt-1" style={{ color: '#D4A574' }}>
-          {t('home2.countdown.noDate', { defaultValue: 'Set your wedding date' })}
+          {t('home2.countdown.noDate')}
         </p>
       </MetricCard>
     );
@@ -78,8 +78,8 @@ export default function CountdownCard({ weddingDate }) {
         <p className="text-4xl font-bold" style={{ color: '#D4A574' }}>{countdown.days}</p>
         <p className="text-sm opacity-70" style={{ color: '#718096' }}>
           {countdown.isPast
-            ? t('home2.countdown.past', { defaultValue: 'Wedding day passed!' })
-            : t('home2.countdown.daysToGo', { defaultValue: 'Days to Go' })
+            ? t('home2.countdown.past')
+            : t('home2.countdown.daysToGo')
           }
         </p>
       </div>

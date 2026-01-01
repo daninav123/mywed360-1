@@ -15,6 +15,7 @@ import {
   Alert,
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Componente de configuración del sistema para administradores
@@ -27,6 +28,7 @@ import React, { useState, useEffect } from 'react';
  * ```
  */
 function SystemSettings() {
+  const { t } = useTranslation(['admin']);
   const [activeTab, setActiveTab] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -117,26 +119,26 @@ function SystemSettings() {
   return (
     <div className="p-6">
       <Typography variant="h4" className="mb-6">
-        Configuración del Sistema
+        {t('admin:systemSettings.title')}
       </Typography>
 
       {saveSuccess && (
         <Alert severity="success" className="mb-4">
-          Configuración guardada correctamente
+          {t('admin:systemSettings.saveSuccess')}
         </Alert>
       )}
 
       {saveError && (
         <Alert severity="error" className="mb-4">
-          Error al guardar la configuración: {saveError}
+          {t('admin:systemSettings.saveError', { error: saveError })}
         </Alert>
       )}
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={activeTab} onChange={handleTabChange} aria-label="configuración del sistema">
-          <Tab label="General" />
-          <Tab label="Correo Electrónico" />
-          <Tab label="Seguridad" />
+        <Tabs value={activeTab} onChange={handleTabChange} aria-label={t('admin:systemSettings.title')}>
+          <Tab label={t('admin:systemSettings.tabs.general')} />
+          <Tab label={t('admin:systemSettings.tabs.email')} />
+          <Tab label={t('admin:systemSettings.tabs.security')} />
         </Tabs>
       </Box>
 
@@ -144,12 +146,12 @@ function SystemSettings() {
       {activeTab === 0 && (
         <Card className="mt-4">
           <CardContent className="space-y-4">
-            <Typography variant="h6">Configuración General</Typography>
+            <Typography variant="h6">{t('admin:systemSettings.general.title')}</Typography>
             <Divider />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <TextField
-                label="Nombre del Sitio"
+                label={t('admin:systemSettings.general.siteName')}
                 name="siteName"
                 value={generalSettings.siteName}
                 onChange={handleGeneralChange}
@@ -158,7 +160,7 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Descripción del Sitio"
+                label={t('admin:systemSettings.general.siteDescription')}
                 name="siteDescription"
                 value={generalSettings.siteDescription}
                 onChange={handleGeneralChange}
@@ -167,7 +169,7 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Tamaño máximo de archivos (MB)"
+                label={t('admin:systemSettings.general.maxUploadSize')}
                 name="maxUploadSize"
                 type="number"
                 value={generalSettings.maxUploadSize}
@@ -177,17 +179,17 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Tipos de archivos permitidos"
+                label={t('admin:systemSettings.general.allowedFileTypes')}
                 name="allowedFileTypes"
                 value={generalSettings.allowedFileTypes}
                 onChange={handleGeneralChange}
                 fullWidth
                 variant="outlined"
-                helperText="Separados por comas, ej: .jpg,.png,.pdf"
+                helperText={t('admin:systemSettings.general.allowedFileTypesHelp')}
               />
 
               <TextField
-                label="Email de Contacto"
+                label={t('admin:systemSettings.general.contactEmail')}
                 name="contactEmail"
                 value={generalSettings.contactEmail}
                 onChange={handleGeneralChange}
@@ -204,7 +206,7 @@ function SystemSettings() {
                       name="enableUserRegistration"
                     />
                   }
-                  label="Permitir registro de usuarios"
+                  label={t('admin:systemSettings.general.enableUserRegistration')}
                 />
 
                 <FormControlLabel
@@ -215,7 +217,7 @@ function SystemSettings() {
                       name="maintenanceMode"
                     />
                   }
-                  label="Modo de mantenimiento"
+                  label={t('admin:systemSettings.general.maintenanceMode')}
                 />
               </div>
             </div>
@@ -227,12 +229,12 @@ function SystemSettings() {
       {activeTab === 1 && (
         <Card className="mt-4">
           <CardContent className="space-y-4">
-            <Typography variant="h6">Configuración de Correo Electrónico</Typography>
+            <Typography variant="h6">{t('admin:systemSettings.email.title')}</Typography>
             <Divider />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <TextField
-                label="Dominio de email predeterminado"
+                label={t('admin:systemSettings.email.defaultEmailDomain')}
                 name="defaultEmailDomain"
                 value={emailSettings.defaultEmailDomain}
                 onChange={handleEmailChange}
@@ -241,7 +243,7 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Servidor SMTP"
+                label={t('admin:systemSettings.email.smtpServer')}
                 name="smtpServer"
                 value={emailSettings.smtpServer}
                 onChange={handleEmailChange}
@@ -250,7 +252,7 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Puerto SMTP"
+                label={t('admin:systemSettings.email.smtpPort')}
                 name="smtpPort"
                 type="number"
                 value={emailSettings.smtpPort}
@@ -268,12 +270,12 @@ function SystemSettings() {
                       name="smtpUseSSL"
                     />
                   }
-                  label="Usar SSL"
+                  label={t('admin:systemSettings.email.smtpUseSSL')}
                 />
               </div>
 
               <TextField
-                label="Usuario SMTP"
+                label={t('admin:systemSettings.email.smtpUsername')}
                 name="smtpUsername"
                 value={emailSettings.smtpUsername}
                 onChange={handleEmailChange}
@@ -282,7 +284,7 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Contraseña SMTP"
+                label={t('admin:systemSettings.email.smtpPassword')}
                 name="smtpPassword"
                 type="password"
                 value={emailSettings.smtpPassword}
@@ -292,18 +294,18 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Emails por hora"
+                label={t('admin:systemSettings.email.emailsPerHour')}
                 name="emailsPerHour"
                 type="number"
                 value={emailSettings.emailsPerHour}
                 onChange={handleEmailChange}
                 fullWidth
                 variant="outlined"
-                helperText="Límite para evitar bloqueos por spam"
+                helperText={t('admin:systemSettings.email.emailsPerHourHelp')}
               />
 
               <TextField
-                label="Tamaño máximo de adjuntos (MB)"
+                label={t('admin:systemSettings.email.maxAttachmentSize')}
                 name="maxAttachmentSize"
                 type="number"
                 value={emailSettings.maxAttachmentSize}
@@ -313,7 +315,7 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Firma predeterminada"
+                label={t('admin:systemSettings.email.defaultSignature')}
                 name="defaultSignature"
                 value={emailSettings.defaultSignature}
                 onChange={handleEmailChange}
@@ -332,34 +334,34 @@ function SystemSettings() {
       {activeTab === 2 && (
         <Card className="mt-4">
           <CardContent className="space-y-4">
-            <Typography variant="h6">Configuración de Seguridad</Typography>
+            <Typography variant="h6">{t('admin:systemSettings.security.title')}</Typography>
             <Divider />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <TextField
-                label="Tiempo de sesión (minutos)"
+                label={t('admin:systemSettings.security.sessionTimeoutMinutes')}
                 name="sessionTimeoutMinutes"
                 type="number"
                 value={securitySettings.sessionTimeoutMinutes}
                 onChange={handleSecurityChange}
                 fullWidth
                 variant="outlined"
-                helperText="0 = sin límite"
+                helperText={t('admin:systemSettings.security.sessionTimeoutHelp')}
               />
 
               <TextField
-                label="Máximo de intentos de login"
+                label={t('admin:systemSettings.security.maxLoginAttempts')}
                 name="maxLoginAttempts"
                 type="number"
                 value={securitySettings.maxLoginAttempts}
                 onChange={handleSecurityChange}
                 fullWidth
                 variant="outlined"
-                helperText="Bloqueo temporal después de X intentos"
+                helperText={t('admin:systemSettings.security.maxLoginAttemptsHelp')}
               />
 
               <TextField
-                label="Tiempo de validez para reset de contraseña (horas)"
+                label={t('admin:systemSettings.security.passwordResetTimeHours')}
                 name="passwordResetTimeHours"
                 type="number"
                 value={securitySettings.passwordResetTimeHours}
@@ -369,13 +371,13 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Lista blanca de IPs"
+                label={t('admin:systemSettings.security.ipWhitelist')}
                 name="ipWhitelist"
                 value={securitySettings.ipWhitelist}
                 onChange={handleSecurityChange}
                 fullWidth
                 variant="outlined"
-                helperText="Separadas por comas, vacío = permitir todas"
+                helperText={t('admin:systemSettings.security.ipWhitelistHelp')}
               />
 
               <div className="col-span-1 md:col-span-2 flex flex-col space-y-2">
@@ -387,7 +389,7 @@ function SystemSettings() {
                       name="requireStrongPasswords"
                     />
                   }
-                  label="Requerir contraseñas seguras"
+                  label={t('admin:systemSettings.security.requireStrongPasswords')}
                 />
 
                 <FormControlLabel
@@ -398,7 +400,7 @@ function SystemSettings() {
                       name="twoFactorAuthDefault"
                     />
                   }
-                  label="Autenticación de dos factores por defecto"
+                  label={t('admin:systemSettings.security.twoFactorAuthDefault')}
                 />
               </div>
             </div>
@@ -408,7 +410,7 @@ function SystemSettings() {
 
       <div className="flex justify-end mt-6 space-x-4">
         <Button variant="outlined" color="secondary" startIcon={<RefreshIcon />}>
-          Restaurar Valores
+          {t('admin:systemSettings.actions.restore')}
         </Button>
 
         <Button
@@ -418,7 +420,7 @@ function SystemSettings() {
           onClick={handleSaveSettings}
           disabled={isSaving}
         >
-          {isSaving ? 'Guardando...' : 'Guardar Configuración'}
+          {isSaving ? t('admin:systemSettings.actions.saving') : t('admin:systemSettings.actions.save')}
         </Button>
       </div>
     </div>

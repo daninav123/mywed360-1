@@ -1,4 +1,4 @@
-/**
+﻿/**
  * PhotoShotListPage - Página de Shot List Fotográfico
  * FASE 3.1.5 del WORKFLOW-USUARIO.md
  */
@@ -10,7 +10,6 @@ import { useWedding } from '../context/WeddingContext';
 import PhotoShotList from '../components/shotlist/PhotoShotList';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
-
 export default function PhotoShotListPage() {
   const { activeWedding, activeWeddingData } = useWedding();
   const [completedShots, setCompletedShots] = useState({});
@@ -78,8 +77,8 @@ export default function PhotoShotListPage() {
       <PageWrapper>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">{t('photoShots.descriptionPlaceholder')}</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2  mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
+            <p className="" style={{ color: 'var(--color-text-secondary)' }}>{t('photoShots.descriptionPlaceholder')}</p>
           </div>
         </div>
       </PageWrapper>

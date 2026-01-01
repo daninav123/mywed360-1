@@ -139,8 +139,8 @@ const Timing = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header con estadísticas */}
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{t('protocol.timing.title')}</h1>
-          <p className="text-sm text-gray-600 mb-3">
+          <h1 className="text-2xl font-bold  mb-1" style={{ color: 'var(--color-text)' }}>{t('protocol.timing.title')}</h1>
+          <p className="text-sm  mb-3" style={{ color: 'var(--color-text-secondary)' }}>
             {t('protocol.timing.subtitle')}
           </p>
           <Link to="/protocolo/dia-de-la-boda">
@@ -152,25 +152,25 @@ const Timing = () => {
         </div>
 
         {/* Estadísticas globales */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <div className=" border  rounded-lg p-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{globalStats.total}</div>
-              <div className="text-xs text-gray-600">Momentos totales</div>
+              <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{globalStats.total}</div>
+              <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Momentos totales</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold " style={{ color: 'var(--color-success)' }}>
                 {globalStats.withDefinitiveSong}
               </div>
-              <div className="text-xs text-gray-600">Con canción ⭐</div>
+              <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Con canción ⭐</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{globalStats.withTime}</div>
-              <div className="text-xs text-gray-600">Con horario</div>
+              <div className="text-2xl font-bold " style={{ color: 'var(--color-primary)' }}>{globalStats.withTime}</div>
+              <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Con horario</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">{globalStats.percentage}%</div>
-              <div className="text-xs text-gray-600">Completado</div>
+              <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Completado</div>
             </div>
           </div>
         </div>
@@ -196,11 +196,11 @@ const Timing = () => {
             return (
               <div
                 key={block.id}
-                className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden hover:shadow-md transition-all"
+                className=" rounded-lg border-2  overflow-hidden hover:shadow-md transition-all" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}
               >
                 {/* Header del bloque - Clickeable */}
                 <div
-                  className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="p-4 cursor-pointer hover: transition-colors" style={{ backgroundColor: 'var(--color-bg)' }}
                   onClick={() => toggleBlock(block.id)}
                 >
                   <div className="flex items-center justify-between">
@@ -213,15 +213,15 @@ const Timing = () => {
                         <Calendar size={20} className="text-blue-500" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900">{block.name}</h3>
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                        <h3 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>{block.name}</h3>
+                        <div className="flex items-center gap-4 text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                           {block.startTime && block.endTime && (
                             <>
                               <span className="flex items-center gap-1">
                                 <Clock size={14} />
                                 {block.startTime} - {block.endTime}
                               </span>
-                              {duration && <span className="text-gray-500">· {duration}</span>}
+                              {duration && <span className="" style={{ color: 'var(--color-muted)' }}>· {duration}</span>}
                             </>
                           )}
                           <span>
@@ -239,7 +239,7 @@ const Timing = () => {
                           style={{ width: `${block.percentage}%` }}
                         />
                       </div>
-                      <span className="text-sm font-semibold text-gray-600 w-12">
+                      <span className="text-sm font-semibold  w-12" style={{ color: 'var(--color-text-secondary)' }}>
                         {block.percentage}%
                       </span>
                     </div>
@@ -248,11 +248,11 @@ const Timing = () => {
 
                 {/* Contenido expandible */}
                 {isExpanded && (
-                  <div className="border-t border-gray-200">
+                  <div className="border-t " style={{ borderColor: 'var(--color-border)' }}>
                     {blockMoments.length === 0 ? (
                       <div className="p-8 text-center">
                         <Music size={48} className="mx-auto text-gray-300 mb-3" />
-                        <p className="text-gray-600 mb-4">No hay momentos en este bloque</p>
+                        <p className=" mb-4" style={{ color: 'var(--color-text-secondary)' }}>No hay momentos en este bloque</p>
                         <Button size="sm" onClick={() => handleAddMoment(block.id)}>
                           <Plus size={16} className="mr-1" />
                           Añadir primer momento
@@ -268,7 +268,7 @@ const Timing = () => {
                             : null;
 
                           return (
-                            <div key={moment.id} className="p-4 hover:bg-gray-50 transition-colors">
+                            <div key={moment.id} className="p-4 hover: transition-colors" style={{ backgroundColor: 'var(--color-bg)' }}>
                               <div className="flex items-start gap-4">
                                 {/* Orden */}
                                 <div className="flex-shrink-0">
@@ -280,7 +280,7 @@ const Timing = () => {
                                 {/* Info principal */}
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 mb-2">
-                                    <h4 className="font-medium text-gray-900">{moment.title}</h4>
+                                    <h4 className="font-medium " style={{ color: 'var(--color-text)' }}>{moment.title}</h4>
                                     {moment.isDefinitive && (
                                       <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 rounded text-xs font-semibold text-amber-800">
                                         <Star size={12} fill="currentColor" />
@@ -292,7 +292,7 @@ const Timing = () => {
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                                     {/* Hora */}
                                     <div className="flex items-center gap-2">
-                                      <Clock size={14} className="text-gray-400" />
+                                      <Clock size={14} className="" style={{ color: 'var(--color-muted)' }} />
                                       <input
                                         type="time"
                                         value={moment.time || ''}
@@ -301,10 +301,10 @@ const Timing = () => {
                                             time: e.target.value,
                                           })
                                         }
-                                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="flex-1 px-2 py-1 border  rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                                       />
                                       {momentDuration && (
-                                        <span className="text-xs text-gray-500">
+                                        <span className="text-xs " style={{ color: 'var(--color-muted)' }}>
                                           ({momentDuration})
                                         </span>
                                       )}
@@ -312,7 +312,7 @@ const Timing = () => {
 
                                     {/* Canción o Playlist */}
                                     <div className="flex items-center gap-2">
-                                      <Music size={14} className="text-gray-400" />
+                                      <Music size={14} className="" style={{ color: 'var(--color-muted)' }} />
                                       {(() => {
                                         const musicType = moment.musicType || 'song';
 
@@ -324,7 +324,7 @@ const Timing = () => {
                                               </span>
                                               <Link
                                                 to="/protocolo/momentos-especiales"
-                                                className="text-green-600 hover:text-green-800 hover:underline truncate text-xs"
+                                                className=" hover:text-green-800 hover:underline truncate text-xs" style={{ color: 'var(--color-success)' }}
                                               >
                                                 Ambiente configurado
                                               </Link>
@@ -334,7 +334,7 @@ const Timing = () => {
 
                                         if (musicType === 'none') {
                                           return (
-                                            <span className="flex-1 text-gray-400 text-xs">
+                                            <span className="flex-1  text-xs" style={{ color: 'var(--color-muted)' }}>
                                               🔇 Sin música
                                             </span>
                                           );
@@ -345,7 +345,7 @@ const Timing = () => {
                                           return (
                                             <Link
                                               to="/protocolo/momentos-especiales"
-                                              className="flex-1 text-blue-600 hover:text-blue-800 hover:underline truncate"
+                                              className="flex-1  hover:text-blue-800 hover:underline truncate" style={{ color: 'var(--color-primary)' }}
                                             >
                                               {selectedSong.title} - {selectedSong.artist}
                                             </Link>
@@ -355,7 +355,7 @@ const Timing = () => {
                                         return (
                                           <Link
                                             to="/protocolo/momentos-especiales"
-                                            className="flex-1 text-gray-400 hover:text-blue-600 hover:underline"
+                                            className="flex-1  hover: hover:underline" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-muted)' }}
                                           >
                                             Sin canción → Configurar
                                           </Link>
@@ -367,18 +367,25 @@ const Timing = () => {
                                   {/* Notas editables */}
                                   <div className="mt-2">
                                     <div className="flex items-start gap-2">
-                                      <FileText size={14} className="text-gray-400 mt-2" />
+                                      <FileText size={14} className=" mt-2" style={{ color: 'var(--color-muted)' }} />
                                       <textarea
                                         value={moment.notes || ''}
+                                        readOnly
+                                        className="flex-1 text-sm  bg-transparent border-none resize-none focus:outline-none" style={{ color: 'var(--color-text-secondary)' }}
+                                        rows="2"
+                                      />
+                                    </div>
+                                  </div>
 
-                                {/* Acciones */}
-                                <div className="flex-shrink-0">
-                                  <Link
-                                    to="/protocolo/momentos-especiales"
-                                    className="text-xs text-blue-600 hover:text-blue-800 font-medium"
-                                  >
-                                    Editar →
-                                  </Link>
+                                  {/* Acciones */}
+                                  <div className="flex-shrink-0">
+                                    <Link
+                                      to="/protocolo/momentos-especiales"
+                                      className="text-xs  hover:text-blue-800 font-medium" style={{ color: 'var(--color-primary)' }}
+                                    >
+                                      Editar →
+                                    </Link>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -386,7 +393,7 @@ const Timing = () => {
                         })}
 
                         {/* Botón añadir momento */}
-                        <div className="p-4 bg-gray-50 flex justify-center">
+                        <div className="p-4  flex justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
                           <Button
                             variant="outline"
                             size="sm"
@@ -397,9 +404,8 @@ const Timing = () => {
                           </Button>
                         </div>
                       </div>
-                    )}
-                  </div>
-                )}
+                    )
+                  )}
               </div>
             );
           })}
@@ -408,7 +414,7 @@ const Timing = () => {
         {/* Enlace a Momentos Especiales */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <Music className="text-blue-600 flex-shrink-0" size={20} />
+            <Music className=" flex-shrink-0" style={{ color: 'var(--color-primary)' }} size={20} />
             <div className="flex-1">
               <h3 className="font-semibold text-blue-900 mb-1">
                 ¿Necesitas configurar las canciones?

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { User, Mail, Moon, LogOut } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
 import useTranslations from '../hooks/useTranslations';
@@ -18,6 +19,10 @@ import UpcomingTasksList from './dashboard/UpcomingTasksList';
 import InspirationBoardCompact from './dashboard/InspirationBoardCompact';
 import LatestBlogPosts from './dashboard/LatestBlogPosts';
 import CoupleIllustration from './dashboard/CoupleIllustration';
+import NotificationCenter from './NotificationCenter';
+import DarkModeToggle from './DarkModeToggle';
+import LanguageSelector from './ui/LanguageSelector';
+import { prefetchModule } from '../utils/prefetch';
 
 const normalizeLang = (l) =>
   String(l || 'es')
@@ -42,10 +47,17 @@ const isGuestConfirmed = (guest) => {
   return confirmedTokens.includes(statusValue);
 };
 
+const heroImages = [
+  '/hero-2.png',
+  '/hero-3.png',
+  '/hero-4.png',
+  '/hero-5.png',
+];
+
 export default function HomePage2() {
   const { t, i18n, format } = useTranslations();
   const navigate = useNavigate();
-  const { hasRole, userProfile, currentUser } = useAuth();
+  const { hasRole, userProfile, currentUser, logout: logoutUnified } = useAuth();
   const { activeWedding, activeWeddingData } = useWedding();
   const { parents: taskParents, childrenByParent: taskChildrenByParent } = useWeddingTasksHierarchy(activeWedding);
   const { stats: financeStats, transactions = [], budget, budgetUsage = [] } = useFinance();
@@ -55,8 +67,24 @@ export default function HomePage2() {
   const isPlanner = role === 'planner';
 
   const [categoryImages, setCategoryImages] = useState([]);
+  const [currentHeroImage, setCurrentHeroImage] = useState(() => Math.floor(Math.random() * heroImages.length));
+  const [openMenu, setOpenMenu] = useState(false);
+  
+  const prefetchEmail = React.useCallback(() => {
+    prefetchModule('UnifiedEmail', () => import('../pages/UnifiedEmail'));
+  }, []);
   const INSPIRATION_CATEGORIES = useMemo(() => getInspirationCategories(t), [t]);
   const lang = normalizeLang(i18n.language);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openMenu && !event.target.closest('[data-user-menu]')) {
+        setOpenMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openMenu]);
 
   useEffect(() => {
     Promise.all(INSPIRATION_CATEGORIES.map(({ slug }) => fetchWall(1, slug)))
@@ -79,6 +107,20 @@ export default function HomePage2() {
         console.error('[HomePage2] Error loading inspiration gallery:', error);
       });
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeroImage((prev) => {
+        let newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * heroImages.length);
+        } while (newIndex === prev && heroImages.length > 1);
+        return newIndex;
+      });
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
 
   const coupleNames = useMemo(() => {
     if (activeWeddingData?.weddingInfo) {
@@ -112,7 +154,7 @@ export default function HomePage2() {
       return { name1: userName, name2: null };
     }
     
-    return { name1: currentUser?.email?.split('@')[0] || t('home2.header.guest', { defaultValue: 'Guest' }), name2: null };
+    return { name1: currentUser?.email?.split('@')[0] || t('home2.header.guest'), name2: null };
   }, [userProfile, currentUser, activeWeddingData, t]);
 
   const displayName = coupleNames.name1;
@@ -187,17 +229,6 @@ export default function HomePage2() {
       .slice(0, 6);
   }, [budgetUsage, budget, transactions]);
 
-  // Debug: ver qué datos tenemos
-  useEffect(() => {
-    console.log('\n=== 📊 HomePage2 Budget Debug ===');
-    console.log('budgetByCategory:', budgetByCategory);
-    console.log('budgetByCategory.length:', budgetByCategory?.length || 0);
-    console.log('budget.categories.length:', budget?.categories?.length || 0);
-    console.log('budgetUsage.length:', budgetUsage?.length || 0);
-    console.log('transactions.length:', transactions?.length || 0);
-    console.log('===================================\n');
-  }, [budgetByCategory, budget, budgetUsage, transactions]);
-
   const upcomingTasks = useMemo(() => {
     const parents = Array.isArray(taskParents) ? taskParents : [];
     const allTasks = [];
@@ -231,30 +262,118 @@ export default function HomePage2() {
   }
 
   const greetingText = partnerName 
-    ? t('home2.header.greeting', { defaultValue: 'Hi {{name}} & {{partner}}!', name: displayName, partner: partnerName })
-    : t('home2.header.greetingSingle', { defaultValue: 'Hi {{name}}!', name: displayName });
+    ? t('home2.header.greeting', { name: displayName, partner: partnerName })
+    : t('home2.header.greetingSingle', { name: displayName });
 
   return (
-    <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#F5F5F5' }}>
-      <div className="mx-auto my-8" style={{ 
-        maxWidth: '1024px',
-        width: '100%',
-        backgroundColor: '#FFFBF7',
-        borderRadius: '32px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-        overflow: 'hidden'
-      }}>
-        <header className="relative overflow-hidden" style={{
+    <>
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        {/* Botones superiores derechos */}
+        <div className="absolute top-4 right-4 flex items-center space-x-3" style={{ zIndex: 100 }}>
+          <LanguageSelector variant="minimal" />
+          
+          <div className="relative" data-user-menu>
+            <button
+              onClick={() => setOpenMenu(!openMenu)}
+              className="w-11 h-11 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center"
+              title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })}
+              style={{
+                backgroundColor: openMenu ? 'var(--color-lavender)' : 'rgba(255, 255, 255, 0.95)',
+                border: `2px solid ${openMenu ? 'var(--color-primary)' : 'rgba(255,255,255,0.8)'}`,
+                boxShadow: openMenu ? '0 4px 12px rgba(94, 187, 255, 0.3)' : '0 2px 8px rgba(0,0,0,0.15)',
+              }}
+            >
+              <User className="w-5 h-5" style={{ color: openMenu ? 'var(--color-primary)' : 'var(--color-text-secondary)' }} />
+            </button>
+            
+            {openMenu && (
+              <div 
+                className="absolute right-0 mt-3 bg-[var(--color-surface)] p-2 space-y-1"
+                style={{
+                  minWidth: '220px',
+                  border: '1px solid var(--color-border-soft)',
+                  borderRadius: 'var(--radius-lg)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  zIndex: 9999,
+                }}
+              >
+                <div className="px-2 py-1">
+                  <NotificationCenter />
+                </div>
+
+                <Link
+                  to="/perfil"
+                  onClick={() => setOpenMenu(false)}
+                  className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
+                  style={{ color: 'var(--color-text)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <User className="w-4 h-4 mr-3" />
+                  {t('navigation.profile', { defaultValue: 'Perfil' })}
+                </Link>
+
+                <Link
+                  to="/email"
+                  onClick={() => setOpenMenu(false)}
+                  onMouseEnter={(e) => { prefetchEmail(); e.currentTarget.style.backgroundColor = 'var(--color-lavender)'; }}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  onFocus={prefetchEmail}
+                  onTouchStart={prefetchEmail}
+                  className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
+                  style={{ color: 'var(--color-text)' }}
+                >
+                  <Mail className="w-4 h-4 mr-3" />
+                  {t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
+                </Link>
+
+                <div 
+                  className="px-3 py-2.5 rounded-xl transition-all duration-200"
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm flex items-center" style={{ color: 'var(--color-text)' }}>
+                      <Moon className="w-4 h-4 mr-3" />
+                      {t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}
+                    </span>
+                    <DarkModeToggle className="ml-2" />
+                  </div>
+                </div>
+
+                <div style={{ height: '1px', backgroundColor: 'var(--color-border-soft)', margin: '8px 0' }}></div>
+                
+                <button
+                  onClick={() => {
+                    logoutUnified();
+                    setOpenMenu(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center"
+                  style={{ color: 'var(--color-danger)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <LogOut className="w-4 h-4 mr-3" />
+                  {t('navigation.logout', { defaultValue: 'Cerrar sesión' })}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <header className="relative" style={{
           height: '240px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          overflow: 'hidden',
+          borderRadius: '32px 32px 0 0',
         }}>
           {/* Imagen de fondo completa */}
           <div className="absolute inset-0">
             <img 
-              src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=1400&auto=format&fit=crop&q=80"
+              src={heroImages[currentHeroImage]}
               alt="Wedding couple" 
               className="w-full h-full object-cover"
-              style={{ objectPosition: 'center 30%' }}
+              style={{ objectPosition: 'center 30%', transition: 'opacity 1s ease-in-out' }}
               onError={(e) => {
                 e.target.src = "https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=1400&auto=format&fit=crop&q=80";
               }}
@@ -262,6 +381,7 @@ export default function HomePage2() {
             {/* Overlay sutil para legibilidad del texto */}
             <div className="absolute inset-0" style={{
               background: 'linear-gradient(to right, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.2) 100%)',
+              zIndex: 2,
             }} />
           </div>
           
@@ -284,37 +404,38 @@ export default function HomePage2() {
                 opacity: 0.95,
                 textShadow: '0 1px 3px rgba(0,0,0,0.3)',
               }}>
-                {t('home2.header.subtitle', { defaultValue: "Let's Plan Your Dream Wedding" })}
+                {t('home2.header.subtitle')}
               </p>
             </div>
           </div>
         </header>
 
-        <section className="px-4 pb-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <section className="px-6 py-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <CountdownCard weddingDate={activeWeddingData?.weddingDate || activeWeddingData?.date} />
             <BudgetCard spent={budgetMetrics.spent} total={budgetMetrics.total} />
             <GuestListCard confirmed={guestsMetrics.confirmed} pending={guestsMetrics.pending} />
           </div>
         </section>
 
-        <section className="px-4 pb-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <section className="px-6 py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <UpcomingTasksList tasks={upcomingTasks} onTaskClick={handleTaskClick} />
             <BudgetDonutChart budgetByCategory={budgetByCategory} />
           </div>
         </section>
 
-        <section className="px-4 pb-4">
+        <section className="px-6 py-6">
           <InspirationBoardCompact categories={categoryImages} />
         </section>
 
-        <section className="px-4 pb-6">
+        <section className="px-6 py-6">
           <LatestBlogPosts />
         </section>
 
-      <Nav active="home" />
+        </div>
       </div>
-    </div>
+      <Nav active="home" />
+    </>
   );
 }

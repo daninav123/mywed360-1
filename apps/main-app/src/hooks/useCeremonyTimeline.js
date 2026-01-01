@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
-
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
-import { performanceMonitor } from '../services/PerformanceMonitor';
+import { ceremonyAPI } from '../services/apiService';
 
 const DEFAULT_SECTIONS = [
   {
@@ -108,75 +105,43 @@ export default function useCeremonyTimeline() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    let unsubscribe = () => {};
-    async function listen() {
+    async function loadTimeline() {
       try {
         if (!activeWedding) {
           setSections(DEFAULT_SECTIONS);
           setLoading(false);
           return;
         }
-        const ref = doc(db, 'weddings', activeWedding, 'ceremonyTimeline', 'main');
-        unsubscribe = onSnapshot(
-          ref,
-          (snap) => {
-            if (snap.exists()) {
-              const data = snap.data() || {};
-              const list = Array.isArray(data.sections) && data.sections.length ? data.sections : DEFAULT_SECTIONS;
-              setSections(mergeSections(list));
-            } else {
-              setSections(DEFAULT_SECTIONS);
-            }
-            setLoading(false);
-          },
-          (err) => {
-            // console.warn('[useCeremonyTimeline] onSnapshot error', err);
-            setError(err);
-            setLoading(false);
-          },
-        );
+        setLoading(true);
+        const ceremonyData = await ceremonyAPI.get(activeWedding);
+        const timelineData = ceremonyData?.timeline;
+        if (timelineData && Array.isArray(timelineData.sections) && timelineData.sections.length) {
+          setSections(mergeSections(timelineData.sections));
+        } else {
+          setSections(DEFAULT_SECTIONS);
+        }
+        setLoading(false);
       } catch (err) {
-        // console.warn('[useCeremonyTimeline] listen error', err);
+        console.error('[useCeremonyTimeline] load error', err);
         setError(err);
         setLoading(false);
       }
     }
-    listen();
-    return () => {
-      try {
-        unsubscribe();
-      } catch {}
-    };
+    loadTimeline();
   }, [activeWedding]);
 
   const saveSections = useCallback(
     async (nextSections) => {
       if (!activeWedding) {
-        // console.warn('[useCeremonyTimeline] saveSections without active wedding');
+        console.warn('[useCeremonyTimeline] saveSections without active wedding');
         return;
       }
-      const ref = doc(db, 'weddings', activeWedding, 'ceremonyTimeline', 'main');
       const sanitized = mergeSections(nextSections);
       setSections(sanitized);
       try {
-        await setDoc(
-          ref,
-          {
-            sections: sanitized,
-            updatedAt: serverTimestamp(),
-          },
-          { merge: true },
-        );
-        performanceMonitor.logEvent('ceremony_timeline_updated', {
-          weddingId: activeWedding,
-          sections: sanitized.length,
-          totalItems: sanitized.reduce(
-            (acc, section) => acc + (Array.isArray(section.items) ? section.items.length : 0),
-            0,
-          ),
-        });
+        await ceremonyAPI.updateTimeline(activeWedding, { sections: sanitized });
       } catch (err) {
-        // console.warn('[useCeremonyTimeline] saveSections error', err);
+        console.error('[useCeremonyTimeline] saveSections error', err);
         setError(err);
       }
     },

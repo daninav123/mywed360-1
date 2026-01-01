@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,7 +7,6 @@ import Spinner from '../components/Spinner';
 import { formatDate } from '../utils/formatUtils';
 import { fetchBlogPosts } from '../services/blogContentService';
 import useTranslations from '../hooks/useTranslations';
-
 const PAGE_SIZE = 12;
 
 const ArticleCard = React.forwardRef(({ post, onOpen, onOpenAuthor, ctaLabel }, ref) => {
@@ -23,7 +22,7 @@ const ArticleCard = React.forwardRef(({ post, onOpen, onOpenAuthor, ctaLabel }, 
   return (
     <article
       ref={ref}
-      className="border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] cursor-pointer flex flex-col"
+      className="border rounded-lg overflow-hidden  shadow-sm hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] cursor-pointer flex flex-col" style={{ backgroundColor: 'var(--color-surface)' }}
       data-testid="blog-card"
       onClick={() => onOpen?.(post)}
       role="link"
@@ -45,9 +44,9 @@ const ArticleCard = React.forwardRef(({ post, onOpen, onOpenAuthor, ctaLabel }, 
       ) : null}
       <div className="p-4 flex flex-col gap-3 flex-1">
         <div className="space-y-1">
-          <h2 className="text-lg font-semibold text-gray-900">{post?.title}</h2>
+          <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>{post?.title}</h2>
           {post?.excerpt ? (
-            <p className="text-sm text-gray-700 line-clamp-3">{post.excerpt}</p>
+            <p className="text-sm  line-clamp-3" style={{ color: 'var(--color-text)' }}>{post.excerpt}</p>
           ) : null}
           {post?.byline?.name ? (
             <button
@@ -60,13 +59,13 @@ const ArticleCard = React.forwardRef(({ post, onOpen, onOpenAuthor, ctaLabel }, 
             </button>
           ) : null}
         </div>
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 text-xs " style={{ color: 'var(--color-muted)' }}>
           <span>{published ? formatDate(published, 'short') : '—'}</span>
           <div className="flex flex-wrap gap-1">
             {(post?.tags || []).slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-gray-600"
+                className="inline-flex items-center rounded-full  px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide " style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-bg)' }}
               >
                 {tag}
               </span>
@@ -218,16 +217,15 @@ function Blog() {
   const searchQuery = searchTerm.trim();
 
   return (
-    <PageWrapper title={t('blog.title')} className="max-w-5xl mx-auto">
-      <p className="text-sm text-gray-600 mb-6">{t('blog.lead')}</p>
-
+    <PageWrapper>
+      <p className="text-sm  mb-6" style={{ color: 'var(--color-text-secondary)' }}>{t('blog.lead')}</p>
       <div className="mb-6 rounded-2xl border border-[color:var(--color-primary-20)] bg-[var(--color-primary-5)] p-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-[color:var(--color-primary)] mb-2">
               ¿Listo para organizar tu boda perfecta?
             </h2>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm " style={{ color: 'var(--color-text)' }}>
               Únete a miles de parejas que ya están disfrutando de una planificación sin estrés con Lovenda.
             </p>
           </div>
@@ -258,10 +256,10 @@ function Blog() {
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
           placeholder={t('blog.searchPlaceholder', { placeholder: 'Buscar en el blog...' })}
-          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]"
+          className="w-full rounded-lg border   px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}
         />
         {isFiltering ? (
-          <p className="mt-2 text-xs text-gray-500">
+          <p className="mt-2 text-xs " style={{ color: 'var(--color-muted)' }}>
             {t('blog.search.matches', { query: searchQuery })}
           </p>
         ) : null}
@@ -287,7 +285,7 @@ function Blog() {
       </section>
 
       {!loading && visiblePosts.length === 0 && !errorKey ? (
-        <div className="border border-dashed border-gray-300 rounded-md p-6 text-center text-sm text-gray-500">
+        <div className="border border-dashed  rounded-md p-6 text-center text-sm " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-muted)' }}>
           {isFiltering ? t('blog.empty.filtered') : t('blog.empty.all')}
         </div>
       ) : null}
@@ -303,11 +301,11 @@ function Blog() {
       ) : null}
 
       {!loading && visiblePosts.length > 0 ? (
-        <div className="mt-12 rounded-2xl border border-gray-200 bg-gradient-to-br from-rose-50 to-purple-50 p-8 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">
+        <div className="mt-12 rounded-2xl border  bg-gradient-to-br from-rose-50 to-purple-50 p-8 text-center" style={{ borderColor: 'var(--color-border)' }}>
+          <h3 className="text-2xl font-bold  mb-3" style={{ color: 'var(--color-text)' }}>
             ✨ Descubre Lovenda
           </h3>
-          <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
+          <p className=" mb-6 max-w-2xl mx-auto" style={{ color: 'var(--color-text)' }}>
             La plataforma completa para organizar bodas. Gestiona invitados, proveedores, presupuesto y más en un solo lugar.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -319,19 +317,19 @@ function Blog() {
             </a>
             <a
               href="/para-planners"
-              className="inline-flex items-center justify-center rounded-md border-2 border-[color:var(--color-primary)] bg-white px-6 py-3 text-base font-semibold text-[color:var(--color-primary)] transition hover:bg-[var(--color-primary-5)]"
+              className="inline-flex items-center justify-center rounded-md border-2 border-[color:var(--color-primary)]  px-6 py-3 text-base font-semibold text-[color:var(--color-primary)] transition hover:bg-[var(--color-primary-5)]" style={{ backgroundColor: 'var(--color-surface)' }}
             >
               Para Wedding Planners
             </a>
             <a
               href="/para-proveedores"
-              className="inline-flex items-center justify-center rounded-md border-2 border-gray-300 bg-white px-6 py-3 text-base font-semibold text-gray-700 transition hover:bg-gray-50"
+              className="inline-flex items-center justify-center rounded-md border-2   px-6 py-3 text-base font-semibold  transition hover:" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }} style={{ backgroundColor: 'var(--color-surface)' }}
             >
               Para Proveedores
             </a>
           </div>
-          <div className="mt-6 pt-6 border-t border-gray-300">
-            <p className="text-xs text-gray-600 mb-2">Enlaces útiles:</p>
+          <div className="mt-6 pt-6 border-t " style={{ borderColor: 'var(--color-border)' }}>
+            <p className="text-xs  mb-2" style={{ color: 'var(--color-text-secondary)' }}>Enlaces útiles:</p>
             <div className="flex flex-wrap justify-center gap-4">
               <a href="/" className="text-sm text-[color:var(--color-primary)] hover:underline">Inicio</a>
               <a href="/precios" className="text-sm text-[color:var(--color-primary)] hover:underline">Precios</a>

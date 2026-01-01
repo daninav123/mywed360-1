@@ -8,7 +8,7 @@ import ImageUploader from '../components/ImageUploader';
 import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
 import useGuests from '../hooks/useGuests';
-import useWeddingInfoSync from '../hooks/useWeddingInfoSync';
+import useWeddingData from '../hooks/useWeddingData';
 import { propagateAllChanges } from '../utils/weddingPropagation';
 import { auth, db } from '../firebaseConfig';
 import WeddingVisionSection from '../components/wedding/WeddingVisionSection';
@@ -178,23 +178,23 @@ function InfoBoda() {
           
           // Mostrar notificación de actualización
           toast.success(
-            `✅ ${supplierName} contratado - Información actualizada automáticamente`,
+            t('weddingInfo.toasts.supplierContracted', { supplierName }),
             { duration: 5000 }
           );
           
           // Notificación adicional con detalles
           const updatedFields = [];
-          if (data.celebrationPlace) updatedFields.push('Lugar');
-          if (data.celebrationAddress) updatedFields.push('Dirección');
-          if (data.venueManagerPhone) updatedFields.push('Contacto');
-          if (data.cateringContact) updatedFields.push('Catering');
-          if (data.photographerContact) updatedFields.push('Fotógrafo');
-          if (data.musicContact) updatedFields.push('Música');
-          if (data.coordinatorName) updatedFields.push('Coordinador');
+          if (data.celebrationPlace) updatedFields.push(t('weddingInfo.toasts.fields.place'));
+          if (data.celebrationAddress) updatedFields.push(t('weddingInfo.toasts.fields.address'));
+          if (data.venueManagerPhone) updatedFields.push(t('weddingInfo.toasts.fields.contact'));
+          if (data.cateringContact) updatedFields.push(t('weddingInfo.toasts.fields.catering'));
+          if (data.photographerContact) updatedFields.push(t('weddingInfo.toasts.fields.photographer'));
+          if (data.musicContact) updatedFields.push(t('weddingInfo.toasts.fields.music'));
+          if (data.coordinatorName) updatedFields.push(t('weddingInfo.toasts.fields.coordinator'));
           
           if (updatedFields.length > 0) {
             toast.info(
-              `📋 Actualizado: ${updatedFields.join(', ')}`,
+              t('weddingInfo.toasts.fieldsUpdated', { fields: updatedFields.join(', ') }),
               { duration: 4000 }
             );
           }
@@ -251,7 +251,7 @@ function InfoBoda() {
   const generateSlug = () => {
     const coupleName = weddingInfo.coupleName || '';
     if (!coupleName) {
-      toast.error('Primero ingresa el nombre de la pareja');
+      toast.error(t('weddingInfo.toasts.enterCoupleName'));
       return;
     }
 
@@ -264,32 +264,32 @@ function InfoBoda() {
       .replace(/^-+|-+$/g, '');
 
     setWebSlug(slug);
-    toast.success('Slug generado. Guarda para aplicar cambios.');
+    toast.success(t('weddingInfo.toasts.slugGenerated'));
   };
 
   // Copiar URL pública al portapapeles
   const copyPublicUrl = () => {
     const url = `${window.location.origin}/web/${webSlug}`;
     navigator.clipboard.writeText(url);
-    toast.success('¡URL copiada al portapapeles!');
+    toast.success(t('weddingInfo.toasts.urlCopied'));
   };
 
   // Generar QR Code
   const generateQRCode = () => {
     if (!webSlug) {
-      toast.error('Primero genera un slug para la web');
+      toast.error(t('weddingInfo.toasts.generateSlugFirst'));
       return;
     }
     const url = `${window.location.origin}/web/${webSlug}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
     window.open(qrUrl, '_blank');
-    toast.success('QR generado en nueva pestaña');
+    toast.success(t('weddingInfo.toasts.qrGenerated'));
   };
 
   // Preview de la web
   const previewWeb = () => {
     if (!webSlug) {
-      toast.error('Primero genera un slug para la web');
+      toast.error(t('weddingInfo.toasts.generateSlugFirst'));
       return;
     }
     window.open(`/web/${webSlug}`, '_blank');
@@ -304,54 +304,44 @@ function InfoBoda() {
     {
       name: 'coupleName',
       labelKey: 'profile.wedding.coupleName',
-      defaultValue: 'Nombre de la pareja',
     },
     {
       name: 'celebrationPlace',
       labelKey: 'profile.wedding.celebrationPlace',
-      defaultValue: 'Lugar de la celebración',
     },
     {
       name: 'celebrationAddress',
       labelKey: 'profile.wedding.celebrationAddress',
-      defaultValue: 'Dirección de la celebración',
     },
     {
       name: 'banquetPlace',
       labelKey: 'profile.wedding.banquetPlace',
-      defaultValue: 'Lugar del banquete',
     },
     {
       name: 'receptionAddress',
       labelKey: 'profile.wedding.receptionAddress',
-      defaultValue: 'Dirección del banquete',
     },
     {
       name: 'schedule',
       labelKey: 'profile.wedding.schedule',
-      defaultValue: 'Horario (ceremonia/recepción)',
     },
     {
       name: 'weddingDate',
       labelKey: 'profile.wedding.date',
-      defaultValue: 'Fecha de la boda',
       type: 'date',
     },
     {
       name: 'rsvpDeadline',
       labelKey: 'profile.wedding.rsvp',
-      defaultValue: 'Fecha límite RSVP',
       type: 'date',
     },
     {
       name: 'giftAccount',
       labelKey: 'profile.wedding.giftAccount',
-      defaultValue: 'Cuenta de regalos',
     },
     {
       name: 'transportation',
       labelKey: 'profile.wedding.transportation',
-      defaultValue: 'Transporte / alojamiento',
     },
     { name: 'weddingStyle', labelKey: 'profile.wedding.style', defaultValue: 'Estilo de la boda' },
     {
@@ -615,7 +605,7 @@ function InfoBoda() {
                     color: 'var(--color-info)',
                   }}
                 >
-                  💾 Guardando...
+                  {t('weddingInfo.labels.saving')}
                 </span>
               )}
               {!hasUnsavedChanges && lastSavedAt && (
@@ -626,7 +616,7 @@ function InfoBoda() {
                     color: 'var(--color-success)',
                   }}
                 >
-                  ✓ Auto-guardado
+                  {t('weddingInfo.labels.autoSaved')}
                 </span>
               )}
             </div>
@@ -640,7 +630,7 @@ function InfoBoda() {
                   color: 'var(--color-on-primary)',
                 }}
               >
-                👁️ Preview Web
+                {t('weddingInfo.labels.previewWeb')}
               </Button>
               <Button
                 onClick={generateQRCode}
@@ -649,7 +639,7 @@ function InfoBoda() {
                   color: 'var(--color-text)',
                 }}
               >
-                📱 Generar QR
+                {t('weddingInfo.labels.generateQR')}
               </Button>
               <Button
                 onClick={copyPublicUrl}
@@ -658,7 +648,7 @@ function InfoBoda() {
                   color: 'var(--color-on-primary)',
                 }}
               >
-                🔗 Copiar URL
+                {t('weddingInfo.labels.copyUrl')}
               </Button>
             </div>
           )}
@@ -751,7 +741,7 @@ function InfoBoda() {
           <h2 className="text-lg font-medium flex items-center gap-2">
             📸 {t('profile.wedding.images', { defaultValue: 'Imágenes de la Web' })}
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
             Las imágenes que subas aquí se mostrarán automáticamente en tu página web
           </p>
 
@@ -767,7 +757,7 @@ function InfoBoda() {
                     'webImages.heroImage': url,
                     updatedAt: serverTimestamp(),
                   });
-                  toast.success('Imagen de portada actualizada');
+                  toast.success(t('weddingInfo.toasts.heroImageUpdated'));
                 } catch (error) {
                   console.error('Error guardando imagen:', error);
                 }
@@ -787,7 +777,7 @@ function InfoBoda() {
               maxSizeMB={10}
               aspectRatio="16:9"
             />
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
               Esta imagen se mostrará en la sección principal de tu web (Hero Section)
             </p>
           </div>
@@ -803,7 +793,7 @@ function InfoBoda() {
                     <img
                       src={imgUrl}
                       alt={`Galería ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg border-2 border-gray-200"
+                      className="w-full h-32 object-cover rounded-lg border-2 " style={{ borderColor: 'var(--color-border)' }}
                     />
                     <button
                       onClick={async () => {
@@ -814,7 +804,7 @@ function InfoBoda() {
                             'webImages.gallery': newGallery,
                             updatedAt: serverTimestamp(),
                           });
-                          toast.success('Imagen eliminada');
+                          toast.success(t('weddingInfo.toasts.imageDeleted'));
                         } catch (error) {
                           console.error('Error:', error);
                         }
@@ -838,7 +828,7 @@ function InfoBoda() {
                     'webImages.gallery': newGallery,
                     updatedAt: serverTimestamp(),
                   });
-                  toast.success('Foto añadida a la galería');
+                  toast.success(t('weddingInfo.toasts.photoAdded'));
                 } catch (error) {
                   console.error('Error:', error);
                 }
@@ -846,7 +836,7 @@ function InfoBoda() {
               label={galleryImages.length === 0 ? 'Añadir primera foto' : 'Añadir otra foto'}
               maxSizeMB={5}
             />
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
               {galleryImages.length} foto{galleryImages.length !== 1 ? 's' : ''} en la galería •
               Estas fotos se mostrarán en la sección de Galería
             </p>
@@ -862,12 +852,12 @@ function InfoBoda() {
               <div className="flex items-center gap-3">
                 <span className="text-3xl">📊</span>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Progreso de Información</h3>
-                  <p className="text-sm text-gray-600">Completa todos los datos de tu boda</p>
+                  <h3 className="text-lg font-bold " style={{ color: 'var(--color-text)' }}>Progreso de Información</h3>
+                  <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>Completa todos los datos de tu boda</p>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold " style={{ color: 'var(--color-primary)' }}>
                   {(() => {
                     const sections = [
                       // Visión General
@@ -893,7 +883,7 @@ function InfoBoda() {
                     return `${completed}/${sections.length}`;
                   })()}
                 </div>
-                <div className="text-xs text-gray-600">secciones</div>
+                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>secciones</div>
               </div>
             </div>
             <div className="mt-4">
@@ -927,13 +917,13 @@ function InfoBoda() {
             <div className="flex items-center gap-3 mb-4">
               <span className="text-3xl">💭</span>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{t('infoBoda.vision.title')}</h2>
-                <p className="text-sm text-gray-600">{t('infoBoda.vision.subtitle')}</p>
+                <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>{t('infoBoda.vision.title')}</h2>
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{t('infoBoda.vision.subtitle')}</p>
               </div>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                   {t('infoBoda.vision.howWeMet')}
                 </label>
                 <textarea
@@ -941,11 +931,11 @@ function InfoBoda() {
                   value={weddingInfo.howWeMet ?? ''}
                   onChange={handleWeddingChange}
                   placeholder={t('infoBoda.vision.howWeMetPlaceholder')}
-                  className="w-full min-h-[80px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full min-h-[80px] px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                   {t('infoBoda.vision.mostImportant')}
                 </label>
                 <textarea
@@ -953,12 +943,12 @@ function InfoBoda() {
                   value={weddingInfo.mostImportant ?? ''}
                   onChange={handleWeddingChange}
                   placeholder={t('infoBoda.vision.mostImportantPlaceholder')}
-                  className="w-full min-h-[80px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full min-h-[80px] px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                     ✅ {t('infoBoda.vision.mustHave')}
                   </label>
                   <textarea
@@ -970,7 +960,7 @@ function InfoBoda() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                     ❌ {t('infoBoda.vision.mustNotHave')}
                   </label>
                   <textarea
@@ -983,7 +973,7 @@ function InfoBoda() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                   💫 {t('infoBoda.vision.remember10Years')}
                 </label>
                 <textarea
@@ -1002,8 +992,8 @@ function InfoBoda() {
             <div className="flex items-center gap-3 mb-4">
               <span className="text-3xl">💑</span>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{t('infoBoda.essential.title')}</h2>
-                <p className="text-sm text-gray-600">{t('infoBoda.essential.subtitle')}</p>
+                <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>{t('infoBoda.essential.title')}</h2>
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{t('infoBoda.essential.subtitle')}</p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1015,7 +1005,7 @@ function InfoBoda() {
                   onChange={handleWeddingChange}
                   placeholder={t('infoBoda.essential.coupleNamePlaceholder')}
                 />
-                <p className="text-xs text-gray-500 mt-1">{t('infoBoda.essential.coupleNameHint')}</p>
+                <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>{t('infoBoda.essential.coupleNameHint')}</p>
               </div>
               <Input
                 label={t('infoBoda.essential.weddingDate')}
@@ -1046,8 +1036,8 @@ function InfoBoda() {
             <div className="flex items-center gap-3 mb-6">
               <span className="text-3xl">⛪</span>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Ceremonia y Celebración</h2>
-                <p className="text-sm text-gray-600">Dónde y cómo será vuestra boda</p>
+                <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>Ceremonia y Celebración</h2>
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>Dónde y cómo será vuestra boda</p>
               </div>
             </div>
             
@@ -1068,15 +1058,15 @@ function InfoBoda() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                      <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium  mb-2 flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
+                      <span className="" style={{ color: 'var(--color-danger)' }}>*</span>
                       Tipo de ceremonia
                     </label>
                     <select
                       name="ceremonyType"
                       value={weddingInfo.ceremonyType ?? ''}
                       onChange={handleWeddingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent " style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
                     >
                       <option value="">Selecciona...</option>
                       <option value="civil">Civil</option>
@@ -1086,14 +1076,14 @@ function InfoBoda() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       Estilo de ceremonia
                     </label>
                     <select
                       name="ceremonyStyle"
                       value={weddingInfo.ceremonyStyle ?? ''}
                       onChange={handleWeddingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent " style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
                     >
                       <option value="">Selecciona...</option>
                       <option value="tradicional">Tradicional</option>
@@ -1103,14 +1093,14 @@ function InfoBoda() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       Momento del día
                     </label>
                     <select
                       name="timeOfDay"
                       value={weddingInfo.timeOfDay ?? ''}
                       onChange={handleWeddingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent " style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
                     >
                       <option value="">Selecciona...</option>
                       <option value="dia">De día ☀️</option>
@@ -1169,11 +1159,11 @@ function InfoBoda() {
                         samePlaceCeremonyReception: e.target.checked,
                       }))
                     }
-                    className="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 mt-0.5"
+                    className="w-5 h-5 text-purple-600  rounded focus:ring-purple-500 mt-0.5" style={{ borderColor: 'var(--color-border)' }}
                   />
                   <div>
-                    <p className="font-semibold text-gray-900">¿Ceremonia y celebración en el mismo lugar?</p>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="font-semibold " style={{ color: 'var(--color-text)' }}>¿Ceremonia y celebración en el mismo lugar?</p>
+                    <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                       {weddingInfo.samePlaceCeremonyReception 
                         ? '✅ Todo en un mismo sitio - más cómodo para los invitados'
                         : '📍 En lugares diferentes - deberás especificar ambas ubicaciones'}
@@ -1192,7 +1182,7 @@ function InfoBoda() {
                   border: '1px solid var(--color-border-soft)',
                 }}
               >
-                  <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold  mb-3 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                     <span>📍</span> Lugar de la Boda (Ceremonia y Celebración)
                   </h3>
                   
@@ -1223,7 +1213,7 @@ function InfoBoda() {
                   </div>
                   
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       📍 Coordenadas GPS o enlace Maps (opcional)
                     </label>
                     <div className="flex gap-2">
@@ -1233,7 +1223,7 @@ function InfoBoda() {
                         value={weddingInfo.ceremonyGPS ?? ''}
                         onChange={handleWeddingChange}
                         placeholder="40.4168, -3.7038 o enlace Google Maps"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="flex-1 px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                       {(weddingInfo.ceremonyGPS || weddingInfo.celebrationPlace) && (
                         <button
@@ -1256,7 +1246,7 @@ function InfoBoda() {
                         </button>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
                       {t('infoBoda.venue.gpsHint')}
                     </p>
                   </div>
@@ -1297,7 +1287,7 @@ function InfoBoda() {
                     </div>
                     
                     <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                         📍 Coordenadas GPS ceremonia (opcional)
                       </label>
                       <div className="flex gap-2">
@@ -1307,7 +1297,7 @@ function InfoBoda() {
                           value={weddingInfo.ceremonyGPS ?? ''}
                           onChange={handleWeddingChange}
                           placeholder="40.4168, -3.7038 o enlace Google Maps"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="flex-1 px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                         />
                         {(weddingInfo.ceremonyGPS || weddingInfo.celebrationPlace) && (
                           <button
@@ -1366,7 +1356,7 @@ function InfoBoda() {
                     </div>
                     
                     <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                         📍 Coordenadas GPS banquete (opcional)
                       </label>
                       <div className="flex gap-2">
@@ -1376,7 +1366,7 @@ function InfoBoda() {
                           value={weddingInfo.banquetGPS ?? ''}
                           onChange={handleWeddingChange}
                           placeholder="40.4168, -3.7038 o enlace Google Maps"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          className="flex-1 px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                         />
                         {(weddingInfo.banquetGPS || weddingInfo.banquetPlace) && (
                           <button
@@ -1411,8 +1401,8 @@ function InfoBoda() {
             <div className="flex items-center gap-3 mb-6">
               <span className="text-3xl">🎉</span>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{t('infoBoda.experience.title')}</h2>
-                <p className="text-sm text-gray-600">{t('infoBoda.experience.subtitle')}</p>
+                <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>{t('infoBoda.experience.title')}</h2>
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{t('infoBoda.experience.subtitle')}</p>
               </div>
             </div>
             
@@ -1433,14 +1423,14 @@ function InfoBoda() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       {t('infoBoda.spaces.spaceType')}
                     </label>
                     <select
                       name="spaceType"
                       value={weddingInfo.spaceType ?? ''}
                       onChange={handleWeddingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent " style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
                     >
                       <option value="">{t('common.select')}</option>
                       <option value="masia">{t('infoBoda.spaces.types.farmhouse')}</option>
@@ -1454,14 +1444,14 @@ function InfoBoda() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       {t('infoBoda.spaces.indoorOutdoor')}
                     </label>
                     <select
                       name="indoorOutdoor"
                       value={weddingInfo.indoorOutdoor ?? ''}
                       onChange={handleWeddingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent " style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
                     >
                       <option value="">{t('common.select')}</option>
                       <option value="interior">{t('infoBoda.spaces.indoor')}</option>
@@ -1481,9 +1471,9 @@ function InfoBoda() {
                       onChange={(e) =>
                         setWeddingInfo((prev) => ({ ...prev, hasPlanB: e.target.checked }))
                       }
-                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      className="w-4 h-4   rounded focus:ring-green-500" style={{ color: 'var(--color-success)', borderColor: 'var(--color-border)' }}
                     />
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>
                       ☔ ¿Hay plan B en caso de lluvia?
                     </label>
                   </div>
@@ -1498,15 +1488,15 @@ function InfoBoda() {
                           onChange={(e) =>
                             setWeddingInfo((prev) => ({ ...prev, needsTent: e.target.checked }))
                           }
-                          className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                          className="w-4 h-4   rounded focus:ring-green-500" style={{ color: 'var(--color-success)', borderColor: 'var(--color-border)' }}
                         />
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>
                           ⛺ {t('infoBoda.spaces.tentNeeded')}
                         </label>
                       </div>
                       
                       <div className="ml-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                           {t('infoBoda.spaces.planBDetails')}
                         </label>
                         <textarea
@@ -1514,7 +1504,7 @@ function InfoBoda() {
                           value={weddingInfo.rainPlanB ?? ''}
                           onChange={handleWeddingChange}
                           placeholder={t('infoBoda.spaces.planBPlaceholder')}
-                          className="w-full min-h-[60px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          className="w-full min-h-[60px] px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                         />
                       </div>
                     </>
@@ -1537,12 +1527,12 @@ function InfoBoda() {
                 >
                   <span>⏰</span> Timing del Día
                 </h3>
-                <p className="text-xs text-gray-600 mb-3">
+                <p className="text-xs  mb-3" style={{ color: 'var(--color-text-secondary)' }}>
                   Especifica la hora exacta de cada momento de vuestra boda
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                    <label className="block text-sm font-medium  mb-2 flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
                       ⛪ Hora de la ceremonia
                     </label>
                     <input
@@ -1550,11 +1540,11 @@ function InfoBoda() {
                       name="ceremonyTime"
                       value={weddingInfo.ceremonyTime ?? ''}
                       onChange={handleWeddingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                    <label className="block text-sm font-medium  mb-2 flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
                       🥂 Hora del cóctel
                     </label>
                     <input
@@ -1562,11 +1552,11 @@ function InfoBoda() {
                       name="cocktailTime"
                       value={weddingInfo.cocktailTime ?? ''}
                       onChange={handleWeddingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                    <label className="block text-sm font-medium  mb-2 flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
                       🍽️ {t('infoBoda.timing.banquetTime')}
                     </label>
                     <input
@@ -1574,11 +1564,11 @@ function InfoBoda() {
                       name="banquetTime"
                       value={weddingInfo.banquetTime ?? ''}
                       onChange={handleWeddingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                    <label className="block text-sm font-medium  mb-2 flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
                       🎉 Hora inicio fiesta
                     </label>
                     <input
@@ -1586,11 +1576,11 @@ function InfoBoda() {
                       name="partyStartTime"
                       value={weddingInfo.partyStartTime ?? ''}
                       onChange={handleWeddingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                    <label className="block text-sm font-medium  mb-2 flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
                       🌙 Hora fin aproximada
                     </label>
                     <input
@@ -1598,7 +1588,7 @@ function InfoBoda() {
                       name="endTime"
                       value={weddingInfo.endTime ?? ''}
                       onChange={handleWeddingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                 </div>
@@ -1609,12 +1599,12 @@ function InfoBoda() {
                 <h3 className="text-sm font-semibold text-red-900 mb-3 flex items-center gap-2">
                   <span>🚨</span> {t('infoBoda.emergency.title')}
                 </h3>
-                <p className="text-xs text-gray-600 mb-3">
+                <p className="text-xs  mb-3" style={{ color: 'var(--color-text-secondary)' }}>
                   {t('infoBoda.emergency.subtitle')}
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       👔 {t('infoBoda.emergency.coordinator')}
                     </label>
                     <input
@@ -1623,7 +1613,7 @@ function InfoBoda() {
                       value={weddingInfo.coordinatorName ?? ''}
                       onChange={handleWeddingChange}
                       placeholder={t('infoBoda.emergency.fullNamePlaceholder')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent mb-2"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent mb-2" style={{ borderColor: 'var(--color-border)' }}
                     />
                     <input
                       type="tel"
@@ -1631,11 +1621,11 @@ function InfoBoda() {
                       value={weddingInfo.coordinatorPhone ?? ''}
                       onChange={handleWeddingChange}
                       placeholder={t('infoBoda.emergency.phonePlaceholder')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       🏛️ {t('infoBoda.emergency.venueManager')}
                     </label>
                     <input
@@ -1644,7 +1634,7 @@ function InfoBoda() {
                       value={weddingInfo.venueManagerName ?? ''}
                       onChange={handleWeddingChange}
                       placeholder={t('infoBoda.emergency.fullNamePlaceholder')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent mb-2"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent mb-2" style={{ borderColor: 'var(--color-border)' }}
                     />
                     <input
                       type="tel"
@@ -1652,11 +1642,11 @@ function InfoBoda() {
                       value={weddingInfo.venueManagerPhone ?? ''}
                       onChange={handleWeddingChange}
                       placeholder={t('infoBoda.emergency.phonePlaceholder')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       📸 {t('infoBoda.emergency.photographer')}
                     </label>
                     <input
@@ -1665,11 +1655,11 @@ function InfoBoda() {
                       value={weddingInfo.photographerContact ?? ''}
                       onChange={handleWeddingChange}
                       placeholder={t('infoBoda.emergency.contactPhonePlaceholder')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       🎵 {t('infoBoda.emergency.music')}
                     </label>
                     <input
@@ -1678,11 +1668,11 @@ function InfoBoda() {
                       value={weddingInfo.musicContact ?? ''}
                       onChange={handleWeddingChange}
                       placeholder={t('infoBoda.emergency.contactPhonePlaceholder')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       🍽️ Catering/Banquete
                     </label>
                     <input
@@ -1691,7 +1681,7 @@ function InfoBoda() {
                       value={weddingInfo.cateringContact ?? ''}
                       onChange={handleWeddingChange}
                       placeholder={t('infoBoda.emergency.contactPhonePlaceholder')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                 </div>
@@ -1702,54 +1692,54 @@ function InfoBoda() {
                 <h3 className="text-sm font-semibold text-purple-900 mb-3 flex items-center gap-2">
                   <span>🎊</span> Eventos Relacionados
                 </h3>
-                <p className="text-xs text-gray-600 mb-3">
+                <p className="text-xs  mb-3" style={{ color: 'var(--color-text-secondary)' }}>
                   Otros eventos importantes alrededor de vuestra boda
                 </p>
                 
                 {/* Cena de ensayo */}
                 <div className="mb-4 pb-4 border-b border-purple-200">
-                  <h4 className="text-sm font-semibold text-gray-800 mb-3">🍷 Cena de Ensayo</h4>
+                  <h4 className="text-sm font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>🍷 Cena de Ensayo</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.date')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.date')}</label>
                       <input
                         type="date"
                         name="rehearsalDinnerDate"
                         value={weddingInfo.rehearsalDinnerDate ?? ''}
                         onChange={handleWeddingChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.time')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.time')}</label>
                       <input
                         type="time"
                         name="rehearsalDinnerTime"
                         value={weddingInfo.rehearsalDinnerTime ?? ''}
                         onChange={handleWeddingChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.venue')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.venue')}</label>
                       <input
                         type="text"
                         name="rehearsalDinnerPlace"
                         value={weddingInfo.rehearsalDinnerPlace ?? ''}
                         onChange={handleWeddingChange}
                         placeholder="Ej: Restaurante La Pérgola"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.address')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.address')}</label>
                       <input
                         type="text"
                         name="rehearsalDinnerAddress"
                         value={weddingInfo.rehearsalDinnerAddress ?? ''}
                         onChange={handleWeddingChange}
                         placeholder="Dirección completa"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                   </div>
@@ -1757,48 +1747,48 @@ function InfoBoda() {
                 
                 {/* Brunch post-boda */}
                 <div className="mb-4 pb-4 border-b border-purple-200">
-                  <h4 className="text-sm font-semibold text-gray-800 mb-3">☕ Brunch Post-boda</h4>
+                  <h4 className="text-sm font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>☕ Brunch Post-boda</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.date')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.date')}</label>
                       <input
                         type="date"
                         name="postWeddingBrunchDate"
                         value={weddingInfo.postWeddingBrunchDate ?? ''}
                         onChange={handleWeddingChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.time')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.time')}</label>
                       <input
                         type="time"
                         name="postWeddingBrunchTime"
                         value={weddingInfo.postWeddingBrunchTime ?? ''}
                         onChange={handleWeddingChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.venue')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.venue')}</label>
                       <input
                         type="text"
                         name="postWeddingBrunchPlace"
                         value={weddingInfo.postWeddingBrunchPlace ?? ''}
                         onChange={handleWeddingChange}
                         placeholder="Ej: Hotel Miramar"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.address')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.address')}</label>
                       <input
                         type="text"
                         name="postWeddingBrunchAddress"
                         value={weddingInfo.postWeddingBrunchAddress ?? ''}
                         onChange={handleWeddingChange}
                         placeholder="Dirección completa"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                   </div>
@@ -1806,37 +1796,37 @@ function InfoBoda() {
                 
                 {/* Welcome Party */}
                 <div className="mb-4 pb-4 border-b border-purple-200">
-                  <h4 className="text-sm font-semibold text-gray-800 mb-3">🎉 Welcome Party</h4>
+                  <h4 className="text-sm font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>🎉 Welcome Party</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.date')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.date')}</label>
                       <input
                         type="date"
                         name="welcomePartyDate"
                         value={weddingInfo.welcomePartyDate ?? ''}
                         onChange={handleWeddingChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.time')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.time')}</label>
                       <input
                         type="time"
                         name="welcomePartyTime"
                         value={weddingInfo.welcomePartyTime ?? ''}
                         onChange={handleWeddingChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.venue')}</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>{t('common.venue')}</label>
                       <input
                         type="text"
                         name="welcomePartyPlace"
                         value={weddingInfo.welcomePartyPlace ?? ''}
                         onChange={handleWeddingChange}
                         placeholder="Ej: Bar El Jardín"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                   </div>
@@ -1844,26 +1834,26 @@ function InfoBoda() {
                 
                 {/* Despedidas */}
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-800 mb-3">🎊 Despedidas</h4>
+                  <h4 className="text-sm font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>🎊 Despedidas</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">👰 Despedida de soltera</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>👰 Despedida de soltera</label>
                       <input
                         type="date"
                         name="bachelorettePartyDate"
                         value={weddingInfo.bachelorettePartyDate ?? ''}
                         onChange={handleWeddingChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">🤵 Despedida de soltero</label>
+                      <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>🤵 Despedida de soltero</label>
                       <input
                         type="date"
                         name="bachelorPartyDate"
                         value={weddingInfo.bachelorPartyDate ?? ''}
                         onChange={handleWeddingChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                       />
                     </div>
                   </div>
@@ -1880,7 +1870,7 @@ function InfoBoda() {
                   value={weddingInfo.menu ?? ''}
                   onChange={handleWeddingChange}
                   placeholder="Entrantes:&#10;- Ensalada...&#10;&#10;Principales:&#10;- Solomillo..."
-                  className="w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full min-h-[100px] px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                 />
               </div>
             </div>
@@ -1891,8 +1881,8 @@ function InfoBoda() {
             <div className="flex items-center gap-3 mb-4">
               <span className="text-3xl">🎨</span>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Estilo y Diseño</h2>
-                <p className="text-sm text-gray-600">Detalles visuales de vuestra boda</p>
+                <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>Estilo y Diseño</h2>
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>Detalles visuales de vuestra boda</p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1920,7 +1910,7 @@ function InfoBoda() {
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                   Detalles del código de vestimenta
                 </label>
                 <textarea
@@ -1928,7 +1918,7 @@ function InfoBoda() {
                   value={weddingInfo.dressCodeDetails ?? ''}
                   onChange={handleWeddingChange}
                   placeholder="Sugerimos tonos pastel y evitar el blanco..."
-                  className="w-full min-h-[80px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-h-[80px] px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                 />
               </div>
             </div>
@@ -1939,13 +1929,13 @@ function InfoBoda() {
             <div className="flex items-center gap-3 mb-4">
               <span className="text-3xl">🚌</span>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Logística para Invitados</h2>
-                <p className="text-sm text-gray-600">Transporte, alojamiento y facilidades</p>
+                <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>Logística para Invitados</h2>
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>Transporte, alojamiento y facilidades</p>
               </div>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                   Información de autobuses
                 </label>
                 <textarea
@@ -1966,7 +1956,7 @@ function InfoBoda() {
               </div>
 
               <div className="border-t pt-4 mt-4">
-                <h3 className="text-md font-semibold text-gray-900 mb-3">📋 Logística Avanzada</h3>
+                <h3 className="text-md font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>📋 Logística Avanzada</h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <input
@@ -1976,12 +1966,12 @@ function InfoBoda() {
                       onChange={(e) =>
                         setWeddingInfo((prev) => ({ ...prev, pets: e.target.checked }))
                       }
-                      className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                      className="w-4 h-4 text-orange-600  rounded focus:ring-orange-500" style={{ borderColor: 'var(--color-border)' }}
                     />
-                    <label className="text-sm font-medium text-gray-700">¿Permitís mascotas?</label>
+                    <label className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>¿Permitís mascotas?</label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                       Restricciones de sonido u horarios
                     </label>
                     <textarea
@@ -1989,7 +1979,7 @@ function InfoBoda() {
                       value={weddingInfo.soundRestrictions ?? ''}
                       onChange={handleWeddingChange}
                       placeholder="Ej: Música hasta las 02:00, límite de decibelios..."
-                      className="w-full min-h-[60px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full min-h-[60px] px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                 </div>
@@ -2002,15 +1992,15 @@ function InfoBoda() {
             <div className="flex items-center gap-3 mb-4">
               <span className="text-3xl">💕</span>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Vuestra Historia</h2>
-                <p className="text-sm text-gray-600">
+                <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>Vuestra Historia</h2>
+                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                   Compartid vuestra historia con los invitados
                 </p>
               </div>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                 {t('infoBoda.experience.musicType')}
               </label>
                 <textarea
@@ -2018,11 +2008,11 @@ function InfoBoda() {
                   value={weddingInfo.giftMessage ?? ''}
                   onChange={handleWeddingChange}
                   placeholder="Lo más importante para nosotros es vuestra asistencia..."
-                  className="w-full min-h-[80px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-h-[80px] px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
                   💳 Cuenta de regalos (IBAN)
                 </label>
                 <div className="relative">
@@ -2044,7 +2034,7 @@ function InfoBoda() {
                   {weddingInfo.giftAccount && (
                     <div className="absolute right-3 top-2.5">
                       {ibanError ? (
-                        <span className="text-red-500 text-xl">❌</span>
+                        <span className=" text-xl" style={{ color: 'var(--color-danger)' }}>❌</span>
                       ) : (
                         <span className="text-green-500 text-xl">✅</span>
                       )}
@@ -2052,24 +2042,24 @@ function InfoBoda() {
                   )}
                 </div>
                 {ibanError && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <p className="mt-1 text-sm  flex items-center gap-1" style={{ color: 'var(--color-danger)' }}>
                     <span>⚠️</span>
                     {ibanError}
                   </p>
                 )}
                 {!ibanError && ibanCountry && weddingInfo.giftAccount && (
-                  <p className="mt-1 text-sm text-green-600 flex items-center gap-1">
+                  <p className="mt-1 text-sm  flex items-center gap-1" style={{ color: 'var(--color-success)' }}>
                     <span>✓</span>
                     IBAN válido - {ibanCountry}
                   </p>
                 )}
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs " style={{ color: 'var(--color-muted)' }}>
                   Este IBAN aparecerá en las invitaciones y en la web para que los invitados puedan
                   enviar regalos
                 </p>
               </div>
               <div className="border-t pt-4 mt-4">
-                <h3 className="text-md font-semibold text-gray-900 mb-3">📱 Redes Sociales</h3>
+                <h3 className="text-md font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>📱 Redes Sociales</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="#️⃣ Hashtag de la boda"
@@ -2086,7 +2076,7 @@ function InfoBoda() {
                     placeholder={t('infoBoda.experience.musicPlaceholder')}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
                   💡 Invita a tus invitados a compartir fotos con vuestro hashtag
                 </p>
               </div>

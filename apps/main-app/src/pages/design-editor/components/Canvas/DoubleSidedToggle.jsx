@@ -19,7 +19,7 @@ export default function DoubleSidedToggle({
     <div className="flex flex-col gap-3">
       {/* Selector de tamaño */}
       <div className="space-y-2">
-        <label className="text-xs font-medium text-gray-700">Tamaño</label>
+        <label className="text-xs font-medium " style={{ color: 'var(--color-text)' }}>Tamaño</label>
         <select
           value={availableSizes.find(s => s.width === canvasSize.width && s.height === canvasSize.height)?.id || 'custom'}
           onChange={(e) => {
@@ -28,7 +28,7 @@ export default function DoubleSidedToggle({
               onSizeChange({ width: size.width, height: size.height });
             }
           }}
-          className="w-full px-3 py-2 text-xs border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+          className="w-full px-3 py-2 text-xs border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}
         >
           {availableSizes.map(size => (
             <option key={size.id} value={size.id}>
@@ -36,7 +36,7 @@ export default function DoubleSidedToggle({
             </option>
           ))}
         </select>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
           {canvasSize.width} × {canvasSize.height} px
         </p>
       </div>
@@ -49,9 +49,9 @@ export default function DoubleSidedToggle({
               type="checkbox"
               checked={isDoubleSided}
               onChange={(e) => onToggleDoubleSided(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4   rounded focus:ring-blue-500" style={{ color: 'var(--color-primary)' }} style={{ borderColor: 'var(--color-border)' }}
             />
-            <span className="text-xs font-medium text-gray-700">Doble cara</span>
+            <span className="text-xs font-medium " style={{ color: 'var(--color-text)' }}>Doble cara</span>
           </label>
         </div>
       )}
@@ -60,7 +60,7 @@ export default function DoubleSidedToggle({
       {isDoubleSided && (
         <>
           <div className="h-6 w-px bg-gray-300" />
-          <div className="flex gap-1.5 bg-gray-100 p-1 rounded-md">
+          <div className="flex gap-1.5  p-1 rounded-md" style={{ backgroundColor: 'var(--color-bg)' }}>
             <button
               onClick={() => onSideChange('front')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
@@ -89,7 +89,7 @@ export default function DoubleSidedToggle({
 
       {/* Indicador visual */}
       {isDoubleSided && (
-        <div className="ml-auto flex items-center gap-1 text-xs text-gray-500">
+        <div className="ml-auto flex items-center gap-1 text-xs " style={{ color: 'var(--color-muted)' }}>
           <div className={`w-2 h-2 rounded-full ${currentSide === 'front' ? 'bg-blue-600' : 'bg-gray-400'}`} />
           <span>Editando {currentSide === 'front' ? 'anverso' : 'reverso'}</span>
         </div>

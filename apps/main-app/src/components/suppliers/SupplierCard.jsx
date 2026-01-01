@@ -25,7 +25,7 @@ import { useFavoritesWithAutoCategory } from '../../hooks/useFavoritesWithAutoCa
 import { useSupplierCompare } from '../../contexts/SupplierCompareContext';
 import { useSupplierContacts } from '../../contexts/SupplierContactsContext';
 import { useWedding } from '../../context/WeddingContext';
-import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
+import useWeddingData from '../../hooks/useWeddingData';
 import SupplierDetailModal from './SupplierDetailModal';
 import RequestQuoteModal from './RequestQuoteModal';
 import useFinance from '../../hooks/useFinance';

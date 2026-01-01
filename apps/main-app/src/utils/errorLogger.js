@@ -148,16 +148,18 @@ class ErrorLogger {
         this.errors = this.errors.slice(-100);
       }
 
-      // Log en consola con formato mejorado evitando recursión
-      if (this.originalConsoleError) {
-        this.originalConsoleError.call(console, `🚨 ${type} - ${new Date().toLocaleTimeString()}`);
-        this.originalConsoleError.call(console, 'Details:', details);
-        this.originalConsoleError.call(console, 'Full Error Entry:', errorEntry);
-      } else {
-        console.group(`🚨 ${type} - ${new Date().toLocaleTimeString()}`);
-        console.log('Details:', details);
-        console.log('Full Error Entry:', errorEntry);
-        console.groupEnd();
+      // Log en consola solo para errores importantes (no 500 de endpoints conocidos)
+      const shouldLogVerbose = !this.isKnownBackendError(details);
+      
+      if (shouldLogVerbose) {
+        if (this.originalConsoleError) {
+          this.originalConsoleError.call(console, `🚨 ${type} - ${new Date().toLocaleTimeString()}`);
+          this.originalConsoleError.call(console, 'Details:', details);
+        } else {
+          console.group(`🚨 ${type} - ${new Date().toLocaleTimeString()}`);
+          console.log('Details:', details);
+          console.groupEnd();
+        }
       }
 
       // Actualizar diagnósticos si es necesario
@@ -165,6 +167,16 @@ class ErrorLogger {
     } finally {
       this.isLoggingError = false;
     }
+  }
+
+  /**
+   * Verifica si es un error conocido del backend que no requiere logging verbose
+   */
+  isKnownBackendError(details) {
+    const knownEndpoints = ['/api/favorites', '/api/blog'];
+    const url = details?.url || '';
+    return knownEndpoints.some(endpoint => url.includes(endpoint)) && 
+           (details?.status === 500 || details?.status === 404);
   }
 
   /**

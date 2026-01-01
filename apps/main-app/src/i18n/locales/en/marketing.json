@@ -12,19 +12,23 @@
     "legal": "Legal"
   },
   "common": {
-    "copyright": "© {year} MaLove.App. All rights reserved.",
-    "logoAlt": "MaLove.App Logo",
-    "contactLabel": "Contact MaLove.App"
+    "copyright": "© {year} Planivia. All rights reserved.",
+    "logoAlt": "Planivia Logo",
+    "contactLabel": "Contact Planivia"
   },
-  "marketing": {
-    "landing": {
+  "landing": {
       "hero": {
-        "brandLabel": "MaLove.App",
-        "logoAlt": "MaLove.App logo",
+        "title": "Plan Your Perfect Wedding",
+        "subtitle": "From 'Yes!' to 'I Do' - organize every magical moment with the platform loved by thousands of couples worldwide",
+        "cta": {
+          "primary": "Start Planning Free",
+          "secondary": "See How It Works"
+        },
+        "brandLabel": "Planivia",
+        "logoAlt": "Planivia logo",
         "badge": "All-in-one wedding planning platform",
-        "title": "Coordinate your dream wedding faster with professional tools built for your team.",
         "description": [
-          "MaLove.App unifies planning, finances, communication, and design in one workspace.",
+          "Planivia unifies planning, finances, communication, and design in one workspace.",
           "Streamline daily tasks, engage vendors, and deliver a memorable experience for every guest."
         ],
         "actions": {
@@ -72,14 +76,76 @@
             ]
           },
           "assistant": {
-            "label": "MaLove.App assistant",
+            "label": "Planivia assistant",
             "message": "\"Your timeline is 82% complete. Send the lodging reminder before Monday and confirm the remaining vendors.\""
           }
         }
       },
+      "features": {
+        "title": "Everything You Need, Beautifully Organized",
+        "subtitle": "Powerful tools designed for modern couples",
+        "planning": {
+          "title": "Smart Planning",
+          "description": "Organize every detail with intelligent timelines and automated reminders"
+        },
+        "guests": {
+          "title": "Guest Management",
+          "description": "Track RSVPs, dietary preferences, and seating arrangements effortlessly"
+        },
+        "vendors": {
+          "title": "Vendor Network",
+          "description": "Connect with trusted wedding professionals and manage all communications"
+        }
+      },
+      "benefits": {
+        "title": "Designed for Your Journey",
+        "subtitle": "From engagement to honeymoon, we've got you covered",
+        "collaboration": "Real-time collaboration with your partner",
+        "time": "Save hours with automated workflows",
+        "security": "Secure document storage and contracts",
+        "design": "Beautiful customizable designs",
+        "registry": "Integrated gift registry management",
+        "ai": "AI-powered planning assistant"
+      },
+      "blog": {
+        "title": "Inspiration & Advice",
+        "description": "Discover articles, guides and trends to plan your perfect wedding. From decoration to protocol, everything you need to know.",
+        "cta": {
+          "primary": "Visit Blog",
+          "secondary": "See Articles"
+        }
+      },
+      "social": {
+        "title": "Join 50,000+ Couples Planning Their Dream Wedding",
+        "quote": "This platform transformed our wedding planning from overwhelming to enjoyable. Every detail organized beautifully in one place.",
+        "author": "— Sarah & Michael, married June 2024"
+      },
+      "stats": {
+        "couples": "Happy Couples",
+        "vendors": "Trusted Vendors",
+        "tasks": "Tasks Completed",
+        "rating": "Average Rating"
+      },
+      "explore": {
+        "title": "Explore Our Platform",
+        "subtitle": "Discover all the features and services we offer",
+        "app": {
+          "title": "Wedding Planning App",
+          "description": "Complete suite of tools to organize your perfect day"
+        },
+        "suppliers": {
+          "title": "For Suppliers",
+          "description": "Grow your wedding business with our vendor network"
+        },
+        "planners": {
+          "title": "For Planners",
+          "description": "Professional tools for wedding planning businesses"
+        },
+        "learnMore": "Learn More"
+      },
       "modules": {
         "title": "Everything you need in one place",
-        "description": "MaLove.App streamlines logistics with collaborative modules for planners, vendors, and guests.",
+        "description": "Planivia streamlines logistics with collaborative modules for planners, vendors, and guests.",
         "items": [
           {
             "title": "Guest management",
@@ -98,7 +164,7 @@
       "planner": {
         "badge": "Built for planners",
         "title": "Total control of your event portfolio without spreadsheets.",
-        "description": "MaLove.App makes it easy to run multiple weddings with dashboards, reusable templates, and exportable reports. Coordinate your team and stay ahead with a single platform.",
+        "description": "Planivia makes it easy to run multiple weddings with dashboards, reusable templates, and exportable reports. Coordinate your team and stay ahead with a single platform.",
         "highlights": [
           {
             "key": "portfolio",
@@ -131,36 +197,13 @@
           "performanceNote": "Average time per wedding: 38% less than last year."
         }
       },
-      "benefits": {
-        "badge": "Key benefits",
-        "title": "A carefully managed operation from start to finish",
-        "description": "Designed for planners who need visibility and couples who want peace of mind. MaLove.App automates repetitive tasks and keeps everyone aligned.",
-        "items": {
-          "timelines": {
-            "title": "Timelines under control",
-            "description": "Dynamic checklists, smart reminders, and shareable schedules for your team."
-          },
-          "collaboration": {
-            "title": "Real collaboration",
-            "description": "Roles for planners, assistants, vendors, and guests with personalized views."
-          },
-          "branding": {
-            "title": "Consistent design",
-            "description": "Wedding website, invitations, and communications with your branding in minutes."
-          },
-          "security": {
-            "title": "Secure data",
-            "description": "Cloud infrastructure and granular permissions to protect contracts, payments, and contacts."
-          }
-        }
-      },
       "stories": {
         "badge": "Real stories",
-        "title": "MaLove.App empowers planners and couples worldwide",
-        "description": "More than 12k weddings are managed in MaLove.App. Every team leverages automations, insights, and templates to spend more time on creativity.",
+        "title": "Planivia empowers planners and couples worldwide",
+        "description": "More than 12k weddings are managed in Planivia. Every team leverages automations, insights, and templates to spend more time on creativity.",
         "testimonials": [
           {
-            "quote": "We integrated MaLove.App into our process and now share dashboards with key vendors. The team arrives prepared to every meeting.",
+            "quote": "We integrated Planivia into our process and now share dashboards with key vendors. The team arrives prepared to every meeting.",
             "name": "Martina R.",
             "role": "Boutique planner in Madrid"
           },
@@ -171,9 +214,9 @@
           }
         ],
         "trust": {
-          "title": "Trusted by MaLove.App",
+          "title": "Trusted by Planivia",
           "brands": ["Lumiere Events", "Novia Atelier", "Festiva Group", "Urban Weddings"],
-          "note": "200+ active planners across Europe and LATAM rely on MaLove.App to standardize processes and deliver memorable experiences."
+          "note": "200+ active planners across Europe and LATAM rely on Planivia to standardize processes and deliver memorable experiences."
         }
       },
       "faq": {
@@ -181,11 +224,11 @@
         "title": "Everything you need to know before getting started",
         "items": [
           {
-            "question": "Can I try MaLove.App for free?",
+            "question": "Can I try Planivia for free?",
             "answer": "Yes. The Essentials plan is free forever and unlocks core features (guests, tasks, website). The Professional plan offers a 14-day trial with advanced integrations."
           },
           {
-            "question": "Does MaLove.App work for planners running multiple events?",
+            "question": "Does Planivia work for planners running multiple events?",
             "answer": "Absolutely. The multi-event dashboard lets you switch weddings, share permissions with collaborators, and automate updates with vendors for each event."
           },
           {
@@ -212,7 +255,7 @@
             "success": "Thank you! Our team will reach out in less than 24 hours.",
             "error": "Please fill in your name and email to request a demo."
           },
-          "consent": "By submitting you agree to receive MaLove.App related communications. You can unsubscribe at any time."
+          "consent": "By submitting you agree to receive Planivia related communications. You can unsubscribe at any time."
         }
       },
       "cta": {
@@ -224,12 +267,17 @@
     },
     "appOverview": {
       "hero": {
-        "title": "The app that brings your entire planning flow together in one place.",
-        "description": "From the first checklist to the final report, MaLove.App supports professional teams and couples who want complete control of their event.",
+        "title": "All-in-One Wedding Planning Platform",
+        "subtitle": "Everything you need to plan, organize, and celebrate your perfect wedding day - all in one beautiful platform",
+        "cta": {
+          "primary": "Start Free Trial",
+          "secondary": "See Pricing"
+        },
+        "description": "From the first checklist to the final report, Planivia supports professional teams and couples who want complete control of their event.",
         "stats": [
           {
             "value": "12k+",
-            "label": "weddings planned with MaLove.App"
+            "label": "weddings planned with Planivia"
           },
           {
             "value": "4.8/5",
@@ -241,15 +289,31 @@
           }
         ],
         "workspace": {
-          "badge": "MaLove.App Workspace",
+          "badge": "Planivia Workspace",
           "title": "A connected ecosystem",
           "description": "Synced modules, personalised roles, and granular permissions so you can collaborate without losing context.",
           "tags": ["Dashboard", "Guests", "Finance", "Communication", "Design", "Automations"]
-        }
-      },
-      "modules": {
-        "title": "Key modules ready for your team",
-        "description": "Each module is designed to connect with the rest, eliminating scattered information and keeping everyone on the same page.",
+        },
+        "tasks": {
+          "title": "Task Management",
+          "description": "Organize every detail with intelligent task management and automated reminders"
+        },
+        "guests": {
+          "title": "Guest Management",
+          "description": "Complete RSVP system with seating charts and dietary tracking"
+        },
+        "finance": {
+          "title": "Budget & Finance",
+          "description": "Track expenses, payments and vendor contracts in real-time"
+        },
+        "design": {
+          "title": "Design Tools",
+          "description": "Create beautiful invitations and wedding websites"
+        },
+        "analytics": {
+          "title": "Analytics Dashboard",
+          "description": "Real-time insights and progress tracking for your wedding"
+        },
         "items": [
           {
             "title": "Collaborative dashboard",
@@ -277,9 +341,35 @@
           }
         ]
       },
+      "features": {
+        "vendors": "Vendor management & contracts",
+        "notifications": "Smart notifications & reminders",
+        "storage": "Secure document storage",
+        "mobile": "Mobile app for iOS & Android",
+        "collaboration": "Collaborative planning tools",
+        "export": "Export & reporting tools"
+      },
+      "integration": {
+        "title": "Everything Works Together Seamlessly",
+        "subtitle": "All modules are deeply integrated to provide a unified experience. Changes sync automatically across every feature."
+      },
+      "collaboration": {
+        "title": "Built for Collaboration",
+        "description": "Invite your partner, family, and wedding planner to collaborate in real-time. Everyone stays updated with automatic notifications and shared access to plans, budgets, and guest lists.",
+        "sync": "Real-time sync across all devices",
+        "permissions": "Role-based permissions for team members",
+        "activity": "Activity feed with full history",
+        "comments": "Comments and notes on every item"
+      },
+      "cta": {
+        "title": "Ready to Get Started?",
+        "subtitle": "Join thousands of couples planning their dream wedding",
+        "primary": "Start Planning Free",
+        "secondary": "View Pricing Plans"
+      },
       "integrations": {
         "title": "Integrations and automations that work for you.",
-        "description": "Connect MaLove.App with payment services, calendars, and communication tools. Configure automatic triggers for RSVP, provider confirmations, or task follow-ups.",
+        "description": "Connect Planivia with payment services, calendars, and communication tools. Configure automatic triggers for RSVP, provider confirmations, or task follow-ups.",
         "items": [
           "Integrations with Google Calendar, Gmail, and productivity suites.",
           "Visual automations with conditions and reusable templates.",
@@ -294,30 +384,109 @@
     },
     "pricing": {
       "title": "Simple, transparent pricing",
+      "subtitle": "Choose the perfect plan for your wedding journey. All plans include a 14-day free trial.",
+      "billingCycle": {
+        "monthly": "Monthly",
+        "annual": "Annual",
+        "savePercent": "Save 17%"
+      },
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "description": "Perfect for small, intimate weddings",
+          "features": {
+            "guests": "Up to 50 guests",
+            "budgetTracking": "Basic budget tracking",
+            "taskChecklist": "Task checklist",
+            "emailSupport": "Email support",
+            "mobileApp": "Mobile app access",
+            "weddingEvents": "1 wedding event"
+          }
+        },
+        "professional": {
+          "name": "Professional",
+          "description": "Most popular for full-scale weddings",
+          "badge": "Most Popular",
+          "features": {
+            "guests": "Up to 250 guests",
+            "budgetTools": "Advanced budget & finance tools",
+            "seatingChart": "Seating chart designer",
+            "website": "Custom wedding website",
+            "prioritySupport": "Priority support",
+            "unlimitedVendors": "Unlimited vendors",
+            "rsvpManagement": "RSVP management",
+            "giftRegistry": "Gift registry integration"
+          }
+        },
+        "premium": {
+          "name": "Premium",
+          "description": "For wedding planners & luxury events",
+          "features": {
+            "unlimitedGuests": "Unlimited guests",
+            "multiWedding": "Multi-wedding management",
+            "whiteLabel": "White-label options",
+            "accountManager": "Dedicated account manager",
+            "customIntegrations": "Custom integrations",
+            "teamTools": "Team collaboration tools",
+            "analytics": "Advanced analytics",
+            "apiAccess": "API access"
+          }
+        }
+      },
+      "perMonth": "month",
+      "perYear": "year",
+      "startFreeTrial": "Start Free Trial",
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "Everything you need to know about our pricing",
+        "questions": {
+          "changePlans": {
+            "q": "Can I change plans later?",
+            "a": "Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately."
+          },
+          "afterTrial": {
+            "q": "What happens after the free trial?",
+            "a": "After your 14-day trial, you'll be charged based on your selected plan. Cancel anytime during the trial with no charges."
+          },
+          "refunds": {
+            "q": "Do you offer refunds?",
+            "a": "Yes, we offer a 30-day money-back guarantee on all annual plans."
+          },
+          "multipleWeddings": {
+            "q": "Can I use it for multiple weddings?",
+            "a": "The Premium plan supports unlimited weddings. Other plans are for single wedding events."
+          }
+        }
+      },
+      "finalCta": {
+        "title": "Still Have Questions?",
+        "subtitle": "Our team is here to help you find the perfect plan",
+        "button": "Contact Sales"
+      },
+      "footer": "© 2025 Wedding Planner. Making dream weddings come true.",
       "free": "Free",
       "pro": "Professional",
       "enterprise": "Enterprise",
       "cta": "Get started"
-    }
-  },
+    },
   "planners": {
     "meta": {
-      "title": "MaLove.App for planners | Run multiple weddings from a single workspace",
-      "description": "Coordinate weddings with your team, centralize vendors, and automate workflows with the professional MaLove.App platform.",
-      "canonical": "https://malove.app/para-planners",
-      "ogTitle": "MaLove.App for planners | Run multiple weddings from a single workspace",
+      "title": "Planivia for planners | Run multiple weddings from a single workspace",
+      "description": "Coordinate weddings with your team, centralize vendors, and automate workflows with the professional Planivia platform.",
+      "canonical": "https://planivia.net/para-planners",
+      "ogTitle": "Planivia for planners | Run multiple weddings from a single workspace",
       "ogDescription": "Manage projects, finances, and communication with tools built for wedding planners.",
-      "image": "https://malove.app/maloveapp-logo.png",
-      "twitterTitle": "MaLove.App for planners | Run multiple weddings from a single workspace",
+      "image": "https://planivia.net/maloveapp-logo.png",
+      "twitterTitle": "Planivia for planners | Run multiple weddings from a single workspace",
       "twitterDescription": "Streamline your wedding planning agency with dashboards, automations, and collaborative tools."
     },
     "hero": {
-      "logoAlt": "MaLove.App",
-      "brand": "MaLove.App",
+      "logoAlt": "Planivia",
+      "brand": "Planivia",
       "badge": "For Wedding Planners",
       "title": "Manage every wedding from one professional platform",
       "description": [
-        "MaLove.App is the definitive software for wedding planners—multi-wedding dashboard, reusable templates, collaborative teamwork, and real-time analytics.",
+        "Planivia is the definitive software for wedding planners—multi-wedding dashboard, reusable templates, collaborative teamwork, and real-time analytics.",
         "Your clients automatically access premium features. No hidden fees."
       ],
       "primaryCta": "Start free for 14 days",
@@ -450,7 +619,7 @@
         "features": [
           "Everything in Agency",
           "Full white label",
-          "No MaLove.App branding",
+          "No Planivia branding",
           "API integrations",
           "24/7 dedicated support",
           "Personalized onboarding"
@@ -512,7 +681,7 @@
     },
     "testimonials": {
       "0": {
-        "quote": "MaLove.App transformed our operation. We used to rely on spreadsheets and lost hours on manual tasks. Now everything is centralized and automated.",
+        "quote": "Planivia transformed our operation. We used to rely on spreadsheets and lost hours on manual tasks. Now everything is centralized and automated.",
         "name": "María González",
         "role": "Director at Momentos Perfectos"
       },
@@ -532,7 +701,7 @@
     "demo": {
       "badge": "Personalized Demo",
       "title": "Schedule a demo with our team",
-      "description": "We'll show you how MaLove.App can transform your agency operations. No commitment.",
+      "description": "We'll show you how Planivia can transform your agency operations. No commitment.",
       "checklist": [
         "Review of your current workflow",
         "Personalized recommendations",
@@ -573,28 +742,28 @@
   },
   "partners": {
     "meta": {
-      "title": "Partner Program | MaLove.App",
-      "description": "Join the MaLove.App partner program and earn recurring commissions with marketing resources, training, and dedicated support.",
-      "canonical": "https://malove.app/partners",
-      "ogTitle": "Partner Program | MaLove.App",
-      "ogDescription": "Earn recurring revenue by recommending MaLove.App to planners and vendors with enablement materials and real-time tracking.",
-      "image": "https://malove.app/maloveapp-logo.png",
-      "twitterTitle": "Partner Program | MaLove.App",
+      "title": "Partner Program | Planivia",
+      "description": "Join the Planivia partner program and earn recurring commissions with marketing resources, training, and dedicated support.",
+      "canonical": "https://planivia.net/partners",
+      "ogTitle": "Partner Program | Planivia",
+      "ogDescription": "Earn recurring revenue by recommending Planivia to planners and vendors with enablement materials and real-time tracking.",
+      "image": "https://planivia.net/maloveapp-logo.png",
+      "twitterTitle": "Partner Program | Planivia",
       "twitterDescription": "Generate recurring commissions by promoting the all-in-one wedding planning platform."
     },
     "hero": {
-      "logoAlt": "MaLove.App",
-      "brand": "MaLove.App",
+      "logoAlt": "Planivia",
+      "brand": "Planivia",
       "badge": "Partner Program",
       "title": "Earn commissions by helping couples plan their perfect wedding",
       "description": [
-        "Join our partner program and receive recurring commissions for every client you refer to MaLove.App.",
+        "Join our partner program and receive recurring commissions for every client you refer to Planivia.",
         "No upfront investment. Attractive payouts. Marketing assets included."
       ],
       "cta": "Request Program Access"
     },
     "benefits": {
-      "title": "Why become a MaLove.App partner?",
+      "title": "Why become a Planivia partner?",
       "subtitle": "Benefits designed to maximise your earning potential",
       "items": [
         {
@@ -674,7 +843,7 @@
         {
           "icon": "eventPros",
           "title": "Event professionals",
-          "description": "Planners who can introduce MaLove.App within their network."
+          "description": "Planners who can introduce Planivia within their network."
         }
       ]
     },
@@ -729,7 +898,7 @@
         "success": "Thanks for your interest! We will review your application and get in touch shortly.",
         "error": "Please fill in all required fields."
       },
-      "consent": "By submitting you agree that we review your profile and contact you regarding the MaLove.App partner program. We never share your information with third parties."
+      "consent": "By submitting you agree that we review your profile and contact you regarding the Planivia partner program. We never share your information with third parties."
     },
     "finalCta": {
       "title": "Ready to start earning recurring revenue?",
@@ -739,17 +908,17 @@
     "structuredData": {
       "@context": "https://schema.org",
       "@type": "ProgramMembership",
-      "name": "MaLove.App Partner Program",
-      "description": "Join the MaLove.App partner program and earn recurring commissions by recommending our wedding planning platform.",
-      "url": "https://malove.app/partners",
+      "name": "Planivia Partner Program",
+      "description": "Join the Planivia partner program and earn recurring commissions by recommending our wedding planning platform.",
+      "url": "https://planivia.net/partners",
       "hostingOrganization": {
         "@type": "Organization",
-        "name": "MaLove.App",
-        "url": "https://malove.app",
-        "logo": "https://malove.app/maloveapp-logo.png",
+        "name": "Planivia",
+        "url": "https://planivia.net",
+        "logo": "https://planivia.net/maloveapp-logo.png",
         "sameAs": [
           "https://www.linkedin.com/company/maloveapp",
-          "https://www.instagram.com/malove.app",
+          "https://www.instagram.com/planivia.net",
           "https://www.facebook.com/maloveapp"
         ]
       }
@@ -757,22 +926,22 @@
   },
   "suppliers": {
     "meta": {
-      "title": "MaLove.App for suppliers | Reach qualified couples",
-      "description": "Publish your portfolio on MaLove.App, reach couples in your area and receive qualified enquiries with centralised metrics and messaging.",
-      "ogTitle": "MaLove.App for suppliers | Reach qualified couples",
+      "title": "Planivia for suppliers | Reach qualified couples",
+      "description": "Publish your portfolio on Planivia, reach couples in your area and receive qualified enquiries with centralised metrics and messaging.",
+      "ogTitle": "Planivia for suppliers | Reach qualified couples",
       "ogDescription": "Manage your presence, pay only per view and convert couples into clients with professional tools.",
-      "twitterTitle": "MaLove.App for suppliers | Reach qualified couples",
+      "twitterTitle": "Planivia for suppliers | Reach qualified couples",
       "twitterDescription": "Showcase your wedding business, receive qualified leads and get real-time analytics.",
-      "canonical": "https://malove.app/para-proveedores",
-      "image": "https://malove.app/maloveapp-logo.png"
+      "canonical": "https://planivia.net/para-proveedores",
+      "image": "https://planivia.net/maloveapp-logo.png"
     },
     "hero": {
-      "brand": "MaLove.App",
-      "logoAlt": "MaLove.App logo",
+      "brand": "Planivia",
+      "logoAlt": "Planivia logo",
       "badge": "For Wedding Suppliers",
       "title": "Connect with couples looking for your services",
       "description": [
-        "MaLove.App helps you reach thousands of couples planning their wedding. Pay-per-view model with no monthly subscriptions or commission fees.",
+        "Planivia helps you reach thousands of couples planning their wedding. Pay-per-view model with no monthly subscriptions or commission fees.",
         "Build a professional portfolio, receive qualified requests and manage everything from your dashboard."
       ],
       "primaryCta": "Create your profile for free",
@@ -804,7 +973,7 @@
       }
     },
     "benefits": {
-      "title": "Why suppliers choose MaLove.App",
+      "title": "Why suppliers choose Planivia",
       "subtitle": "Professional tools to grow your wedding business",
       "items": [
         {
@@ -893,10 +1062,10 @@
     },
     "testimonials": {
       "badge": "Testimonials",
-      "title": "Suppliers already growing with MaLove.App",
+      "title": "Suppliers already growing with Planivia",
       "items": [
         {
-          "quote": "Since joining MaLove.App I receive qualified enquiries every week. Couples arrive with clear information and defined budgets.",
+          "quote": "Since joining Planivia I receive qualified enquiries every week. Couples arrive with clear information and defined budgets.",
           "name": "Carlos Mendoza",
           "role": "Wedding photographer",
           "rating": 5
@@ -917,7 +1086,7 @@
     },
     "categoriesSection": {
       "badge": "Available categories",
-      "title": "Does your business fit MaLove.App?",
+      "title": "Does your business fit Planivia?",
       "description": "We work with every kind of wedding supplier",
       "list": [
         "Photography & Video",
@@ -958,7 +1127,7 @@
       },
       "submit": "Request information",
       "submitting": "Sending...",
-      "consent": "By submitting you agree to be contacted about MaLove.App for suppliers.",
+      "consent": "By submitting you agree to be contacted about Planivia for suppliers.",
       "messages": {
         "success": "Thank you! We will get in touch within 24 hours.",
         "error": "Please fill in all the required fields."
@@ -973,13 +1142,13 @@
     "structuredData": {
       "@context": "https://schema.org",
       "@type": "Service",
-      "name": "MaLove.App for suppliers",
+      "name": "Planivia for suppliers",
       "serviceType": "Qualified lead generation for wedding suppliers",
       "provider": {
         "@type": "Organization",
-        "name": "MaLove.App",
-        "url": "https://malove.app",
-        "logo": "https://malove.app/maloveapp-logo.png"
+        "name": "Planivia",
+        "url": "https://planivia.net",
+        "logo": "https://planivia.net/maloveapp-logo.png"
       },
       "areaServed": {
         "@type": "Country",
@@ -991,11 +1160,29 @@
       },
       "offers": {
         "@type": "Offer",
-        "url": "https://malove.app/para-proveedores",
+        "url": "https://planivia.net/para-proveedores",
         "priceCurrency": "EUR",
         "availability": "https://schema.org/InStock",
         "description": "Pay-per-view system with portfolio, analytics and integrated messaging tools."
       }
     }
+  },
+  "footer": {
+    "product": "Product",
+    "features": "Features",
+    "pricing": "Pricing",
+    "demo": "Request Demo",
+    "forProfessionals": "For Professionals",
+    "suppliers": "Suppliers",
+    "planners": "Wedding Planners",
+    "partners": "Partners",
+    "company": "Company",
+    "about": "About Us",
+    "contact": "Contact",
+    "blog": "Blog",
+    "support": "Support",
+    "help": "Help Center",
+    "privacy": "Privacy",
+    "terms": "Terms"
   }
 }

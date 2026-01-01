@@ -1,25 +1,19 @@
-import { doc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
-import { useState, useEffect, useCallback, useRef } from 'react';
-
+import { useState, useEffect, useCallback } from 'react';
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
-import useSpecialMoments from './useSpecialMoments';
+import { timelineAPI } from '../services/apiService';
 
-// Estados posibles de los bloques
 const BLOCK_STATES = {
   ON_TIME: 'on-time',
   SLIGHTLY_DELAYED: 'slightly-delayed',
   DELAYED: 'delayed',
 };
 
-// Colores para los estados
 const STATE_COLORS = {
   [BLOCK_STATES.ON_TIME]: 'green',
   [BLOCK_STATES.SLIGHTLY_DELAYED]: 'yellow',
   [BLOCK_STATES.DELAYED]: 'red',
 };
 
-// Bloques por defecto del timeline
 const DEFAULT_BLOCKS = [
   {
     id: 'preparativos',
@@ -68,362 +62,170 @@ const DEFAULT_BLOCKS = [
   },
 ];
 
-export default function useTimeline() {
+export default function useTimelinePostgres() {
   const { activeWedding } = useWedding();
-  const { moments: specialMoments } = useSpecialMoments();
   const [blocks, setBlocks] = useState(DEFAULT_BLOCKS);
   const [alerts, setAlerts] = useState([]);
   const [automaticAlerts, setAutomaticAlerts] = useState(true);
-  const [syncInProgress, setSyncInProgress] = useState(false);
-  const unsubRef = useRef(null);
-  const alertTimersRef = useRef({});
+  const [loading, setLoading] = useState(false);
 
-  // Sincronizar momentos especiales con el timeline
-  useEffect(() => {
-    if (!specialMoments) return;
-
-    setBlocks((prev) => {
-      const updated = prev.map((block) => {
-        // Mapear IDs de bloques (coctail -> coctel)
-        const momentBlockId = block.id === 'coctel' ? 'coctail' : block.id;
-        const blockMoments = specialMoments[momentBlockId] || [];
-        
-        // Convertir momentos a formato del timeline
-        const timelineMoments = blockMoments.map((moment) => ({
-          id: moment.id,
-          title: moment.title,
-          time: moment.time || block.startTime,
-          duration: moment.duration || '15',
-          responsible: moment.responsables?.[0]?.name || '',
-          status: moment.state || 'pendiente',
-          song: moment.song,
-          type: moment.type,
-        }));
-
-        return {
-          ...block,
-          moments: timelineMoments,
-        };
-      });
-
-      return updated;
-    });
-  }, [specialMoments]);
-
-  // Cargar y suscribirse a cambios en Firestore
-  useEffect(() => {
+  const loadTimeline = useCallback(async () => {
     if (!activeWedding) return;
-
-    const ref = doc(db, 'weddings', activeWedding, 'timeline', 'main');
     
-    const unsub = onSnapshot(ref, (snap) => {
-      if (!snap.exists()) return;
+    setLoading(true);
+    try {
+      const events = await timelineAPI.getAll(activeWedding);
       
-      const data = snap.data();
-      if (data.blocks && Array.isArray(data.blocks)) {
-        setBlocks(data.blocks);
+      if (events.length === 0) {
+        setBlocks(DEFAULT_BLOCKS);
+      } else {
+        const mappedBlocks = events.map(event => ({
+          id: event.notes || event.id,
+          name: event.name,
+          startTime: event.startTime,
+          endTime: event.endTime,
+          status: event.status,
+          alerts: event.alerts || [],
+          moments: event.moments || [],
+        }));
+        setBlocks(mappedBlocks);
       }
-      if (data.alerts && Array.isArray(data.alerts)) {
-        setAlerts(data.alerts);
-      }
-      if (typeof data.automaticAlerts === 'boolean') {
-        setAutomaticAlerts(data.automaticAlerts);
-      }
-    }, (error) => {
-      // console.warn('Error al cargar timeline:', error);
-    });
-
-    unsubRef.current = unsub;
-
-    return () => {
-      if (unsubRef.current) {
-        unsubRef.current();
-        unsubRef.current = null;
-      }
-    };
+    } catch (error) {
+      console.error('Error loading timeline:', error);
+      setBlocks(DEFAULT_BLOCKS);
+    } finally {
+      setLoading(false);
+    }
   }, [activeWedding]);
 
-  // Guardar cambios en Firestore
-  const saveToFirestore = useCallback(async () => {
-    if (!activeWedding || syncInProgress) return;
-
-    setSyncInProgress(true);
-    try {
-      const ref = doc(db, 'weddings', activeWedding, 'timeline', 'main');
-      await setDoc(
-        ref,
-        {
-          blocks,
-          alerts,
-          automaticAlerts,
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
-    } catch (error) {
-      // console.error('Error al guardar timeline:', error);
-    } finally {
-      setSyncInProgress(false);
-    }
-  }, [activeWedding, blocks, alerts, automaticAlerts, syncInProgress]);
-
-  // Guardar cambios con debounce
   useEffect(() => {
-    const timer = setTimeout(() => {
-      saveToFirestore();
-    }, 1000);
+    loadTimeline();
+  }, [loadTimeline]);
 
-    return () => clearTimeout(timer);
-  }, [blocks, alerts, automaticAlerts]);
-
-  // Actualizar bloque
-  const updateBlock = useCallback((blockId, updates) => {
+  const updateBlock = useCallback(async (blockId, updates) => {
+    if (!activeWedding) return;
+    
     setBlocks((prev) =>
       prev.map((block) =>
         block.id === blockId ? { ...block, ...updates } : block
       )
     );
-  }, []);
 
-  // Añadir bloque personalizado
-  const addBlock = useCallback((name, startTime, endTime) => {
-    const id = name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/\p{Diacritic}/gu, '')
-      .replace(/[^a-z0-9]+/g, '-');
+    try {
+      const block = blocks.find(b => b.id === blockId);
+      if (block) {
+        await timelineAPI.update(block.id, {
+          name: updates.name || block.name,
+          startTime: updates.startTime || block.startTime,
+          endTime: updates.endTime || block.endTime,
+          status: updates.status || block.status,
+          moments: updates.moments || block.moments,
+          alerts: updates.alerts || block.alerts,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating timeline block:', error);
+      await loadTimeline();
+    }
+  }, [activeWedding, blocks, loadTimeline]);
 
-    const newBlock = {
-      id,
-      name,
-      startTime,
-      endTime,
-      status: BLOCK_STATES.ON_TIME,
-      alerts: [],
-      moments: [],
-    };
-
-    setBlocks((prev) => [...prev, newBlock]);
-  }, []);
-
-  // Eliminar bloque
-  const removeBlock = useCallback((blockId) => {
-    setBlocks((prev) => prev.filter((block) => block.id !== blockId));
-  }, []);
-
-  // Reordenar bloques (drag & drop)
-  const reorderBlocks = useCallback((fromIndex, toIndex) => {
-    setBlocks((prev) => {
-      const updated = [...prev];
-      const [item] = updated.splice(fromIndex, 1);
-      updated.splice(toIndex, 0, item);
-      return updated;
-    });
-  }, []);
-
-  // Cambiar estado de un bloque
   const setBlockStatus = useCallback((blockId, status) => {
     if (!Object.values(BLOCK_STATES).includes(status)) return;
-
     updateBlock(blockId, { status });
+  }, [updateBlock]);
 
-    // Generar alerta automática si está habilitado
-    if (automaticAlerts && status !== BLOCK_STATES.ON_TIME) {
-      const block = blocks.find((b) => b.id === blockId);
-      if (block) {
-        const alertType = status === BLOCK_STATES.SLIGHTLY_DELAYED ? 'warning' : 'error';
-        const message = status === BLOCK_STATES.SLIGHTLY_DELAYED
-          ? `${block.name} tiene un ligero retraso`
-          : `${block.name} está retrasado`;
+  const setBlockTimes = useCallback((blockId, startTime, endTime) => {
+    updateBlock(blockId, { startTime, endTime });
+  }, [updateBlock]);
 
-        addAlert(alertType, message, blockId);
-      }
-    }
-  }, [automaticAlerts, blocks, updateBlock]);
+  const addAlert = useCallback((blockId, alert) => {
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
 
-  // Añadir alerta manual
-  const addAlert = useCallback((type, message, blockId = null) => {
-    const alert = {
-      id: Date.now(),
-      type,
-      message,
-      blockId,
-      timestamp: new Date().toISOString(),
-      acknowledged: false,
-    };
-
+    const newAlerts = [...(block.alerts || []), alert];
+    updateBlock(blockId, { alerts: newAlerts });
     setAlerts((prev) => [...prev, alert]);
+  }, [blocks, updateBlock]);
 
-    // Auto-descartar alertas de información después de 5 minutos
-    if (type === 'info') {
-      alertTimersRef.current[alert.id] = setTimeout(() => {
-        acknowledgeAlert(alert.id);
-      }, 300000);
-    }
-  }, []);
+  const clearBlockAlerts = useCallback((blockId) => {
+    updateBlock(blockId, { alerts: [] });
+    setAlerts((prev) => prev.filter(a => a.blockId !== blockId));
+  }, [updateBlock]);
 
-  // Reconocer/descartar alerta
-  const acknowledgeAlert = useCallback((alertId) => {
-    setAlerts((prev) =>
-      prev.map((alert) =>
-        alert.id === alertId ? { ...alert, acknowledged: true } : alert
-      )
-    );
-
-    // Limpiar timer si existe
-    if (alertTimersRef.current[alertId]) {
-      clearTimeout(alertTimersRef.current[alertId]);
-      delete alertTimersRef.current[alertId];
-    }
-  }, []);
-
-  // Eliminar alerta
-  const removeAlert = useCallback((alertId) => {
-    setAlerts((prev) => prev.filter((alert) => alert.id !== alertId));
-
-    // Limpiar timer si existe
-    if (alertTimersRef.current[alertId]) {
-      clearTimeout(alertTimersRef.current[alertId]);
-      delete alertTimersRef.current[alertId];
-    }
-  }, []);
-
-  // Calcular tiempo restante/excedido para un bloque
-  const calculateBlockTiming = useCallback((block) => {
+  const getCurrentBlock = useCallback(() => {
     const now = new Date();
-    const [startHour, startMin] = block.startTime.split(':').map(Number);
-    const [endHour, endMin] = block.endTime.split(':').map(Number);
-
-    const startDate = new Date();
-    startDate.setHours(startHour, startMin, 0, 0);
-
-    const endDate = new Date();
-    if (endHour < startHour) {
-      // El bloque cruza medianoche
-      endDate.setDate(endDate.getDate() + 1);
-    }
-    endDate.setHours(endHour, endMin, 0, 0);
-
-    const isActive = now >= startDate && now <= endDate;
-    const isPast = now > endDate;
-    const isFuture = now < startDate;
-
-    let minutesRemaining = 0;
-    let minutesExceeded = 0;
-
-    if (isActive) {
-      minutesRemaining = Math.floor((endDate - now) / 60000);
-    } else if (isPast) {
-      minutesExceeded = Math.floor((now - endDate) / 60000);
-    }
-
-    return {
-      isActive,
-      isPast,
-      isFuture,
-      minutesRemaining,
-      minutesExceeded,
-    };
-  }, []);
-
-  // Verificar coherencia de horarios
-  const validateSchedule = useCallback(() => {
-    const issues = [];
-
-    for (let i = 0; i < blocks.length - 1; i++) {
-      const current = blocks[i];
-      const next = blocks[i + 1];
-
-      const [currEndHour, currEndMin] = current.endTime.split(':').map(Number);
-      const [nextStartHour, nextStartMin] = next.startTime.split(':').map(Number);
-
-      const currEndMinutes = currEndHour * 60 + currEndMin;
-      let nextStartMinutes = nextStartHour * 60 + nextStartMin;
-
-      // Ajustar si el siguiente bloque es después de medianoche
-      if (nextStartHour < currEndHour) {
-        nextStartMinutes += 24 * 60;
-      }
-
-      if (currEndMinutes > nextStartMinutes) {
-        issues.push({
-          type: 'overlap',
-          blocks: [current.name, next.name],
-          message: `${current.name} termina después de que comience ${next.name}`,
-        });
-      } else if (currEndMinutes < nextStartMinutes) {
-        const gap = nextStartMinutes - currEndMinutes;
-        if (gap > 60) {
-          issues.push({
-            type: 'gap',
-            blocks: [current.name, next.name],
-            message: `Hay ${gap} minutos sin actividad entre ${current.name} y ${next.name}`,
-          });
-        }
-      }
-    }
-
-    return issues;
+    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    return blocks.find(block => {
+      return currentTime >= block.startTime && currentTime <= block.endTime;
+    });
   }, [blocks]);
 
-  // Obtener resumen del estado actual
+  const getNextBlock = useCallback(() => {
+    const now = new Date();
+    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    return blocks.find(block => currentTime < block.startTime);
+  }, [blocks]);
+
   const getTimelineSummary = useCallback(() => {
-    const activeBlock = blocks.find((block) => {
-      const timing = calculateBlockTiming(block);
-      return timing.isActive;
+    const byStatus = {
+      [BLOCK_STATES.ON_TIME]: 0,
+      [BLOCK_STATES.SLIGHTLY_DELAYED]: 0,
+      [BLOCK_STATES.DELAYED]: 0,
+    };
+
+    blocks.forEach(block => {
+      byStatus[block.status]++;
     });
 
-    const delayedBlocks = blocks.filter(
-      (block) => block.status !== BLOCK_STATES.ON_TIME
-    );
-
-    const unacknowledgedAlerts = alerts.filter((alert) => !alert.acknowledged);
-
-    const scheduleIssues = validateSchedule();
+    const currentBlock = getCurrentBlock();
+    const nextBlock = getNextBlock();
 
     return {
-      activeBlock,
-      delayedBlocks,
-      unacknowledgedAlerts,
-      scheduleIssues,
-      totalBlocks: blocks.length,
-      onTimeBlocks: blocks.filter((b) => b.status === BLOCK_STATES.ON_TIME).length,
+      total: blocks.length,
+      byStatus,
+      currentBlock,
+      nextBlock,
+      alertCount: alerts.length,
     };
-  }, [blocks, alerts, calculateBlockTiming, validateSchedule]);
+  }, [blocks, alerts, getCurrentBlock, getNextBlock]);
 
-  // Limpiar timers al desmontar
-  useEffect(() => {
-    return () => {
-      Object.values(alertTimersRef.current).forEach(clearTimeout);
-    };
-  }, []);
+  const saveTimeline = useCallback(async () => {
+    if (!activeWedding || blocks.length === 0) return;
+
+    try {
+      await timelineAPI.bulkUpdate(activeWedding, blocks.map((block, index) => ({
+        name: block.name,
+        startTime: block.startTime,
+        endTime: block.endTime,
+        status: block.status,
+        order: index,
+        moments: block.moments,
+        alerts: block.alerts,
+        notes: block.id,
+      })));
+    } catch (error) {
+      console.error('Error saving timeline:', error);
+    }
+  }, [activeWedding, blocks]);
 
   return {
-    // Datos
     blocks,
     alerts,
     automaticAlerts,
-    syncInProgress,
-
-    // Gestión de bloques
+    loading,
+    setBlocks,
     updateBlock,
-    addBlock,
-    removeBlock,
-    reorderBlocks,
     setBlockStatus,
-
-    // Gestión de alertas
+    setBlockTimes,
     addAlert,
-    acknowledgeAlert,
-    removeAlert,
+    clearBlockAlerts,
     setAutomaticAlerts,
-
-    // Utilidades
-    calculateBlockTiming,
-    validateSchedule,
+    getCurrentBlock,
+    getNextBlock,
     getTimelineSummary,
-
-    // Constantes
+    saveTimeline,
     BLOCK_STATES,
     STATE_COLORS,
   };

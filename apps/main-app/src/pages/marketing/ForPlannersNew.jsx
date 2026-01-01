@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Briefcase, Users, Calendar, BarChart3, Layers, Clock } from 'lucide-react';
@@ -60,8 +61,24 @@ export default function ForPlannersNew() {
   ];
 
   return (
-    <PageWrapper>
-      <HeroSection
+    <>
+      <Helmet>
+        <title>Planivia para Wedding Planners | Gestiona Múltiples Bodas</title>
+        <meta name="description" content="Software profesional para wedding planners. Gestiona múltiples bodas, colabora con tu equipo, plantillas reutilizables y analíticas de negocio." />
+        <meta name="keywords" content="software wedding planners, gestión múltiples bodas, herramientas wedding planner, CRM bodas" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Planivia para Wedding Planners" />
+        <meta property="og:description" content="Gestiona tu negocio de wedding planning con herramientas profesionales" />
+        <meta property="og:url" content="https://planivia.net/para-planners" />
+        
+        {/* Canonical */}
+        <link rel="canonical" href="https://planivia.net/para-planners" />
+      </Helmet>
+      
+      <PageWrapper>
+        <HeroSection
         title={t('forPlanners.hero.title', { defaultValue: 'Scale Your Planning Business' })}
         subtitle={t('forPlanners.hero.subtitle', { defaultValue: 'Professional tools designed for wedding planners who manage multiple events. Streamline operations and deliver exceptional experiences.' })}
         image="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&auto=format&fit=crop&q=80"
@@ -206,6 +223,7 @@ export default function ForPlannersNew() {
           </p>
         </div>
       </footer>
-    </PageWrapper>
+      </PageWrapper>
+    </>
   );
 }

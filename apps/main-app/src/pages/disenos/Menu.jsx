@@ -129,7 +129,7 @@ export default function MenuDiseno() {
           />
           <button
             onClick={addDish}
-            className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded"
+            className="flex items-center gap-1  text-white px-4 py-2 rounded" style={{ backgroundColor: 'var(--color-primary)' }}
           >
             <Plus size={16} /> Añadir
           </button>
@@ -142,13 +142,13 @@ export default function MenuDiseno() {
           {Object.entries(menu).map(([key, dishes]) => (
             <div key={key} className="space-y-1">
               <h3 className="text-lg font-bold capitalize">{key}</h3>
-              {dishes.length === 0 && <p className="text-sm text-gray-500">Sin elementos</p>}
+              {dishes.length === 0 && <p className="text-sm " style={{ color: 'var(--color-muted)' }}>Sin elementos</p>}
               {dishes.map((d, idx) => (
                 <div key={idx} className="flex items-center justify-center gap-2 group">
                   <span>{d}</span>
                   <button
                     onClick={() => removeDish(key, idx)}
-                    className="hidden group-hover:inline-flex text-red-600"
+                    className="hidden group-hover:inline-flex " style={{ color: 'var(--color-danger)' }}
                     aria-label={`Eliminar ${d}`}
                   >
                     <Trash2 size={14} />
@@ -162,7 +162,7 @@ export default function MenuDiseno() {
 
       <div className="mt-8 mb-4">
         <h2 className="text-lg font-semibold mb-2">Diseña tu menú</h2>
-        <p className="text-gray-600">
+        <p className="" style={{ color: 'var(--color-text-secondary)' }}>
           Genera diseños para tu menú utilizando IA. Los datos que has introducido arriba se
           incluirán automáticamente.
         </p>

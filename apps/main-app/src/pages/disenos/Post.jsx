@@ -80,13 +80,13 @@ export default function PostDiseno() {
     <div className="space-y-6">
       <Card className="p-6 space-y-4">
         <h1 className="text-2xl font-semibold" placeholder={t('design.post.textPlaceholder')}>Dise�o de Posts para Redes Sociales</h1>
-        <p className="text-gray-600">
+        <p className="" style={{ color: 'var(--color-text-secondary)' }}>
           Crea im�genes atractivas para compartir en tus redes sociales antes, durante y despu�s de
           la boda. Selecciona un estilo o personaliza tu propio dise�o.
         </p>
 
         <div className="mt-2">
-          <p className="text-sm text-blue-600">
+          <p className="text-sm " style={{ color: 'var(--color-primary)' }}>
             <span className="font-medium" placeholder={t('design.post.titlePlaceholder')}>Consejo:</span> Estas im�genes est�n optimizadas para
             formato cuadrado, ideal para Instagram y otras plataformas de redes sociales.
           </p>

@@ -1,0 +1,357 @@
+{
+  "eventosRelacionados": {
+    "title": "Related Events",
+    "subtitle": "Manage bachelor parties, rehearsals and other events",
+    "addEvent": "Add event",
+    "noEvents": "No related events",
+    "addFirst": "Add first event",
+    "eventTypes": {
+      "despedida_soltero": "Bachelor party",
+      "despedida_soltera": "Bachelorette party",
+      "ensayo": "Ceremony rehearsal",
+      "cena_ensayo": "Rehearsal dinner",
+      "brunch": "Post-wedding brunch",
+      "bienvenida": "Welcome cocktail",
+      "otro": "Other event"
+    },
+    "form": {
+      "eventType": "Event type",
+      "eventName": "Event name",
+      "date": "Date",
+      "time": "Time",
+      "location": "Location",
+      "description": "Description",
+      "budget": "Budget",
+      "guests": "Estimated guests",
+      "organizer": "Organizer",
+      "status": "Status"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "stats": {
+      "total": "Total events",
+      "confirmed": "Confirmed",
+      "totalBudget": "Total budget",
+      "totalGuests": "Total guests"
+    },
+    "messages": {
+      "created": "Event created",
+      "updated": "Event updated",
+      "deleted": "Event deleted",
+      "confirmDelete": "Delete this event?"
+    }
+  },
+  "weddingTeam": {
+    "title": "Wedding Team",
+    "subtitle": "Organize your wedding team",
+    "addMember": "Add member",
+    "noMembers": "No team members",
+    "addFirst": "Add first member",
+    "roles": {
+      "coordinador": "Wedding coordinator",
+      "padrino": "Best man",
+      "madrina": "Maid of honor",
+      "testigo": "Witness",
+      "dama_honor": "Bridesmaid",
+      "paje": "Ring bearer",
+      "maestro_ceremonias": "Master of ceremonies",
+      "otro": "Other role"
+    },
+    "form": {
+      "role": "Role",
+      "name": "Full name",
+      "phone": "Phone",
+      "email": "Email",
+      "relationship": "Relationship",
+      "responsibilities": "Responsibilities",
+      "notes": "Additional notes",
+      "confirmed": "Confirmed"
+    },
+    "stats": {
+      "total": "Total members",
+      "confirmed": "Confirmed",
+      "pending": "Pending"
+    },
+    "messages": {
+      "created": "Member added",
+      "updated": "Member updated",
+      "deleted": "Member deleted",
+      "confirmDelete": "Remove this team member?"
+    }
+  },
+  "tramitesLegales": {
+    "title": "Legal Procedures",
+    "subtitle": "Manage documentation and official procedures",
+    "addTramite": "Add procedure",
+    "noTramites": "No procedures registered",
+    "addFirst": "Add first procedure",
+    "categories": {
+      "civil": "Civil ceremony",
+      "religiosa": "Religious ceremony",
+      "extranjero": "Marriage with foreigner",
+      "regimen": "Economic regime",
+      "otros": "Other procedures"
+    },
+    "form": {
+      "category": "Category",
+      "name": "Procedure name",
+      "description": "Description",
+      "required": "Required",
+      "deadline": "Deadline",
+      "status": "Status",
+      "documents": "Required documents",
+      "cost": "Estimated cost",
+      "notes": "Notes"
+    },
+    "status": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "not_required": "Not required"
+    },
+    "stats": {
+      "total": "Total procedures",
+      "completed": "Completed",
+      "pending": "Pending",
+      "progress": "Progress"
+    },
+    "messages": {
+      "created": "Procedure added",
+      "updated": "Procedure updated",
+      "deleted": "Procedure deleted",
+      "statusChanged": "Status updated",
+      "confirmDelete": "Delete this procedure?"
+    }
+  },
+  "invitadosEspeciales": {
+    "title": "Special Needs Guests",
+    "subtitle": "Manage special needs, diets and allergies",
+    "addGuest": "Add guest",
+    "noGuests": "No guests with special needs",
+    "addFirst": "Add first guest",
+    "diets": {
+      "vegetariana": "Vegetarian",
+      "vegana": "Vegan",
+      "celiaca": "Celiac / Gluten-free",
+      "lactosa": "Lactose-free",
+      "kosher": "Kosher",
+      "halal": "Halal",
+      "diabetes": "Diabetic",
+      "otra": "Other"
+    },
+    "needs": {
+      "movilidad": "Reduced mobility",
+      "visual": "Visual disability",
+      "auditiva": "Hearing disability",
+      "embarazada": "Pregnant",
+      "bebe": "With baby",
+      "mayor": "Elderly person",
+      "otra": "Other"
+    },
+    "form": {
+      "name": "Guest name",
+      "diets": "Special diets",
+      "allergies": "Allergies",
+      "needs": "Special needs",
+      "notes": "Additional notes",
+      "seating": "Preferred seating",
+      "contact": "Emergency contact"
+    },
+    "stats": {
+      "total": "Special guests",
+      "withDiets": "With diets",
+      "withAllergies": "With allergies",
+      "withNeeds": "With needs"
+    },
+    "messages": {
+      "created": "Guest added",
+      "updated": "Guest updated",
+      "deleted": "Guest deleted",
+      "confirmDelete": "Delete this guest?",
+      "nameRequired": "Name is required"
+    }
+  },
+  "diaDeBoda": {
+    "title": "Wedding Day",
+    "subtitle": "Checklist, timeline and emergency contacts",
+    "tabs": {
+      "checklist": "Checklist",
+      "timeline": "Timeline",
+      "contacts": "Contacts"
+    },
+    "checklist": {
+      "addItem": "Add task",
+      "noItems": "No tasks in checklist",
+      "addFirst": "Add first task",
+      "categories": {
+        "novios": "Couple",
+        "ceremonia": "Ceremony",
+        "banquete": "Reception",
+        "proveedores": "Vendors",
+        "decoracion": "Decoration",
+        "emergencia": "Emergency kit"
+      },
+      "form": {
+        "category": "Category",
+        "task": "Task",
+        "responsible": "Responsible",
+        "time": "Estimated time",
+        "notes": "Notes",
+        "completed": "Completed"
+      }
+    },
+    "timeline": {
+      "addEvent": "Add moment",
+      "noEvents": "No moments in timeline",
+      "addFirst": "Add first moment",
+      "form": {
+        "time": "Time",
+        "event": "Moment",
+        "location": "Location",
+        "duration": "Duration (min)",
+        "responsible": "Responsible",
+        "notes": "Important notes"
+      }
+    },
+    "contacts": {
+      "addContact": "Add contact",
+      "noContacts": "No emergency contacts",
+      "addFirst": "Add first contact",
+      "roles": {
+        "coordinador": "Coordinator",
+        "fotografo": "Photographer",
+        "video": "Videographer",
+        "catering": "Catering",
+        "floristeria": "Florist",
+        "musica": "Music/DJ",
+        "transporte": "Transport",
+        "lugar": "Venue manager",
+        "emergencia": "Emergency",
+        "otro": "Other"
+      },
+      "form": {
+        "role": "Role",
+        "name": "Name/Company",
+        "phone": "Phone",
+        "email": "Email",
+        "notes": "Notes"
+      }
+    },
+    "stats": {
+      "totalTasks": "Total tasks",
+      "completed": "Completed",
+      "pending": "Pending",
+      "timeline": "Timeline moments",
+      "contacts": "Contacts"
+    },
+    "messages": {
+      "itemCreated": "Item added",
+      "itemUpdated": "Item updated",
+      "itemDeleted": "Item deleted",
+      "statusChanged": "Status updated",
+      "confirmDelete": "Delete this item?"
+    }
+  },
+  "postBoda": {
+    "title": "Post-Wedding",
+    "subtitle": "Thank you notes, memories and vendor ratings",
+    "tabs": {
+      "thanks": "Thank you notes",
+      "memories": "Memories",
+      "ratings": "Ratings"
+    },
+    "thanks": {
+      "add": "Add thank you",
+      "noThanks": "No thank you notes",
+      "addFirst": "Add first thank you",
+      "categories": {
+        "invitados": "Guests",
+        "familia": "Close family",
+        "padrinos": "Wedding party",
+        "proveedores": "Vendors"
+      },
+      "form": {
+        "category": "Category",
+        "recipient": "Recipient",
+        "email": "Email",
+        "message": "Message",
+        "sent": "Sent",
+        "dateSent": "Date sent",
+        "useTemplate": "Use template"
+      },
+      "status": {
+        "sent": "Sent",
+        "pending": "Pending"
+      }
+    },
+    "memories": {
+      "add": "Add memory",
+      "noMemories": "No memories saved",
+      "addFirst": "Add first memory",
+      "types": {
+        "foto": "Photo",
+        "video": "Video",
+        "mensaje": "Message",
+        "otro": "Other"
+      },
+      "form": {
+        "type": "Type",
+        "title": "Title",
+        "description": "Description",
+        "url": "URL (Drive, Dropbox, etc.)",
+        "date": "Date",
+        "viewDownload": "View/Download"
+      }
+    },
+    "ratings": {
+      "add": "Add rating",
+      "noRatings": "No ratings registered",
+      "addFirst": "Add first rating",
+      "providerTypes": [
+        "Photographer",
+        "Videographer",
+        "Ceremony venue",
+        "Reception venue",
+        "Catering",
+        "Florist",
+        "DJ/Music",
+        "Coordinator",
+        "Hair",
+        "Makeup",
+        "Transport",
+        "Other"
+      ],
+      "form": {
+        "provider": "Provider",
+        "serviceType": "Service type",
+        "rating": "Rating",
+        "comment": "Comment",
+        "recommend": "Would you recommend this vendor?",
+        "yes": "Would recommend",
+        "no": "Would not recommend"
+      }
+    },
+    "stats": {
+      "thanks": "Thank you notes",
+      "sent": "Sent",
+      "memories": "Memories",
+      "ratings": "Ratings",
+      "avgRating": "Average rating",
+      "files": "files",
+      "providers": "providers"
+    },
+    "messages": {
+      "created": "Item added",
+      "updated": "Item updated",
+      "deleted": "Item deleted",
+      "confirmDelete": "Delete this item?",
+      "recipientRequired": "Recipient is required",
+      "titleRequired": "Title is required",
+      "providerRequired": "Provider name is required"
+    }
+  }
+}

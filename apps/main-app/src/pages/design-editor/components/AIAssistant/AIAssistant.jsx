@@ -92,10 +92,10 @@ export default function AIAssistant({ onClose, canvasRef }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className=" rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10  bg-opacity-20 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface)' }}>
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
@@ -107,7 +107,7 @@ export default function AIAssistant({ onClose, canvasRef }) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+            className="p-2 hover: hover:bg-opacity-20 rounded-lg transition-colors" style={{ backgroundColor: 'var(--color-surface)' }}
           >
             <X className="w-6 h-6" />
           </button>
@@ -131,33 +131,33 @@ export default function AIAssistant({ onClose, canvasRef }) {
                     className={`w-6 h-6 mb-2 ${activeMode === mode.id ? 'text-purple-600' : 'text-gray-400'}`}
                   />
                   <div className="font-semibold text-sm mb-1">{mode.label}</div>
-                  <div className="text-xs text-gray-500">{mode.description}</div>
+                  <div className="text-xs " style={{ color: 'var(--color-muted)' }}>{mode.description}</div>
                 </button>
               );
             })}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
               Describe tu diseño
             </label>
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Ej: Invitación de boda minimalista con flores en las esquinas, tipografía elegante, colores tierra..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-3 border  rounded-lg resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
               rows={4}
             />
           </div>
 
           <div>
-            <div className="text-xs font-medium text-gray-700 mb-2">Sugerencias</div>
+            <div className="text-xs font-medium  mb-2" style={{ color: 'var(--color-text)' }}>Sugerencias</div>
             <div className="flex flex-wrap gap-2">
               {suggestions.map((suggestion) => (
                 <button
                   key={suggestion}
                   onClick={() => setPrompt(suggestion)}
-                  className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                  className="px-3 py-1.5 text-xs  hover:bg-gray-200 rounded-full transition-colors" style={{ backgroundColor: 'var(--color-bg)' }}
                 >
                   {suggestion}
                 </button>
@@ -183,7 +183,7 @@ export default function AIAssistant({ onClose, canvasRef }) {
             )}
           </button>
 
-          <div className="text-xs text-gray-500 text-center">
+          <div className="text-xs  text-center" style={{ color: 'var(--color-muted)' }}>
             La IA te ayudará a crear diseños profesionales en segundos
           </div>
         </div>

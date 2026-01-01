@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Sparkles, Loader2, X } from 'lucide-react';
 import { useFavorites } from '../../contexts/FavoritesContext';
-import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
+import useWeddingData from '../../hooks/useWeddingData';
 import SupplierCard from './SupplierCard';
 import { searchSuppliersHybrid } from '../../services/suppliersService';
 

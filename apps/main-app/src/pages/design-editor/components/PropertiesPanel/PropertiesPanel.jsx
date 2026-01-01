@@ -33,8 +33,8 @@ export default function PropertiesPanel({ selectedElement, canvasRef }) {
   };
 
   return (
-    <aside className="w-72 bg-white border-l border-gray-200 flex flex-col overflow-hidden" data-testid="properties-panel">
-      <div className="flex border-b border-gray-200">
+    <aside className="w-72  border-l  flex flex-col overflow-hidden" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }} data-testid="properties-panel">
+      <div className="flex border-b " style={{ borderColor: 'var(--color-border)' }}>
         <button
           onClick={() => setActiveTab('properties')}
           className={`flex-1 py-3 text-xs font-medium ${
@@ -72,21 +72,21 @@ export default function PropertiesPanel({ selectedElement, canvasRef }) {
         {activeTab === 'properties' ? (
           selectedElement ? (
             <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-900">
+              <div className="flex items-center justify-between pb-3 border-b " style={{ borderColor: 'var(--color-border)' }}>
+                <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
                   {selectedElement.type || 'Elemento'}
                 </h3>
                 <div className="flex gap-1">
                   <button
                     onClick={handleDuplicate}
-                    className="p-1.5 rounded hover:bg-gray-100"
+                    className="p-1.5 rounded hover:" style={{ backgroundColor: 'var(--color-bg)' }}
                     title="Duplicar"
                   >
                     <Copy className="w-4 h-4" />
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="p-1.5 rounded hover:bg-red-50 text-red-600"
+                    className="p-1.5 rounded hover:bg-red-50 " style={{ color: 'var(--color-danger)' }}
                     title="Eliminar"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -98,13 +98,13 @@ export default function PropertiesPanel({ selectedElement, canvasRef }) {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <Layers className="w-8 h-8 text-gray-400" />
+              <div className="w-16 h-16  rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <Layers className="w-8 h-8 " style={{ color: 'var(--color-muted)' }} />
               </div>
-              <p className="text-sm font-medium text-gray-900 mb-1">
+              <p className="text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                 Ningún elemento seleccionado
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
                 Selecciona un elemento del canvas para ver sus propiedades
               </p>
             </div>

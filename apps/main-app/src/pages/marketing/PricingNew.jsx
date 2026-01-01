@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Check, Sparkles, Heart, Crown } from 'lucide-react';
@@ -13,126 +14,135 @@ import {
 } from '../../components/theme/WeddingTheme';
 
 export default function PricingNew() {
+  const { t } = useTranslation('marketing');
   const navigate = useNavigate();
-  const [billingCycle, setBillingCycle] = useState('monthly');
 
   const plans = [
     {
-      name: 'Starter',
+      name: 'Free',
       icon: Heart,
-      description: 'Perfect for small, intimate weddings',
-      price: billingCycle === 'monthly' ? 29 : 290,
+      description: 'Perfecto para bodas íntimas',
+      price: 0,
       color: theme.colors.yellow,
       accentColor: theme.colors.yellowAccent,
       features: [
-        'Up to 50 guests',
-        'Basic budget tracking',
-        'Task checklist',
-        'Email support',
-        'Mobile app access',
-        '1 wedding event',
+        'Hasta 80 invitados',
+        'Seating plan básico',
+        'Gestión de finanzas',
+        'Directorio de proveedores',
+        '1 boda activa',
       ],
     },
     {
-      name: 'Professional',
+      name: 'Wedding Pass',
       icon: Sparkles,
-      description: 'Most popular for full-scale weddings',
-      price: billingCycle === 'monthly' ? 79 : 790,
+      description: 'El más popular para bodas completas',
+      price: 50,
       color: theme.colors.pink,
       accentColor: theme.colors.pinkAccent,
       popular: true,
+      badge: t('pricing.plans.professional.badge'),
       features: [
-        'Up to 250 guests',
-        'Advanced budget & finance tools',
-        'Seating chart designer',
-        'Custom wedding website',
-        'Priority support',
-        'Unlimited vendors',
-        'RSVP management',
-        'Gift registry integration',
+        'Invitados ilimitados',
+        'Contacto directo proveedores',
+        'Protocolo completo',
+        '50 diseños web',
+        'Soporte prioritario',
+        'Plantillas premium',
       ],
     },
     {
-      name: 'Premium',
+      name: 'Wedding Pass Plus',
       icon: Crown,
-      description: 'For wedding planners & luxury events',
-      price: billingCycle === 'monthly' ? 149 : 1490,
+      description: 'Para bodas premium y eventos especiales',
+      price: 85,
       color: theme.colors.green,
       accentColor: theme.colors.greenAccent,
       features: [
-        'Unlimited guests',
-        'Multi-wedding management',
-        'White-label options',
-        'Dedicated account manager',
-        'Custom integrations',
-        'Team collaboration tools',
-        'Advanced analytics',
-        'API access',
+        'Todo lo de Wedding Pass',
+        'Sin marca en invitaciones/PDF',
+        'Biblioteca completa de diseños',
+        'Editor web premium',
+        'Galería de recuerdos',
+        '1 ayudante incluido',
       ],
     },
   ];
 
   return (
-    <PageWrapper>
-      <HeroSection
-        title="Simple, Transparent Pricing"
-        subtitle="Choose the perfect plan for your wedding journey. All plans include a 14-day free trial."
+    <>
+      <Helmet>
+        <title>Precios de Planivia - Planes desde 0€ | Software para Bodas</title>
+        <meta name="description" content="Descubre los planes de Planivia para planificar tu boda. Plan Free gratis para siempre, Wedding Pass desde 50€. Sin permanencia, cancela cuando quieras." />
+        <meta name="keywords" content="precios planivia, planes boda, software boda gratis, wedding pass, planificación bodas precio" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Precios de Planivia - Planes desde 0€" />
+        <meta property="og:description" content="Elige el plan perfecto para tu boda. Desde el plan Free gratuito hasta Wedding Pass Plus con todas las funcionalidades." />
+        <meta property="og:url" content="https://planivia.net/precios" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Precios de Planivia - Planes desde 0€" />
+        <meta name="twitter:description" content="Elige el plan perfecto para tu boda" />
+        
+        {/* Canonical */}
+        <link rel="canonical" href="https://planivia.net/precios" />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "Planivia Wedding Planning Software",
+            "description": "Software completo para planificación de bodas",
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Plan Free",
+                "price": "0",
+                "priceCurrency": "EUR",
+                "availability": "https://schema.org/InStock",
+                "eligibleQuantity": {
+                  "@type": "QuantitativeValue",
+                  "value": "80",
+                  "unitText": "invitados"
+                }
+              },
+              {
+                "@type": "Offer",
+                "name": "Wedding Pass",
+                "price": "50",
+                "priceCurrency": "EUR",
+                "availability": "https://schema.org/InStock",
+                "description": "Plan más popular con invitados ilimitados"
+              },
+              {
+                "@type": "Offer",
+                "name": "Wedding Pass Plus",
+                "price": "85",
+                "priceCurrency": "EUR",
+                "availability": "https://schema.org/InStock",
+                "description": "Plan premium para bodas especiales"
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
+      
+      <PageWrapper>
+        <HeroSection
+        title={t('pricing.title')}
+        subtitle={t('pricing.subtitle')}
         compact
-      >
-        <div className="flex justify-center gap-4 mt-8">
-          <button
-            onClick={() => setBillingCycle('monthly')}
-            style={{
-              padding: '12px 24px',
-              borderRadius: theme.radius.md,
-              fontFamily: theme.fonts.body,
-              fontSize: '14px',
-              fontWeight: 600,
-              border: `2px solid ${billingCycle === 'monthly' ? theme.colors.primary : theme.colors.borderSubtle}`,
-              backgroundColor: billingCycle === 'monthly' ? theme.colors.primary : 'transparent',
-              color: billingCycle === 'monthly' ? theme.colors.onPrimary : theme.colors.textPrimary,
-              cursor: 'pointer',
-              transition: 'all 220ms',
-            }}
-          >
-            Monthly
-          </button>
-          <button
-            onClick={() => setBillingCycle('annual')}
-            style={{
-              padding: '12px 24px',
-              borderRadius: theme.radius.md,
-              fontFamily: theme.fonts.body,
-              fontSize: '14px',
-              fontWeight: 600,
-              border: `2px solid ${billingCycle === 'annual' ? theme.colors.primary : theme.colors.borderSubtle}`,
-              backgroundColor: billingCycle === 'annual' ? theme.colors.primary : 'transparent',
-              color: billingCycle === 'annual' ? theme.colors.onPrimary : theme.colors.textPrimary,
-              cursor: 'pointer',
-              transition: 'all 220ms',
-            }}
-          >
-            Annual
-            <span style={{
-              marginLeft: '8px',
-              padding: '2px 8px',
-              borderRadius: theme.radius.sm,
-              backgroundColor: theme.colors.sage,
-              fontSize: '12px',
-              color: theme.colors.textSecondary,
-            }}>
-              Save 17%
-            </span>
-          </button>
-        </div>
-      </HeroSection>
+      />
 
       <Container>
         <div className="grid md:grid-cols-3 gap-6">
           {plans.map((plan, index) => (
             <div
               key={index}
-              placeholder={t('pricing.coupleNamePlaceholder')}
               style={{
                 backgroundColor: plan.color,
                 borderRadius: theme.radius.xl,
@@ -161,7 +171,7 @@ export default function PricingNew() {
                     letterSpacing: '0.05em',
                   }}
                 >
-                  Most Popular
+                  {plan.badge}
                 </div>
               )}
 
@@ -198,16 +208,18 @@ export default function PricingNew() {
                   fontWeight: 400,
                   color: plan.accentColor,
                 }}>
-                  ${plan.price}
+                  {plan.price === 0 ? 'Gratis' : `${plan.price}€`}
                 </span>
-                <span style={{
-                  fontFamily: theme.fonts.body,
-                  fontSize: '16px',
-                  color: theme.colors.textSecondary,
-                  marginLeft: '8px',
-                }}>
-                  /{billingCycle === 'monthly' ? 'month' : 'year'}
-                </span>
+                {plan.price > 0 && (
+                  <span style={{
+                    fontFamily: theme.fonts.body,
+                    fontSize: '16px',
+                    color: theme.colors.textSecondary,
+                    marginLeft: '8px',
+                  }}>
+                    /boda
+                  </span>
+                )}
               </div>
 
               <button
@@ -229,7 +241,7 @@ export default function PricingNew() {
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
               >
-                Start Free Trial
+                {t('pricing.startFreeTrial')}
               </button>
 
               <div className="space-y-3">
@@ -258,27 +270,27 @@ export default function PricingNew() {
 
       <Container>
         <SectionTitle 
-          title="Frequently Asked Questions"
-          subtitle="Everything you need to know about our pricing"
+          title={t('pricing.faq.title')}
+          subtitle={t('pricing.faq.subtitle')}
         />
         
         <div className="max-w-3xl mx-auto space-y-4">
           {[
             {
-              q: 'Can I change plans later?',
-              a: 'Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately.',
+              q: t('pricing.faq.questions.changePlans.q'),
+              a: t('pricing.faq.questions.changePlans.a'),
             },
             {
-              q: 'What happens after the free trial?',
-              a: 'After your 14-day trial, you\'ll be charged based on your selected plan. Cancel anytime during the trial with no charges.',
+              q: t('pricing.faq.questions.afterTrial.q'),
+              a: t('pricing.faq.questions.afterTrial.a'),
             },
             {
-              q: 'Do you offer refunds?',
-              a: 'Yes, we offer a 30-day money-back guarantee on all annual plans.',
+              q: t('pricing.faq.questions.refunds.q'),
+              a: t('pricing.faq.questions.refunds.a'),
             },
             {
-              q: 'Can I use it for multiple weddings?',
-              a: 'The Premium plan supports unlimited weddings. Other plans are for single wedding events.',
+              q: t('pricing.faq.questions.multipleWeddings.q'),
+              a: t('pricing.faq.questions.multipleWeddings.a'),
             },
           ].map((faq, index) => (
             <div
@@ -329,7 +341,7 @@ export default function PricingNew() {
             color: theme.colors.textPrimary,
             marginBottom: '16px',
           }}>
-            Still Have Questions?
+            {t('pricing.finalCta.title')}
           </h2>
           <p style={{
             fontFamily: theme.fonts.body,
@@ -337,10 +349,10 @@ export default function PricingNew() {
             color: theme.colors.textSecondary,
             marginBottom: '32px',
           }}>
-            Our team is here to help you find the perfect plan
+            {t('pricing.finalCta.subtitle')}
           </p>
           <SecondaryButton onClick={() => navigate('/contacto')}>
-            Contact Sales
+            {t('pricing.finalCta.button')}
           </SecondaryButton>
         </div>
       </Container>
@@ -355,10 +367,11 @@ export default function PricingNew() {
             fontSize: '14px',
             color: theme.colors.textSecondary,
           }}>
-            © 2025 Wedding Planner. Making dream weddings come true.
+            {t('pricing.footer')}
           </p>
         </div>
       </footer>
-    </PageWrapper>
+      </PageWrapper>
+    </>
   );
 }

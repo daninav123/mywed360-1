@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 import useTranslations from '../hooks/useTranslations';
-
 export default function SupplierPortal() {
   const { token } = useParams();
   const { t } = useTranslations();
@@ -107,11 +106,11 @@ export default function SupplierPortal() {
     }
     
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="max-w-lg w-full bg-white border border-red-200 rounded-xl p-6">
+      <div className="min-h-screen  flex items-center justify-center p-6" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <div className="max-w-lg w-full  border border-red-200 rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
           <div className="text-center mb-4">
-            <div className="text-red-600 text-4xl mb-2">⚠️</div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className=" text-4xl mb-2" style={{ color: 'var(--color-danger)' }}>⚠️</div>
+            <h2 className="text-xl font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
               {isTokenError ? 'Enlace no válido' : 'Error'}
             </h2>
             <p className="text-red-700">{message}</p>
@@ -132,21 +131,21 @@ export default function SupplierPortal() {
           <div className="flex gap-2">
             <button
               onClick={() => window.location.reload()}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="flex-1 px-4 py-2  text-white rounded-md hover:bg-blue-700" style={{ backgroundColor: 'var(--color-primary)' }}
             >
               Reintentar
             </button>
             {isTokenError && (
               <button
                 onClick={() => window.history.back()}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                className="flex-1 px-4 py-2 border   rounded-md hover:" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
               >
                 Volver
               </button>
             )}
           </div>
           
-          <div className="mt-4 pt-4 border-t border-gray-200 text-center text-sm text-gray-600">
+          <div className="mt-4 pt-4 border-t  text-center text-sm " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text-secondary)' }}>
             <p>
               Si crees que esto es un error, contacta con la pareja que te envió este enlace.
             </p>
@@ -158,12 +157,12 @@ export default function SupplierPortal() {
 
   if (sent) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="max-w-lg w-full bg-white border rounded-xl p-6 text-center">
+      <div className="min-h-screen  flex items-center justify-center p-6" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <div className="max-w-lg w-full  border rounded-xl p-6 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
           <h1 className="text-2xl font-semibold mb-2">
             {t('public.supplierPortal.thanksTitle')}
           </h1>
-          <p className="text-gray-600">
+          <p className="" style={{ color: 'var(--color-text-secondary)' }}>
             {t('public.supplierPortal.thanksDescription')}
           </p>
         </div>
@@ -172,18 +171,18 @@ export default function SupplierPortal() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="max-w-2xl w-full bg-white border rounded-xl p-6 shadow-sm">
+    <div className="min-h-screen  flex items-center justify-center p-6" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="max-w-2xl w-full  border rounded-xl p-6 shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
         <header className="mb-6">
           <h1 className="text-2xl font-semibold">
             {t('public.supplierPortal.title')}
           </h1>
-          <p className="text-gray-600">
+          <p className="" style={{ color: 'var(--color-text-secondary)' }}>
             {t('public.supplierPortal.labels.wedding')}:{' '}
             <strong>{w.name}</strong> {w.date ? `· ${String(w.date).slice(0, 10)}` : ''}{' '}
             {w.location ? `· ${w.location}` : ''}
           </p>
-          <p className="text-gray-600">
+          <p className="" style={{ color: 'var(--color-text-secondary)' }}>
             {t('public.supplierPortal.labels.supplier')}:{' '}
             <strong>{s.name}</strong> {s.service ? `· ${s.service}` : ''}
           </p>

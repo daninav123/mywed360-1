@@ -1,12 +1,18 @@
-import { Search, Eye, Download, Save, Copy, Zap } from 'lucide-react';
+import { Search, Eye, Download, Save, Copy, Zap, User, Mail, Moon, LogOut } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 import Spinner from '../components/Spinner';
 import Toast from '../components/Toast';
 import Card from '../components/ui/Card';
+import LanguageSelector from '../components/ui/LanguageSelector';
+import NotificationCenter from '../components/NotificationCenter';
+import DarkModeToggle from '../components/DarkModeToggle';
+import Nav from '../components/Nav';
+import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
-import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
+import useWeddingData from '../hooks/useWeddingData';
 import useGuests from '../hooks/useGuests';
 import * as EmailService from '../services/emailService';
 import { generateRsvpLink } from '../services/rsvpService';
@@ -20,12 +26,14 @@ export default function Invitaciones() {
   const { activeWedding } = useWedding();
   const { info: weddingInfo } = useActiveWeddingInfo();
   const { guests } = useGuests();
+  const { logout: logoutUnified } = useAuth();
 
   const [aiPrompt, setAiPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [generatedText, setGeneratedText] = useState('');
   const [toast, setToast] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
   const handleAiGenerate = async () => {
     if (!aiPrompt) return;
     setLoading(true);
@@ -213,36 +221,159 @@ export default function Invitaciones() {
   }, [showPreview]);
 
   return (
-    <Card className="p-6 space-y-6">
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      <h1 className="text-2xl font-semibold">{t('invitations.title')}</h1>
-      {/* Etiqueta invisible global para satisfacer aserciones iniciales en E2E sin afectar UI */}
-      <span className="opacity-0">Selecci�n de Plantilla</span>
-      <div className="flex justify-between mb-4">
-        {step > 1 && (
-          <button onClick={() => setStep(step - 1)} className="bg-gray-200 px-3 py-1 rounded">
-            {t('invitations.buttons.previous')}
-          </button>
-        )}
-        {step < 4 && (
-          <button
-            onClick={() => setStep(step + 1)}
-            className="bg-blue-600 text-white px-3 py-1 rounded"
-          >
-            {t('invitations.buttons.next')}
-          </button>
-        )}
-        {step === 4 && (
-          <button
-            onClick={() => alert('Wizard completado')}
-            className="bg-green-600 text-white px-3 py-1 rounded"
-          >
-            {t('invitations.buttons.finish')}
-          </button>
-        )}
-      </div>
+    <>
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        {/* Botones superiores derechos */}
+        <div className="absolute top-4 right-4 flex items-center space-x-3" style={{ zIndex: 100 }}>
+          <LanguageSelector variant="minimal" />
+          
+          <div className="relative" data-user-menu>
+            <button
+              onClick={() => setOpenMenu(!openMenu)}
+              className="w-11 h-11 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center"
+              title="Menú de usuario"
+              style={{
+                backgroundColor: openMenu ? 'var(--color-lavender)' : 'rgba(255, 255, 255, 0.95)',
+                border: `2px solid ${openMenu ? 'var(--color-primary)' : 'rgba(255,255,255,0.8)'}`,
+                boxShadow: openMenu ? '0 4px 12px rgba(94, 187, 255, 0.3)' : '0 2px 8px rgba(0,0,0,0.15)',
+              }}
+            >
+              <User className="w-5 h-5" style={{ color: openMenu ? 'var(--color-primary)' : 'var(--color-text-secondary)' }} />
+            </button>
+            
+            {openMenu && (
+              <div 
+                className="absolute right-0 mt-3 bg-[var(--color-surface)] p-2 space-y-1"
+                style={{
+                  minWidth: '220px',
+                  border: '1px solid var(--color-border-soft)',
+                  borderRadius: 'var(--radius-lg)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  zIndex: 9999,
+                }}
+              >
+                <div className="px-2 py-1">
+                  <NotificationCenter />
+                </div>
 
-      {/* Asistente de IA */}
+                <Link
+                  to="/perfil"
+                  onClick={() => setOpenMenu(false)}
+                  className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
+                  style={{ color: 'var(--color-text)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <User className="w-4 h-4 mr-3" />
+                  Perfil
+                </Link>
+
+                <Link
+                  to="/email"
+                  onClick={() => setOpenMenu(false)}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
+                  style={{ color: 'var(--color-text)' }}
+                >
+                  <Mail className="w-4 h-4 mr-3" />
+                  Buzón de Emails
+                </Link>
+
+                <div 
+                  className="px-3 py-2.5 rounded-xl transition-all duration-200"
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm flex items-center" style={{ color: 'var(--color-text)' }}>
+                      <Moon className="w-4 h-4 mr-3" />
+                      Modo oscuro
+                    </span>
+                    <DarkModeToggle className="ml-2" />
+                  </div>
+                </div>
+
+                <div style={{ height: '1px', backgroundColor: 'var(--color-border-soft)', margin: '8px 0' }}></div>
+                
+                <button
+                  onClick={() => {
+                    logoutUnified();
+                    setOpenMenu(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center"
+                  style={{ color: 'var(--color-danger)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <LogOut className="w-4 h-4 mr-3" />
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      <div className="mx-auto my-8" style={{
+        maxWidth: '1024px',
+        width: '100%',
+        backgroundColor: '#FFFBF7',
+        borderRadius: '32px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        overflow: 'hidden'
+      }}>
+        
+        {/* Hero con degradado beige-dorado */}
+        <header className="relative overflow-hidden" style={{
+          background: 'linear-gradient(135deg, #FFF4E6 0%, #F8EFE3 50%, #E8D5C4 100%)',
+          padding: '48px 32px 32px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div className="max-w-4xl mx-auto" style={{ textAlign: 'center' }}>
+            {/* Título con líneas decorativas */}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              gap: '16px',
+              marginBottom: '12px'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to right, transparent, #D4A574)',
+              }} />
+              <h1 style={{
+                fontFamily: "'Playfair Display', 'Cormorant Garamond', serif",
+                fontSize: '40px',
+                fontWeight: 400,
+                color: '#1F2937',
+                letterSpacing: '-0.01em',
+                margin: 0,
+              }}>Invitaciones</h1>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to left, transparent, #D4A574)',
+              }} />
+            </div>
+            
+            {/* Subtítulo como tag uppercase */}
+            <p style={{
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginBottom: 0,
+            }}>Diseño de Invitaciones</p>
+          </div>
+        </header>
+
+        {/* Contenido */}
+        <div className="px-6 py-6">
+          <Card className="p-6 space-y-6">
+            {/* Asistente de IA */}
       {step === 1 && (
         <section className="border rounded p-4 space-y-4">
           <h2 className="text-lg font-semibold">{t('invitations.aiAssistant.title')}</h2>
@@ -309,7 +440,7 @@ export default function Invitaciones() {
                 onClick={() => setSelectedTemplateId(t.id)}
                 className={`border rounded overflow-hidden cursor-pointer hover:shadow-lg ${selectedTemplateId === t.id ? 'ring-2 ring-blue-500' : ''}`}
               >
-                <div className="h-32 bg-gray-100 flex items-center justify-center">
+                <div className="h-32  flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
                   <span className="text-sm font-medium">{t.name}</span>
                 </div>
               </div>
@@ -335,7 +466,7 @@ export default function Invitaciones() {
               Sobre
             </button>
           </div>
-          <div className="border bg-surface h-[400px] flex items-center justify-center text-gray-400">
+          <div className="border bg-surface h-[400px] flex items-center justify-center " style={{ color: 'var(--color-muted)' }}>
             {panel === 'invitation'
               ? 'Canvas de invitación: arrastra componentes aquí'
               : 'Canvas de sobre: frontal / trasero'}
@@ -350,16 +481,16 @@ export default function Invitaciones() {
           <span className="opacity-0">Selecci�n de Plantilla</span>
           <button
             onClick={() => setShowPreview((prev) => !prev)}
-            className="bg-blue-600 text-white px-4 py-2 rounded flex items-center"
+            className=" text-white px-4 py-2 rounded flex items-center" style={{ backgroundColor: 'var(--color-primary)' }}
           >
             <Eye size={16} className="mr-2" />
             {showPreview ? 'Ocultar preview' : 'Previsualizar'}
           </button>
-          <button className="bg-green-600 text-white px-4 py-2 rounded flex items-center">
+          <button className=" text-white px-4 py-2 rounded flex items-center" style={{ backgroundColor: 'var(--color-success)' }}>
             <Download size={16} className="mr-2" />
             Exportar PDF
           </button>
-          <button className="bg-gray-200 text-gray-800 px-4 py-2 rounded flex items-center">
+          <button className="bg-gray-200  px-4 py-2 rounded flex items-center" style={{ color: 'var(--color-text)' }}>
             <Download size={16} className="mr-2" />
             Exportar PNG
           </button>
@@ -456,7 +587,7 @@ export default function Invitaciones() {
                   setSendingBulk(false);
                 }
               }}
-              className="bg-blue-600 text-white px-3 py-1 rounded"
+              className=" text-white px-3 py-1 rounded" style={{ backgroundColor: 'var(--color-primary)' }}
             >
               {sendingBulk ? 'Enviando&' : 'Enviar a pendientes'}
             </button>
@@ -512,7 +643,7 @@ export default function Invitaciones() {
                   setLoading(false);
                 }
               }}
-              className="bg-blue-600 text-white px-3 py-1 rounded"
+              className=" text-white px-3 py-1 rounded" style={{ backgroundColor: 'var(--color-primary)' }}
             >
               Enviar recordatorios
             </button>
@@ -521,7 +652,7 @@ export default function Invitaciones() {
       )}
 
       {showPreview && (
-        <section className="border rounded p-4 bg-gray-50 mt-4">
+        <section className="border rounded p-4  mt-4" style={{ backgroundColor: 'var(--color-bg)' }}>
           <h3 className="text-lg font-semibold mb-2">Preview de Invitaci�n</h3>
           <div className="mb-3">
             <label className="text-sm mr-2">Invitado para preview:</label>
@@ -593,7 +724,14 @@ export default function Invitaciones() {
           </div>
         </section>
       )}
-    </Card>
+          </Card>
+        </div>
+      </div>
+      </div>
+      
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      <Nav />
+    </>
   );
 }
 

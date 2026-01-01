@@ -305,26 +305,131 @@ export default function Ideas() {
 
   if (loading) {
     return (
-      <PageWrapper title="Ideas" className="max-w-5xl mx-auto">
-        <div className="flex justify-center items-center py-10">
-          <Spinner />
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        <div className="mx-auto my-8" style={{ 
+          maxWidth: '1024px',
+          width: '100%',
+          backgroundColor: '#FFFBF7',
+          borderRadius: '32px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          overflow: 'hidden'
+        }}>
+          <div className="px-6 py-6">
+            <div className="flex justify-center items-center py-10">
+              <Spinner />
+            </div>
+          </div>
         </div>
-      </PageWrapper>
+      </div>
     );
   }
 
   return (
-    <PageWrapper title="Ideas" className="max-w-5xl mx-auto">
-      <PageTabs
-        value={view}
-        onChange={setView}
-        options={[
-          { id: 'notes', label: 'Notas' },
-          { id: 'photos', label: 'Fotos' },
-          { id: 'blog', label: 'Blog interno' },
-        ]}
-        className="mb-4"
-      />
+    <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+      <div className="mx-auto my-8" style={{ 
+        maxWidth: '1024px',
+        width: '100%',
+        backgroundColor: '#FFFBF7',
+        borderRadius: '32px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        overflow: 'hidden'
+      }}>
+        
+        {/* Hero con degradado beige-dorado */}
+        <header className="relative overflow-hidden" style={{
+          background: 'linear-gradient(135deg, #FFF4E6 0%, #F8EFE3 50%, #E8D5C4 100%)',
+          padding: '48px 32px 32px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div className="max-w-4xl mx-auto" style={{ textAlign: 'center' }}>
+            {/* Título con líneas decorativas */}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              gap: '16px',
+              marginBottom: '12px'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to right, transparent, #D4A574)',
+              }} />
+              <h1 style={{
+                fontFamily: "'Playfair Display', 'Cormorant Garamond', serif",
+                fontSize: '40px',
+                fontWeight: 400,
+                color: '#1F2937',
+                letterSpacing: '-0.01em',
+                margin: 0,
+              }}>Ideas</h1>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to left, transparent, #D4A574)',
+              }} />
+            </div>
+            
+            {/* Subtítulo como tag uppercase */}
+            <p style={{
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginBottom: '32px',
+            }}>Inspiración y Notas</p>
+            
+            {/* Tabs integrados en el hero */}
+            <div style={{ 
+              display: 'flex',
+              gap: '8px',
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}>
+              {[
+                { id: 'notes', label: 'Notas' },
+                { id: 'photos', label: 'Fotos' },
+                { id: 'blog', label: 'Blog interno' },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setView(tab.id)}
+                  style={{
+                    fontFamily: "'DM Sans', 'Inter', sans-serif",
+                    fontSize: '14px',
+                    fontWeight: view === tab.id ? 600 : 500,
+                    padding: '10px 24px',
+                    borderRadius: '20px',
+                    border: 'none',
+                    backgroundColor: view === tab.id ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
+                    color: view === tab.id ? '#1F2937' : '#6B7280',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: view === tab.id ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (view !== tab.id) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.75)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (view !== tab.id) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.5)';
+                    }
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </header>
+
+        {/* Contenido */}
+        <div className="px-6 py-6">
+          <div className="max-w-5xl mx-auto">
 
       {view === 'notes' && (
         <div>
@@ -386,7 +491,7 @@ export default function Ideas() {
           </div>
 
           {folderNotes.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm " style={{ color: 'var(--color-muted)' }}>
               Aún no hay notas en <strong>{currentFolder}</strong>. Añade la primera utilizando el
               cuadro superior.
             </p>
@@ -415,14 +520,14 @@ export default function Ideas() {
                                   value={editingValue}
                                   onChange={(e) => setEditingValue(e.target.value)}
                                   rows={3}
-                                  className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm"
+                                  className="flex-1 border  rounded px-2 py-1 text-sm" style={{ borderColor: 'var(--color-border)' }}
                                 />
                               ) : (
                                 <p className="text-sm whitespace-pre-wrap break-words flex-1">
                                   {note.text}
                                 </p>
                               )}
-                              <div className="flex flex-col gap-2 text-xs text-gray-500 items-end">
+                              <div className="flex flex-col gap-2 text-xs  items-end" style={{ color: 'var(--color-muted)' }}>
                                 <span>Creada: {formatDate(note.createdAt, 'custom')}</span>
                                 {note.updatedAt && note.updatedAt !== note.createdAt && (
                                   <span>Editada: {formatDate(note.updatedAt, 'custom')}</span>
@@ -438,7 +543,7 @@ export default function Ideas() {
                                       </button>
                                       <button
                                         onClick={handleCancelEdit}
-                                        className="px-2 py-1 border border-gray-300 rounded"
+                                        className="px-2 py-1 border  rounded" style={{ borderColor: 'var(--color-border)' }}
                                       >
                                         Cancelar
                                       </button>
@@ -447,13 +552,13 @@ export default function Ideas() {
                                     <>
                                       <button
                                         onClick={() => handleStartEditing(note)}
-                                        className="px-2 py-1 border border-gray-300 rounded"
+                                        className="px-2 py-1 border  rounded" style={{ borderColor: 'var(--color-border)' }}
                                       >
                                         Editar
                                       </button>
                                       <button
                                         onClick={() => handleDeleteNote(note.id)}
-                                        className="px-2 py-1 border border-red-300 text-red-600 rounded"
+                                        className="px-2 py-1 border border-red-300  rounded" style={{ color: 'var(--color-danger)' }}
                                       >
                                         Eliminar
                                       </button>
@@ -489,7 +594,7 @@ export default function Ideas() {
             }}
           />
           {photos.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm " style={{ color: 'var(--color-muted)' }}>
               Añade imágenes de referencia para tus ideas. Se almacenarán en la nube y estarán
               disponibles sin conexión.
             </p>
@@ -508,7 +613,7 @@ export default function Ideas() {
                   </div>
                   <button
                     onClick={() => handleDeletePhoto(index)}
-                    className="absolute top-1 right-1 bg-white/90 text-xs px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition"
+                    className="absolute top-1 right-1 /90 text-xs px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition" style={{ backgroundColor: 'var(--color-surface)' }}
                   >
                     Eliminar
                   </button>
@@ -520,7 +625,10 @@ export default function Ideas() {
       )}
 
       {view === 'blog' && <IdeasBlogSection />}
-    </PageWrapper>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -658,8 +766,8 @@ function IdeasBlogSection() {
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h2 className="text-lg font-semibold text-gray-900">Blog interno</h2>
-        <p className="text-sm text-gray-600">
+        <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Blog interno</h2>
+        <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
           Gestiona entradas internas para alinear al equipo. Se sincronizarán con la boda activa
           cuando esté seleccionada.
         </p>
@@ -675,7 +783,7 @@ function IdeasBlogSection() {
       <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
         <aside className="space-y-3">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-base font-semibold text-gray-800">Entradas</h3>
+            <h3 className="text-base font-semibold " style={{ color: 'var(--color-text)' }}>Entradas</h3>
             <button
               onClick={() => {
                 setSelectedPostId(null);
@@ -687,7 +795,7 @@ function IdeasBlogSection() {
             </button>
           </div>
           {posts.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm " style={{ color: 'var(--color-muted)' }}>
               Aún no hay entradas. Crea la primera con el editor de la derecha.
             </p>
           ) : (
@@ -704,7 +812,7 @@ function IdeasBlogSection() {
                 >
                   <div className="flex flex-col gap-1">
                     <span className="font-medium truncate">{post.title}</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs " style={{ color: 'var(--color-muted)' }}>
                       {formatDate(post.updatedAt || post.createdAt, 'short')}
                     </span>
                   </div>
@@ -715,9 +823,9 @@ function IdeasBlogSection() {
         </aside>
 
         <section className="space-y-4">
-          <div className="flex flex-col gap-3 border rounded-lg p-4 bg-white shadow-sm">
+          <div className="flex flex-col gap-3 border rounded-lg p-4  shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">Título</label>
+              <label className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>Título</label>
               <input
                 type="text"
                 value={draft.title}
@@ -732,7 +840,7 @@ function IdeasBlogSection() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">Contenido</label>
+              <label className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>Contenido</label>
               <textarea
                 value={draft.content}
                 onChange={(event) =>
@@ -747,14 +855,14 @@ function IdeasBlogSection() {
               />
             </div>
             <div className="flex justify-between items-center gap-3 flex-wrap">
-              <span className="text-xs text-gray-500">
+              <span className="text-xs " style={{ color: 'var(--color-muted)' }}>
                 {isSaving ? 'Guardando…' : 'Cambios guardados automáticamente'}
               </span>
               <div className="flex gap-2">
                 {selectedPostId && (
                   <button
                     onClick={() => handleDeletePost(selectedPostId)}
-                    className="px-3 py-2 text-sm border border-red-300 text-red-600 rounded"
+                    className="px-3 py-2 text-sm border border-red-300  rounded" style={{ color: 'var(--color-danger)' }}
                   >
                     Eliminar
                   </button>
@@ -769,10 +877,10 @@ function IdeasBlogSection() {
             </div>
           </div>
 
-          <div className="border rounded-lg p-4 bg-white shadow-sm">
-            <h3 className="text-sm font-semibold text-gray-800 mb-2">Vista previa</h3>
+          <div className="border rounded-lg p-4  shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <h3 className="text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>Vista previa</h3>
             <div
-              className="prose prose-sm max-w-none text-sm text-gray-700"
+              className="prose prose-sm max-w-none text-sm " style={{ color: 'var(--color-text)' }}
               dangerouslySetInnerHTML={{
                 __html: previewHtml || '<p>Aquí verás la vista previa…</p>',
               }}

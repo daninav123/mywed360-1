@@ -1166,14 +1166,67 @@ function Invitados() {
   };
 
   return (
-    <div className="min-h-screen bg-app p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="page-header">
-          <div>
-            <h1 className="page-title">Lista de invitados</h1>
-            <p className="text-muted mt-1">Gestiona tu lista de invitados de forma eficiente</p>
+    <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+      <div className="mx-auto my-8" style={{
+        maxWidth: '1024px',
+        width: '100%',
+        backgroundColor: '#FFFBF7',
+        borderRadius: '32px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        overflow: 'hidden'
+      }}>
+        
+        {/* Hero con degradado beige-dorado */}
+        <header className="relative overflow-hidden" style={{
+          background: 'linear-gradient(135deg, #FFF4E6 0%, #F8EFE3 50%, #E8D5C4 100%)',
+          padding: '48px 32px 32px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div className="max-w-4xl mx-auto" style={{ textAlign: 'center' }}>
+            {/* Título con líneas decorativas */}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              gap: '16px',
+              marginBottom: '12px'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to right, transparent, #D4A574)',
+              }} />
+              <h1 style={{
+                fontFamily: "'Playfair Display', 'Cormorant Garamond', serif",
+                fontSize: '40px',
+                fontWeight: 400,
+                color: '#1F2937',
+                letterSpacing: '-0.01em',
+                margin: 0,
+              }}>Lista de Invitados</h1>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to left, transparent, #D4A574)',
+              }} />
+            </div>
+            
+            {/* Subtítulo como tag uppercase */}
+            <p style={{
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginBottom: 0,
+            }}>Gestión de Boda</p>
           </div>
-        </div>
+        </header>
+
+        {/* Contenido */}
+        <div className="px-6 py-6">
+        <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Filtros y acciones */}
         <GuestFilters
@@ -1288,12 +1341,12 @@ function Invitados() {
         <Modal open={showRsvpModal} onClose={handleCloseRsvpSummary} title="Resumen RSVP" size="lg">
           <div className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white p-4 rounded-lg border">
+              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
                 <div className="text-2xl font-bold text-primary">{totalGuestsCount}</div>
                 <div className="text-sm text-muted">Total invitados</div>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
-                <div className="text-2xl font-bold text-green-600">
+              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="text-2xl font-bold " style={{ color: 'var(--color-success)' }}>
                   {
                     (guests || []).filter((g) => {
                       const s = String(g.status || '').toLowerCase();
@@ -1303,7 +1356,7 @@ function Invitados() {
                 </div>
                 <div className="text-sm text-muted">Confirmados</div>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
+              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
                 <div className="text-2xl font-bold text-yellow-600">
                   {
                     (guests || []).filter((g) => {
@@ -1314,8 +1367,8 @@ function Invitados() {
                 </div>
                 <div className="text-sm text-muted">Pendientes</div>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
-                <div className="text-2xl font-bold text-red-600">
+              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="text-2xl font-bold " style={{ color: 'var(--color-danger)' }}>
                   {
                     (guests || []).filter((g) => {
                       const s = String(g.status || '').toLowerCase();
@@ -1327,7 +1380,7 @@ function Invitados() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border overflow-hidden">
+            <div className=" rounded-lg border overflow-hidden" style={{ backgroundColor: 'var(--color-surface)' }}>
               <div className="px-4 py-3 border-b font-medium">Confirmados (Nombre y Mesa)</div>
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
@@ -1376,17 +1429,17 @@ function Invitados() {
         >
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              <div className="bg-white p-4 rounded-lg border">
+              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
                 <div className="text-xs uppercase text-muted">Registrados</div>
-                <div className="text-2xl font-semibold text-green-600">
+                <div className="text-2xl font-semibold " style={{ color: 'var(--color-success)' }}>
                   {checkInStats.checkedIn}
                 </div>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
+              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
                 <div className="text-xs uppercase text-muted">Pendientes</div>
                 <div className="text-2xl font-semibold text-yellow-600">{checkInStats.pending}</div>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
+              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
                 <div className="text-xs uppercase text-muted">Total</div>
                 <div className="text-2xl font-semibold">{checkInStats.total}</div>
               </div>
@@ -1410,7 +1463,7 @@ function Invitados() {
                   </Button>
                 )}
               </div>
-              {scanError && <p className="text-sm text-red-600">{scanError}</p>}
+              {scanError && <p className="text-sm " style={{ color: 'var(--color-danger)' }}>{scanError}</p>}
             </div>
 
             {isScanning && (
@@ -1425,7 +1478,7 @@ function Invitados() {
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="bg-white border rounded-lg p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className=" border rounded-lg p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between" style={{ backgroundColor: 'var(--color-surface)' }}>
                   <div>
                     <h3 className="text-lg font-semibold">
                       {checkInGuest.name || 'Invitado sin nombre'}
@@ -1475,7 +1528,7 @@ function Invitados() {
 
                 {Array.isArray(checkInGuest.checkInHistory) &&
                   checkInGuest.checkInHistory.length > 0 && (
-                    <div className="bg-white border rounded-lg p-4">
+                    <div className=" border rounded-lg p-4" style={{ backgroundColor: 'var(--color-surface)' }}>
                       <h4 className="font-semibold text-sm mb-2">Historial reciente</h4>
                       <ul className="space-y-1 max-h-40 overflow-auto text-sm">
                         {checkInGuest.checkInHistory
@@ -1591,14 +1644,16 @@ function Invitados() {
                 return;
               }
               if (res?.success) {
-                alert(`Invitaci�n enviada a ${res.ok ?? res.count ?? 0} invitado(s).`);
+                alert(`Invitación enviada a ${res.ok ?? res.count ?? 0} invitado(s).`);
               }
             } catch {}
           }}
         />
       </div>
+      </div>
+      </div>
     </div>
   );
-}
+};
 
 export default Invitados;

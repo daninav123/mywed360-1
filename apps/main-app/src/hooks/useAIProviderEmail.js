@@ -16,7 +16,7 @@ export const useAIProviderEmail = () => {
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState(null);
   const { userEmail, sendEmailToProvider } = useProviderEmail();
-  const { info: weddingDoc } = useActiveWeddingInfo();
+  const { weddingData: weddingDoc } = useWeddingData();
 
   const getWeddingProfile = () => (weddingDoc && (weddingDoc.weddingInfo || weddingDoc)) || {};
   const fmtWeddingDate = (raw) => {

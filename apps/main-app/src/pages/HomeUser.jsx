@@ -1,9 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import HomePage from '../components/HomePage';
 import { prefetchModule } from '../utils/prefetch';
-
 export default function HomeUser() {
   const { t } = useTranslation();
   React.useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -201,7 +201,7 @@ export default function CreateWeddingAI() {
   if (isLoading) {
     return (
       <div className="p-6 max-w-3xl mx-auto">
-        <Card className="p-6 text-center text-sm text-gray-600">Cargando…</Card>
+        <Card className="p-6 text-center text-sm " style={{ color: 'var(--color-text-secondary)' }}>Cargando…</Card>
       </div>
     );
   }
@@ -210,7 +210,7 @@ export default function CreateWeddingAI() {
     return (
       <div className="p-6 max-w-3xl mx-auto">
         <Card className="p-6 space-y-3 text-sm">
-          <h1 className="text-xl font-semibold text-gray-900">Acceso restringido</h1>
+          <h1 className="text-xl font-semibold " style={{ color: 'var(--color-text)' }}>Acceso restringido</h1>
           <p>
             Este asistente está reservado para propietarios del evento. Solicita acceso al owner o
             al administrador si necesitas crear un nuevo evento.
@@ -218,7 +218,7 @@ export default function CreateWeddingAI() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded"
+            className="inline-flex items-center justify-center px-4 py-2  text-white rounded" style={{ backgroundColor: 'var(--color-primary)' }}
           >
             Volver al inicio
           </button>
@@ -228,17 +228,19 @@ export default function CreateWeddingAI() {
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-3xl mx-auto">
+    
+      
+        <div className="p-4 md:p-6 max-w-3xl mx-auto">
       <Card className="p-6 space-y-6">
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Crear evento con IA (beta)</h1>
-            <p className="text-sm text-gray-600">
+            <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>Crear evento con IA (beta)</h1>
+            <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
               Generaremos tareas, finanzas y recordatorios iniciales en base a tus respuestas.
               Podrás ajustarlos después.
             </p>
           </div>
-          <span className="text-sm font-medium text-gray-500">Paso {step} de 2</span>
+          <span className="text-sm font-medium " style={{ color: 'var(--color-muted)' }}>Paso {step} de 2</span>
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -272,7 +274,7 @@ export default function CreateWeddingAI() {
                     className="w-full border rounded px-3 py-2"
                   />
                   {fieldErrors.weddingDate && (
-                    <p className="mt-1 text-xs text-red-600">{fieldErrors.weddingDate}</p>
+                    <p className="mt-1 text-xs " style={{ color: 'var(--color-danger)' }}>{fieldErrors.weddingDate}</p>
                   )}
                 </div>
                 <div>
@@ -288,7 +290,7 @@ export default function CreateWeddingAI() {
                     placeholder={t('createWedding.locationPlaceholder')}
                   />
                   {fieldErrors.location && (
-                    <p className="mt-1 text-xs text-red-600">{fieldErrors.location}</p>
+                    <p className="mt-1 text-xs " style={{ color: 'var(--color-danger)' }}>{fieldErrors.location}</p>
                   )}
                 </div>
               </div>
@@ -418,7 +420,7 @@ export default function CreateWeddingAI() {
                   })}
                 </div>
                 {form.relatedEvents.length > 0 && (
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs " style={{ color: 'var(--color-muted)' }}>
                     Seleccionado: {form.relatedEvents.map((value) => relatedEventLabel[value]).join(', ')}
                   </p>
                 )}
@@ -440,10 +442,10 @@ export default function CreateWeddingAI() {
             </section>
           )}
 
-          {error && <div className="text-sm text-red-600">{error}</div>}
+          {error && <div className="text-sm " style={{ color: 'var(--color-danger)' }}>{error}</div>}
 
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div className="text-xs text-gray-500">
+            <div className="text-xs " style={{ color: 'var(--color-muted)' }}>
               Podrás modificar estos datos en la configuración del evento cuando lo necesites.
             </div>
             <div className="flex gap-2 justify-end">
@@ -459,7 +461,7 @@ export default function CreateWeddingAI() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="px-4 py-2 bg-gray-100 rounded"
+                  className="px-4 py-2  rounded" style={{ backgroundColor: 'var(--color-bg)' }}
                   disabled={loading}
                 >
                   Volver
@@ -469,7 +471,7 @@ export default function CreateWeddingAI() {
                 type={step === 2 ? 'submit' : 'button'}
                 onClick={step === 1 ? goToStepTwo : undefined}
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="px-4 py-2  text-white rounded" style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 {loading
                   ? 'Creando…'
@@ -482,7 +484,9 @@ export default function CreateWeddingAI() {
             </div>
           </div>
         </form>
-      </Card>
-    </div>
+        </Card>
+        </div>
+      
+    
   );
 }

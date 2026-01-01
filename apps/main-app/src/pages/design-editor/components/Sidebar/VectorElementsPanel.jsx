@@ -167,23 +167,23 @@ export default function VectorElementsPanel({ onAddElement }) {
       {/* Header */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-900">Elementos Vectoriales</h3>
-          <span className="text-xs text-gray-500">{filteredElements.length} elementos</span>
+          <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Elementos Vectoriales</h3>
+          <span className="text-xs " style={{ color: 'var(--color-muted)' }}>{filteredElements.length} elementos</span>
         </div>
-        <p className="text-xs text-gray-600">
+        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
           {counts.total}+ elementos vectoriales con colores personalizables
         </p>
       </div>
       
       {/* Búsqueda */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 " style={{ color: 'var(--color-muted)' }} />
         <input
           type="text"
           placeholder="Buscar elementos..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full pl-10 pr-4 py-2 text-sm border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
         />
       </div>
       
@@ -210,10 +210,10 @@ export default function VectorElementsPanel({ onAddElement }) {
       </div>
       
       {/* Controles de Color */}
-      <div className="space-y-3 p-3 bg-gray-50 rounded-lg">
+      <div className="space-y-3 p-3  rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-gray-700">Personalización</span>
-          <Palette className="w-4 h-4 text-gray-400" />
+          <span className="text-xs font-medium " style={{ color: 'var(--color-text)' }}>Personalización</span>
+          <Palette className="w-4 h-4 " style={{ color: 'var(--color-muted)' }} />
         </div>
         
         {/* Fill */}
@@ -222,15 +222,15 @@ export default function VectorElementsPanel({ onAddElement }) {
             type="checkbox"
             checked={fillEnabled}
             onChange={(e) => setFillEnabled(e.target.checked)}
-            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+            className="w-4 h-4  rounded focus:ring-blue-500" style={{ color: 'var(--color-primary)' }}
           />
-          <label className="text-xs text-gray-700 flex-1">Relleno</label>
+          <label className="text-xs  flex-1" style={{ color: 'var(--color-text)' }}>Relleno</label>
           <input
             type="color"
             value={selectedColor}
             onChange={(e) => setSelectedColor(e.target.value)}
             disabled={!fillEnabled}
-            className="w-10 h-8 rounded border border-gray-300 cursor-pointer disabled:opacity-50"
+            className="w-10 h-8 rounded border  cursor-pointer disabled:opacity-50" style={{ borderColor: 'var(--color-border)' }}
           />
         </div>
         
@@ -240,20 +240,20 @@ export default function VectorElementsPanel({ onAddElement }) {
             type="checkbox"
             checked={strokeEnabled}
             onChange={(e) => setStrokeEnabled(e.target.checked)}
-            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+            className="w-4 h-4  rounded focus:ring-blue-500" style={{ color: 'var(--color-primary)' }}
           />
-          <label className="text-xs text-gray-700 flex-1">Borde</label>
+          <label className="text-xs  flex-1" style={{ color: 'var(--color-text)' }}>Borde</label>
           <input
             type="color"
             value={strokeColor}
             onChange={(e) => setStrokeColor(e.target.value)}
             disabled={!strokeEnabled}
-            className="w-10 h-8 rounded border border-gray-300 cursor-pointer disabled:opacity-50"
+            className="w-10 h-8 rounded border  cursor-pointer disabled:opacity-50" style={{ borderColor: 'var(--color-border)' }}
           />
         </div>
         
         {/* Vista previa */}
-        <div className="mt-2 p-2 bg-white rounded border border-gray-200 flex items-center justify-center">
+        <div className="mt-2 p-2  rounded border  flex items-center justify-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
           <svg width="40" height="40" viewBox="0 0 24 24">
             <path
               d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
@@ -268,11 +268,11 @@ export default function VectorElementsPanel({ onAddElement }) {
       {/* Grid de Elementos */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h4 className="text-xs font-semibold text-gray-700">Elementos</h4>
+          <h4 className="text-xs font-semibold " style={{ color: 'var(--color-text)' }}>Elementos</h4>
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="text-xs text-blue-600 hover:text-blue-700"
+              className="text-xs  hover:text-blue-700" style={{ color: 'var(--color-primary)' }}
             >
               Limpiar búsqueda
             </button>
@@ -281,7 +281,7 @@ export default function VectorElementsPanel({ onAddElement }) {
         
         <div className="grid grid-cols-3 gap-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
           {filteredElements.length === 0 ? (
-            <div className="col-span-4 text-center py-8 text-sm text-gray-500">
+            <div className="col-span-4 text-center py-8 text-sm " style={{ color: 'var(--color-muted)' }}>
               No se encontraron elementos
             </div>
           ) : (
@@ -293,7 +293,7 @@ export default function VectorElementsPanel({ onAddElement }) {
                   onDragEnd={handleDragEnd}
                   draggable
                   onClick={() => handleAddElement(element)}
-                  className="w-full aspect-square p-3 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:shadow-lg transition-all cursor-grab active:cursor-grabbing hover:scale-105"
+                  className="w-full aspect-square p-3  border-2  rounded-xl hover:border-blue-500 hover:shadow-lg transition-all cursor-grab active:cursor-grabbing hover:scale-105" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}
                   title={element.id.replace(/_/g, ' ')}
                 >
                   <svg
@@ -340,7 +340,7 @@ export default function VectorElementsPanel({ onAddElement }) {
                       e.stopPropagation();
                       handleAddElement(element, { flipH: true });
                     }}
-                    className="pointer-events-auto flex-1 p-1.5 bg-white shadow-md rounded text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                    className="pointer-events-auto flex-1 p-1.5  shadow-md rounded  hover: hover:bg-blue-50 transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-surface)' }}
                     title="Voltear horizontal"
                   >
                     <FlipHorizontal className="w-3.5 h-3.5 mx-auto" />
@@ -350,7 +350,7 @@ export default function VectorElementsPanel({ onAddElement }) {
                       e.stopPropagation();
                       handleAddElement(element, { flipV: true });
                     }}
-                    className="pointer-events-auto flex-1 p-1.5 bg-white shadow-md rounded text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                    className="pointer-events-auto flex-1 p-1.5  shadow-md rounded  hover: hover:bg-blue-50 transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-surface)' }}
                     title="Voltear vertical"
                   >
                     <FlipVertical className="w-3.5 h-3.5 mx-auto" />
@@ -360,7 +360,7 @@ export default function VectorElementsPanel({ onAddElement }) {
                       e.stopPropagation();
                       handleAddElement(element, { rotation: 90 });
                     }}
-                    className="pointer-events-auto flex-1 p-1.5 bg-white shadow-md rounded text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                    className="pointer-events-auto flex-1 p-1.5  shadow-md rounded  hover: hover:bg-blue-50 transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-surface)' }}
                     title="Rotar 90°"
                   >
                     <RotateCw className="w-3.5 h-3.5 mx-auto" />
@@ -373,7 +373,7 @@ export default function VectorElementsPanel({ onAddElement }) {
       </div>
       
       {filteredElements.length >= 100 && (
-        <div className="text-xs text-center text-gray-500 bg-amber-50 p-2 rounded">
+        <div className="text-xs text-center  bg-amber-50 p-2 rounded" style={{ color: 'var(--color-muted)' }}>
           Mostrando 100 de {selectedCategory === 'all' ? counts.total : counts[selectedCategory]} elementos.
           Usa la búsqueda para encontrar más.
         </div>
@@ -387,15 +387,15 @@ export default function VectorElementsPanel({ onAddElement }) {
         </p>
         <ul className="text-blue-800 space-y-1.5 text-[11px]">
           <li className="flex items-start gap-2">
-            <span className="text-blue-600">•</span>
+            <span className="" style={{ color: 'var(--color-primary)' }}>•</span>
             <span><strong>Click:</strong> Añade al canvas</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-600">•</span>
+            <span className="" style={{ color: 'var(--color-primary)' }}>•</span>
             <span><strong>Arrastra:</strong> Posiciona donde quieras</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-600">•</span>
+            <span className="" style={{ color: 'var(--color-primary)' }}>•</span>
             <span><strong>Hover:</strong> Muestra transformaciones</span>
           </li>
           <li className="flex items-start gap-2">

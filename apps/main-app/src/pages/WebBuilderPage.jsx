@@ -162,28 +162,28 @@ const WebBuilderPage = () => {
   // Mostrar loading mientras se carga el perfil
   if (profileLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
+      <div className="flex items-center justify-center h-screen " style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-800">Cargando tu perfil...</h2>
-          <p className="text-gray-600 mt-2">Preparando el sistema de diseño web</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2  mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
+          <h2 className="text-xl font-semibold " style={{ color: 'var(--color-text)' }}>Cargando tu perfil...</h2>
+          <p className=" mt-2" style={{ color: 'var(--color-text-secondary)' }}>Preparando el sistema de diseño web</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="web-builder-page min-h-screen bg-gray-50">
+    <div className="web-builder-page min-h-screen " style={{ backgroundColor: 'var(--color-bg)' }}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <header className=" border-b  sticky top-0 z-50" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>
               {paso === 1 && '🎨 Crear tu Web de Boda'}
               {paso === 2 && '👀 Vista Previa'}
               {paso === 3 && '✏️ Editar tu Web'}
             </h1>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
               {paso === 1 && 'Genera tu web automáticamente en segundos'}
               {paso === 2 && 'Revisa cómo se ve tu web'}
               {paso === 3 && 'Personaliza cada detalle a tu gusto'}
@@ -198,7 +198,7 @@ const WebBuilderPage = () => {
                     setPaso(1);
                     setWebConfig(null);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
                 >
                   ← Volver
                 </button>
@@ -207,13 +207,13 @@ const WebBuilderPage = () => {
                     setModoEdicion(true);
                     setPaso(3);
                   }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2  text-white rounded-lg hover:bg-blue-700 transition-colors" style={{ backgroundColor: 'var(--color-primary)' }}
                 >
                   ✏️ Editar
                 </button>
                 <button
                   onClick={handlePublicar}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2  text-white rounded-lg hover:bg-green-700 transition-colors" style={{ backgroundColor: 'var(--color-success)' }}
                 >
                   ✨ Publicar
                 </button>
@@ -227,13 +227,13 @@ const WebBuilderPage = () => {
                     setModoEdicion(false);
                     setPaso(2);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
                 >
                   👁️ Ver Preview
                 </button>
                 <button
                   onClick={handlePublicar}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2  text-white rounded-lg hover:bg-green-700 transition-colors" style={{ backgroundColor: 'var(--color-success)' }}
                 >
                   ✨ Publicar
                 </button>
@@ -248,10 +248,10 @@ const WebBuilderPage = () => {
         {/* Paso 1: Pantalla inicial */}
         {paso === 1 && (
           <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-white rounded-2xl shadow-lg p-12">
+            <div className=" rounded-2xl shadow-lg p-12" style={{ backgroundColor: 'var(--color-surface)' }}>
               <div className="text-6xl mb-6">✨</div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">¿Listo para crear tu web?</h2>
-              <p className="text-gray-600 mb-8 text-lg">
+              <h2 className="text-3xl font-bold  mb-4" style={{ color: 'var(--color-text)' }}>¿Listo para crear tu web?</h2>
+              <p className=" mb-8 text-lg" style={{ color: 'var(--color-text-secondary)' }}>
                 En solo <strong>10 segundos</strong> generaremos una web completa con todos tus
                 datos. Luego podrás editarla como quieras.
               </p>
@@ -292,9 +292,9 @@ const WebBuilderPage = () => {
                 )}
               </button>
 
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <h3 className="font-semibold text-gray-900 mb-3">¿Qué incluye?</h3>
-                <ul className="text-left text-gray-600 space-y-2 inline-block">
+              <div className="mt-12 pt-8 border-t " style={{ borderColor: 'var(--color-border)' }}>
+                <h3 className="font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>¿Qué incluye?</h3>
+                <ul className="text-left  space-y-2 inline-block" style={{ color: 'var(--color-text-secondary)' }}>
                   <li>✓ Portada con tus nombres y fecha</li>
                   <li>✓ Tu historia de amor</li>
                   <li>✓ Información del evento</li>
@@ -309,7 +309,7 @@ const WebBuilderPage = () => {
 
         {/* Paso 2: Preview */}
         {paso === 2 && webConfig && (
-          <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+          <div className=" rounded-lg shadow-xl overflow-hidden" style={{ backgroundColor: 'var(--color-surface)' }}>
             <WebRenderer
               config={webConfig}
               editable={false}

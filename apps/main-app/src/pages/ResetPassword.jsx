@@ -1,19 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
-import { sendPasswordResetEmail } from 'firebase/auth';
 import { toast } from 'react-toastify';
 
-import { auth } from '../firebaseConfig';
+import { useAuth } from '../hooks/useAuth';
 import useTranslations from '../hooks/useTranslations';
 import { performanceMonitor } from '../services/PerformanceMonitor';
-
 const STATUS_ID = 'reset-status-message';
 const ERROR_ID = 'reset-error-message';
 
 export default function ResetPassword() {
   const location = useLocation();
-  const { sendPasswordReset } = useAuth();
+  const { resetPassword } = useAuth();
   const { t } = useTranslations();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('');
@@ -53,7 +51,7 @@ export default function ResetPassword() {
     });
 
     try {
-      await sendPasswordReset(trimmedEmail);
+      await resetPassword(trimmedEmail);
       const message = t('authResetPassword.success');
       setStatus(message);
       setTimeout(() => submitButtonRef.current?.focus(), 0);

@@ -72,7 +72,7 @@ const ADMIN_SESSION_FLAG = 'isAdminAuthenticated';
 const ADMIN_SESSION_TOKEN_KEY = 'Planivia_admin_session_token';
 const ADMIN_SESSION_EXPIRES_KEY = 'Planivia_admin_session_expires';
 const ADMIN_SESSION_ID_KEY = 'Planivia_admin_session_id';
-const ADMIN_ALLOWED_DOMAINS = getEnv('VITE_ADMIN_ALLOWED_DOMAINS', 'lovenda.com');
+const ADMIN_ALLOWED_DOMAINS = getEnv('VITE_ADMIN_ALLOWED_DOMAINS', 'lovenda.com,planivia.com,planivia.net');
 const isCypressRuntime = () => typeof window !== 'undefined' && !!window.Cypress;
 // Flag para desactivar explícitamente el autologin/mock en Cypress (por defecto desactivado)
 const CYPRESS_AUTOLOGIN_DISABLED = String(

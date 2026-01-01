@@ -6,6 +6,12 @@
     "contributions": "Aportaciones",
     "analytics": "Análisis"
   },
+  "kpi": {
+    "totalBudget": "Presupuesto Total",
+    "spent": "Gastado",
+    "available": "Disponible"
+  },
+  "searchPlaceholder": "Buscar categorías...",
   "connectBank": {
     "title": "Conecta tu banco para importar movimientos",
     "desc": "Acelera el registro de gastos e ingresos conectando tu cuenta bancaria.",
@@ -295,6 +301,7 @@
     "advisorShort": "IA",
     "muteShort": "Silenciar",
     "exceeded": "Excedido",
+    "reopenWizard": "Rehacer Asistente",
     "thresholds": {
       "warn": "Aviso (en riesgo) %",
       "danger": "Crítico (exceso) %"

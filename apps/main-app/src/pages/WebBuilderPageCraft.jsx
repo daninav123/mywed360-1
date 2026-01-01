@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Editor, Frame, Element, useEditor } from '@craftjs/core';
 import '../styles/craft-canvas-background.css';
 import '../styles/hide-craft-dev-tools.css';
@@ -34,7 +35,8 @@ import {
   generateWebId,
   publishWeb,
 } from '../services/webBuilder/craftWebService';
-import { enrichTemplateWithWeddingData, getTemplateSummary } from '../utils/templateDataAdapter';
+// Template data adapter no longer needed - using direct data
+// import { enrichTemplateWithWeddingData, getTemplateSummary } from '../utils/templateDataAdapter';
 import useGuests from '../hooks/useGuests';
 
 /**
@@ -55,19 +57,19 @@ const EditorHeader = ({
   const { query, actions } = useEditor();
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <header className=" border-b  px-6 py-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={onBackToDashboard}
-            className="px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2"
+            className="px-3 py-2  hover: hover: rounded-lg transition-colors flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
             title="Volver a Mis Webs"
           >
             ← Mis Webs
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">🎨 Diseñador de Webs de Boda</h1>
-            <p className="text-sm text-gray-600 mt-1">
+            <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>🎨 Diseñador de Webs de Boda</h1>
+            <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
               Arrastra componentes para crear tu web perfecta
             </p>
           </div>
@@ -75,7 +77,7 @@ const EditorHeader = ({
 
         <div className="flex items-center gap-4">
           {/* Grupo 1: Tema y Estilos */}
-          <div className="flex items-center gap-2 pr-4 border-r border-gray-300">
+          <div className="flex items-center gap-2 pr-4 border-r " style={{ borderColor: 'var(--color-border)' }}>
             <ThemeSelector temaActual={tema} onTemaChange={onTemaChange} />
             <button
               onClick={onMostrarEstilos}
@@ -87,7 +89,7 @@ const EditorHeader = ({
           </div>
 
           {/* Grupo 2: Vista */}
-          <div className="flex items-center gap-2 pr-4 border-r border-gray-300">
+          <div className="flex items-center gap-2 pr-4 border-r " style={{ borderColor: 'var(--color-border)' }}>
             <button
               onClick={() =>
                 window.open(
@@ -135,7 +137,7 @@ const EditorHeader = ({
             </button>
 
             {ultimoGuardado && (
-              <span className="text-xs text-gray-500 whitespace-nowrap">{ultimoGuardado}</span>
+              <span className="text-xs  whitespace-nowrap" style={{ color: 'var(--color-muted)' }}>{ultimoGuardado}</span>
             )}
 
             <button
@@ -524,7 +526,7 @@ const WebBuilderPageCraft = () => {
           enabled={enabled}
         >
           <EditorWrapper onActionsReady={setEditorState} />
-          <div className="h-screen flex flex-col bg-gray-100">
+          <div className="h-screen flex flex-col " style={{ backgroundColor: 'var(--color-bg)' }}>
             {/* Header */}
             <EditorHeader
               enabled={enabled}
@@ -542,12 +544,12 @@ const WebBuilderPageCraft = () => {
             {/* Editor principal */}
             <div className="flex-1 flex overflow-hidden">
               {/* Toolbox izquierda */}
-              <div className="w-64 bg-white">
+              <div className="w-64 " style={{ backgroundColor: 'var(--color-surface)' }}>
                 <Toolbox />
               </div>
 
               {/* Canvas centro - Fondo limpio para edición */}
-              <div className="flex-1 overflow-auto bg-gray-50">
+              <div className="flex-1 overflow-auto " style={{ backgroundColor: 'var(--color-bg)' }}>
                 <div className="min-h-full w-full">
                   <div
                     className="min-h-full w-full"
@@ -575,7 +577,7 @@ const WebBuilderPageCraft = () => {
                         data-cy="canvas-root"
                       >
                         {/* Canvas vacío - los usuarios arrastran componentes aquí */}
-                        <div className="flex items-center justify-center min-h-screen text-gray-400">
+                        <div className="flex items-center justify-center min-h-screen " style={{ color: 'var(--color-muted)' }}>
                           <div className="text-center" style={{ position: 'relative', zIndex: 10 }}>
                             <div className="text-6xl mb-4">⬅️</div>
                             <p className="text-lg font-semibold">
@@ -591,7 +593,7 @@ const WebBuilderPageCraft = () => {
               </div>
 
               {/* Settings derecha */}
-              <div className="w-80 bg-white">
+              <div className="w-80 " style={{ backgroundColor: 'var(--color-surface)' }}>
                 {mostrarEstilosGlobales ? (
                   <GlobalStylesPanel tema={tema} onTemaChange={handleTemaChange} />
                 ) : (
@@ -601,12 +603,12 @@ const WebBuilderPageCraft = () => {
             </div>
 
             {/* Footer con tips */}
-            <footer className="bg-white border-t border-gray-200 px-6 py-3">
+            <footer className=" border-t  px-6 py-3" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
               <div className="flex items-center justify-between text-sm">
-                <p className="text-gray-600">
+                <p className="" style={{ color: 'var(--color-text-secondary)' }}>
                   💡 <strong>Tip:</strong> Arrastra componentes al canvas, haz clic para editar
                 </p>
-                <p className="text-gray-500">Hecho con ❤️ por MaLoveApp</p>
+                <p className="" style={{ color: 'var(--color-muted)' }}>Hecho con ❤️ por MaLoveApp</p>
               </div>
             </footer>
           </div>

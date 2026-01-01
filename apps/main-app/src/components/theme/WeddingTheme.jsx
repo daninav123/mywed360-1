@@ -292,14 +292,15 @@ export function Navbar() {
         transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      <div className="max-w-7xl mx-auto px-8 py-4">
+      <div className="max-w-7xl mx-auto px-8 py-7">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <button
             onClick={() => navigate('/')}
+            className="hover:scale-105"
             style={{
               fontFamily: theme.fonts.heading,
-              fontSize: '26px',
+              fontSize: '36px',
               fontWeight: 500,
               background: 'linear-gradient(135deg, #2D3748 0%, #4A5568 100%)',
               WebkitBackgroundClip: 'text',
@@ -309,15 +310,7 @@ export function Navbar() {
               cursor: 'pointer',
               padding: 0,
               letterSpacing: '-0.02em',
-              transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #5EBBFF 0%, #45AFFF 100%)';
-              e.currentTarget.style.transform = 'scale(1.02)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #2D3748 0%, #4A5568 100%)';
-              e.currentTarget.style.transform = 'scale(1)';
+              transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
             Planivia
@@ -335,13 +328,13 @@ export function Navbar() {
                   onMouseLeave={() => setHovered(false)}
                   style={{
                     fontFamily: theme.fonts.body,
-                    fontSize: '14px',
+                    fontSize: '16px',
                     fontWeight: 500,
                     color: hovered ? theme.colors.textPrimary : theme.colors.textSecondary,
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
-                    padding: '8px 14px',
+                    padding: '12px 18px',
                     borderRadius: '8px',
                     transition: 'all 200ms ease-out',
                     backgroundColor: 'transparent',
@@ -370,13 +363,13 @@ export function Navbar() {
               onClick={() => navigate('/login')}
               style={{
                 fontFamily: theme.fonts.body,
-                fontSize: '14px',
+                fontSize: '16px',
                 fontWeight: 500,
                 color: theme.colors.textSecondary,
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                padding: '8px 16px',
+                padding: '12px 20px',
                 borderRadius: '8px',
                 transition: 'all 200ms ease-out',
               }}
@@ -393,14 +386,14 @@ export function Navbar() {
               onClick={() => navigate('/signup')}
               style={{
                 fontFamily: theme.fonts.body,
-                fontSize: '14px',
+                fontSize: '16px',
                 fontWeight: 600,
                 color: theme.colors.onPrimary,
                 backgroundColor: theme.colors.primary,
                 border: 'none',
                 borderRadius: '10px',
                 cursor: 'pointer',
-                padding: '9px 20px',
+                padding: '13px 28px',
                 transition: 'all 200ms ease-out',
                 boxShadow: 'none',
               }}

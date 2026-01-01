@@ -472,66 +472,129 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
   const contact = [profile?.contactEmail, profile?.contactPhone].filter(Boolean).join(' � ');
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-8">
-      <h2 className="text-xl font-semibold mb-3">
-        {t('websiteGenerator.profileSummary.title', 'Datos del perfil aplicados')}
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
-        {couple && (
-          <div>
-            <span className="text-gray-500">
-              {t('websiteGenerator.profileSummary.labels.couple', 'Pareja')}:&nbsp;
-            </span>
-            {couple}
+    <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+      <div className="mx-auto my-8" style={{
+        maxWidth: '1024px',
+        width: '100%',
+        backgroundColor: '#FFFBF7',
+        borderRadius: '32px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        overflow: 'hidden'
+      }}>
+        
+        {/* Hero con degradado beige-dorado */}
+        <header className="relative overflow-hidden" style={{
+          background: 'linear-gradient(135deg, #FFF4E6 0%, #F8EFE3 50%, #E8D5C4 100%)',
+          padding: '48px 32px 32px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div className="max-w-4xl mx-auto" style={{ textAlign: 'center' }}>
+            {/* Título con líneas decorativas */}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              gap: '16px',
+              marginBottom: '12px'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to right, transparent, #D4A574)',
+              }} />
+              <h1 style={{
+                fontFamily: "'Playfair Display', 'Cormorant Garamond', serif",
+                fontSize: '40px',
+                fontWeight: 400,
+                color: '#1F2937',
+                letterSpacing: '-0.01em',
+                margin: 0,
+              }}>Diseño Web</h1>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to left, transparent, #D4A574)',
+              }} />
+            </div>
+            
+            {/* Subtítulo como tag uppercase */}
+            <p style={{
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginBottom: 0,
+            }}>Web de Boda</p>
           </div>
-        )}
-        {ceremonyDate && (
-          <div>
-            <span className="text-gray-500">
-              {t('websiteGenerator.profileSummary.labels.date', 'Fecha')}:&nbsp;
-            </span>
-            {ceremonyDate}
+        </header>
+
+        {/* Contenido */}
+        <div className="px-6 py-6">
+          <div className=" rounded-lg shadow p-6 mb-8" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <h2 className="text-xl font-semibold mb-3">
+              {t('websiteGenerator.profileSummary.title', 'Datos del perfil aplicados')}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm " style={{ color: 'var(--color-text)' }}>
+              {couple && (
+                <div>
+                  <span className="" style={{ color: 'var(--color-muted)' }}>
+                    {t('websiteGenerator.profileSummary.labels.couple', 'Pareja')}:&nbsp;
+                  </span>
+                  {couple}
+                </div>
+              )}
+              {ceremonyDate && (
+                <div>
+                  <span className="" style={{ color: 'var(--color-muted)' }}>
+                    {t('websiteGenerator.profileSummary.labels.date', 'Fecha')}:&nbsp;
+                  </span>
+                  {ceremonyDate}
+                </div>
+              )}
+              {ceremony && (
+                <div>
+                  <span className="" style={{ color: 'var(--color-muted)' }}>
+                    {t('websiteGenerator.profileSummary.labels.ceremony', 'Ceremonia')}:&nbsp;
+                  </span>
+                  {ceremony}
+                </div>
+              )}
+              {reception && (
+                <div>
+                  <span className="" style={{ color: 'var(--color-muted)' }}>
+                    {t('websiteGenerator.profileSummary.labels.reception', 'Recepción')}:&nbsp;
+                  </span>
+                  {reception}
+                </div>
+              )}
+              {contact && (
+                <div className="sm:col-span-2">
+                  <span className="" style={{ color: 'var(--color-muted)' }}>
+                    {t('websiteGenerator.profileSummary.labels.contact', 'Contacto')}:&nbsp;
+                  </span>
+                  {contact}
+                </div>
+              )}
+              {profile?.additionalInfo && (
+                <div className="sm:col-span-2">
+                  <span className="" style={{ color: 'var(--color-muted)' }}>
+                    {t('common.websiteGenerator.profileSummary.labels.additionalInfo', 'Info adicional')}
+                    :&nbsp;
+                  </span>
+                  {profile.additionalInfo}
+                </div>
+              )}
+            </div>
+            {publishDisabledReason && (
+              <div className="mt-4 text-sm text-amber-700 bg-amber-50 border-l-4 border-amber-500 px-3 py-2 rounded">
+                {publishDisabledReason}
+              </div>
+            )}
           </div>
-        )}
-        {ceremony && (
-          <div>
-            <span className="text-gray-500">
-              {t('websiteGenerator.profileSummary.labels.ceremony', 'Ceremonia')}:&nbsp;
-            </span>
-            {ceremony}
-          </div>
-        )}
-        {reception && (
-          <div>
-            <span className="text-gray-500">
-              {t('websiteGenerator.profileSummary.labels.reception', 'Recepción')}:&nbsp;
-            </span>
-            {reception}
-          </div>
-        )}
-        {contact && (
-          <div className="sm:col-span-2">
-            <span className="text-gray-500">
-              {t('websiteGenerator.profileSummary.labels.contact', 'Contacto')}:&nbsp;
-            </span>
-            {contact}
-          </div>
-        )}
-        {profile?.additionalInfo && (
-          <div className="sm:col-span-2">
-            <span className="text-gray-500">
-              {t('common.websiteGenerator.profileSummary.labels.additionalInfo', 'Info adicional')}
-              :&nbsp;
-            </span>
-            {profile.additionalInfo}
-          </div>
-        )}
-      </div>
-      {publishDisabledReason && (
-        <div className="mt-4 text-sm text-amber-700 bg-amber-50 border-l-4 border-amber-500 px-3 py-2 rounded">
-          {publishDisabledReason}
         </div>
-      )}
+      </div>
     </div>
   );
 };
@@ -540,28 +603,28 @@ const VersionsTable = ({ versions, templates, onView, onEdit }) => {
   if (!versions?.length) return null;
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className=" rounded-lg shadow p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
       <h2 className="text-xl font-semibold mb-4">Versiones publicadas</h2>
 
-      <div className="overflow-hidden rounded-lg border border-gray-200">
+      <div className="overflow-hidden rounded-lg border " style={{ borderColor: 'var(--color-border)' }}>
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="" style={{ backgroundColor: 'var(--color-bg)' }}>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
                 Fecha
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
                 Plantilla
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
                 Indicaciones
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-medium  uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
                 Acciones
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className=" divide-y divide-gray-200" style={{ backgroundColor: 'var(--color-surface)' }}>
             {versions.map((version) => {
               const templateKey = detectTemplateFromText(version.prompt || '');
               const templateName = templates?.[templateKey]?.name || 'Personalizada';
@@ -570,26 +633,26 @@ const VersionsTable = ({ versions, templates, onView, onEdit }) => {
                 : '';
 
               return (
-                <tr key={version.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{createdAt}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                <tr key={version.id} className="hover:" style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm " style={{ color: 'var(--color-text-secondary)' }}>{createdAt}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm " style={{ color: 'var(--color-text-secondary)' }}>
                     {templateName}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600 truncate max-w-xs">
+                  <td className="px-6 py-4 text-sm  truncate max-w-xs" style={{ color: 'var(--color-text-secondary)' }}>
                     {version.prompt || 'Sin indicaciones'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       type="button"
                       onClick={() => onView?.(version, templateKey)}
-                      className="text-blue-600 hover:text-blue-800 mr-4"
+                      className=" hover:text-blue-800 mr-4" style={{ color: 'var(--color-primary)' }}
                     >
                       Ver
                     </button>
                     <button
                       type="button"
                       onClick={() => onEdit?.(version, templateKey)}
-                      className="text-green-600 hover:text-green-800"
+                      className=" hover:text-green-800" style={{ color: 'var(--color-success)' }}
                     >
                       Editar
                     </button>
@@ -750,22 +813,22 @@ const PromptLibraryModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden flex flex-col">
+      <div className=" rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--color-surface)' }}>
         <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800">
+          <h3 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>
             {t('common.websiteGenerator.promptLibrary.title', 'Biblioteca de prompts')}
           </h3>
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className=" hover: transition-colors" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text)' }}
           >
             {t('websiteGenerator.promptLibrary.close', 'Cerrar')}
           </button>
         </header>
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
           <section>
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm  mb-3" style={{ color: 'var(--color-text-secondary)' }}>
               {t(
                 'common.websiteGenerator.promptLibrary.intro',
                 'Selecciona un prompt para rellenar automáticamente el generador.'
@@ -781,11 +844,11 @@ const PromptLibraryModal = ({
                       ? ` ${tokenConjunction} `
                       : ', '
                     : ''}
-                  <code className="bg-gray-100 px-1 rounded">{token}</code>
+                  <code className=" px-1 rounded" style={{ backgroundColor: 'var(--color-bg)' }}>{token}</code>
                 </React.Fragment>
               ))}
             </p>
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+            <h4 className="text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
               {t('common.websiteGenerator.promptLibrary.builtIn.title', 'Prompts predeterminados')}
             </h4>
             <div className="space-y-3">
@@ -796,18 +859,18 @@ const PromptLibraryModal = ({
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h5 className="text-base font-semibold text-gray-800">{option.name}</h5>
-                      <p className="text-sm text-gray-500 mt-1">{option.description}</p>
+                      <h5 className="text-base font-semibold " style={{ color: 'var(--color-text)' }}>{option.name}</h5>
+                      <p className="text-sm  mt-1" style={{ color: 'var(--color-muted)' }}>{option.description}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleUsePrompt(option)}
-                      className="shrink-0 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full text-sm transition-colors"
+                      className="shrink-0 inline-flex items-center gap-2  hover:bg-blue-700 text-white px-3 py-2 rounded-full text-sm transition-colors" style={{ backgroundColor: 'var(--color-primary)' }}
                     >
                       {t('common.websiteGenerator.promptLibrary.builtIn.use', 'Usar prompt')}
                     </button>
                   </div>
-                  <pre className="mt-3 text-sm bg-gray-50 rounded-lg p-3 whitespace-pre-wrap text-gray-700">
+                  <pre className="mt-3 text-sm  rounded-lg p-3 whitespace-pre-wrap " style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
                     {option.samplePrompt}
                   </pre>
                 </div>
@@ -817,27 +880,27 @@ const PromptLibraryModal = ({
 
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-semibold text-gray-700">
+              <h4 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
                 {t('common.websiteGenerator.promptLibrary.custom.title', 'Mis prompts')}
               </h4>
               <button
                 type="button"
                 onClick={beginCreate}
-                className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-full text-sm transition-colors"
+                className="inline-flex items-center gap-2  hover:bg-green-700 text-white px-3 py-2 rounded-full text-sm transition-colors" style={{ backgroundColor: 'var(--color-success)' }}
                 disabled={saving}
               >
                 {t('common.websiteGenerator.promptLibrary.custom.new', 'Nuevo prompt')}
               </button>
             </div>
             {loading ? (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm " style={{ color: 'var(--color-muted)' }}>
                 {t(
                   'common.websiteGenerator.promptLibrary.custom.loading',
                   'Cargando biblioteca personal…'
                 )}
               </p>
             ) : customPrompts.length === 0 ? (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm " style={{ color: 'var(--color-muted)' }}>
                 {t(
                   'common.websiteGenerator.promptLibrary.custom.empty',
                   'Aún no tienes prompts personalizados. Crea uno para reutilizar tus indicaciones favoritas.'
@@ -852,14 +915,14 @@ const PromptLibraryModal = ({
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h5 className="text-base font-semibold text-gray-800">
+                        <h5 className="text-base font-semibold " style={{ color: 'var(--color-text)' }}>
                           {item.name ||
                             t(
                               'common.websiteGenerator.promptLibrary.custom.untitled',
                               'Sin título'
                             )}
                         </h5>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
                           {t(
                             'common.websiteGenerator.promptLibrary.custom.templateLabel',
                             'Plantilla sugerida:'
@@ -871,7 +934,7 @@ const PromptLibraryModal = ({
                             )}
                         </p>
                         {item.description ? (
-                          <p className="text-sm text-gray-500 mt-1">{item.description}</p>
+                          <p className="text-sm  mt-1" style={{ color: 'var(--color-muted)' }}>{item.description}</p>
                         ) : null}
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -883,14 +946,14 @@ const PromptLibraryModal = ({
                               samplePrompt: item.prompt,
                             })
                           }
-                          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full text-sm transition-colors"
+                          className="inline-flex items-center gap-2  hover:bg-blue-700 text-white px-3 py-2 rounded-full text-sm transition-colors" style={{ backgroundColor: 'var(--color-primary)' }}
                         >
                           {t('websiteGenerator.promptLibrary.buttons.use', 'Usar')}
                         </button>
                         <button
                           type="button"
                           onClick={() => beginEdit(item)}
-                          className="inline-flex items-center gap-2 border border-gray-300 px-3 py-2 rounded-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="inline-flex items-center gap-2 border  px-3 py-2 rounded-full text-sm  hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
                           disabled={saving}
                         >
                           {t('websiteGenerator.promptLibrary.buttons.edit', 'Editar')}
@@ -898,14 +961,14 @@ const PromptLibraryModal = ({
                         <button
                           type="button"
                           onClick={() => handleDelete(item.id)}
-                          className="inline-flex items-center gap-2 border border-red-200 px-3 py-2 rounded-full text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          className="inline-flex items-center gap-2 border border-red-200 px-3 py-2 rounded-full text-sm  hover:bg-red-50 transition-colors" style={{ color: 'var(--color-danger)' }}
                           disabled={saving}
                         >
                           {t('websiteGenerator.promptLibrary.buttons.delete', 'Eliminar')}
                         </button>
                       </div>
                     </div>
-                    <pre className="mt-3 text-sm bg-gray-50 rounded-lg p-3 whitespace-pre-wrap text-gray-700">
+                    <pre className="mt-3 text-sm  rounded-lg p-3 whitespace-pre-wrap " style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
                       {item.prompt}
                     </pre>
                   </div>
@@ -916,7 +979,7 @@ const PromptLibraryModal = ({
 
           {editingPrompt && (
             <section className="border border-blue-100 rounded-xl p-4 bg-blue-50/40 space-y-4">
-              <h4 className="text-sm font-semibold text-gray-700">
+              <h4 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
                 {editingPrompt.id
                   ? t(
                       'common.websiteGenerator.promptLibrary.form.editTitle',
@@ -928,14 +991,14 @@ const PromptLibraryModal = ({
                     )}
               </h4>
               {formError && (
-                <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+                <div className="text-sm  bg-red-50 border border-red-200 rounded px-3 py-2" style={{ color: 'var(--color-danger)' }}>
                   {formError}
                 </div>
               )}
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold  mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                       {t('websiteGenerator.promptLibrary.form.labels.name', 'Nombre')}
                     </label>
                     <input
@@ -944,7 +1007,7 @@ const PromptLibraryModal = ({
                       onChange={(event) =>
                         setFormState((prev) => ({ ...prev, name: event.target.value }))
                       }
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                      className="w-full border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                       placeholder={t(
                         'common.websiteGenerator.promptLibrary.form.placeholders.name',
                         'Prompt para estilo moderno'
@@ -952,7 +1015,7 @@ const PromptLibraryModal = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold  mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                       {t(
                         'websiteGenerator.promptLibrary.form.labels.template',
                         'Plantilla sugerida'
@@ -963,7 +1026,7 @@ const PromptLibraryModal = ({
                       onChange={(event) =>
                         setFormState((prev) => ({ ...prev, templateKey: event.target.value }))
                       }
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                      className="w-full border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                     >
                       {templateEntries.map(([key, info]) => (
                         <option key={key} value={key}>
@@ -974,7 +1037,7 @@ const PromptLibraryModal = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  <label className="block text-xs font-semibold  mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                     {t(
                       'common.websiteGenerator.promptLibrary.form.labels.description',
                       'Descripción'
@@ -985,7 +1048,7 @@ const PromptLibraryModal = ({
                     onChange={(event) =>
                       setFormState((prev) => ({ ...prev, description: event.target.value }))
                     }
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                    className="w-full border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                     rows={2}
                     placeholder={t(
                       'common.websiteGenerator.promptLibrary.form.placeholders.description',
@@ -994,7 +1057,7 @@ const PromptLibraryModal = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  <label className="block text-xs font-semibold  mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                     {t('websiteGenerator.promptLibrary.form.labels.prompt', 'Prompt')}
                   </label>
                   <textarea
@@ -1002,7 +1065,7 @@ const PromptLibraryModal = ({
                     onChange={(event) =>
                       setFormState((prev) => ({ ...prev, prompt: event.target.value }))
                     }
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                    className="w-full border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                     rows={5}
                     placeholder={t(
                       'common.websiteGenerator.promptLibrary.form.placeholders.prompt',
@@ -1014,14 +1077,14 @@ const PromptLibraryModal = ({
                   <button
                     type="button"
                     onClick={cancelEdit}
-                    className="inline-flex items-center px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="inline-flex items-center px-4 py-2 rounded-full border   hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
                     disabled={saving}
                   >
                     {t('websiteGenerator.promptLibrary.form.cancel', 'Cancelar')}
                   </button>
                   <button
                     type="submit"
-                    className="inline-flex items-center px-5 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60"
+                    className="inline-flex items-center px-5 py-2 rounded-full  text-white hover:bg-blue-700 transition-colors disabled:opacity-60" style={{ backgroundColor: 'var(--color-primary)' }}
                     disabled={saving}
                   >
                     {saving
@@ -1037,7 +1100,7 @@ const PromptLibraryModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center px-4 py-2 rounded-full border   hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-bg)' }}
             disabled={saving}
           >
             {t('websiteGenerator.promptLibrary.close', 'Cerrar')}
@@ -1130,13 +1193,13 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div className="bg-white w-full max-w-4xl h-full sm:h-auto sm:rounded-l-3xl shadow-2xl overflow-hidden flex flex-col">
+      <div className=" w-full max-w-4xl h-full sm:h-auto sm:rounded-l-3xl shadow-2xl overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--color-surface)' }}>
         <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>
               {t('websiteGenerator.logistics.title', 'Editar logística del sitio')}
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm " style={{ color: 'var(--color-muted)' }}>
               {t(
                 'common.websiteGenerator.logistics.description',
                 'Ajusta horarios de autobuses, hospedajes recomendados y guía de llegada. Los cambios se guardan en la boda activa.'
@@ -1146,7 +1209,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className=" hover: transition-colors" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text)' }}
           >
             {t('actions.close', 'Cerrar')}
           </button>
@@ -1155,11 +1218,11 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              <h4 className="text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                 {t('common.websiteGenerator.logistics.story.title', 'Historia de la pareja')}
               </h4>
               <textarea
-                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                className="w-full border  rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                 rows={4}
                 value={draft.story || ''}
                 onChange={(event) => updateStory(event.target.value)}
@@ -1170,11 +1233,11 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
               />
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              <h4 className="text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
                 {t('common.websiteGenerator.logistics.notes.title', 'Notas / recomendaciones')}
               </h4>
               <textarea
-                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                className="w-full border  rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                 rows={4}
                 value={draft.additionalInfo || ''}
                 onChange={(event) => updateAdditionalInfo(event.target.value)}
@@ -1187,11 +1250,11 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
           </section>
 
           <section>
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+            <h4 className="text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
               {t('common.websiteGenerator.logistics.transportation.title', 'Transporte general')}
             </h4>
             <textarea
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+              className="w-full border  rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
               rows={3}
               value={draft.transportation}
               onChange={(event) => updateTransportation(event.target.value)}
@@ -1204,13 +1267,13 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
 
           <section>
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-700">
+              <h4 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
                 {t('common.websiteGenerator.logistics.schedule.title', 'Horarios de autobuses')}
               </h4>
               <button
                 type="button"
                 onClick={addScheduleItem}
-                className="text-sm text-blue-600 hover:text-blue-700"
+                className="text-sm  hover:text-blue-700" style={{ color: 'var(--color-primary)' }}
               >
                 {t('websiteGenerator.logistics.schedule.add', 'Añadir horario')}
               </button>
@@ -1219,11 +1282,11 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
               {(draft.schedule || []).map((item, index) => (
                 <div
                   key={item.id || index}
-                  className="grid grid-cols-1 md:grid-cols-4 gap-3 border border-gray-100 rounded-lg p-3 bg-gray-50"
+                  className="grid grid-cols-1 md:grid-cols-4 gap-3 border border-gray-100 rounded-lg p-3 " style={{ backgroundColor: 'var(--color-bg)' }}
                 >
                   <input
                     type="time"
-                    className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                    className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                     value={item.time}
                     onChange={(event) => updateScheduleItem(index, 'time', event.target.value)}
                   />
@@ -1233,7 +1296,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                       'common.websiteGenerator.logistics.schedule.departure',
                       'Sale de'
                     )}
-                    className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                    className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                     value={item.departure}
                     onChange={(event) => updateScheduleItem(index, 'departure', event.target.value)}
                   />
@@ -1243,7 +1306,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                       'common.websiteGenerator.logistics.schedule.destination',
                       'Llega a'
                     )}
-                    className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                    className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                     value={item.destination}
                     onChange={(event) =>
                       updateScheduleItem(index, 'destination', event.target.value)
@@ -1253,14 +1316,14 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                     <input
                       type="text"
                       placeholder={t('webDesign.contentPlaceholder')}
-                      className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                      className="flex-1 border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                       value={item.notes}
                       onChange={(event) => updateScheduleItem(index, 'notes', event.target.value)}
                     />
                     <button
                       type="button"
                       onClick={() => removeScheduleItem(index)}
-                      className="text-xs text-red-500 hover:text-red-600"
+                      className="text-xs  hover:" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-danger)' }}
                     >
                       {t('actions.remove', 'Quitar')}
                     </button>
@@ -1272,13 +1335,13 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
 
           <section>
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-700">
+              <h4 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
                 {t('common.websiteGenerator.logistics.lodging.title', 'Hospedaje recomendado')}
               </h4>
               <button
                 type="button"
                 onClick={addLodgingItem}
-                className="text-sm text-blue-600 hover:text-blue-700"
+                className="text-sm  hover:text-blue-700" style={{ color: 'var(--color-primary)' }}
               >
                 {t('common.websiteGenerator.logistics.lodging.add', 'Añadir hospedaje')}
               </button>
@@ -1287,7 +1350,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
               {(draft.lodging || []).map((item, index) => (
                 <div
                   key={item.id || index}
-                  className="border border-gray-100 rounded-lg p-3 bg-white shadow-sm space-y-2"
+                  className="border border-gray-100 rounded-lg p-3  shadow-sm space-y-2" style={{ backgroundColor: 'var(--color-surface)' }}
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <input
@@ -1296,7 +1359,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                         'common.websiteGenerator.logistics.lodging.placeholders.name',
                         'Nombre del hotel o alojamiento'
                       )}
-                      className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                      className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                       value={item.name}
                       onChange={(event) => updateLodgingItem(index, 'name', event.target.value)}
                     />
@@ -1306,7 +1369,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                         'common.websiteGenerator.logistics.lodging.placeholders.distance',
                         'Distancia o tiempo'
                       )}
-                      className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                      className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                       value={item.distance}
                       onChange={(event) => updateLodgingItem(index, 'distance', event.target.value)}
                     />
@@ -1318,7 +1381,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                         'common.websiteGenerator.logistics.lodging.placeholders.priceRange',
                         'Rango de precio'
                       )}
-                      className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                      className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                       value={item.priceRange}
                       onChange={(event) =>
                         updateLodgingItem(index, 'priceRange', event.target.value)
@@ -1330,13 +1393,13 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                         'common.websiteGenerator.logistics.lodging.placeholders.link',
                         'Enlace de reserva'
                       )}
-                      className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                      className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                       value={item.link}
                       onChange={(event) => updateLodgingItem(index, 'link', event.target.value)}
                     />
                   </div>
                   <textarea
-                    className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                    className="w-full border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                     rows={2}
                     placeholder={t(
                       'common.websiteGenerator.logistics.lodging.placeholders.amenities',
@@ -1349,7 +1412,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                     <button
                       type="button"
                       onClick={() => removeLodgingItem(index)}
-                      className="text-xs text-red-500 hover:text-red-600"
+                      className="text-xs  hover:" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-danger)' }}
                     >
                       {t('common.websiteGenerator.logistics.lodging.remove', 'Quitar hospedaje')}
                     </button>
@@ -1360,11 +1423,11 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
           </section>
 
           <section className="space-y-3">
-            <h4 className="text-sm font-semibold text-gray-700">
+            <h4 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
               {t('websiteGenerator.logistics.travel.title', 'Guía de llegada')}
             </h4>
             <textarea
-              className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+              className="w-full border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
               rows={2}
               placeholder={t(
                 'common.websiteGenerator.logistics.travel.summaryPlaceholder',
@@ -1375,7 +1438,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <textarea
-                className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                 rows={2}
                 placeholder={t(
                   'common.websiteGenerator.logistics.travel.byPlanePlaceholder',
@@ -1385,7 +1448,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                 onChange={(event) => updateTravel('byPlane', event.target.value)}
               />
               <textarea
-                className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                 rows={2}
                 placeholder={t(
                   'common.websiteGenerator.logistics.travel.byTrainPlaceholder',
@@ -1396,7 +1459,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
               />
             </div>
             <textarea
-              className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+              className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
               rows={2}
               placeholder={t(
                 'common.websiteGenerator.logistics.travel.byCarPlaceholder',
@@ -1406,7 +1469,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
               onChange={(event) => updateTravel('byCar', event.target.value)}
             />
             <textarea
-              className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+              className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
               rows={2}
               placeholder={t(
                 'common.websiteGenerator.logistics.travel.tipsPlaceholder',
@@ -1417,7 +1480,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <textarea
-                className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                 rows={3}
                 placeholder={t(
                   'common.websiteGenerator.logistics.travel.airportsPlaceholder',
@@ -1427,7 +1490,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                 onChange={(event) => updateTravel('airportsText', event.target.value)}
               />
               <textarea
-                className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                className="border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                 rows={3}
                 placeholder={t(
                   'common.websiteGenerator.logistics.travel.stationsPlaceholder',
@@ -1441,13 +1504,13 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
 
           <section>
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-700">
+              <h4 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
                 {t('websiteGenerator.logistics.faq.title', 'Preguntas frecuentes')}
               </h4>
               <button
                 type="button"
                 onClick={addFaqItem}
-                className="text-sm text-blue-600 hover:text-blue-700"
+                className="text-sm  hover:text-blue-700" style={{ color: 'var(--color-primary)' }}
               >
                 {t('websiteGenerator.logistics.faq.add', 'Añadir pregunta')}
               </button>
@@ -1456,7 +1519,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
               {(draft.faqs || []).map((item, index) => (
                 <div
                   key={item.id || index}
-                  className="border border-gray-100 rounded-lg p-3 bg-white shadow-sm space-y-2"
+                  className="border border-gray-100 rounded-lg p-3  shadow-sm space-y-2" style={{ backgroundColor: 'var(--color-surface)' }}
                 >
                   <input
                     type="text"
@@ -1464,7 +1527,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                       'common.websiteGenerator.logistics.faq.questionPlaceholder',
                       'Pregunta'
                     )}
-                    className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                    className="w-full border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                     value={item.question}
                     onChange={(event) => updateFaqItem(index, 'question', event.target.value)}
                   />
@@ -1473,7 +1536,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                       'common.websiteGenerator.logistics.faq.answerPlaceholder',
                       'Respuesta'
                     )}
-                    className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                    className="w-full border  rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" style={{ borderColor: 'var(--color-border)' }}
                     rows={2}
                     value={item.answer}
                     onChange={(event) => updateFaqItem(index, 'answer', event.target.value)}
@@ -1482,7 +1545,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
                     <button
                       type="button"
                       onClick={() => removeFaqItem(index)}
-                      className="text-xs text-red-500 hover:text-red-600"
+                      className="text-xs  hover:" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-danger)' }}
                     >
                       {t('common.websiteGenerator.logistics.faq.remove', 'Quitar pregunta')}
                     </button>
@@ -1497,7 +1560,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center px-4 py-2 rounded-full border   hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-bg)' }}
           >
             {t('websiteGenerator.logisticsActions.cancel', 'Cancelar')}
           </button>
@@ -1574,7 +1637,7 @@ export default function DisenoWeb() {
       <div className="p-6 space-y-6">
         <header className="space-y-2">
           <h1 className="text-2xl font-semibold">Diseño web</h1>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
             Selecciona una plantilla y genera una vista previa ficticia (modo E2E).
           </p>
         </header>
@@ -1595,7 +1658,7 @@ export default function DisenoWeb() {
               }}
             >
               <h3 className="font-medium text-lg">{info?.name || key}</h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                 {info?.desc || 'Plantilla predeterminada para generar la web.'}
               </p>
             </button>
@@ -1614,7 +1677,7 @@ export default function DisenoWeb() {
           />
           <button
             type="button"
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full  text-white hover:bg-blue-700 transition-colors disabled:opacity-60" style={{ backgroundColor: 'var(--color-primary)' }}
             onClick={() => setTestPreviewReady(true)}
             disabled={!testPrompt.trim()}
           >
@@ -2256,7 +2319,7 @@ export default function DisenoWeb() {
                   setCurrentStep(3);
                 }}
                 disabled={loading || !prompt.trim()}
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-8 py-3  text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 {loading ? 'Generando...' : 'Generar mi web'}
               </button>
@@ -2345,7 +2408,6 @@ export default function DisenoWeb() {
         onCreate={handleCreatePrompt}
         onUpdate={handleUpdatePrompt}
         onDelete={handleDeletePrompt}
-        loading={promptLibraryLoading}
       />
 
       <LogisticsEditor

@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc } from 'firebase/firestore';
+﻿import { doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc } from 'firebase/firestore';
 import { Plus, Trash, Zap } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,6 @@ import { useAuth } from '../hooks/useAuth';
 import useTranslations from '../hooks/useTranslations';
 import { db } from '../firebaseConfig';
 import { post as apiPost } from '../services/apiClient';
-
 /*
   Editor interno para la página web de la boda.
   Permite al usuario rellenar/editar la información que utilizará WeddingSite.jsx.
@@ -215,7 +214,7 @@ export default function WebEditor() {
 
   return (
     <div className="p-4 md:p-6 space-y-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-800">Editor de mi web</h1>
+      <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>Editor de mi web</h1>
 
       {/* Información básica */}
       <section className="space-y-4">
@@ -251,7 +250,7 @@ export default function WebEditor() {
           type="button"
           onClick={suggestStory}
           disabled={aiLoading}
-          className="text-sm text-blue-600 underline"
+          className="text-sm  underline" style={{ color: 'var(--color-primary)' }}
         >
           {aiLoading ? 'Generando...' : 'Sugerir con IA'}
         </button>
@@ -276,7 +275,7 @@ export default function WebEditor() {
           />
         </div>
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className=" text-white px-4 py-2 rounded" style={{ backgroundColor: 'var(--color-primary)' }}
           disabled={loading}
           onClick={saveInfo}
         >
@@ -289,7 +288,7 @@ export default function WebEditor() {
         <h2 className="text-xl font-medium flex items-center justify-between">
           Programa del día
           <div className="flex gap-3">
-            <button onClick={addSchedule} className="text-green-600 flex items-center gap-1">
+            <button onClick={addSchedule} className=" flex items-center gap-1" style={{ color: 'var(--color-success)' }}>
               <Plus size={16} /> Añadir
             </button>
             <button
@@ -315,13 +314,13 @@ export default function WebEditor() {
               value={s.title}
               onChange={(e) => updateSchedule(idx, 'title', e.target.value)}
             />
-            <button onClick={() => removeSchedule(idx)} className="text-red-600">
+            <button onClick={() => removeSchedule(idx)} className="" style={{ color: 'var(--color-danger)' }}>
               <Trash size={16} />
             </button>
           </div>
         ))}
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className=" text-white px-4 py-2 rounded" style={{ backgroundColor: 'var(--color-primary)' }}
           disabled={loading}
           onClick={saveSchedule}
         >
@@ -333,7 +332,7 @@ export default function WebEditor() {
       <section className="space-y-4">
         <h2 className="text-xl font-medium flex items-center justify-between">
           Galería{' '}
-          <button onClick={addImage} className="text-green-600 flex items-center gap-1">
+          <button onClick={addImage} className=" flex items-center gap-1" style={{ color: 'var(--color-success)' }}>
             <Plus size={16} /> Añadir
           </button>
         </h2>
@@ -345,13 +344,13 @@ export default function WebEditor() {
               value={g.url}
               onChange={(e) => updateImage(idx, e.target.value)}
             />
-            <button onClick={() => removeImage(idx)} className="text-red-600">
+            <button onClick={() => removeImage(idx)} className="" style={{ color: 'var(--color-danger)' }}>
               <Trash size={16} />
             </button>
           </div>
         ))}
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className=" text-white px-4 py-2 rounded" style={{ backgroundColor: 'var(--color-primary)' }}
           disabled={loading}
           onClick={saveGallery}
         >

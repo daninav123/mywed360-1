@@ -1,3 +1,7 @@
+/**
+ * @deprecated Este hook usa Firebase Firestore.
+ * Este hook se eliminará en futuras versiones.
+ */
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { useEffect, useState, useCallback } from 'react';

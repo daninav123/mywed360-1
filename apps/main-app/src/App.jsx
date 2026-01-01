@@ -18,7 +18,6 @@ import { UserPreferencesProvider } from './contexts/UserContext';
 import { useAuth, AuthProvider } from './hooks/useAuth';
 import useSupplierSpecs from './hooks/useSupplierSpecs';
 import AcceptInvitation from './pages/AcceptInvitation';
-import Home from './pages/Home';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
 const BankConnect = React.lazy(() => import('./pages/BankConnect.jsx'));
@@ -27,9 +26,10 @@ const Bodas = React.lazy(() => import('./pages/Bodas'));
 const DevEnsureFinance = React.lazy(() => import('./pages/DevEnsureFinance'));
 const DevSeedGuests = React.lazy(() => import('./pages/DevSeedGuests'));
 const Finance = React.lazy(() => import('./pages/Finance'));
-const HomeUser = React.lazy(() => import('./pages/HomeUser.jsx'));
-const Home2 = React.lazy(() => import('./pages/Home2.jsx'));
+const Home = React.lazy(() => import('./pages/Home.jsx'));
 const Landing2 = React.lazy(() => import('./pages/Landing2.jsx'));
+const LandingNew = React.lazy(() => import('./pages/marketing/LandingNew.jsx'));
+const PageIndex = React.lazy(() => import('./pages/PageIndex.jsx'));
 const Invitaciones = React.lazy(() => import('./pages/Invitaciones'));
 const More = React.lazy(() => import('./pages/More'));
 const Perfil = React.lazy(() => import('./pages/Perfil'));
@@ -39,6 +39,7 @@ const SavedSuppliers = React.lazy(() => import('./pages/SavedSuppliers.jsx'));
 const SupplierCompare = React.lazy(() => import('./pages/SupplierCompare.jsx'));
 const QuoteResponsesPage = React.lazy(() => import('./pages/QuoteResponsesPage.jsx'));
 const ResetPassword = React.lazy(() => import('./pages/ResetPassword.jsx'));
+const ResetPasswordConfirm = React.lazy(() => import('./pages/ResetPasswordConfirm.jsx'));
 const PublicWedding = React.lazy(() => import('./pages/PublicWedding'));
 const PublicQuoteResponse = React.lazy(() => import('./pages/PublicQuoteResponse'));
 const RSVPConfirm = React.lazy(() => import('./pages/RSVPConfirm'));
@@ -109,6 +110,11 @@ const MarketingPricing = React.lazy(() => import('./pages/marketing/Pricing.jsx'
 const MarketingAccess = React.lazy(() => import('./pages/marketing/Access.jsx'));
 const ForSuppliers = React.lazy(() => import('./pages/marketing/ForSuppliers.jsx'));
 const ForPlanners = React.lazy(() => import('./pages/marketing/ForPlanners.jsx'));
+const GestionInvitados = React.lazy(() => import('./pages/marketing/GestionInvitados.jsx'));
+const PresupuestoBoda = React.lazy(() => import('./pages/marketing/PresupuestoBoda.jsx'));
+const SeatingPlanBoda = React.lazy(() => import('./pages/marketing/SeatingPlanBoda.jsx'));
+const CountryHub = React.lazy(() => import('./pages/marketing/CountryHub.jsx'));
+const DynamicServicePage = React.lazy(() => import('./pages/marketing/DynamicServicePage.jsx'));
 const Partners = React.lazy(() => import('./pages/marketing/Partners.jsx'));
 const PaymentSuccess = React.lazy(() => import('./pages/payment/PaymentSuccess.jsx'));
 const PaymentCancel = React.lazy(() => import('./pages/payment/PaymentCancel.jsx'));
@@ -165,6 +171,8 @@ const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost.jsx'));
 const BlogAuthor = React.lazy(() => import('./pages/BlogAuthor.jsx'));
+const SEOBlogList = React.lazy(() => import('./pages/marketing/SEOBlogList'));
+const SEOBlogPost = React.lazy(() => import('./pages/marketing/SEOBlogPost'));
 const ProveedoresCompareTest = React.lazy(() => import('./pages/test/ProveedoresCompareTest.jsx'));
 const ProveedoresSmoke = React.lazy(() => import('./pages/test/ProveedoresSmoke.jsx'));
 const ProveedoresFlowHarness = React.lazy(() => import('./pages/test/ProveedoresFlowHarness.jsx'));
@@ -235,6 +243,7 @@ function ProtectedRoute() {
 
 function RootLandingRoute() {
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const [shouldRedirectToLogin, setShouldRedirectToLogin] = React.useState(false);
 
   React.useEffect(() => {
@@ -268,16 +277,24 @@ function RootLandingRoute() {
     setShouldRedirectToLogin(shouldRedirect);
   }, [location]);
 
+  // Si es app móvil, redirigir a login
   if (shouldRedirectToLogin) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  return <Home />;
+  // Si usuario autenticado, redirigir a /home
+  if (isAuthenticated) {
+    return <Navigate to="/home" replace />;
+  }
+
+  // Si no autenticado, mostrar landing pública
+  return <LandingNew />;
 }
 
 function App() {
+  // TODO: Migrar a PostgreSQL o eliminar si no se usa
   // Cargar especificaciones dinámicas de proveedores al iniciar
-  useSupplierSpecs();
+  // useSupplierSpecs(); // COMENTADO: Usa Firestore legacy
 
   return (
     <HelmetProvider>
@@ -315,9 +332,14 @@ function App() {
                           <Route path="/para-proveedores" element={<ForSuppliers />} />
                           <Route path="/para-planners" element={<ForPlanners />} />
                           <Route path="/partners" element={<Partners />} />
-                          <Route path="/blog" element={<Blog />} />
+                          <Route path="/gestion-invitados-boda" element={<GestionInvitados />} />
+                          <Route path="/presupuesto-boda-online" element={<PresupuestoBoda />} />
+                          <Route path="/seating-plan-boda" element={<SeatingPlanBoda />} />
+                          <Route path="/:country" element={<CountryHub />} />
+                          <Route path="/:country/:city/:service" element={<DynamicServicePage />} />
+                          <Route path="/blog" element={<SEOBlogList />} />
                           <Route path="/blog/autor/:slug" element={<BlogAuthor />} />
-                          <Route path="/blog/:slug" element={<BlogPost />} />
+                          <Route path="/blog/:slug" element={<SEOBlogPost />} />
                           <Route path="/payment/success" element={<PaymentSuccess />} />
                           <Route path="/payment/cancel" element={<PaymentCancel />} />
                           <Route path="/landing2" element={<Landing2 />} />
@@ -326,6 +348,7 @@ function App() {
                           <Route path="/registro" element={<Navigate to="/signup" replace />} />
                           <Route path="/verify-email" element={<VerifyEmail />} />
                           <Route path="/reset-password" element={<ResetPassword />} />
+                          <Route path="/reset-password-confirm" element={<ResetPasswordConfirm />} />
                           <Route path="/partner/:token" element={<PartnerStats />} />
                           <Route path="/admin/login" element={<AdminLogin />} />
                           <Route element={<RequireAdmin />}>
@@ -365,6 +388,7 @@ function App() {
                           <Route path="/registro" element={<Navigate to="/signup" replace />} />
                           <Route path="/verify-email" element={<VerifyEmail />} />
                           <Route path="/reset-password" element={<ResetPassword />} />
+                          <Route path="/reset-password-confirm" element={<ResetPasswordConfirm />} />
                           <Route path="/partner/:token" element={<PartnerStats />} />
                           <Route path="/admin/login" element={<AdminLogin />} />
                           <Route element={<RequireAdmin />}>
@@ -476,17 +500,40 @@ function App() {
                           
                           {/* Style Demo */}
                           <Route path="style-demo" element={<StyleDemo />} />
+                          
+                          {/* Page Index - Listado de todas las rutas */}
+                          <Route path="page-index" element={<PageIndex />} />
 
                           {/* Rutas protegidas */}
                           <Route element={<ProtectedRoute />}>
-                            {/* Home2 fuera de MainLayout para diseño full-screen */}
-                            <Route path="home2" element={<Home2 />} />
+                            {/* Páginas full-screen FUERA de MainLayout */}
+                            <Route path="finance" element={<Finance />} />
+                            <Route path="home" element={<Home />} />
+                            <Route path="perfil" element={<Perfil />} />
+                            <Route path="more" element={<More />} />
+                            <Route path="inspiracion" element={<Inspiration />} />
+                            <Route path="invitados/invitaciones" element={<Invitaciones />} />
+                            <Route path="invitados" element={<Invitados />} />
+                            <Route path="proveedores" element={<GestionProveedores />} />
+                            <Route path="diseno-web" element={<DisenoWeb />} />
+                            <Route path="diseno-web/preview" element={<DisenoWeb mode="preview" />} />
+                            <Route path="checklist" element={<Checklist />} />
+                            
+                            {/* Protocolo con diseño full-screen */}
+                            <Route path="protocolo" element={<ProtocoloLayout />}>
+                              <Route index element={<Navigate to="momentos-especiales" replace />} />
+                              <Route path="momentos-especiales" element={<MomentosEspecialesSimple />} />
+                              <Route path="timing" element={<ProtocoloTiming />} />
+                              <Route path="dia-de-la-boda" element={<WeddingDayMode />} />
+                              <Route path="checklist" element={<ProtocoloChecklist />} />
+                              <Route path="ayuda-ceremonia" element={<ProtocoloAyuda />} />
+                              <Route path="documentos" element={<DocumentosLegales />} />
+                              <Route path="documentos-legales" element={<Navigate to="documentos" replace />} />
+                            </Route>
                             
                             <Route element={<MainLayout />}>
-                              <Route path="home" element={<HomeUser />} />
                               <Route path="tasks" element={<Tasks />} />
                               <Route path="tareas-ia" element={<TasksAI />} />
-                              <Route path="checklist" element={<Checklist />} />
                               <Route path="shot-list" element={<PhotoShotListPage />} />
                               <Route path="pruebas-ensayos" element={<PruebasEnsayos />} />
                               <Route path="design-wizard" element={<DesignWizard />} />
@@ -506,17 +553,13 @@ function App() {
                               <Route path="post-boda" element={<PostBoda />} />
                               <Route path="bodas" element={<Bodas />} />
                               <Route path="bodas/:id" element={<BodaDetalle />} />
-                              <Route path="finance" element={<Finance />} />
                               <Route path="finance/bank-connect" element={<BankConnect />} />
-                              <Route path="invitados" element={<Invitados />} />
                               <Route path="invitados/seating" element={<SeatingPlan />} />
                               <Route
                                 path="plan-asientos"
                                 element={<Navigate to="/invitados/seating" replace />}
                               />
-                              <Route path="invitados/invitaciones" element={<Invitaciones />} />
                               <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
-                              <Route path="proveedores" element={<GestionProveedores />} />
                               <Route path="proveedores/favoritos" element={<SavedSuppliers />} />
                               <Route path="proveedores/comparar" element={<SupplierCompare />} />
                               <Route path="proveedores/contratos" element={<Contratos />} />
@@ -538,27 +581,6 @@ function App() {
                               {/* Ruta directa a música limpia (sin layout) */}
                               <Route path="musica-boda" element={<MomentosEspecialesSimple />} />
 
-                              {/* Protocolo */}
-                              <Route path="protocolo" element={<ProtocoloLayout />}>
-                                <Route
-                                  index
-                                  element={<Navigate to="momentos-especiales" replace />}
-                                />
-                                <Route
-                                  path="momentos-especiales"
-                                  element={<MomentosEspecialesSimple />}
-                                />
-                                <Route path="timing" element={<ProtocoloTiming />} />
-                                <Route path="dia-de-la-boda" element={<WeddingDayMode />} />
-                                <Route path="checklist" element={<ProtocoloChecklist />} />
-                                <Route path="ayuda-ceremonia" element={<ProtocoloAyuda />} />
-                                <Route path="documentos" element={<DocumentosLegales />} />
-                                {/* Legacy path redirect to the new one */}
-                                <Route
-                                  path="documentos-legales"
-                                  element={<Navigate to="documentos" replace />}
-                                />
-                              </Route>
 
                               {/* Diseños - Nuevo Editor Unificado */}
                               <Route path="editor-disenos" element={<DesignEditor />} />
@@ -578,14 +600,8 @@ function App() {
                               </Route>
 
                               {/* Extras */}
-                              <Route path="perfil" element={<Perfil />} />
                               <Route path="info-boda" element={<InfoBoda />} />
                               <Route path="notificaciones" element={<Notificaciones />} />
-                              <Route path="diseno-web" element={<DisenoWeb />} />
-                              <Route
-                                path="diseno-web/preview"
-                                element={<DisenoWeb mode="preview" />}
-                              />
                               <Route path="web-builder" element={<WebBuilderPage />} />
                               <Route
                                 path="web-builder-dashboard"
@@ -595,12 +611,10 @@ function App() {
                               <Route path="preview-web" element={<WebPreview />} />
                               <Route path="web" element={<WebEditor />} />
                               <Route path="ideas" element={<Ideas />} />
-                              <Route path="inspiracion" element={<Inspiration />} />
                               <Route path="blog" element={<Blog />} />
                               <Route path="blog/autor/:slug" element={<BlogAuthor />} />
                               <Route path="blog/:slug" element={<BlogPost />} />
                               <Route path="momentos" element={<Momentos />} />
-                              <Route path="more" element={<More />} />
                               <Route path="crear-evento" element={<CreateWeddingAI />} />
                               {/* Alias documentado para acceso manual al asistente de creación */}
                               <Route

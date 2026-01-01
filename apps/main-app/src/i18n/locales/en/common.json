@@ -1,7 +1,7 @@
 {
   "app": {
-    "name": "MaLove.App",
-    "brandName": "MaLoveApp",
+    "name": "Planivia",
+    "brandName": "Planivia",
     "tagline": "Your perfect wedding, digitally organized",
     "loading": "Loading...",
     "error": "Error",
@@ -81,6 +81,180 @@
     "passwordTooShort": "Password must be at least 6 characters",
     "passwordsDoNotMatch": "Passwords do not match",
     "invalidEmail": "Invalid email format"
+  },
+  "documents": {
+    "uploaded": "File uploaded",
+    "uploadFailed": "Could not upload file",
+    "fileDeleted": "File deleted",
+    "fileRefRemoved": "Reference removed. Could not delete from storage or registry.",
+    "docDownloadStarted": "Download started (.DOC)",
+    "docFailed": "Could not generate .DOC",
+    "pdfReady": "PDF generated",
+    "pdfFailed": "Could not generate PDF",
+    "tasksGenerateError": "Missing data needed to generate tasks",
+    "tasksCreated": "✅ {count} tasks created automatically in your task list",
+    "noTasksGenerated": "No tasks could be generated for this selection",
+    "tasksGenerateErrorGeneric": "Error generating automatic tasks"
+  },
+  "weddingAssistant": {
+    "welcome": "Hello! I'm your assistant for creating the event. I'll ask you some questions and with your answers I'll prepare the project base.",
+    "restart": "Perfect, let's start over. I'll ask you the key questions again to prepare the event.",
+    "allInfoCollected": "Great, I have all the information. Here's a summary. If everything is correct, we'll create the event.",
+    "parseError": "I didn't quite understand, could you say it another way?",
+    "validation": {
+      "nameRequired": "I need some name, even if it's provisional.",
+      "dateInvalid": "I couldn't understand the date. Use the format 2025-05-17.",
+      "locationRequired": "Indicate at least a city or approximate area.",
+      "budgetRequired": "Please indicate an approximate budget or write 'flexible'.",
+      "timeInvalid": "Indicate approximately how many months (example: 6, 12, 18).",
+      "prioritiesInvalid": "Write 3 numbers separated by commas (example: 1,3,2).",
+      "noConcerns": "No specific concerns",
+      "noNotes": "No additional notes"
+    },
+    "summary": {
+      "eventType": "Event type",
+      "coupleName": "Name / couple",
+      "date": "Date",
+      "location": "Location",
+      "style": "Style",
+      "guestCount": "Number of guests",
+      "formality": "Formality",
+      "ceremonyType": "Ceremony type",
+      "notes": "Notes",
+      "notSpecified": "(not specified)",
+      "toConfirm": "(to confirm)",
+      "toDefined": "(to define)",
+      "noAdditionalNotes": "No additional notes"
+    },
+    "actions": {
+      "restart": "Start over",
+      "createEvent": "Create event",
+      "creating": "Creating..."
+    }
+  },
+  "weddingDay": {
+    "noPhoneRegistered": "No phone registered",
+    "taskDescriptionPlaceholder": "Describe the task...",
+    "momentNamePlaceholder": "Optional note...",
+    "textRequired": "Text is required",
+    "editTask": "Edit task",
+    "newTask": "New task",
+    "task": "Task",
+    "markAsImportant": "Mark as important",
+    "additionalNote": "Additional note",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create",
+    "timeAndActivityRequired": "Time and activity are required",
+    "editActivity": "Edit activity",
+    "newActivity": "New activity",
+    "time": "Time",
+    "activity": "Activity",
+    "responsible": "Responsible",
+    "duration": "Duration (minutes)",
+    "editContact": "Edit contact",
+    "newContact": "New contact",
+    "name": "Name",
+    "role": "Role",
+    "phone": "Phone",
+    "priority": "Priority contact"
+  },
+  "webBuilder": {
+    "backToWebsites": "My Websites",
+    "designer": "Wedding Website Designer",
+    "dragComponents": "Drag components to create your perfect website",
+    "styles": "Styles",
+    "customizeColors": "Customize colors, fonts and decorations",
+    "preview": "Preview",
+    "viewPreview": "View website preview",
+    "saving": "Saving...",
+    "save": "Save",
+    "saveChanges": "Save changes",
+    "autoSaved": "Auto-saved",
+    "publish": "Publish",
+    "publishWeb": "Publish website",
+    "cannotSave": "Cannot save now",
+    "errorSaving": "Error saving website",
+    "savingChanges": "Saving changes...",
+    "themeApplied": "Theme \"{name}\" applied",
+    "componentsUpdated": "{count} component(s) updated - Now you'll see the background",
+    "noComponentsToUpdate": "No components to update"
+  },
+  "home2": {
+    "header": {
+      "greeting": "Hi {{name}} & {{partner}}!",
+      "greetingSingle": "Hi {{name}}!",
+      "subtitle": "Let's Plan Your Dream Wedding",
+      "guest": "Guest"
+    },
+    "countdown": {
+      "title": "Countdown",
+      "noDate": "Set your wedding date",
+      "past": "Wedding day passed!",
+      "daysToGo": "Days to Go"
+    },
+    "budget": {
+      "title": "Budget",
+      "of": "of"
+    },
+    "guestList": {
+      "title": "Guest List",
+      "confirmed": "Confirmed",
+      "pending": "Pending"
+    },
+    "tasks": {
+      "title": "Upcoming Tasks",
+      "untitled": "Untitled task",
+      "noTasks": "No pending tasks. Great job!"
+    },
+    "budgetChart": {
+      "title": "Budget Overview",
+      "spent": "Spent",
+      "total": "Total",
+      "venue": "Venue",
+      "catering": "Catering",
+      "flowers": "Flowers",
+      "noDataTitle": "You don't have a budget yet",
+      "noDataSubtitle": "Set up your budget to see how your expenses are distributed",
+      "createBudget": "Create budget"
+    },
+    "inspiration": {
+      "title": "Inspiration Board"
+    },
+    "blog": {
+      "sectionTitle": "Latest from Blog",
+      "viewAll": "View all →"
+    }
+  },
+  "weddingInfo": {
+    "toasts": {
+      "supplierContracted": "✅ {supplierName} contracted - Information automatically updated",
+      "fieldsUpdated": "📋 Updated: {fields}",
+      "fields": {
+        "place": "Place",
+        "address": "Address",
+        "contact": "Contact",
+        "catering": "Catering",
+        "photographer": "Photographer",
+        "music": "Music",
+        "coordinator": "Coordinator"
+      },
+      "enterCoupleName": "First enter the couple's name",
+      "slugGenerated": "Slug generated. Save to apply changes.",
+      "urlCopied": "URL copied to clipboard!",
+      "generateSlugFirst": "First generate a slug for the web",
+      "qrGenerated": "QR generated in new tab",
+      "heroImageUpdated": "Cover image updated",
+      "imageDeleted": "Image deleted",
+      "photoAdded": "Photo added to gallery"
+    },
+    "labels": {
+      "saving": "💾 Saving...",
+      "autoSaved": "✓ Auto-saved",
+      "previewWeb": "👁️ Preview Web",
+      "generateQR": "📱 Generate QR",
+      "copyUrl": "🔗 Copy URL"
+    }
   },
   "authLogin": {
     "title": "Access your account",
@@ -2056,10 +2230,25 @@
       "saved": "Saved"
     },
     "account": {
-      "title": "Title"
+      "title": "Account Information",
+      "name": "Name",
+      "linkedAccount": "Linked Account",
+      "planner": "Linked Wedding Planner",
+      "helpers": "Linked Helpers",
+      "email": "Email Address",
+      "whatsapp": "Personal WhatsApp Number",
+      "whatsappPlaceholder": "e.g. +349XXXXXXXX",
+      "password": "Reset Password"
     },
     "billing": {
-      "title": "Title"
+      "title": "Billing Information",
+      "fullName": "Full Name",
+      "address": "Address",
+      "zip": "Postal Code",
+      "city": "City",
+      "state": "State/Province",
+      "country": "Country",
+      "dni": "Tax ID / VAT Number"
     }
   },
   "forms": {

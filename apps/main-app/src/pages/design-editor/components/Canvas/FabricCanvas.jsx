@@ -788,14 +788,14 @@ const FabricCanvas = forwardRef(({ onElementSelect, initialState, initialWidth =
           }}>
           {/* Indicador de dimensiones */}
           <div className="absolute -top-8 left-0 right-0 text-center">
-            <span className="inline-block bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-mono">
+            <span className="inline-block  text-white text-xs px-3 py-1 rounded-full font-mono" style={{ backgroundColor: 'var(--color-primary)' }}>
               {initialWidth} × {initialHeight} px
             </span>
           </div>
 
         {/* Canvas con borde, sombra - zoom con CSS transform */}
         <div 
-          className="bg-white shadow-2xl relative origin-top-left"
+          className=" shadow-2xl relative origin-top-left" style={{ backgroundColor: 'var(--color-surface)' }}
           style={{
             border: '3px solid #3b82f6',
             boxShadow: '0 20px 25px -5px rgba(59, 130, 246, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
@@ -819,10 +819,10 @@ const FabricCanvas = forwardRef(({ onElementSelect, initialState, initialWidth =
           />
           
           {/* Esquinas decorativas */}
-          <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-blue-600" />
-          <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-blue-600" />
-          <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-blue-600" />
-          <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-blue-600" />
+          <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 " style={{ borderColor: 'var(--color-primary)' }} />
+          <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 " style={{ borderColor: 'var(--color-primary)' }} />
+          <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 " style={{ borderColor: 'var(--color-primary)' }} />
+          <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 " style={{ borderColor: 'var(--color-primary)' }} />
         </div>
 
         {/* Indicador inferior con formato */}

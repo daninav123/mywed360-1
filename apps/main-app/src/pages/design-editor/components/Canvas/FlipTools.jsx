@@ -86,13 +86,13 @@ export default function FlipTools({ canvasRef }) {
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 px-4 py-2">
+    <div className=" border-b  px-4 py-2" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
       <div className="flex items-center gap-1">
-        <span className="text-xs font-medium text-gray-600 mr-2">Transformar:</span>
+        <span className="text-xs font-medium  mr-2" style={{ color: 'var(--color-text-secondary)' }}>Transformar:</span>
         
         <button
           onClick={flipHorizontal}
-          className="p-1.5 hover:bg-gray-100 rounded"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
           title="Voltear horizontalmente"
         >
           <FlipHorizontal className="w-4 h-4" />
@@ -100,7 +100,7 @@ export default function FlipTools({ canvasRef }) {
         
         <button
           onClick={flipVertical}
-          className="p-1.5 hover:bg-gray-100 rounded"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
           title="Voltear verticalmente"
         >
           <FlipVertical className="w-4 h-4" />
@@ -108,7 +108,7 @@ export default function FlipTools({ canvasRef }) {
         
         <button
           onClick={rotate90}
-          className="p-1.5 hover:bg-gray-100 rounded"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
           title="Rotar 90°"
         >
           <RotateCw className="w-4 h-4" />
@@ -118,7 +118,7 @@ export default function FlipTools({ canvasRef }) {
         
         <button
           onClick={toggleLockMovement}
-          className="p-1.5 hover:bg-gray-100 rounded"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
           title="Bloquear/Desbloquear posición"
         >
           <Lock className="w-4 h-4" />
@@ -126,7 +126,7 @@ export default function FlipTools({ canvasRef }) {
         
         <button
           onClick={toggleAspectRatio}
-          className="p-1.5 hover:bg-gray-100 rounded"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
           title="Bloquear/Desbloquear proporción"
         >
           <Unlock className="w-4 h-4" />

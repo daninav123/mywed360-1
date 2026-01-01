@@ -327,7 +327,7 @@ export async function ensurePlanWindow({
       {
         date: admin.firestore.Timestamp.fromDate(new Date(`${key}T00:00:00Z`)),
         dateKey: key,
-        topic: entry?.topic || `Inspiración Lovenda ${key}`,
+        topic: entry?.topic || `Inspiración Planivia ${key}`,
         angle: entry?.angle || '',
         keywords: entry?.keywords || [],
         tone:
@@ -456,7 +456,7 @@ export async function runBlogAutomationCycle({
       tone: 'inspirador',
       language,
       length: 'medio',
-      keywords: ['bodas', 'lovenda', 'planificación'],
+      keywords: ['bodas', 'planivia', 'planificación'],
       audience: 'parejas',
       includeTips: true,
       includeCTA: true,

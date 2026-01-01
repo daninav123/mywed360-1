@@ -1,0 +1,878 @@
+{
+  "title": "Correo electrónico",
+  "inbox": "Bandeja de entrada",
+  "compose": {
+    "header": {
+      "title": "Nuevo correo"
+    },
+    "fields": {
+      "to": {
+        "placeholder": "Para:",
+        "aria": "Campo destinatario"
+      },
+      "subject": {
+        "placeholder": "Asunto:",
+        "aria": "Campo asunto"
+      },
+      "cc": {
+        "placeholder": "CC:",
+        "aria": "Campo con copia"
+      },
+      "bcc": {
+        "placeholder": "BCC:",
+        "aria": "Campo con copia oculta"
+      }
+    },
+    "toggle": {
+      "showCcBcc": "Añadir CC/BCC",
+      "hideCcBcc": "Ocultar CC/BCC"
+    },
+    "quickReplies": {
+      "options": [
+        "Gracias por su respuesta. Quedo atento/a a próximos pasos.",
+        "¿Podrían enviarnos un presupuesto detallado, por favor?",
+        "Confirmamos nuestra disponibilidad en la fecha indicada. Muchas gracias."
+      ],
+      "ariaLabel": "Insertar respuesta sugerida {{index}}"
+    }
+  },
+  "sent": "Enviados",
+  "drafts": "Borradores",
+  "trash": "Papelera",
+  "searchPlaceholder": "Buscar correos...",
+  "noEmails": "No hay correos",
+  "form": {
+    "to": "Para",
+    "subject": "Asunto",
+    "message": "Mensaje",
+    "attachments": "Adjuntos"
+  },
+  "messages": {
+    "sent": "Correo enviado correctamente",
+    "saved": "Borrador guardado",
+    "deleted": "Correo eliminado",
+    "error": "Error al enviar el correo"
+  },
+  "composer": {
+    "header": {
+      "title": "Nuevo mensaje",
+      "closeAria": "Cerrar compositor"
+    },
+    "fields": {
+      "from": {
+        "label": "De"
+      },
+      "to": {
+        "label": "Para",
+        "placeholder": "Destinatarios (correo@ejemplo.com, correo2@ejemplo.com)"
+      },
+      "cc": {
+        "label": "CC",
+        "placeholder": "CC (correo@ejemplo.com, correo2@ejemplo.com)"
+      },
+      "subject": {
+        "label": "Asunto",
+        "placeholder": "Asunto del correo"
+      },
+      "body": {
+        "label": "Mensaje",
+        "placeholder": "Escribe tu mensaje aquí..."
+      }
+    },
+    "templates": {
+      "placeholder": "Plantillas"
+    },
+    "status": {
+      "loadingEmail": "cargando..."
+    },
+    "actions": {
+      "configureEmail": "Configurar correo",
+      "addCc": "Añadir CC"
+    },
+    "attachments": {
+      "label": "Adjuntos",
+      "addFile": "Adjuntar archivo",
+      "maxSizeHint": "Máximo 10MB por archivo",
+      "count_one": "{{count}} archivo adjunto",
+      "count_other": "{{count}} archivos adjuntos",
+      "removeAria": "Eliminar adjunto"
+    },
+    "schedule": {
+      "label": "Programar el envío",
+      "helper": "Selecciona día y hora para enviar automáticamente."
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "schedule": "Programar",
+      "send": "Enviar",
+      "scheduling": "Programando...",
+      "sending": "Enviando..."
+    },
+    "success": {
+      "scheduled": "Correo programado correctamente",
+      "sent": "Correo enviado correctamente"
+    },
+    "errors": {
+      "invalidAttachments": "Algunos archivos exceden el tamaño máximo de {{maxSize}}: {{names}}",
+      "missingRecipient": "Debes especificar al menos un destinatario.",
+      "missingSubject": "Añade un asunto al correo.",
+      "emptyBody": "El mensaje no puede estar vacío.",
+      "invalidRecipients": "Algunas direcciones de correo no son válidas: {{emails}}",
+      "invalidCc": "Algunas direcciones CC no son válidas: {{emails}}",
+      "missingSchedule": "Selecciona una fecha y hora para programar el envío.",
+      "attachmentsNotSupported": "Actualmente no es posible programar correos con adjuntos.",
+      "invalidScheduleDate": "Fecha y hora no válidas.",
+      "scheduleFailed": "No se pudo programar el correo.",
+      "sendFailed": "No se pudo enviar el correo.",
+      "sendFailedWithDetails": "No se pudo enviar el correo: {{details}}"
+    },
+    "prompts": {
+      "setupCustomAddress": "No tienes configurada una dirección de correo personalizada. ¿Deseas configurarla ahora?"
+    }
+  },
+  "calendarIntegration": {
+    "header": "Añadir evento al calendario",
+    "status": {
+      "analyzing": "Analizando contenido del correo...",
+      "detectedInfo": "Información detectada en el correo:"
+    },
+    "tooltips": {
+      "useDate": "Usar esta fecha",
+      "useTime": "Usar esta hora",
+      "useLocation": "Usar esta ubicación",
+      "useAttendee": "Usar este asistente"
+    },
+    "errors": {
+      "noEmail": "No hay un correo para analizar.",
+      "analyzeFailed": "No se pudo analizar correctamente el contenido del correo.",
+      "missingTitle": "El título del evento es obligatorio.",
+      "missingDate": "Debes seleccionar una fecha para el evento."
+    },
+    "defaults": {
+      "description": "Evento creado a partir del correo: \"{{subject}}\"",
+      "noSubject": "(Sin asunto)"
+    },
+    "detection": {
+      "locationKeywords": [
+        "en",
+        "ubicado en",
+        "ubicada en",
+        "dirección",
+        "lugar",
+        "local",
+        "ubicación"
+      ],
+      "providerKeywords": ["proveedor", "servicio", "contratación"]
+    },
+    "fields": {
+      "title": {
+        "label": "Título del evento:",
+        "placeholder": "Título del evento"
+      },
+      "date": {
+        "label": "Fecha:"
+      },
+      "time": {
+        "label": "Hora:"
+      },
+      "location": {
+        "label": "Ubicación:",
+        "placeholder": "Ubicación del evento"
+      },
+      "description": {
+        "label": "Descripción:",
+        "placeholder": "Descripción del evento"
+      }
+    },
+    "attendees": {
+      "label": "Asistentes:",
+      "placeholder": "Nombre del asistente"
+    },
+    "checkbox": {
+      "providerRelated": "Este evento está relacionado con un proveedor"
+    },
+    "buttons": {
+      "addAttendee": "Añadir asistente",
+      "cancel": "Cancelar",
+      "save": "Guardar evento"
+    }
+  },
+  "aliasConfig": {
+    "header": {
+      "title": "Configura tu correo electrónico",
+      "subtitle": "Elige tu alias personalizado"
+    },
+    "currentEmail": {
+      "label": "Correo actual:"
+    },
+    "fields": {
+      "alias": {
+        "label": "Tu alias de correo",
+        "placeholder": "ejemplo: ana, pedro, boda2025"
+      }
+    },
+    "rules": [
+      "Entre 3 y 30 caracteres",
+      "Solo letras minúsculas, números, puntos (.), guiones (-) y guiones bajos (_)",
+      "Ejemplos: ana, pedro-2025, mi.boda"
+    ],
+    "preview": {
+      "label": "Tu nuevo correo será:"
+    },
+    "errors": {
+      "required": "El alias es obligatorio.",
+      "minLength": "Mínimo 3 caracteres.",
+      "maxLength": "Máximo 30 caracteres.",
+      "invalidChars": "Solo se permiten letras minúsculas, números, puntos (.), guiones (-) y guiones bajos (_).",
+      "aliasUsed": "Este alias ya está en uso.",
+      "checkFailed": "Error al verificar la disponibilidad.",
+      "config": "Error de configuración. Recarga la página.",
+      "unavailable": "El alias no está disponible.",
+      "saveFailed": "No se pudo guardar el alias. Inténtalo de nuevo."
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    }
+  },
+  "configValidation": {
+    "title": "Validación de configuración",
+    "subtitle": "Verifica que tu dominio esté configurado para enviar correos electrónicos",
+    "buttons": {
+      "validate": "Validar configuración",
+      "validating": "Validando...",
+      "sendTest": "Enviar correo de prueba",
+      "sendingTest": "Enviando...",
+      "sent": "Correo enviado"
+    },
+    "current": {
+      "domain": "Dominio:",
+      "email": "Correo:"
+    },
+    "errorTitle": "Error",
+    "errors": {
+      "invalidEmail": "Correo electrónico no válido",
+      "validateGeneric": "Error al validar la configuración. Inténtalo nuevamente.",
+      "sendTestGeneric": "Error al enviar el correo de prueba. Verifica tu configuración."
+    },
+    "summary": {
+      "successTitle": "Configuración correcta",
+      "warningTitle": "Configuración incompleta",
+      "cta": "Tu configuración está lista. Envía un correo de prueba para verificar que todo funciona correctamente."
+    },
+    "checks": {
+      "spfTitle": "SPF (Sender Policy Framework)",
+      "spfValid": "Registro SPF configurado correctamente",
+      "dkimTitle": "DKIM (DomainKeys Identified Mail)",
+      "dkimValid": "Registro DKIM configurado correctamente",
+      "dmarcTitle": "DMARC (Recomendado)",
+      "dmarcValid": "Registro DMARC configurado (mejora deliverability)"
+    },
+    "successNotice": {
+      "description": "Correo de prueba enviado a {{email}}. Revisa tu bandeja de entrada."
+    },
+    "help": {
+      "title": "¿Qué se valida?",
+      "spf": "Verifica que tu dominio autorice a MaLoveApp para enviar correos.",
+      "dkim": "Confirma que los correos están firmados digitalmente.",
+      "dmarc": "Mejora la entregabilidad y protege contra suplantación."
+    }
+  },
+  "feedback": {
+    "header": {
+      "title": "Tu opinión importa",
+      "toggleAria": "Dar feedback sobre el sistema de correo",
+      "closeAria": "Cerrar formulario de feedback"
+    },
+    "thanks": {
+      "title": "Gracias por tu feedback",
+      "subtitle": "Tu opinión nos ayuda a mejorar el sistema de correos de MaLoveApp."
+    },
+    "common": {
+      "next": "Siguiente",
+      "back": "Atrás",
+      "selectOption": "Selecciona una opción",
+      "sending": "Enviando..."
+    },
+    "messages": {
+      "submitError": "No se pudo enviar tu feedback. Inténtalo más tarde."
+    },
+    "options": {
+      "features": {
+        "alias": "Alias de correo",
+        "templates": "Plantillas de correo",
+        "tracking": "Seguimiento de correos",
+        "events": "Detección de eventos",
+        "search": "Búsqueda en correos",
+        "notifications": "Notificaciones"
+      },
+      "performance": {
+        "verySlow": "Muy lento",
+        "slow": "Algo lento",
+        "acceptable": "Aceptable",
+        "fast": "Rápido",
+        "veryFast": "Muy rápido"
+      },
+      "usability": {
+        "veryDifficult": "Muy difícil de usar",
+        "difficult": "Algo difícil",
+        "neutral": "Neutral",
+        "easy": "Fácil de usar",
+        "veryEasy": "Muy fácil de usar"
+      }
+    },
+    "steps": {
+      "rating": {
+        "question": "¿Cómo valorarías tu experiencia con el correo de MaLoveApp?",
+        "scaleStart": "Muy malo",
+        "scaleEnd": "Excelente",
+        "ratingAria": "Seleccionar puntuación {{value}}"
+      },
+      "usability": {
+        "title": "Sobre la usabilidad y el rendimiento",
+        "usabilityLabel": "¿Qué tan fácil es usar el sistema de correo?",
+        "performanceLabel": "¿Cómo valoras la velocidad del sistema de correo?"
+      },
+      "features": {
+        "title": "Funcionalidades y sugerencias",
+        "featureLabel": "¿Qué funcionalidades has utilizado? (selecciona todas las que apliquen)",
+        "improvementLabel": "¿Qué podemos mejorar en nuestro sistema de correo?",
+        "improvementPlaceholder": "Comparte tus sugerencias...",
+        "featureRequestLabel": "¿Hay alguna funcionalidad que te gustaría ver en el futuro?",
+        "featureRequestPlaceholder": "Tus ideas son importantes para nosotros...",
+        "submit": "Enviar feedback"
+      }
+    }
+  },
+  "onboarding": {
+    "steps": {
+      "welcome": {
+        "title": "Bienvenido al módulo de correo",
+        "description": "Configura tu sistema de correo en 3 simples pasos"
+      },
+      "domain": {
+        "title": "Configuración de dominio",
+        "description": "Configura tu dominio de envío"
+      },
+      "validation": {
+        "title": "Validación DNS",
+        "description": "Verificaremos tu configuración DKIM y SPF"
+      },
+      "test": {
+        "title": "Envío de prueba",
+        "description": "Envía un correo de prueba"
+      },
+      "complete": {
+        "title": "Listo",
+        "description": "Tu correo electrónico está configurado correctamente"
+      }
+    },
+    "welcome": {
+      "intro": "Vamos a configurar tu sistema de correo para que puedas enviar invitaciones y comunicarte con tus invitados.",
+      "noteLabel": "Nota:",
+      "noteText": "Necesitarás acceso a la configuración DNS de tu dominio."
+    },
+    "domain": {
+      "fields": {
+        "domain": {
+          "label": "Dominio *",
+          "placeholder": "miboda.com"
+        },
+        "fromEmail": {
+          "label": "Correo de envío *",
+          "placeholder": "invitaciones@miboda.com"
+        },
+        "fromName": {
+          "label": "Nombre del Remitente *",
+          "placeholder": "María & Juan"
+        },
+        "replyTo": {
+          "label": "Correo de respuesta (opcional)",
+          "placeholder": "contacto@miboda.com"
+        }
+      }
+    },
+    "validation": {
+      "title": "Registros DNS Requeridos:",
+      "button": {
+        "validate": "Validar DNS",
+        "validating": "Validando..."
+      },
+      "errors": {
+        "recordsMissing": "Verifica que hayas añadido correctamente los registros DNS",
+        "generic": "Error al validar DNS. Intenta de nuevo."
+      }
+    },
+    "test": {
+      "description": "Envía un correo de prueba para verificar que todo funciona correctamente.",
+      "fields": {
+        "recipient": {
+          "label": "Correo de destino",
+          "placeholder": "tu@email.com"
+        }
+      },
+      "button": "Enviar correo de prueba",
+      "success": "Correo de prueba enviado correctamente. Revisa tu bandeja de entrada."
+    },
+    "complete": {
+      "message": "Tu configuración de correo está completa. Ya puedes empezar a enviar invitaciones.",
+      "reminder": "Recuerda: puedes cambiar esta configuración en cualquier momento desde Ajustes."
+    },
+    "actions": {
+      "skip": "Saltar por ahora",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "finish": "Finalizar"
+    },
+    "errors": {
+      "missingDomainFields": "Por favor completa todos los campos obligatorios",
+      "dnsIncomplete": "Por favor completa la configuración DNS antes de continuar.",
+      "testNotSent": "Por favor envía un correo de prueba antes de continuar",
+      "missingTestRecipient": "Por favor ingresa un correo de destino",
+      "testSendFailed": "Error al enviar el correo de prueba"
+    }
+  },
+  "mailgunTester": {
+    "title": "Tester de Mailgun",
+    "subtitle": "Utiliza estas herramientas para probar la integración con Mailgun.",
+    "sections": {
+      "send": {
+        "title": "1. Enviar correo",
+        "fields": {
+          "from": "Remitente",
+          "to": "Destinatario",
+          "subject": "Asunto",
+          "text": "Mensaje"
+        },
+        "placeholders": {
+          "from": "Test <test@mg.maloveapp.com>",
+          "to": "destinatario@ejemplo.com",
+          "subject": "Prueba de Mailgun desde MaLoveApp",
+          "text": "Este es un correo de prueba enviado desde la aplicación MaLoveApp."
+        },
+        "button": {
+          "default": "Enviar correo",
+          "loading": "Enviando..."
+        }
+      },
+      "validate": {
+        "title": "2. Validar correo",
+        "field": "Correo para validar",
+        "placeholder": "ejemplo@gmail.com",
+        "button": {
+          "default": "Validar",
+          "loading": "Validando..."
+        },
+        "defaultReason": "formato incorrecto"
+      },
+      "availability": {
+        "title": "3. Verificar Disponibilidad",
+        "field": "Nombre de usuario",
+        "placeholder": "nombre",
+        "helper": "Solo el nombre sin @maloveapp.com",
+        "button": {
+          "default": "Verificar Disponibilidad",
+          "loading": "Verificando..."
+        }
+      }
+    },
+    "notifications": {
+      "sendSuccess": "Correo enviado correctamente. ID: {{id}}",
+      "sendError": "Error al enviar el correo: {{message}}",
+      "validateError": "Error al validar: {{message}}",
+      "availabilityError": "Error al verificar disponibilidad: {{message}}"
+    },
+    "validation": {
+      "success": "El correo es válido",
+      "invalid": "El correo no es válido: {{reason}}",
+      "resultValid": "✅ Correo válido",
+      "resultInvalid": "❌ Correo inválido"
+    },
+    "availability": {
+      "available": "El nombre de usuario \"{{username}}@maloveapp.com\" está disponible",
+      "unavailable": "El nombre de usuario \"{{username}}@maloveapp.com\" ya está en uso"
+    }
+  },
+  "filters": {
+    "header": "Filtros avanzados",
+    "fields": {
+      "from": {
+        "label": "De (Remitente)",
+        "placeholder": "correo@ejemplo.com"
+      },
+      "to": {
+        "label": "Para (Destinatario)",
+        "placeholder": "correo@ejemplo.com"
+      },
+      "subject": {
+        "label": "Asunto",
+        "placeholder": "Palabras clave en el asunto"
+      },
+      "dateFrom": "Desde fecha",
+      "dateTo": "Hasta fecha",
+      "hasAttachment": "Con archivos adjuntos",
+      "isUnread": "Solo no leídos"
+    },
+    "labels": {
+      "title": "Etiquetas",
+      "important": "Importante",
+      "work": "Trabajo",
+      "personal": "Personal",
+      "invitation": "Invitación",
+      "provider": "Proveedor"
+    },
+    "buttons": {
+      "clear": "Limpiar filtros",
+      "apply": "Aplicar filtros"
+    }
+  },
+  "settings": {
+    "title": "Configuración de correo electrónico",
+    "address": {
+      "title": "Tu dirección de correo",
+      "description": "Esta es tu dirección de correo electrónico actual en MaLoveApp:"
+    },
+    "alias": {
+      "title": "Personaliza tu dirección de correo",
+      "description": "Puedes personalizar la parte inicial de tu dirección de correo para hacerla más fácil de recordar.",
+      "label": "Nuevo alias de correo",
+      "placeholder": "tunombre",
+      "suffix": "@maloveapp.com",
+      "helper": "Solo letras minúsculas, números y puntos. Mínimo 3 caracteres.",
+      "validationError": "El alias debe tener al menos 3 caracteres y solo puede contener letras, números y puntos.",
+      "success": "Tu dirección de correo se actualizó con éxito.",
+      "button": {
+        "default": "Actualizar dirección",
+        "loading": "Actualizando..."
+      },
+      "changeError": "Error: {{message}}"
+    },
+    "notifications": {
+      "title": "Preferencias de notificación",
+      "newEmail": "Notificarme cuando reciba nuevos correos",
+      "read": "Notificarme cuando mis correos sean leídos"
+    },
+    "autoReply": {
+      "title": "Respuestas automáticas inteligentes",
+      "lastSync": "Última sincronización: {{value}}",
+      "lastSyncPending": "pendiente",
+      "syncing": "Sincronizando...",
+      "description": "Configura mensajes automáticos según el tipo de correo mientras la IA analiza los correos entrantes.",
+      "success": "Configuración guardada correctamente.",
+      "errors": {
+        "sync": "No se pudo sincronizar la configuración de auto-respuestas.",
+        "save": "No se pudo guardar la configuración."
+      },
+      "enable": "Activar respuestas automáticas",
+      "defaultSubject": "Re: [Asunto]",
+      "generalDefault": "Hola [Nombre],\\n\\nHemos recibido tu mensaje y te responderemos en breve.\\n\\nGracias!",
+      "helper": "Puedes usar [Nombre], [Categoría] y [Asunto] como variables.",
+      "fields": {
+        "general": "Mensaje general",
+        "subject": "Asunto automático",
+        "interval": {
+          "label": "Intervalo (horas)"
+        },
+        "exclusions": {
+          "label": "Remitentes excluidos",
+          "placeholder": "correo1@dominio.com, correo2@dominio.com"
+        }
+      },
+      "categories": {
+        "provider": "Mensaje para proveedores",
+        "guest": "Mensaje para invitados",
+        "finance": "Mensaje para finanzas",
+        "contract": "Mensaje para contratos",
+        "invoice": "Mensaje para facturas",
+        "meeting": "Mensaje para reuniones",
+        "rsvp": "Mensaje para confirmaciones (RSVP)"
+      },
+      "buttons": {
+        "save": "Guardar respuestas automáticas",
+        "saving": "Guardando..."
+      }
+    },
+    "scheduled": {
+      "title": "Correos programados",
+      "description": "Consulta y gestiona los envíos que has programado desde el compositor.",
+      "empty": "No tienes correos programados actualmente.",
+      "subjectFallback": "(Sin asunto)",
+      "toLabel": "Para: {{value}}",
+      "toFallback": "Sin destinatario",
+      "scheduledLabel": "Programado: {{value}}",
+      "scheduledFallback": "Sin fecha",
+      "buttons": {
+        "cancel": "Cancelar",
+        "refresh": "Actualizar lista"
+      }
+    }
+  },
+  "recommendations": {
+    "title": "Recomendaciones personalizadas",
+    "tooltip": "Las recomendaciones se basan en datos históricos de efectividad",
+    "loading": "Analizando datos y generando recomendaciones...",
+    "empty": "No hay suficientes datos para generar recomendaciones personalizadas.",
+    "errors": {
+      "generate": "No se pudieron generar las recomendaciones. Inténtalo de nuevo más tarde."
+    },
+    "confidence": {
+      "label": "Confianza en recomendaciones:",
+      "levels": {
+        "low": "Baja",
+        "medium": "Media",
+        "high": "Alta"
+      },
+      "chip": "{{label}} ({{score}}%)"
+    },
+    "sections": {
+      "bestTime": {
+        "title": "Mejor momento para enviar",
+        "result": "El mejor momento para enviar correos es por la {{time}} con una tasa de respuesta del {{rate}}%",
+        "button": "Programar en este horario",
+        "fallback": "No hay suficientes datos para determinar el mejor momento. Por ahora, recomendamos enviar por la mañana (8-12h)."
+      },
+      "subject": {
+        "title": "Línea de asunto efectiva",
+        "label": "Patrones recomendados:",
+        "length": "Longitud óptima: entre {{min}} y {{max}} caracteres",
+        "button": "Usar"
+      },
+      "customization": {
+        "title": "Impacto de personalización",
+        "summary": "Los correos personalizados tienen una tasa de respuesta del {{customized}}%, frente al {{plain}}% de correos sin personalizar.",
+        "labels": {
+          "customized": "Personalizados",
+          "nonCustomized": "No personalizados"
+        },
+        "fallback": {
+          "recommend": "Recomendamos personalizar tus mensajes para aumentar la tasa de respuesta.",
+          "insufficient": "No hay suficientes datos para medir el impacto de la personalización."
+        }
+      },
+      "templates": {
+        "title": "Plantilla recomendada",
+        "summary": "La plantilla con mejor rendimiento es {{template}} con una tasa de respuesta del {{rate}}%.",
+        "category": "Para la categoría {{category}}: Tasa de respuesta del {{rate}}%",
+        "button": "Aplicar plantilla recomendada",
+        "fallback": "No hay suficientes datos para recomendar una plantilla específica. Por ahora, recomendamos usar la plantilla general."
+      },
+      "responseTime": {
+        "title": "Tiempo de respuesta esperado",
+        "average": "Tiempo promedio de respuesta: {{value}} horas",
+        "median": "Tiempo mediano: {{value}} horas",
+        "fastest": "Respuesta más rápida: {{value}}h",
+        "slowest": "Respuesta más lenta: {{value}}h",
+        "category": "Para esta categoría específica: {{value}} horas",
+        "fallback": "Con base en promedios generales, espera una respuesta en aproximadamente 24-48 horas."
+      },
+      "categorySpecific": {
+        "title": "Recomendaciones para {{category}}",
+        "generic": "esta categoría",
+        "responseRate": "Tasa de respuesta en esta categoría: {{rate}}%",
+        "fallback": "No hay suficientes datos para recomendaciones específicas en esta categoría."
+      },
+      "querySpecific": {
+        "title": "Basado en tu búsqueda"
+      }
+    }
+  },
+  "unifiedInbox": {
+    "folders": {
+      "inbox": "Bandeja de entrada",
+      "sent": "Enviados",
+      "trash": "Papelera",
+      "important": "Importantes",
+      "default": "Recibidos"
+    },
+    "filters": {
+      "status": {
+        "all": "Todos",
+        "unread": "No leídos",
+        "read": "Leídos"
+      },
+      "sort": {
+        "date": "Fecha",
+        "subject": "Asunto",
+        "from": "Remitente"
+      },
+      "density": {
+        "comfortable": "Cómoda",
+        "compact": "Compacta"
+      }
+    },
+    "search": {
+      "placeholder": "Buscar correos..."
+    },
+    "labels": {
+      "suggestedOnly": "Solo sugeridos",
+      "sortBy": "Ordenar por",
+      "aiTags": "Etiquetas IA",
+      "allTags": "Todas"
+    },
+    "aria": {
+      "filterStatus": "Filtro por estado",
+      "sortToggle": "Invertir orden",
+      "suggestedTitle": "Mostrar solo correos con sugerencia de IA",
+      "density": "Densidad de lista"
+    },
+    "buttons": {
+      "providerAi": "IA Proveedores"
+    },
+    "emptyState": {
+      "selectEmail": "Selecciona un correo para verlo"
+    },
+    "sidebar": {
+      "inboxBadge": "{{unread}} no leídos · {{total}} totales",
+      "sentBadge": "{{total}} enviados",
+      "trashBadge": "{{total}} en papelera"
+    },
+    "summary": {
+      "visible_one": "{{count}} correo visible",
+      "visible_other": "{{count}} correos visibles",
+      "filters": {
+        "unread": "solo no leídos",
+        "read": "solo leídos",
+        "suggested": "sugerencias activas",
+        "tag": "etiqueta IA: {{tag}}"
+      },
+      "important": {
+        "label": "Destacados",
+        "unread": "{{count}} sin leer",
+        "total": "{{count}}"
+      }
+    },
+    "analyze": {
+      "button": "Analizar IA (carpeta actual)",
+      "loading": "Analizando...",
+      "title": "Analizar correos (IA) - solo en desarrollo"
+    },
+    "header": {
+      "chip": "Bandeja unificada"
+    }
+  },
+  "smartComposer": {
+    "title": "Redactar correo",
+    "titleWithProvider": "a {{name}}",
+    "sections": {
+      "message": "Mensaje"
+    },
+    "toggles": {
+      "show": "Mostrar recomendaciones",
+      "hide": "Ocultar recomendaciones"
+    },
+    "fields": {
+      "to": {
+        "label": "Para",
+        "placeholder": "correo@dominio.com"
+      },
+      "subject": {
+        "label": "Asunto",
+        "placeholder": "Escribe un asunto efectivo..."
+      },
+      "message": {
+        "label": "Mensaje",
+        "placeholder": "Escribe tu mensaje aquí..."
+      }
+    },
+    "templates": {
+      "label": "Plantilla",
+      "none": "Ninguna"
+    },
+    "schedule": {
+      "label": "Programar envío:",
+      "clear": "Limpiar"
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "send": "Enviar",
+      "schedule": "Programar"
+    },
+    "feedback": {
+      "missingFields": "Completa destinatario, asunto y mensaje antes de enviar.",
+      "subjectApplied": "Línea de asunto actualizada con la recomendación.",
+      "templateApplied": "Plantilla \"{{name}}\" aplicada.",
+      "timeApplied": "Correo programado para mañana a las {{hour}}:00h ({{slot}})."
+    },
+    "placeholders": {
+      "provider": "proveedor",
+      "service": "servicio",
+      "date": "próximamente",
+      "event": "evento"
+    }
+  },
+  "providerSearch": {
+    "title": "Buscar proveedor",
+    "form": {
+      "placeholder": "¿Qué buscas? Ej: Fotógrafo con experiencia en bodas al aire libre",
+      "servicesAll": "Todos los servicios",
+      "searchAria": "Buscar proveedores"
+    },
+    "services": [
+      {
+        "value": "Catering",
+        "label": "Catering"
+      },
+      {
+        "value": "Fotografía",
+        "label": "Fotografía"
+      },
+      {
+        "value": "Música",
+        "label": "Música"
+      },
+      {
+        "value": "Flores",
+        "label": "Flores"
+      },
+      {
+        "value": "Vestidos",
+        "label": "Vestidos"
+      },
+      {
+        "value": "Decoración",
+        "label": "Decoración"
+      },
+      {
+        "value": "Lugar",
+        "label": "Lugar"
+      },
+      {
+        "value": "Transporte",
+        "label": "Transporte"
+      },
+      {
+        "value": "Invitaciones",
+        "label": "Invitaciones"
+      },
+      {
+        "value": "Pasteles",
+        "label": "Pasteles"
+      },
+      {
+        "value": "Joyería",
+        "label": "Joyería"
+      },
+      {
+        "value": "Detalles",
+        "label": "Detalles"
+      }
+    ],
+    "messages": {
+      "loading": "Buscando proveedores...",
+      "fallback": "Mostramos resultados de referencia porque el servicio en vivo no está disponible.",
+      "noResults": "No se encontraron proveedores que coincidan con tu búsqueda.",
+      "noLocation": "No especificada",
+      "noDescription": "Sin descripción disponible",
+      "errorRetry": "Error al buscar proveedores. Inténtalo de nuevo.",
+      "error": "Error al buscar proveedores.",
+      "missingQuery": "Por favor, ingresa un término de búsqueda."
+    },
+    "results": {
+      "title": "Resultados ({{count}})"
+    },
+    "buttons": {
+      "close": "Cerrar"
+    }
+  }
+}

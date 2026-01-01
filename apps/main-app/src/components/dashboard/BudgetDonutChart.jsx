@@ -11,9 +11,9 @@ export default function BudgetDonutChart({ budgetByCategory = [] }) {
   const chartData = useMemo(() => {
     if (!Array.isArray(budgetByCategory) || budgetByCategory.length === 0) {
       return [
-        { name: t('home2.budgetChart.venue', { defaultValue: 'Venue' }), value: 0 },
-        { name: t('home2.budgetChart.catering', { defaultValue: 'Catering' }), value: 0 },
-        { name: t('home2.budgetChart.flowers', { defaultValue: 'Flowers' }), value: 0 },
+        { name: t('home2.budgetChart.venue'), value: 0 },
+        { name: t('home2.budgetChart.catering'), value: 0 },
+        { name: t('home2.budgetChart.flowers'), value: 0 },
       ];
     }
 
@@ -57,7 +57,7 @@ export default function BudgetDonutChart({ budgetByCategory = [] }) {
     <div
       className="transition-all duration-200"
       style={{
-        backgroundColor: 'transparent',
+        backgroundColor: 'white',
         borderRadius: 'var(--radius-xl)',
         boxShadow: 'var(--shadow-card)',
         border: '1px solid var(--color-border-soft)',
@@ -71,7 +71,7 @@ export default function BudgetDonutChart({ budgetByCategory = [] }) {
           fontWeight: 600,
           color: 'var(--color-text)',
         }}>
-          {t('home2.budgetChart.title', { defaultValue: 'Budget Overview' })}
+          {t('home2.budgetChart.title')}
         </h3>
       </div>
       
@@ -92,7 +92,7 @@ export default function BudgetDonutChart({ budgetByCategory = [] }) {
                 fontSize: '13px',
                 color: 'var(--color-text-secondary)',
               }}>
-                {t('home2.budgetChart.spent', { defaultValue: 'Spent' })} / {format.currency(total)} {t('home2.budgetChart.total', { defaultValue: 'Total' })}
+                {t('home2.budgetChart.spent')} / {format.currency(total)} {t('home2.budgetChart.total')}
               </p>
             </div>
             <div className="w-40 h-40">
@@ -148,14 +148,14 @@ export default function BudgetDonutChart({ budgetByCategory = [] }) {
             fontWeight: 600,
             marginBottom: '8px',
           }}>
-            {t('home2.budgetChart.noDataTitle', { defaultValue: 'Aún no tienes presupuesto' })}
+            {t('home2.budgetChart.noDataTitle')}
           </p>
           <p style={{
             fontSize: '14px',
             color: 'var(--color-text-secondary)',
             marginBottom: '16px',
           }}>
-            {t('home2.budgetChart.noDataSubtitle', { defaultValue: 'Configura tu presupuesto para ver cómo se distribuyen tus gastos' })}
+            {t('home2.budgetChart.noDataSubtitle')}
           </p>
           <button
             onClick={() => window.location.href = '/finanzas'}
@@ -179,7 +179,7 @@ export default function BudgetDonutChart({ budgetByCategory = [] }) {
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            {t('home2.budgetChart.createBudget', { defaultValue: 'Crear presupuesto' })}
+            {t('home2.budgetChart.createBudget')}
           </button>
         </div>
       )}

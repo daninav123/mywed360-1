@@ -11,7 +11,7 @@ export default function BudgetCard({ spent, total }) {
 
   return (
     <MetricCard
-      title={t('home2.budget.title', { defaultValue: 'Budget' })}
+      title={t('home2.budget.title')}
       bgColor="#E8F5E9"
       textColor="#4A9B5F"
       valueColor="#4A9B5F"
@@ -21,7 +21,7 @@ export default function BudgetCard({ spent, total }) {
       {totalAmount > 0 && (
         <>
           <p className="text-xs opacity-70 mt-1" style={{ color: '#718096' }}>
-            {t('home2.budget.of', { defaultValue: 'of' })} {format.currency(totalAmount)}
+            {t('home2.budget.of')} {format.currency(totalAmount)}
           </p>
           <div className="mt-3 w-full rounded-full h-1" style={{ backgroundColor: 'rgba(74, 155, 95, 0.3)' }}>
             <div 

@@ -73,7 +73,7 @@ export default function MisDiseños() {
         <h1 className="text-xl font-semibold">
           {t('designsLibrary.myDesigns.title', 'Mis diseños')}
         </h1>
-        <Link placeholder={t('design.myDesigns.searchPlaceholder')} className="text-blue-600 hover:underline">
+        <Link placeholder={t('design.myDesigns.searchPlaceholder')} className=" hover:underline" style={{ color: 'var(--color-primary)' }}>
           {t('designsLibrary.myDesigns.backLink', 'Volver a Diseños')}
         </Link>
       </div>
@@ -87,15 +87,15 @@ export default function MisDiseños() {
       )}
       {error && <div className="p-3 border rounded bg-red-50 text-red-700">{error}</div>}
       {loading && (
-        <div className="text-sm text-gray-600">
+        <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
           {t('designsLibrary.myDesigns.loading', 'Cargando...')}
         </div>
       )}
       {!loading && activeWedding && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((it) => (
-            <div key={it.id} className="border rounded overflow-hidden bg-white">
-              <div className="p-2 bg-gray-50 text-xs text-gray-600 flex items-center justify-between">
+            <div key={it.id} className="border rounded overflow-hidden " style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className="p-2  text-xs  flex items-center justify-between" style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
                 <span>
                   {it.type || t('designsLibrary.myDesigns.item.typeFallback', 'diseño')}
                 </span>
@@ -104,7 +104,7 @@ export default function MisDiseños() {
                     t('designsLibrary.myDesigns.item.categoryFallback', 'general')}
                 </span>
               </div>
-              <div className="aspect-square w-full overflow-hidden flex items-center justify-center bg-white">
+              <div className="aspect-square w-full overflow-hidden flex items-center justify-center " style={{ backgroundColor: 'var(--color-surface)' }}>
                 {it.url ? (
                   <img
                     src={it.url}
@@ -115,7 +115,7 @@ export default function MisDiseños() {
                     className="max-w-full max-h-full object-contain"
                   />
                 ) : (
-                  <div className="text-gray-400 text-sm">
+                  <div className=" text-sm" style={{ color: 'var(--color-muted)' }}>
                     {t('designsLibrary.myDesigns.item.noPreview', 'Sin vista previa')}
                   </div>
                 )}
@@ -147,7 +147,7 @@ export default function MisDiseños() {
                   </a>
                 )}
                 <button
-                  className="px-2 py-1 text-sm rounded border text-red-600"
+                  className="px-2 py-1 text-sm rounded border " style={{ color: 'var(--color-danger)' }}
                   onClick={() => handleDelete(it)}
                 >
                   {t('designsLibrary.myDesigns.actions.delete', 'Eliminar')}
@@ -156,7 +156,7 @@ export default function MisDiseños() {
             </div>
           ))}
           {items.length === 0 && (
-            <div className="text-sm text-gray-600">
+            <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
               {t('designsLibrary.myDesigns.noItems', 'No hay diseños guardados todavía.')}
             </div>
           )}

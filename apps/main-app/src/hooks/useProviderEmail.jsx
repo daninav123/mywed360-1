@@ -15,7 +15,7 @@ import { addTagToEmail } from '../services/tagService';
  */
 export const useProviderEmail = () => {
   const { user, profile } = useAuth();
-  const { info: weddingDoc } = useActiveWeddingInfo();
+  const { weddingData: weddingDoc } = useWeddingData();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [userEmail, setUserEmail] = useState('');

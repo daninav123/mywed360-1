@@ -12,9 +12,9 @@ export default function InspirationBoardCompact({ categories = [] }) {
 
   if (displayCategories.length === 0) {
     return (
-      <Card className="p-6 rounded-2xl shadow-sm" style={{ backgroundColor: 'transparent' }}>
+      <Card className="p-6 rounded-2xl shadow-sm" style={{ backgroundColor: 'white' }}>
         <h3 className="text-lg font-semibold text-gray-800 mb-4">
-          {t('home2.inspiration.title', { defaultValue: 'Inspiration Board' })}
+          {t('home2.inspiration.title')}
         </h3>
         <div className="grid grid-cols-3 gap-3">
           {[1, 2, 3].map((i) => (
@@ -27,7 +27,7 @@ export default function InspirationBoardCompact({ categories = [] }) {
 
   return (
     <Card style={{
-      backgroundColor: 'transparent',
+      backgroundColor: 'white',
       borderRadius: '20px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
       border: '1px solid #EEF2F7',
@@ -40,7 +40,7 @@ export default function InspirationBoardCompact({ categories = [] }) {
           fontWeight: 600,
           color: '#2D3748',
         }}>
-          {t('home2.inspiration.title', { defaultValue: 'Inspiration Board' })}
+          {t('home2.inspiration.title')}
         </h3>
       </div>
       <div className="grid grid-cols-3 gap-3">

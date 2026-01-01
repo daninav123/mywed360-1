@@ -2,7 +2,6 @@
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '../context/UserContext';
 import { listEmailTemplates, saveEmailTemplate } from '../services/emailTemplatesService';
-
 export default function EmailTemplatesPage() {
   const { t } = useTranslation('pages');
   const { user } = useUserContext();
@@ -43,17 +42,17 @@ export default function EmailTemplatesPage() {
       <div>
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-lg font-semibold">{t('emailTemplates.title')}</h2>
-          <button className="text-sm text-blue-600" onClick={onNew}>{t('emailTemplates.add')}</button>
+          <button className="text-sm " style={{ color: 'var(--color-primary)' }} onClick={onNew}>{t('emailTemplates.add')}</button>
         </div>
         <ul className="divide-y border rounded">
           {items.map(t => (
-            <li key={t.id} className="p-2 cursor-pointer hover:bg-gray-50" onClick={()=>onEdit(t)}>
+            <li key={t.id} className="p-2 cursor-pointer hover:" style={{ backgroundColor: 'var(--color-bg)' }} onClick={()=>onEdit(t)}>
               <div className="font-medium">{t.name}</div>
-              <div className="text-sm text-gray-600">{t.subject}</div>
-              <div className="text-xs text-gray-500">{t.category || t.owner}</div>
+              <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{t.subject}</div>
+              <div className="text-xs " style={{ color: 'var(--color-muted)' }}>{t.category || t.owner}</div>
             </li>
           ))}
-          {items.length === 0 && <li className="p-2 text-sm text-gray-500">Sin plantillas</li>}
+          {items.length === 0 && <li className="p-2 text-sm " style={{ color: 'var(--color-muted)' }}>Sin plantillas</li>}
         </ul>
       </div>
       <div>
@@ -63,12 +62,14 @@ export default function EmailTemplatesPage() {
           <input className="w-full border rounded px-2 py-1" placeholder={t('emailTemplates.subject')} value={form.subject} onChange={(e)=>setForm({ ...form, subject: e.target.value })} />
           <textarea className="w-full border rounded px-2 py-1 h-40" placeholder={t('emailTemplates.body')} value={form.body} onChange={(e)=>setForm({ ...form, body: e.target.value })} />
           <div>
-            <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={onSave} disabled={saving}>{saving ? t('app.saving') : t('emailTemplates.save')}</button>
-            {msg && <span className="ml-3 text-sm text-gray-600">{msg}</span>}
+            <button className="px-3 py-1  text-white rounded" style={{ backgroundColor: 'var(--color-primary)' }} onClick={onSave} disabled={saving}>{saving ? t('app.saving') : t('emailTemplates.save')}</button>
+            {msg && <span className="ml-3 text-sm " style={{ color: 'var(--color-text-secondary)' }}>{msg}</span>}
           </div>
         </div>
       </div>
     </div>
+      
+    
   );
 }
 

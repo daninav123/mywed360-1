@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 📧 PublicQuoteResponse - Página pública para que proveedores respondan
  *
  * Los proveedores reciben un email con un link único:
@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-
 export default function PublicQuoteResponse() {
   const { token } = useParams();
   const navigate = useNavigate();
@@ -184,10 +183,10 @@ export default function PublicQuoteResponse() {
   // Loading
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen  flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
         <Card className="text-center py-12">
           <Loader className="animate-spin h-8 w-8 text-indigo-600 mx-auto mb-4" />
-          <p className="text-gray-600">Cargando solicitud...</p>
+          <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando solicitud...</p>
         </Card>
       </div>
     );
@@ -196,12 +195,12 @@ export default function PublicQuoteResponse() {
   // Error
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen  flex items-center justify-center p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
         <Card className="max-w-md text-center py-12">
-          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Link inválido o expirado</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <p className="text-sm text-gray-500">
+          <AlertCircle className="h-16 w-16  mx-auto mb-4" style={{ color: 'var(--color-danger)' }} />
+          <h2 className="text-2xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>Link inválido o expirado</h2>
+          <p className=" mb-6" style={{ color: 'var(--color-text-secondary)' }}>{error}</p>
+          <p className="text-sm " style={{ color: 'var(--color-muted)' }}>
             Si crees que esto es un error, contacta con el cliente directamente.
           </p>
         </Card>
@@ -212,15 +211,15 @@ export default function PublicQuoteResponse() {
   // Success
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen  flex items-center justify-center p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
         <Card className="max-w-md text-center py-12">
           <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">¡Presupuesto enviado!</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-2xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>¡Presupuesto enviado!</h2>
+          <p className=" mb-6" style={{ color: 'var(--color-text-secondary)' }}>
             Tu presupuesto ha sido enviado correctamente a{' '}
             <strong>{requestData?.contacto?.nombre}</strong>.
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm " style={{ color: 'var(--color-muted)' }}>
             El cliente recibirá una notificación y podrá comparar tu propuesta con otras opciones.
           </p>
           <div className="mt-8 p-4 bg-indigo-50 rounded-lg">
@@ -237,7 +236,7 @@ export default function PublicQuoteResponse() {
 
   // Formulario principal
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen  py-8 px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="layout-container-wide">
         {/* Header */}
         <Card className="mb-6">
@@ -246,10 +245,10 @@ export default function PublicQuoteResponse() {
               <DollarSign className="h-8 w-8 text-indigo-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>
                 Responder Solicitud de Presupuesto
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                 Solicitud de: <strong>{requestData?.contacto?.nombre}</strong> •{' '}
                 {requestData?.supplierCategoryName}
               </p>
@@ -259,11 +258,11 @@ export default function PublicQuoteResponse() {
 
         {/* Info de la boda */}
         <Card className="mb-6 bg-[var(--color-primary)]">
-          <h3 className="font-semibold text-gray-900 mb-3">📋 Información del Evento</h3>
+          <h3 className="font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>📋 Información del Evento</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             {requestData?.weddingInfo?.fecha && (
               <div>
-                <p className="text-gray-600">Fecha</p>
+                <p className="" style={{ color: 'var(--color-text-secondary)' }}>Fecha</p>
                 <p className="font-semibold">
                   {new Date(requestData.weddingInfo.fecha).toLocaleDateString('es-ES')}
                 </p>
@@ -271,19 +270,19 @@ export default function PublicQuoteResponse() {
             )}
             {requestData?.weddingInfo?.ciudad && (
               <div>
-                <p className="text-gray-600">Ciudad</p>
+                <p className="" style={{ color: 'var(--color-text-secondary)' }}>Ciudad</p>
                 <p className="font-semibold">{requestData.weddingInfo.ciudad}</p>
               </div>
             )}
             {requestData?.weddingInfo?.numeroInvitados && (
               <div>
-                <p className="text-gray-600">Invitados</p>
+                <p className="" style={{ color: 'var(--color-text-secondary)' }}>Invitados</p>
                 <p className="font-semibold">{requestData.weddingInfo.numeroInvitados}</p>
               </div>
             )}
             {requestData?.weddingInfo?.presupuestoTotal && (
               <div>
-                <p className="text-gray-600">Presupuesto Total</p>
+                <p className="" style={{ color: 'var(--color-text-secondary)' }}>Presupuesto Total</p>
                 <p className="font-semibold">
                   {requestData.weddingInfo.presupuestoTotal.toLocaleString('es-ES')}€
                 </p>
@@ -296,14 +295,14 @@ export default function PublicQuoteResponse() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Precio */}
           <Card>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold  mb-4 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
               <DollarSign className="text-indigo-600" size={20} />
               💰 Precio
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                   Subtotal (sin IVA) *
                 </label>
                 <input
@@ -314,13 +313,13 @@ export default function PublicQuoteResponse() {
                   step="0.01"
                   min="0"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500" style={{ borderColor: 'var(--color-border)' }}
                   placeholder="2000"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">IVA (21%)</label>
+                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>IVA (21%)</label>
                 <input
                   type="number"
                   name="taxes"
@@ -328,13 +327,13 @@ export default function PublicQuoteResponse() {
                   onChange={handleInputChange}
                   step="0.01"
                   min="0"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500" style={{ borderColor: 'var(--color-border)' }}
                   placeholder="420"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                   Descuento (opcional)
                 </label>
                 <input
@@ -344,36 +343,36 @@ export default function PublicQuoteResponse() {
                   onChange={handleInputChange}
                   step="0.01"
                   min="0"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500" style={{ borderColor: 'var(--color-border)' }}
                   placeholder="100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Total *</label>
+                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>Total *</label>
                 <input
                   type="number"
                   name="total"
                   value={formData.total}
                   readOnly
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 font-bold text-lg"
+                  className="w-full px-4 py-2 border  rounded-lg  font-bold text-lg" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
                 />
               </div>
             </div>
 
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
               El total se calcula automáticamente: Subtotal + IVA - Descuento
             </p>
           </Card>
 
           {/* Servicios */}
           <Card>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold  mb-4 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
               <Package className="text-indigo-600" size={20} />
               📸 Servicios Incluidos
             </h3>
 
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm  mb-4" style={{ color: 'var(--color-text-secondary)' }}>
               Confirma o modifica los servicios que ofrecerás:
             </p>
 
@@ -381,7 +380,7 @@ export default function PublicQuoteResponse() {
               {requestData?.serviceDetails &&
                 Object.entries(requestData.serviceDetails).map(([key, value]) => (
                   <div key={key} className="flex items-center gap-3">
-                    <label className="text-sm font-medium text-gray-700 min-w-[200px]">
+                    <label className="text-sm font-medium  min-w-[200px]" style={{ color: 'var(--color-text)' }}>
                       {key}:
                     </label>
                     {typeof value === 'boolean' ? (
@@ -392,7 +391,7 @@ export default function PublicQuoteResponse() {
                             : value
                         }
                         onChange={(e) => handleServiceChange(key, e.target.value === 'true')}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                        className="flex-1 px-3 py-2 border  rounded-lg" style={{ borderColor: 'var(--color-border)' }}
                       >
                         <option value="true">Sí</option>
                         <option value="false">No</option>
@@ -406,7 +405,7 @@ export default function PublicQuoteResponse() {
                             : value
                         }
                         onChange={(e) => handleServiceChange(key, e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                        className="flex-1 px-3 py-2 border  rounded-lg" style={{ borderColor: 'var(--color-border)' }}
                       />
                     )}
                   </div>
@@ -414,7 +413,7 @@ export default function PublicQuoteResponse() {
             </div>
 
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                 ✨ Extras Incluidos (uno por línea)
               </label>
               <textarea
@@ -422,7 +421,7 @@ export default function PublicQuoteResponse() {
                 value={formData.extras}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500" style={{ borderColor: 'var(--color-border)' }}
                 placeholder="Ej:&#10;Pendrive USB personalizado&#10;Galería online privada 2 años&#10;Impresión 20x30cm regalo"
               />
             </div>
@@ -430,7 +429,7 @@ export default function PublicQuoteResponse() {
 
           {/* Condiciones */}
           <Card>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold  mb-4 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
               <FileText className="text-indigo-600" size={20} />
               📋 Condiciones Comerciales
             </h3>
@@ -438,7 +437,7 @@ export default function PublicQuoteResponse() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                     Adelanto requerido (%) *
                   </label>
                   <input
@@ -449,12 +448,12 @@ export default function PublicQuoteResponse() {
                     min="0"
                     max="100"
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500" style={{ borderColor: 'var(--color-border)' }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                     Tiempo de entrega (días) *
                   </label>
                   <input
@@ -464,13 +463,13 @@ export default function PublicQuoteResponse() {
                     onChange={handleInputChange}
                     min="1"
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500" style={{ borderColor: 'var(--color-border)' }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                   Forma de pago *
                 </label>
                 <input
@@ -479,13 +478,13 @@ export default function PublicQuoteResponse() {
                   value={formData.paymentTerms}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500" style={{ borderColor: 'var(--color-border)' }}
                   placeholder="30% adelanto, 40% día boda, 30% entrega"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                   Política de cancelación *
                 </label>
                 <input
@@ -494,13 +493,13 @@ export default function PublicQuoteResponse() {
                   value={formData.cancellationPolicy}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500" style={{ borderColor: 'var(--color-border)' }}
                   placeholder="Reembolso 100% hasta 60 días antes"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
                   Garantía (opcional)
                 </label>
                 <input
@@ -508,7 +507,7 @@ export default function PublicQuoteResponse() {
                   name="warranty"
                   value={formData.warranty}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500" style={{ borderColor: 'var(--color-border)' }}
                   placeholder="Garantía de satisfacción 100%"
                 />
               </div>
@@ -517,7 +516,7 @@ export default function PublicQuoteResponse() {
 
           {/* Mensaje */}
           <Card>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold  mb-4 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
               <Send className="text-indigo-600" size={20} />
               💬 Mensaje para el Cliente
             </h3>
@@ -528,10 +527,10 @@ export default function PublicQuoteResponse() {
               onChange={handleInputChange}
               rows={6}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500" style={{ borderColor: 'var(--color-border)' }}
               placeholder="Cuéntale al cliente por qué eres la mejor opción para su boda. Destaca tu experiencia, estilo de trabajo, y cualquier detalle que te diferencie..."
             />
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
               Mínimo 20 caracteres. Este mensaje aparecerá en el comparador de presupuestos.
             </p>
           </Card>
@@ -539,7 +538,7 @@ export default function PublicQuoteResponse() {
           {/* Footer */}
           <Card className="bg-[var(--color-primary)] border-2 border-indigo-200">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="text-sm text-gray-700">
+              <div className="text-sm " style={{ color: 'var(--color-text)' }}>
                 <p className="font-semibold mb-1">Antes de enviar, verifica que:</p>
                 <ul className="list-disc list-inside space-y-1 text-xs">
                   <li>El precio total sea correcto</li>

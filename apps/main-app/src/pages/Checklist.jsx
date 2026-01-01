@@ -115,9 +115,67 @@ export default function Checklist() {
   };
 
   return (
-    <div className="ww-page" style={{ padding: '40px 32px', maxWidth: '900px', margin: '0 auto' }}>
-      <h1 className="ww-title">Lista de tareas</h1>
-      <p className="ww-subtitle">Vamos paso a paso 👰</p>
+    <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+      <div className="mx-auto my-8" style={{
+        maxWidth: '1024px',
+        width: '100%',
+        backgroundColor: '#FFFBF7',
+        borderRadius: '32px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        overflow: 'hidden'
+      }}>
+        
+        {/* Hero con degradado beige-dorado */}
+        <header className="relative overflow-hidden" style={{
+          background: 'linear-gradient(135deg, #FFF4E6 0%, #F8EFE3 50%, #E8D5C4 100%)',
+          padding: '48px 32px 32px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div className="max-w-4xl mx-auto" style={{ textAlign: 'center' }}>
+            {/* Título con líneas decorativas */}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              gap: '16px',
+              marginBottom: '12px'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to right, transparent, #D4A574)',
+              }} />
+              <h1 style={{
+                fontFamily: "'Playfair Display', 'Cormorant Garamond', serif",
+                fontSize: '40px',
+                fontWeight: 400,
+                color: '#1F2937',
+                letterSpacing: '-0.01em',
+                margin: 0,
+              }}>Lista de Tareas</h1>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to left, transparent, #D4A574)',
+              }} />
+            </div>
+            
+            {/* Subtítulo como tag uppercase */}
+            <p style={{
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginBottom: 0,
+            }}>Organización de Boda</p>
+          </div>
+        </header>
+
+        {/* Contenido */}
+        <div className="px-6 py-6">
+<div className="ww-page" style={{ padding: '40px 32px', maxWidth: '900px', margin: '0 auto' }}>
       
       <div className="ww-card" style={{ marginBottom: '40px', padding: '36px', background: 'linear-gradient(135deg, #FFFFFF 0%, #F9F9F9 100%)' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', marginBottom: '20px' }}>
@@ -470,6 +528,10 @@ export default function Checklist() {
           </div>
         )}
       </div>
+      </div>
+      </div>
+      </div>
+      <Nav />
     </div>
   );
 }

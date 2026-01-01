@@ -1,7 +1,8 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Calendar, Users, Heart, CheckCircle, Sparkles, Gift, Clock, Palette, Shield, ArrowRight, Store, Briefcase } from 'lucide-react';
+import { Calendar, Users, Heart, CheckCircle, Sparkles, Gift, Clock, Palette, Shield, ArrowRight, Store, Briefcase, BookOpen, PenTool } from 'lucide-react';
 import { 
   PageWrapper, 
   HeroSection, 
@@ -15,62 +16,113 @@ import {
 
 export default function LandingNew() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['marketing']);
 
   const mainFeatures = [
     {
       icon: Calendar,
-      title: t('landing.features.planning.title', { defaultValue: 'Smart Planning' }),
-      description: t('landing.features.planning.description', { defaultValue: 'Organize every detail with intelligent timelines and automated reminders' }),
+      title: t('marketing:landing.features.planning.title'),
+      description: t('marketing:landing.features.planning.description'),
       color: theme.colors.yellow,
       accentColor: theme.colors.yellowAccent,
     },
     {
       icon: Users,
-      title: t('landing.features.guests.title', { defaultValue: 'Guest Management' }),
-      description: t('landing.features.guests.description', { defaultValue: 'Track RSVPs, dietary preferences, and seating arrangements effortlessly' }),
+      title: t('marketing:landing.features.guests.title'),
+      description: t('marketing:landing.features.guests.description'),
       color: theme.colors.green,
       accentColor: theme.colors.greenAccent,
     },
     {
       icon: Heart,
-      title: t('landing.features.vendors.title', { defaultValue: 'Vendor Network' }),
-      description: t('landing.features.vendors.description', { defaultValue: 'Connect with trusted wedding professionals and manage all communications' }),
+      title: t('marketing:landing.features.vendors.title'),
+      description: t('marketing:landing.features.vendors.description'),
       color: theme.colors.pink,
       accentColor: theme.colors.pinkAccent,
     },
   ];
 
   const benefits = [
-    { icon: CheckCircle, text: t('landing.benefits.collaboration', { defaultValue: 'Real-time collaboration with your partner' }) },
-    { icon: Clock, text: t('landing.benefits.time', { defaultValue: 'Save hours with automated workflows' }) },
-    { icon: Shield, text: t('landing.benefits.security', { defaultValue: 'Secure document storage and contracts' }) },
-    { icon: Palette, text: t('landing.benefits.design', { defaultValue: 'Beautiful customizable designs' }) },
-    { icon: Gift, text: t('landing.benefits.registry', { defaultValue: 'Integrated gift registry management' }) },
-    { icon: Sparkles, text: t('landing.benefits.ai', { defaultValue: 'AI-powered planning assistant' }) },
+    { icon: CheckCircle, text: t('marketing:landing.benefits.collaboration') },
+    { icon: Clock, text: t('marketing:landing.benefits.time') },
+    { icon: Shield, text: t('marketing:landing.benefits.security') },
+    { icon: Palette, text: t('marketing:landing.benefits.design') },
+    { icon: Gift, text: t('marketing:landing.benefits.registry') },
+    { icon: Sparkles, text: t('marketing:landing.benefits.ai') },
   ];
 
   return (
-    <PageWrapper>
-      <HeroSection
-        title={t('landing.hero.title', { defaultValue: 'Plan Your Perfect Wedding' })}
-        subtitle={t('landing.hero.subtitle', { defaultValue: "From 'Yes!' to 'I Do' - organize every magical moment with the platform loved by thousands of couples worldwide" })}
-        image="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80"
-      >
-        <div className="flex gap-4">
-          <PrimaryButton onClick={() => navigate('/signup')}>
-            {t('landing.hero.cta.primary', { defaultValue: 'Start Planning Free' })}
-          </PrimaryButton>
-          <SecondaryButton onClick={() => navigate('/app')}>
-            {t('landing.hero.cta.secondary', { defaultValue: 'See How It Works' })}
-          </SecondaryButton>
-        </div>
-      </HeroSection>
+    <>
+      <Helmet>
+        <title>Planivia - Planifica Tu Boda Perfecta | Software de Gestión de Bodas</title>
+        <meta name="description" content="Organiza cada detalle de tu boda con Planivia. Gestión de invitados, presupuestos, proveedores y más. Prueba gratuita sin tarjeta de crédito." />
+        <meta name="keywords" content="planificación bodas, organizar boda, software bodas, gestión invitados boda, presupuesto boda, proveedores boda" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Planivia - Planifica Tu Boda Perfecta" />
+        <meta property="og:description" content="Software todo-en-uno para planificar tu boda. Gestión de invitados, presupuestos, proveedores y diseño web." />
+        <meta property="og:url" content="https://planivia.net/" />
+        <meta property="og:site_name" content="Planivia" />
+        <meta property="og:locale" content="es_ES" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Planivia - Planifica Tu Boda Perfecta" />
+        <meta name="twitter:description" content="Software todo-en-uno para planificar tu boda perfecta" />
+        
+        {/* Canonical */}
+        <link rel="canonical" href="https://planivia.net/" />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Planivia",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "description": "Plataforma completa para planificación de bodas con gestión de invitados, presupuestos, proveedores y diseño web",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "EUR",
+              "availability": "https://schema.org/InStock"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "ratingCount": "2500"
+            },
+            "author": {
+              "@type": "Organization",
+              "name": "Planivia",
+              "url": "https://planivia.net"
+            }
+          })}
+        </script>
+      </Helmet>
+      
+      <PageWrapper>
+        <HeroSection
+          title={t('marketing:landing.hero.title')}
+          subtitle={t('marketing:landing.hero.subtitle')}
+          image="/landing.png"
+        >
+          <div className="flex gap-4">
+            <PrimaryButton onClick={() => navigate('/signup')}>
+              {t('marketing:landing.hero.cta.primary')}
+            </PrimaryButton>
+            <SecondaryButton onClick={() => navigate('/app')}>
+              {t('marketing:landing.hero.cta.secondary')}
+            </SecondaryButton>
+          </div>
+        </HeroSection>
 
       <Container>
         <SectionTitle 
-          title={t('landing.features.title', { defaultValue: 'Everything You Need, Beautifully Organized' })}
-          subtitle={t('landing.features.subtitle', { defaultValue: 'Powerful tools designed for modern couples' })}
+          title={t('marketing:landing.features.title')}
+          subtitle={t('marketing:landing.features.subtitle')}
         />
         <div className="grid md:grid-cols-3 gap-6">
           {mainFeatures.map((feature, index) => (
@@ -81,8 +133,8 @@ export default function LandingNew() {
 
       <Container>
         <SectionTitle 
-          title={t('landing.benefits.title', { defaultValue: 'Designed for Your Journey' })}
-          subtitle={t('landing.benefits.subtitle', { defaultValue: 'From engagement to honeymoon, we\'ve got you covered' })}
+          title={t('marketing:landing.benefits.title')}
+          subtitle={t('marketing:landing.benefits.subtitle')}
         />
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {benefits.map((benefit, index) => (
@@ -133,7 +185,7 @@ export default function LandingNew() {
               marginBottom: '16px',
               letterSpacing: '-0.01em',
             }}>
-              {t('landing.social.title', { defaultValue: 'Join 50,000+ Couples Planning Their Dream Wedding' })}
+              {t('marketing:landing.social.title')}
             </h2>
             <p style={{
               fontFamily: theme.fonts.body,
@@ -142,7 +194,7 @@ export default function LandingNew() {
               marginBottom: '32px',
               lineHeight: '1.6',
             }}>
-              {t('landing.social.quote', { defaultValue: '"This platform transformed our wedding planning from overwhelming to enjoyable. Every detail organized beautifully in one place."' })}
+              {t('marketing:landing.social.quote')}
             </p>
             <p style={{
               fontFamily: theme.fonts.body,
@@ -150,7 +202,7 @@ export default function LandingNew() {
               fontWeight: 600,
               color: theme.colors.textSecondary,
             }}>
-              {t('landing.social.author', { defaultValue: '— Sarah & Michael, married June 2024' })}
+              {t('marketing:landing.social.author')}
             </p>
           </div>
         </div>
@@ -159,10 +211,10 @@ export default function LandingNew() {
       <Container>
         <div className="grid md:grid-cols-4 gap-8">
           {[
-            { value: '50K+', label: t('landing.stats.couples', { defaultValue: 'Happy Couples' }) },
-            { value: '500+', label: t('landing.stats.vendors', { defaultValue: 'Trusted Vendors' }) },
-            { value: '15M+', label: t('landing.stats.tasks', { defaultValue: 'Tasks Completed' }) },
-            { value: '4.9/5', label: t('landing.stats.rating', { defaultValue: 'Average Rating' }) },
+            { value: '50K+', label: t('marketing:landing.stats.couples') },
+            { value: '500+', label: t('marketing:landing.stats.vendors') },
+            { value: '15M+', label: t('marketing:landing.stats.tasks') },
+            { value: '4.9/5', label: t('marketing:landing.stats.rating') },
           ].map((stat, index) => (
             <div key={index} className="text-center">
               <p style={{
@@ -188,29 +240,29 @@ export default function LandingNew() {
 
       <Container>
         <SectionTitle 
-          title={t('landing.explore.title', { defaultValue: 'Explore Our Platform' })}
-          subtitle={t('landing.explore.subtitle', { defaultValue: 'Discover all the features and services we offer' })}
+          title={t('marketing:landing.explore.title')}
+          subtitle={t('marketing:landing.explore.subtitle')}
         />
         <div className="grid md:grid-cols-3 gap-6">
           {[
             {
               icon: Calendar,
-              title: t('landing.explore.app.title', { defaultValue: 'Wedding Planning App' }),
-              description: t('landing.explore.app.description', { defaultValue: 'Complete suite of tools to organize your perfect day' }),
+              title: t('marketing:landing.explore.app.title'),
+              description: t('marketing:landing.explore.app.description'),
               link: '/app',
               color: theme.colors.yellow,
             },
             {
               icon: Store,
-              title: t('landing.explore.suppliers.title', { defaultValue: 'For Suppliers' }),
-              description: t('landing.explore.suppliers.description', { defaultValue: 'Grow your wedding business with our vendor network' }),
+              title: t('marketing:landing.explore.suppliers.title'),
+              description: t('marketing:landing.explore.suppliers.description'),
               link: '/para-proveedores',
               color: theme.colors.pink,
             },
             {
               icon: Briefcase,
-              title: t('landing.explore.planners.title', { defaultValue: 'For Planners' }),
-              description: t('landing.explore.planners.description', { defaultValue: 'Professional tools for wedding planning businesses' }),
+              title: t('marketing:landing.explore.planners.title'),
+              description: t('marketing:landing.explore.planners.description'),
               link: '/para-planners',
               color: theme.colors.green,
             },
@@ -264,12 +316,66 @@ export default function LandingNew() {
                   fontWeight: 600,
                   color: theme.colors.primary,
                 }}>
-                  {t('landing.explore.learnMore', { defaultValue: 'Learn More' })}
+                  {t('marketing:landing.explore.learnMore')}
                 </span>
                 <ArrowRight className="w-4 h-4" style={{ color: theme.colors.primary }} strokeWidth={2} />
               </div>
             </div>
           ))}
+        </div>
+      </Container>
+
+      <Container>
+        <div 
+          className="rounded-3xl overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, #E6D9FF 0%, #FCE4EC 100%)',
+            boxShadow: theme.shadow.md,
+          }}
+        >
+          <div className="grid md:grid-cols-2 gap-0">
+            <div className="p-12 flex flex-col justify-center">
+              <div className="flex items-center gap-3 mb-4">
+                <div 
+                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: theme.colors.surface }}
+                >
+                  <BookOpen className="w-6 h-6" style={{ color: theme.colors.primary }} />
+                </div>
+                <PenTool className="w-8 h-8" style={{ color: theme.colors.pinkAccent }} />
+              </div>
+              <h2 style={{
+                fontFamily: theme.fonts.heading,
+                fontSize: '36px',
+                fontWeight: 400,
+                color: theme.colors.textPrimary,
+                marginBottom: '16px',
+                letterSpacing: '-0.01em',
+              }}>
+                {t('marketing:landing.blog.title')}
+              </h2>
+              <p style={{
+                fontFamily: theme.fonts.body,
+                fontSize: '18px',
+                color: theme.colors.textSecondary,
+                marginBottom: '32px',
+                lineHeight: '1.6',
+              }}>
+                {t('marketing:landing.blog.description')}
+              </p>
+              <div>
+                <PrimaryButton onClick={() => navigate('/blog')}>
+                  {t('marketing:landing.blog.cta.primary')}
+                </PrimaryButton>
+              </div>
+            </div>
+            <div 
+              className="h-full min-h-[400px] bg-cover bg-center"
+              style={{
+                backgroundImage: 'url(/sillas.png)',
+              }}
+            />
+          </div>
         </div>
       </Container>
 
@@ -291,7 +397,7 @@ export default function LandingNew() {
             marginBottom: '16px',
             letterSpacing: '-0.01em',
           }}>
-            {t('landing.cta.title', { defaultValue: 'Ready to Start Planning?' })}
+            {t('marketing:landing.cta.title')}
           </h2>
           <p style={{
             fontFamily: theme.fonts.body,
@@ -299,14 +405,14 @@ export default function LandingNew() {
             color: theme.colors.textSecondary,
             marginBottom: '32px',
           }}>
-            {t('landing.cta.subtitle', { defaultValue: 'Create your free account and start organizing your dream wedding today' })}
+            {t('marketing:landing.cta.subtitle')}
           </p>
           <div className="flex gap-4 justify-center">
             <PrimaryButton onClick={() => navigate('/signup')}>
-              {t('landing.cta.primary', { defaultValue: 'Get Started Free' })}
+              {t('marketing:landing.cta.primary')}
             </PrimaryButton>
             <SecondaryButton onClick={() => navigate('/precios')}>
-              {t('landing.cta.secondary', { defaultValue: 'View Pricing' })}
+              {t('marketing:landing.cta.secondary')}
             </SecondaryButton>
           </div>
         </div>
@@ -326,13 +432,13 @@ export default function LandingNew() {
                 color: theme.colors.textPrimary,
                 marginBottom: '16px',
               }}>
-                {t('footer.product', { defaultValue: 'Product' })}
+                {t('marketing:footer.product')}
               </h4>
               <div className="space-y-3">
                 {[
-                  { label: t('footer.features', { defaultValue: 'Features' }), link: '/app' },
-                  { label: t('footer.pricing', { defaultValue: 'Pricing' }), link: '/precios' },
-                  { label: t('footer.demo', { defaultValue: 'Demo' }), link: '/signup' },
+                  { label: t('marketing:footer.features'), link: '/app' },
+                  { label: t('marketing:footer.pricing'), link: '/precios' },
+                  { label: t('marketing:footer.demo'), link: '/signup' },
                 ].map((item, index) => (
                   <div key={index}>
                     <button
@@ -365,13 +471,13 @@ export default function LandingNew() {
                 color: theme.colors.textPrimary,
                 marginBottom: '16px',
               }}>
-                {t('footer.forProfessionals', { defaultValue: 'For Professionals' })}
+                {t('marketing:footer.forProfessionals')}
               </h4>
               <div className="space-y-3">
                 {[
-                  { label: t('footer.suppliers', { defaultValue: 'For Suppliers' }), link: '/para-proveedores' },
-                  { label: t('footer.planners', { defaultValue: 'For Planners' }), link: '/para-planners' },
-                  { label: t('footer.partners', { defaultValue: 'Partners' }), link: '/partners' },
+                  { label: t('marketing:footer.suppliers'), link: '/para-proveedores' },
+                  { label: t('marketing:footer.planners'), link: '/para-planners' },
+                  { label: t('marketing:footer.partners'), link: '/partners' },
                 ].map((item, index) => (
                   <div key={index}>
                     <button
@@ -404,13 +510,13 @@ export default function LandingNew() {
                 color: theme.colors.textPrimary,
                 marginBottom: '16px',
               }}>
-                {t('footer.company', { defaultValue: 'Company' })}
+                {t('marketing:footer.company')}
               </h4>
               <div className="space-y-3">
                 {[
-                  { label: t('footer.about', { defaultValue: 'About Us' }), link: '/about' },
-                  { label: t('footer.contact', { defaultValue: 'Contact' }), link: '/contacto' },
-                  { label: t('footer.blog', { defaultValue: 'Blog' }), link: '/blog' },
+                  { label: t('marketing:footer.about'), link: '/about' },
+                  { label: t('marketing:footer.contact'), link: '/contacto' },
+                  { label: t('marketing:footer.blog'), link: '/blog' },
                 ].map((item, index) => (
                   <div key={index}>
                     <button
@@ -443,13 +549,13 @@ export default function LandingNew() {
                 color: theme.colors.textPrimary,
                 marginBottom: '16px',
               }}>
-                {t('footer.support', { defaultValue: 'Support' })}
+                {t('marketing:footer.support')}
               </h4>
               <div className="space-y-3">
                 {[
-                  { label: t('footer.help', { defaultValue: 'Help Center' }), link: '/help' },
-                  { label: t('footer.privacy', { defaultValue: 'Privacy Policy' }), link: '/privacy' },
-                  { label: t('footer.terms', { defaultValue: 'Terms of Service' }), link: '/terms' },
+                  { label: t('marketing:footer.help'), link: '/help' },
+                  { label: t('marketing:footer.privacy'), link: '/privacy' },
+                  { label: t('marketing:footer.terms'), link: '/terms' },
                 ].map((item, index) => (
                   <div key={index}>
                     <button
@@ -481,11 +587,12 @@ export default function LandingNew() {
               fontSize: '14px',
               color: theme.colors.textSecondary,
             }}>
-              {t('footer.copyright', { defaultValue: '© 2025 Wedding Planner. Making dream weddings come true.' })}
+              {t('marketing:common.copyright', { year: 2025 })}
             </p>
           </div>
         </div>
       </footer>
-    </PageWrapper>
+      </PageWrapper>
+    </>
   );
 }

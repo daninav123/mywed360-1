@@ -4,10 +4,11 @@
 import React, { useEffect, useState, useId } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { getMetricsData, getProductMetrics } from '../../services/adminDataService';
+import { useTranslation } from 'react-i18next';
 
-const TABS = [
-  { id: 'resumen', label: '📊 Resumen' },
-  { id: 'producto', label: '📱 Producto' },
+const getTabs = (t) => [
+  { id: 'resumen', label: t('admin:metrics.tabs.summary') },
+  { id: 'producto', label: t('admin:metrics.tabs.product') },
 ];
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -33,9 +34,9 @@ const KPICard = ({ title, value, subtitle, color = 'gray', description = '' }) =
         aria-describedby={hasTooltip ? tooltipId : undefined}
         tabIndex={hasTooltip ? 0 : undefined}
       >
-        <p className="text-xs text-gray-600">{title}</p>
+        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{title}</p>
         <p className={`text-2xl font-bold ${textClass}`}>{value}</p>
-        {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+        {subtitle && <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>{subtitle}</p>}
       </div>
       {hasTooltip && (
         <div
@@ -52,9 +53,11 @@ const KPICard = ({ title, value, subtitle, color = 'gray', description = '' }) =
 };
 
 const AdminMetricsComplete = () => {
+  const { t } = useTranslation(['admin']);
   const [activeTab, setActiveTab] = useState('resumen');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({});
+  const TABS = getTabs(t);
 
   useEffect(() => {
     const loadAll = async () => {
@@ -75,7 +78,7 @@ const AdminMetricsComplete = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Métricas MaLoveApp</h1>
+      <h1 className="text-xl font-semibold">{t('admin:metrics.title')}</h1>
       
       {/* Tabs */}
       <div className="border-b">
@@ -95,7 +98,7 @@ const AdminMetricsComplete = () => {
       </div>
 
       {loading ? (
-        <div className="py-12 text-center text-gray-500">Cargando métricas...</div>
+        <div className="py-12 text-center " style={{ color: 'var(--color-muted)' }}>{t('admin:metrics.loading')}</div>
       ) : (
         <div>
           {activeTab === 'resumen' && <ResumenTab data={data} />}
@@ -108,6 +111,7 @@ const AdminMetricsComplete = () => {
 
 // TAB COMPONENTS
 const ResumenTab = ({ data }) => {
+  const { t } = useTranslation(['admin']);
   const downloadsMonthly = Array.isArray(data.main?.downloads?.byMonth)
     ? data.main.downloads.byMonth.map((entry) => ({
         month: entry.month,
@@ -129,129 +133,129 @@ const ResumenTab = ({ data }) => {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-4">
         <KPICard
-          title="MRR"
+          title={t('admin:metrics.kpi.mrr')}
           value={`€${data.main?.recurringRevenue?.mrr?.toFixed(0) || 0}`}
           color="green"
-          description="Ingreso recurrente mensual generado por suscripciones activas."
+          description={t('admin:metrics.kpi.mrrDesc')}
         />
         <KPICard
-          title="Bodas Activas"
+          title={t('admin:metrics.kpi.activeWeddings')}
           value={formatNumber(data.main?.weddingStats?.active || 0)}
           color="blue"
-          description="Eventos que registraron actividad durante el periodo seleccionado."
+          description={t('admin:metrics.kpi.activeWeddingsDesc')}
         />
         <KPICard
-          title="DAU/MAU"
+          title={t('admin:metrics.kpi.dauMau')}
           value={`${formatNumber(Math.round(data.main?.userStats?.dau || 0))}/${formatNumber(data.main?.userStats?.mau || 0)}`}
           color="purple"
-          description="Relación entre usuarios activos diarios y mensuales para medir engagement."
+          description={t('admin:metrics.kpi.dauMauDesc')}
         />
         <KPICard
-          title="D7 Retention"
+          title={t('admin:metrics.kpi.d7Retention')}
           value={formatPercentage(data.main?.retentionData?.d7 || 0, 0)}
           color="pink"
-          description="Porcentaje de usuarios que regresan siete días después de su activación."
+          description={t('admin:metrics.kpi.d7RetentionDesc')}
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <KPICard
-          title="Bodas finalizadas"
+          title={t('admin:metrics.kpi.finishedWeddings')}
           value={formatNumber(weddingProgress.finished || 0)}
-          description="Bodas que ya no están activas en el sistema (archivadas o finalizadas)."
+          description={t('admin:metrics.kpi.finishedWeddingsDesc')}
         />
         <KPICard
-          title="Bodas completadas"
+          title={t('admin:metrics.kpi.completedWeddings')}
           value={formatNumber(weddingProgress.completed || 0)}
           color="green"
-          description="Bodas finalizadas con todas las tareas principales resueltas."
+          description={t('admin:metrics.kpi.completedWeddingsDesc')}
         />
         <KPICard
-          title="% completadas"
+          title={t('admin:metrics.kpi.completionRate')}
           value={formatPercentage(weddingProgress.completionRate || 0)}
           color="blue"
-          description="Relación entre bodas completadas y total de bodas finalizadas."
+          description={t('admin:metrics.kpi.completionRateDesc')}
         />
         <KPICard
-          title="Tareas completadas (media)"
+          title={t('admin:metrics.kpi.avgTasksCompleted')}
           value={formatPercentage(tasksCompletion.averageCompletionPercent || 0)}
           color="purple"
-          description="Promedio de progresos de tareas marcadas como hechas por boda."
+          description={t('admin:metrics.kpi.avgTasksCompletedDesc')}
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <KPICard
-          title="Descargas totales app"
+          title={t('admin:metrics.kpi.totalDownloads')}
           value={formatNumber(data.main?.downloads?.total || 0)}
-          description="Descargas acumuladas entre Play Store, App Store y fuentes internas."
+          description={t('admin:metrics.kpi.totalDownloadsDesc')}
         />
         <KPICard
-          title="Descargas últimos 30 días"
+          title={t('admin:metrics.kpi.downloads30d')}
           value={formatNumber(data.main?.downloads?.last30d || 0)}
           color="blue"
-          description="Descargas recientes registradas durante el último mes."
+          description={t('admin:metrics.kpi.downloads30dDesc')}
         />
         <KPICard
-          title="Altas totales"
+          title={t('admin:metrics.kpi.totalSignups')}
           value={formatNumber(userAcquisition.total || 0)}
           color="orange"
-          description="Usuarios que han creado cuenta en cualquier momento."
+          description={t('admin:metrics.kpi.totalSignupsDesc')}
         />
         <KPICard
-          title="Altas de pago"
+          title={t('admin:metrics.kpi.paidSignups')}
           value={formatNumber(userAcquisition.paidTotal || 0)}
           color="green"
-          description="Usuarios que han escogido un plan de pago desde el alta."
+          description={t('admin:metrics.kpi.paidSignupsDesc')}
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <KPICard
-          title="Planners activos"
+          title={t('admin:metrics.kpi.activePlanners')}
           value={formatNumber(plannerStats.totalPlanners || 0)}
           color="purple"
-          description="Número de planners únicos que gestionan bodas activas."
+          description={t('admin:metrics.kpi.activePlannersDesc')}
         />
         {topPlannerEntry && (
           <KPICard
-            title="Planner con más bodas"
+            title={t('admin:metrics.kpi.topPlanner')}
             value={formatNumber(topPlannerEntry.count || 0)}
-            description={`ID planner: ${topPlannerEntry.plannerId || 'Sin asignar'}`}
+            description={t('admin:metrics.kpi.topPlannerDesc', { id: topPlannerEntry.plannerId || t('admin:metrics.charts.unassigned') })}
           />
         )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <KPICard
-          title="Bodas con Momentos activo"
+          title={t('admin:metrics.kpi.weddingsWithMomentos')}
           value={formatNumber(momentosUsage.weddingsWithMoments || 0)}
           color="indigo"
-          description="Bodas que tienen habilitado el plan Momentos."
+          description={t('admin:metrics.kpi.weddingsWithMomentosDesc')}
         />
         <KPICard
-          title="Uso medio Momentos"
+          title={t('admin:metrics.kpi.avgMomentosUsage')}
           value={formatGigabytes(momentosUsage.averageGigabytes || 0)}
           color="indigo"
-          description="Gigabytes medios consumidos en fotos/vídeos por bodas con Momentos."
+          description={t('admin:metrics.kpi.avgMomentosUsageDesc')}
         />
         <KPICard
-          title="Uso total Momentos"
+          title={t('admin:metrics.kpi.totalMomentosUsage')}
           value={formatGigabytes(momentosUsage.totalGigabytes || 0)}
-          description="Almacenamiento total destinado a Momentos entre todas las bodas activas."
+          description={t('admin:metrics.kpi.totalMomentosUsageDesc')}
         />
       </div>
 
       {downloadsMonthly.length > 0 && (
         <div className="rounded-lg border p-4">
-          <h3 className="font-semibold mb-3">Descargas app (últimos {downloadsMonthly.length} meses)</h3>
+          <h3 className="font-semibold mb-3">{t('admin:metrics.charts.appDownloads', { count: downloadsMonthly.length })}</h3>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={downloadsMonthly}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis allowDecimals={false} />
               <Tooltip />
-              <Bar dataKey="value" name="Descargas" fill="#2563eb" />
+              <Bar dataKey="value" name={t('admin:metrics.charts.downloads')} fill="#2563eb" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -259,8 +263,8 @@ const ResumenTab = ({ data }) => {
 
       {tasksSample.length > 0 && (
         <div className="rounded-lg border p-4">
-          <h3 className="font-semibold mb-3">Muestra de progreso por bodas</h3>
-          <ul className="space-y-2 text-sm text-gray-600">
+          <h3 className="font-semibold mb-3">{t('admin:metrics.charts.progressSample')}</h3>
+          <ul className="space-y-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
             {tasksSample.map((sample) => (
               <li key={sample.weddingId} className="flex items-center justify-between">
                 <span className="font-medium">
@@ -276,9 +280,9 @@ const ResumenTab = ({ data }) => {
       )}
 
       <div className="rounded-lg border p-4">
-        <h3 className="font-semibold mb-3">Explora los tabs para más detalle</h3>
-        <p className="text-sm text-gray-600">
-          Producto: adopción de funcionalidades y altas mensuales · Económicas: revenue, CAC y LTV · Técnicas: performance y uptime · Soporte: tickets y satisfacción.
+        <h3 className="font-semibold mb-3">{t('admin:metrics.charts.exploreTitle')}</h3>
+        <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+          {t('admin:metrics.charts.exploreDesc')}
         </p>
       </div>
     </div>
@@ -286,6 +290,7 @@ const ResumenTab = ({ data }) => {
 };
 
 const ProductoTab = ({ data }) => {
+  const { t } = useTranslation(['admin']);
   const userAcquisition = data.main?.userAcquisition || {};
   const userMonthlyData = Array.isArray(userAcquisition.byMonth)
     ? userAcquisition.byMonth.map((entry) => {
@@ -305,71 +310,71 @@ const ProductoTab = ({ data }) => {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-4">
         <KPICard
-          title="Usuarios"
+          title={t('admin:metrics.kpi.users')}
           value={formatNumber(data.main?.userStats?.total || 0)}
-          description="Total de cuentas registradas con acceso al sistema."
+          description={t('admin:metrics.kpi.usersDesc')}
         />
         <KPICard
-          title="Activos 7d"
+          title={t('admin:metrics.kpi.active7d')}
           value={formatNumber(data.main?.userStats?.active7d || 0)}
           color="green"
-          description="Usuarios con actividad registrada en los últimos siete días."
+          description={t('admin:metrics.kpi.active7dDesc')}
         />
         <KPICard
-          title="MAU"
+          title={t('admin:metrics.kpi.mau')}
           value={formatNumber(data.main?.userStats?.mau || 0)}
           color="blue"
-          description="Usuarios únicos activos durante los últimos 30 días."
+          description={t('admin:metrics.kpi.mauDesc')}
         />
         <KPICard
-          title="Nuevos (30d)"
+          title={t('admin:metrics.kpi.new30d')}
           value={formatNumber(data.product?.newRegistrations?.last30days || 0)}
           color="purple"
-          description="Altas confirmadas en el último mes."
+          description={t('admin:metrics.kpi.new30dDesc')}
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <KPICard
-          title="Altas totales"
+          title={t('admin:metrics.kpi.totalSignups')}
           value={formatNumber(userAcquisition.total || 0)}
           color="orange"
-          description="Usuarios registrados en el periodo analizado."
+          description={t('admin:metrics.kpi.totalSignupsDesc')}
         />
         <KPICard
-          title="Altas de pago"
+          title={t('admin:metrics.kpi.paidTotal')}
           value={formatNumber(userAcquisition.paidTotal || 0)}
           color="green"
-          description="Nuevos usuarios con plan de pago activo."
+          description={t('admin:metrics.kpi.paidTotalDesc')}
         />
         <KPICard
-          title="Descargas totales app"
+          title={t('admin:metrics.kpi.totalDownloads')}
           value={formatNumber(data.main?.downloads?.total || 0)}
-          description="Descargas únicas acumuladas reportadas por los distintos canales."
+          description={t('admin:metrics.kpi.totalDownloadsDesc')}
         />
         <KPICard
-          title="Descargas últimos 30d"
+          title={t('admin:metrics.kpi.downloads30d')}
           value={formatNumber(data.main?.downloads?.last30d || 0)}
           color="blue"
-          description="Descargas registradas durante los últimos 30 días."
+          description={t('admin:metrics.kpi.downloads30dDesc')}
         />
       </div>
 
       {data.product?.featureAdoption && (
         <div className="rounded-lg border p-4">
-          <h3 className="font-semibold mb-3">Adopción de Features</h3>
+          <h3 className="font-semibold mb-3">{t('admin:metrics.charts.featureAdoption')}</h3>
           {Object.entries(data.product.featureAdoption).map(([feature, pct]) => (
             <div
               key={feature}
               className="mb-2"
-              title={`Porcentaje de usuarios activos que usan ${feature}.`}
+              title={t('admin:metrics.charts.featureAdoptionDesc', { feature })}
             >
               <div className="flex justify-between text-sm mb-1">
                 <span className="capitalize">{feature}</span>
                 <span>{pct}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${pct}%` }} />
+                <div className=" h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }} style={{ width: `${pct}%` }} />
               </div>
             </div>
           ))}
@@ -378,7 +383,7 @@ const ProductoTab = ({ data }) => {
 
       {userMonthlyData.length > 0 && (
         <div className="rounded-lg border p-4">
-          <h3 className="font-semibold mb-3">Altas mensuales</h3>
+          <h3 className="font-semibold mb-3">{t('admin:metrics.charts.monthlySignups')}</h3>
           <ResponsiveContainer width="100%" height={240}>
             <LineChart data={userMonthlyData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -386,8 +391,8 @@ const ProductoTab = ({ data }) => {
               <YAxis allowDecimals={false} />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="total" name="Totales" stroke="#2563eb" strokeWidth={2} />
-              <Line type="monotone" dataKey="paid" name="Pago" stroke="#10b981" strokeWidth={2} />
+              <Line type="monotone" dataKey="total" name={t('admin:metrics.charts.total')} stroke="#2563eb" strokeWidth={2} />
+              <Line type="monotone" dataKey="paid" name={t('admin:metrics.charts.paid')} stroke="#10b981" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -395,15 +400,15 @@ const ProductoTab = ({ data }) => {
 
       {Array.isArray(plannerStats.top) && plannerStats.top.length > 0 && (
         <div className="rounded-lg border p-4">
-          <h3 className="font-semibold mb-3">Top planners por volumen de bodas</h3>
-          <ol className="space-y-2 text-sm text-gray-600">
+          <h3 className="font-semibold mb-3">{t('admin:metrics.charts.topPlanners')}</h3>
+          <ol className="space-y-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
             {plannerStats.top.map((entry, index) => (
               <li key={`${entry.plannerId || 'sin_asignar'}-${index}`} className="flex items-center justify-between">
                 <span>
                   <span className="font-medium mr-2">{index + 1}.</span>
-                  {entry.plannerId || 'Sin asignar'}
+                  {entry.plannerId || t('admin:metrics.charts.unassigned')}
                 </span>
-                <span>{formatNumber(entry.count || 0)} bodas</span>
+                <span>{formatNumber(entry.count || 0)} {t('admin:metrics.charts.weddings')}</span>
               </li>
             ))}
           </ol>

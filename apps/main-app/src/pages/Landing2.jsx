@@ -1,8 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, Heart, CheckCircle, Sparkles, Gift } from 'lucide-react';
-
 export default function Landing2() {
   const navigate = useNavigate();
 
@@ -50,6 +49,78 @@ export default function Landing2() {
 
   return (
     <div style={{ backgroundColor: '#FFFBF7', minHeight: '100vh' }}>
+      {/* Navegación Superior */}
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: '24px',
+            fontWeight: 600,
+            color: '#2D3748',
+          }}>
+            Planivia
+          </div>
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => navigate('/blog')}
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '15px',
+                color: '#4A5568',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F7FAFC'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              Blog
+            </button>
+            <button
+              onClick={() => navigate('/login')}
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '15px',
+                color: '#4A5568',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F7FAFC'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              Iniciar sesión
+            </button>
+            <button
+              onClick={() => navigate('/registro')}
+              style={{
+                backgroundColor: '#5EBBFF',
+                color: '#FFFFFF',
+                padding: '10px 24px',
+                borderRadius: '10px',
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '15px',
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(94, 187, 255, 0.25)',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3DA9F5'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#5EBBFF'}
+            >
+              Comenzar gratis
+            </button>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div 

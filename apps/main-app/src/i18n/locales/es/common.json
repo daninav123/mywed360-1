@@ -1,7 +1,7 @@
 {
   "app": {
-    "name": "MaLove.App",
-    "brandName": "Lovenda",
+    "name": "Planivia",
+    "brandName": "Planivia",
     "tagline": "Tu boda perfecta, organizada digitalmente",
     "loading": "Cargando...",
     "error": "Error",
@@ -82,6 +82,180 @@
     "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
     "passwordsDoNotMatch": "Las contraseñas no coinciden",
     "invalidEmail": "Formato de correo inválido"
+  },
+  "documents": {
+    "uploaded": "Archivo subido",
+    "uploadFailed": "No se pudo subir el archivo",
+    "fileDeleted": "Archivo eliminado",
+    "fileRefRemoved": "Referencia eliminada. No se pudo borrar del almacenamiento o del registro.",
+    "docDownloadStarted": "Descarga iniciada (.DOC)",
+    "docFailed": "No se pudo generar el .DOC",
+    "pdfReady": "PDF generado",
+    "pdfFailed": "No se pudo generar el PDF",
+    "tasksGenerateError": "Faltan datos necesarios para generar tareas",
+    "tasksCreated": "✅ {count} tareas creadas automáticamente en tu lista de tareas",
+    "noTasksGenerated": "No se pudieron generar tareas para esta selección",
+    "tasksGenerateErrorGeneric": "Error al generar tareas automáticas"
+  },
+  "weddingAssistant": {
+    "welcome": "¡Hola! Soy tu asistente para crear el evento. Te iré haciendo algunas preguntas y con tus respuestas prepararé la base del proyecto.",
+    "restart": "Perfecto, volvamos a empezar. Te haré de nuevo las preguntas clave para preparar el evento.",
+    "allInfoCollected": "Genial, ya tengo toda la información. Aquí tienes un resumen. Si todo está correcto, creamos el evento.",
+    "parseError": "No me ha quedado claro, ¿puedes decirlo de otra forma?",
+    "validation": {
+      "nameRequired": "Necesito algún nombre, aunque sea provisional.",
+      "dateInvalid": "No pude entender la fecha. Usa el formato 2025-05-17.",
+      "locationRequired": "Indica al menos una ciudad o zona aproximada.",
+      "budgetRequired": "Por favor indica un presupuesto aproximado o escribe 'flexible'.",
+      "timeInvalid": "Indica cuántos meses aproximados (ejemplo: 6, 12, 18).",
+      "prioritiesInvalid": "Escribe 3 números separados por comas (ejemplo: 1,3,2).",
+      "noConcerns": "Sin preocupaciones específicas",
+      "noNotes": "Sin notas adicionales"
+    },
+    "summary": {
+      "eventType": "Tipo de evento",
+      "coupleName": "Nombre / pareja",
+      "date": "Fecha",
+      "location": "Ubicación",
+      "style": "Estilo",
+      "guestCount": "Número de invitados",
+      "formality": "Formalidad",
+      "ceremonyType": "Tipo de ceremonia",
+      "notes": "Notas",
+      "notSpecified": "(no indicado)",
+      "toConfirm": "(por confirmar)",
+      "toDefined": "(por definir)",
+      "noAdditionalNotes": "Sin notas adicionales"
+    },
+    "actions": {
+      "restart": "Empezar de nuevo",
+      "createEvent": "Crear evento",
+      "creating": "Creando..."
+    }
+  },
+  "weddingDay": {
+    "noPhoneRegistered": "Sin teléfono registrado",
+    "taskDescriptionPlaceholder": "Describe la tarea...",
+    "momentNamePlaceholder": "Nota opcional...",
+    "textRequired": "El texto es obligatorio",
+    "editTask": "Editar tarea",
+    "newTask": "Nueva tarea",
+    "task": "Tarea",
+    "markAsImportant": "Marcar como importante",
+    "additionalNote": "Nota adicional",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "create": "Crear",
+    "timeAndActivityRequired": "Hora y actividad son obligatorios",
+    "editActivity": "Editar actividad",
+    "newActivity": "Nueva actividad",
+    "time": "Hora",
+    "activity": "Actividad",
+    "responsible": "Responsable",
+    "duration": "Duración (minutos)",
+    "editContact": "Editar contacto",
+    "newContact": "Nuevo contacto",
+    "name": "Nombre",
+    "role": "Rol",
+    "phone": "Teléfono",
+    "priority": "Contacto prioritario"
+  },
+  "webBuilder": {
+    "backToWebsites": "Mis Webs",
+    "designer": "Diseñador de Webs de Boda",
+    "dragComponents": "Arrastra componentes para crear tu web perfecta",
+    "styles": "Estilos",
+    "customizeColors": "Personalizar colores, fuentes y decoraciones",
+    "preview": "Vista Previa",
+    "viewPreview": "Ver vista previa de la web",
+    "saving": "Guardando...",
+    "save": "Guardar",
+    "saveChanges": "Guardar cambios",
+    "autoSaved": "Auto-guardado",
+    "publish": "Publicar",
+    "publishWeb": "Publicar web",
+    "cannotSave": "No se puede guardar ahora",
+    "errorSaving": "Error al guardar la web",
+    "savingChanges": "Guardando cambios...",
+    "themeApplied": "Tema \"{name}\" aplicado",
+    "componentsUpdated": "{count} componente(s) actualizado(s) - Ahora verás el fondo",
+    "noComponentsToUpdate": "No hay componentes que actualizar"
+  },
+  "home2": {
+    "header": {
+      "greeting": "¡Hola {{name}} y {{partner}}!",
+      "greetingSingle": "¡Hola {{name}}!",
+      "subtitle": "Planifiquemos la Boda de Tus Sueños",
+      "guest": "Invitado"
+    },
+    "countdown": {
+      "title": "Cuenta Regresiva",
+      "noDate": "Define tu fecha de boda",
+      "past": "¡El día de la boda ya pasó!",
+      "daysToGo": "Días Restantes"
+    },
+    "budget": {
+      "title": "Presupuesto",
+      "of": "de"
+    },
+    "guestList": {
+      "title": "Lista de Invitados",
+      "confirmed": "Confirmados",
+      "pending": "Pendientes"
+    },
+    "tasks": {
+      "title": "Tareas Próximas",
+      "untitled": "Tarea sin título",
+      "noTasks": "No hay tareas pendientes. ¡Excelente trabajo!"
+    },
+    "budgetChart": {
+      "title": "Resumen de Presupuesto",
+      "spent": "Gastado",
+      "total": "Total",
+      "venue": "Lugar",
+      "catering": "Catering",
+      "flowers": "Flores",
+      "noDataTitle": "Aún no tienes presupuesto",
+      "noDataSubtitle": "Configura tu presupuesto para ver cómo se distribuyen tus gastos",
+      "createBudget": "Crear presupuesto"
+    },
+    "inspiration": {
+      "title": "Tablero de Inspiración"
+    },
+    "blog": {
+      "sectionTitle": "Últimas del Blog",
+      "viewAll": "Ver todo →"
+    }
+  },
+  "weddingInfo": {
+    "toasts": {
+      "supplierContracted": "✅ {supplierName} contratado - Información actualizada automáticamente",
+      "fieldsUpdated": "📋 Actualizado: {fields}",
+      "fields": {
+        "place": "Lugar",
+        "address": "Dirección",
+        "contact": "Contacto",
+        "catering": "Catering",
+        "photographer": "Fotógrafo",
+        "music": "Música",
+        "coordinator": "Coordinador"
+      },
+      "enterCoupleName": "Primero ingresa el nombre de la pareja",
+      "slugGenerated": "Slug generado. Guarda para aplicar cambios.",
+      "urlCopied": "¡URL copiada al portapapeles!",
+      "generateSlugFirst": "Primero genera un slug para la web",
+      "qrGenerated": "QR generado en nueva pestaña",
+      "heroImageUpdated": "Imagen de portada actualizada",
+      "imageDeleted": "Imagen eliminada",
+      "photoAdded": "Foto añadida a la galería"
+    },
+    "labels": {
+      "saving": "💾 Guardando...",
+      "autoSaved": "✓ Auto-guardado",
+      "previewWeb": "👁️ Preview Web",
+      "generateQR": "📱 Generar QR",
+      "copyUrl": "🔗 Copiar URL"
+    }
   },
   "authLogin": {
     "title": "Inicia sesión",
@@ -2057,10 +2231,25 @@
       "saved": "Saved"
     },
     "account": {
-      "title": "Title"
+      "title": "Información de cuenta",
+      "name": "Nombre",
+      "linkedAccount": "Cuenta vinculada",
+      "planner": "Wedding planner vinculada",
+      "helpers": "Ayudantes vinculados",
+      "email": "Correo electrónico",
+      "whatsapp": "Número WhatsApp personal",
+      "whatsappPlaceholder": "ej. +349XXXXXXXX",
+      "password": "Reestablecer contraseña"
     },
     "billing": {
-      "title": "Title"
+      "title": "Datos de facturación",
+      "fullName": "Nombre completo",
+      "address": "Dirección",
+      "zip": "Código postal",
+      "city": "Ciudad",
+      "state": "Provincia/Estado",
+      "country": "País",
+      "dni": "NIF/CIF"
     }
   },
   "forms": {

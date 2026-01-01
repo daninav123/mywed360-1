@@ -18,8 +18,8 @@ export default function BackgroundsPanel({ onSetBackground }) {
   return (
     <div className="p-4 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-gray-900">Fondos</h3>
-        <p className="text-xs text-gray-600">
+        <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Fondos</h3>
+        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
           {currentPatterns.length} fondos disponibles
         </p>
       </div>
@@ -68,7 +68,7 @@ export default function BackgroundsPanel({ onSetBackground }) {
       </div>
 
       {currentPatterns.length === 0 && (
-        <div className="text-center py-8 text-gray-500 text-sm">
+        <div className="text-center py-8  text-sm" style={{ color: 'var(--color-muted)' }}>
           No hay fondos en esta categoría
         </div>
       )}

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Heart, Calendar, Users, Bell, Settings, Search, Plus, Check, Star, ArrowRight } from 'lucide-react';
-
 /**
  * Página de demostración de estilos visuales para Planivia
  * Permite comparar diferentes propuestas de diseño
@@ -597,7 +596,7 @@ export default function StyleDemo() {
               {isWeddingDashboard ? (
                 /* Task list con checkmarks circulares de colores */
                 <>
-                  <div className="flex items-center gap-3 p-3 rounded-lg transition-all hover:bg-gray-50">
+                  <div className="flex items-center gap-3 p-3 rounded-lg transition-all hover:" style={{ backgroundColor: 'var(--color-bg)' }}>
                     <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: currentTheme.colors.taskYellow }}>
                       <Check className="w-5 h-5 text-white" strokeWidth={2.5} />
                     </div>
@@ -609,7 +608,7 @@ export default function StyleDemo() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-3 rounded-lg transition-all hover:bg-gray-50">
+                  <div className="flex items-center gap-3 p-3 rounded-lg transition-all hover:" style={{ backgroundColor: 'var(--color-bg)' }}>
                     <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: currentTheme.colors.taskPurple }}>
                       <Users className="w-5 h-5 text-white" strokeWidth={2} />
                     </div>
@@ -621,7 +620,7 @@ export default function StyleDemo() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-3 rounded-lg transition-all hover:bg-gray-50">
+                  <div className="flex items-center gap-3 p-3 rounded-lg transition-all hover:" style={{ backgroundColor: 'var(--color-bg)' }}>
                     <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: currentTheme.colors.taskRed }}>
                       <Heart className="w-5 h-5 text-white" strokeWidth={2} fill="currentColor" />
                     </div>

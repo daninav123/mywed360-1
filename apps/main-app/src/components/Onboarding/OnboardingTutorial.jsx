@@ -9,6 +9,7 @@ import {
   Image,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
@@ -19,6 +20,7 @@ import { createWedding, getWeddingIdForOwner } from '../../services/WeddingServi
  * Tutorial de onboarding para nuevos usuarios
  */
 const OnboardingTutorial = ({ onComplete }) => {
+  const { t } = useTranslation(['onboarding']);
   const { currentUser } = useAuth();
   const { setActiveWedding } = useWedding();
   const [currentStep, setCurrentStep] = useState(0);
@@ -59,40 +61,39 @@ const OnboardingTutorial = ({ onComplete }) => {
 
   const steps = [
     {
-      title: 'Bienvenido a MaLoveApp!',
+      title: t('onboarding:tutorial.steps.welcome.title'),
       content: (
         <div className="text-center">
           <div className="mx-auto w-32 h-32 bg-100 rounded-full flex items-center justify-center mb-6">
             <img src="/icon-192.png" alt="MaLoveApp" className="w-20 h-20" />
           </div>
-          <h2 className="text-2xl font-bold mb-4">Comienza a planificar tu boda!</h2>
+          <h2 className="text-2xl font-bold mb-4">{t('onboarding:tutorial.steps.welcome.heading')}</h2>
           <p className="mb-6 text-gray-600">
-            Te guiaremos a travs de los primeros pasos para configurar tu boda en MaLoveApp. Este
-            tutorial te ayudar a personalizar la app y conocer sus funcionalidades principales.
+            {t('onboarding:tutorial.steps.welcome.description')}
           </p>
         </div>
       ),
     },
     {
-      title: 'Datos bsicos',
+      title: t('onboarding:tutorial.steps.basicData.title'),
       content: (
         <div>
-          <h2 className="text-xl font-semibold mb-4">Completa los datos bsicos de tu boda</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('onboarding:tutorial.steps.basicData.heading')}</h2>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Nombres de la pareja
+                {t('onboarding:tutorial.steps.basicData.coupleNames')}
               </label>
               <input
                 type="text"
                 value={profileData.nombres}
                 onChange={(e) => setProfileData({ ...profileData, nombres: e.target.value })}
-                placeholder="Ej: Mara y Juan"
+                placeholder={t('onboarding:tutorial.steps.basicData.coupleNamesPlaceholder')}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Fecha de la boda</label>
+              <label className="block text-sm font-medium text-gray-700">{t('onboarding:tutorial.steps.basicData.weddingDate')}</label>
               <input
                 type="date"
                 value={profileData.fecha}
@@ -102,13 +103,13 @@ const OnboardingTutorial = ({ onComplete }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Lugar de celebracin
+                {t('onboarding:tutorial.steps.basicData.celebrationPlace')}
               </label>
               <input
                 type="text"
                 value={profileData.lugar}
                 onChange={(e) => setProfileData({ ...profileData, lugar: e.target.value })}
-                placeholder="Ej: Madrid"
+                placeholder={t('onboarding:tutorial.steps.basicData.celebrationPlacePlaceholder')}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
             </div>
@@ -117,7 +118,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       ),
     },
     {
-      title: 'Gestin de invitados',
+      title: t('onboarding:tutorial.steps.guestManagement.title'),
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -125,32 +126,33 @@ const OnboardingTutorial = ({ onComplete }) => {
               <Users className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-center">Gestin de Invitados</h2>
+          <h2 className="text-xl font-semibold mb-2 text-center">{t('onboarding:tutorial.steps.guestManagement.heading')}</h2>
           <p className="mb-4 text-gray-600 text-center">
-            Organiza tu lista de invitados, confirma asistencia y asigna mesas para la ceremonia.
+            {t('onboarding:tutorial.steps.guestManagement.description')}
           </p>
           <ul className="space-y-3">
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Aade invitados y sus acompaantes</span>
+              <span>{t('onboarding:tutorial.steps.guestManagement.features.addGuests')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Organiza por grupos (familia, amigos...)</span>
+              <span>{t('onboarding:tutorial.steps.guestManagement.features.organizeGroups')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Confirma asistencias y alrgenos</span>
+              <span>{t('onboarding:tutorial.steps.guestManagement.features.confirmAttendance')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Disea el plano de mesas con arrastrar y soltar</span>
+              <span>{t('onboarding:tutorial.steps.guestManagement.features.designSeating')}</span>
             </li>
           </ul>
         </div>
       ),
     },
     {
+      title: t('onboarding:tutorial.steps.suppliers.title'),
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -158,33 +160,29 @@ const OnboardingTutorial = ({ onComplete }) => {
               <ShoppingBag className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-center">Proveedores</h2>
+          <h2 className="text-xl font-semibold mb-2 text-center">{t('onboarding:tutorial.steps.suppliers.heading')}</h2>
           <p className="mb-4 text-gray-600 text-center">
-            Gestiona tus proveedores, consulta con IA y lleva el seguimiento de todos los servicios
-            contratados.
+            {t('onboarding:tutorial.steps.suppliers.description')}
           </p>
           <ul className="space-y-3">
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Busca proveedores recomendados con IA</span>
+              <span>{t('onboarding:tutorial.steps.suppliers.features.searchAI')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
+              <span>{t('onboarding:tutorial.steps.suppliers.features.markFavorites')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Marca favoritos para comparar opciones</span>
-            </li>
-            <li className="flex items-center">
-              <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Registra pagos y Seales para control financiero</span>
+              <span>{t('onboarding:tutorial.steps.suppliers.features.registerPayments')}</span>
             </li>
           </ul>
         </div>
       ),
     },
     {
-      title: 'Calendario y Tareas',
+      title: t('onboarding:tutorial.steps.calendarTasks.title'),
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -192,33 +190,33 @@ const OnboardingTutorial = ({ onComplete }) => {
               <Calendar className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-center">Planificacin</h2>
+          <h2 className="text-xl font-semibold mb-2 text-center">{t('onboarding:tutorial.steps.calendarTasks.heading')}</h2>
           <p className="mb-4 text-gray-600 text-center">
-            Organiza todo tu calendario y listas de tareas para llevar un control perfecto.
+            {t('onboarding:tutorial.steps.calendarTasks.description')}
           </p>
           <ul className="space-y-3">
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Sincroniza con Google Calendar y otros</span>
+              <span>{t('onboarding:tutorial.steps.calendarTasks.features.syncCalendar')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Organiza tareas por prioridad y fecha</span>
+              <span>{t('onboarding:tutorial.steps.calendarTasks.features.organizeTasks')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Checklists para antes y durante la boda</span>
+              <span>{t('onboarding:tutorial.steps.calendarTasks.features.checklists')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Recibe recordatorios importantes</span>
+              <span>{t('onboarding:tutorial.steps.calendarTasks.features.reminders')}</span>
             </li>
           </ul>
         </div>
       ),
     },
     {
-      title: 'Diseos e Invitaciones',
+      title: t('onboarding:tutorial.steps.designs.title'),
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -226,33 +224,33 @@ const OnboardingTutorial = ({ onComplete }) => {
               <Image className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-center">Diseos con IA</h2>
+          <h2 className="text-xl font-semibold mb-2 text-center">{t('onboarding:tutorial.steps.designs.heading')}</h2>
           <p className="mb-4 text-gray-600 text-center">
-            Crea invitaciones, mens y otros elementos visuales para tu boda con ayuda de IA.
+            {t('onboarding:tutorial.steps.designs.description')}
           </p>
           <ul className="space-y-3">
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Genera Diseos personalizados con IA</span>
+              <span>{t('onboarding:tutorial.steps.designs.features.generateDesigns')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Crea invitaciones, mens y Sealizacin</span>
+              <span>{t('onboarding:tutorial.steps.designs.features.createInvitations')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Disea tu logo de boda personalizado</span>
+              <span>{t('onboarding:tutorial.steps.designs.features.designLogo')}</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Exporta en alta resolucin para imprimir</span>
+              <span>{t('onboarding:tutorial.steps.designs.features.exportHighRes')}</span>
             </li>
           </ul>
         </div>
       ),
     },
     {
-      title: 'Listo para empezar!',
+      title: t('onboarding:tutorial.steps.ready.title'),
       content: (
         <div className="text-center">
           <div className="mb-6 flex items-center justify-center">
@@ -260,14 +258,12 @@ const OnboardingTutorial = ({ onComplete }) => {
               <Check className="w-8 h-8 text-green-600" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold mb-4">Todo listo!</h2>
+          <h2 className="text-2xl font-bold mb-4">{t('onboarding:tutorial.steps.ready.heading')}</h2>
           <p className="mb-6 text-gray-600">
-            Has completado el tutorial inicial. Ya puedes comenzar a utilizar todas las funciones de
-            MaLoveApp para planificar la boda de tus sueos.
+            {t('onboarding:tutorial.steps.ready.description')}
           </p>
           <p className="text-sm text-gray-500">
-            Recuerda que puedes acceder a la Configuracin en cualquier momento para modificar tus
-            datos o consultar esta Gua nuevamente.
+            {t('onboarding:tutorial.steps.ready.hint')}
           </p>
         </div>
       ),
@@ -406,7 +402,7 @@ const OnboardingTutorial = ({ onComplete }) => {
           </div>
           {/* Botn saltar */}
           <button onClick={handleComplete} className="text-xs underline hover:text-gray-200">
-            Saltar
+            {t('onboarding:tutorial.skip')}
           </button>
         </div>
 
@@ -424,7 +420,7 @@ const OnboardingTutorial = ({ onComplete }) => {
                 : 'text-gray-700 hover:bg-gray-200'
             }`}
           >
-            <ChevronLeft className="w-5 h-5 mr-1" /> Anterior
+            <ChevronLeft className="w-5 h-5 mr-1" /> {t('onboarding:tutorial.previous')}
           </button>
 
           {currentStep < steps.length - 1 ? (
@@ -432,7 +428,7 @@ const OnboardingTutorial = ({ onComplete }) => {
               onClick={handleNext}
               className="px-4 py-2 bg-rose-500 text-white rounded flex items-center hover:bg-rose-600"
             >
-              Siguiente <ChevronRight className="w-5 h-5 ml-1" />
+              {t('onboarding:tutorial.next')} <ChevronRight className="w-5 h-5 ml-1" />
             </button>
           ) : (
             <button
@@ -442,7 +438,7 @@ const OnboardingTutorial = ({ onComplete }) => {
                 loading ? 'opacity-70 cursor-wait' : ''
               }`}
             >
-              {loading ? 'Guardando...' : 'Finalizar'} <Check className="w-5 h-5 ml-1" />
+              {loading ? t('onboarding:tutorial.saving') : t('onboarding:tutorial.finish')} <Check className="w-5 h-5 ml-1" />
             </button>
           )}
         </div>

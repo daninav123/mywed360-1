@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Heart, Trash2, Download } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -7,7 +7,6 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import SupplierCard from '../components/suppliers/SupplierCard';
 import Loader from '../components/ui/Loader';
 import useTranslations from '../hooks/useTranslations';
-
 export default function SavedSuppliers() {
   const { favorites, loading, removeFavorite, count } = useFavorites();
   const [deletingId, setDeletingId] = useState(null);
@@ -47,11 +46,11 @@ export default function SavedSuppliers() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-              <Heart className="text-red-500" fill="currentColor" />
+            <h1 className="text-3xl font-bold  flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+              <Heart className="" style={{ color: 'var(--color-danger)' }} fill="currentColor" />
               {t('suppliers.saved.title')}
             </h1>
-            <p className="text-gray-600 mt-2">
+            <p className=" mt-2" style={{ color: 'var(--color-text-secondary)' }}>
               {count === 0
                 ? t('suppliers.saved.count.zero')
                 : tPlural('common.suppliers.saved.count', count, { count })}
@@ -62,7 +61,7 @@ export default function SavedSuppliers() {
             <button
               type="button"
               onClick={handleExportToPDF}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2  text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2" style={{ backgroundColor: 'var(--color-primary)' }}
             >
               <Download size={18} />
               {t('suppliers.saved.buttons.export')}
@@ -74,13 +73,13 @@ export default function SavedSuppliers() {
       {count === 0 ? (
         <div className="text-center py-16">
           <Heart className="mx-auto text-gray-300 mb-4" size={64} />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <h3 className="text-xl font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
             {t('suppliers.saved.empty.title')}
           </h3>
-          <p className="text-gray-500 mb-6">{t('suppliers.saved.empty.description')}</p>
+          <p className=" mb-6" style={{ color: 'var(--color-muted)' }}>{t('suppliers.saved.empty.description')}</p>
           <a
             href="/suppliers"
-            className="inline-block px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            className="inline-block px-6 py-3  text-white rounded-md hover:bg-green-700 transition-colors" style={{ backgroundColor: 'var(--color-success)' }}
           >
             {t('suppliers.saved.empty.cta')}
           </a>
@@ -94,7 +93,7 @@ export default function SavedSuppliers() {
                   type="button"
                   onClick={() => handleRemove(favorite.supplierId)}
                   disabled={deletingId === favorite.supplierId}
-                  className="absolute top-2 right-2 z-10 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                  className="absolute top-2 right-2 z-10 p-2 bg-red-500 text-white rounded-full hover: transition-colors shadow-lg" style={{ backgroundColor: 'var(--color-danger)' }}
                   title={t('suppliers.favorites.actions.removeTooltip')}
                 >
                   {deletingId === favorite.supplierId ? (
@@ -113,14 +112,14 @@ export default function SavedSuppliers() {
 
                 {favorite.notes && (
                   <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm " style={{ color: 'var(--color-text)' }}>
                       <strong>{t('suppliers.favorites.notesLabel')}</strong> {favorite.notes}
                     </p>
                   </div>
                 )}
 
                 {favorite.addedAt && (
-                  <div className="mt-2 text-xs text-gray-500">
+                  <div className="mt-2 text-xs " style={{ color: 'var(--color-muted)' }}>
                     {t('suppliers.saved.addedAt', {
                       value: format.dateShort(new Date(favorite.addedAt)),
                     })}
@@ -132,7 +131,7 @@ export default function SavedSuppliers() {
 
           <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="font-semibold text-lg mb-3">{t('suppliers.saved.tips.title')}</h3>
-            <ul className="space-y-2 text-sm text-gray-700">
+            <ul className="space-y-2 text-sm " style={{ color: 'var(--color-text)' }}>
               {[
                 t('suppliers.saved.tips.compare'),
                 t('suppliers.saved.tips.contact'),

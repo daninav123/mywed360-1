@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
@@ -7,7 +7,6 @@ import SocialLoginButtons from '../components/auth/SocialLoginButtons';
 import { useAuth } from '../hooks/useAuth';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import useTranslations from '../hooks/useTranslations';
-
 const FORM_ERROR_ID = 'signup-form-error';
 const SOCIAL_ERROR_ID = 'signup-social-error';
 const INFO_MESSAGE_ID = 'signup-info-message';
@@ -271,7 +270,7 @@ export default function Signup() {
                 id={SOCIAL_ERROR_ID}
                 role="alert"
                 aria-live="assertive"
-                className="mt-3 text-center text-sm text-red-600"
+                className="mt-3 text-center text-sm " style={{ color: 'var(--color-danger)' }}
               >
                 {socialError}
               </p>

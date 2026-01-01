@@ -57,118 +57,154 @@ export default function BudgetCategoryCard({
 
   const sourceTag = category.source?.toLowerCase() === 'advisor';
 
-  return (
-    <Card className={`relative p-0 overflow-hidden transition-shadow duration-300 hover:shadow-lg ${borderColor}`}>
-      {/* Header */}
-      <div className="p-4 border-b border-soft">
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex-1">
-            <h3 className="text-lg font-bold text-body mb-1">{category.name}</h3>
-            <div className="flex flex-wrap items-center gap-2">
-              {sourceTag && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary-15)] px-2.5 py-0.5 text-xs font-semibold text-[color:var(--color-primary)]">
-                  <Sparkles size={12} />
-                  {t('finance.budget.advisor', { defaultValue: 'AI' })}
-                </span>
-              )}
-              {isSpentOverBudget && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-danger-15)] px-2.5 py-0.5 text-xs font-semibold text-[color:var(--color-danger)]">
-                  <AlertTriangle size={12} />
-                  {t('finance.budget.exceeded', { defaultValue: 'Excedido' })}
-                </span>
-              )}
-              {!isSpentOverBudget && isCommittedOverBudget && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-warning-15)] px-2.5 py-0.5 text-xs font-semibold text-[color:var(--color-warning)]">
-                  <AlertTriangle size={12} />
-                  {t('finance.budget.committed', { defaultValue: 'Comprometido' })}
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => onEdit(category, index)}
-              className="p-2 rounded-lg text-[color:var(--color-primary)] hover:bg-[var(--color-primary-10)] transition-colors duration-150"
-              aria-label={t('app.edit', { defaultValue: 'Editar' })}
-            >
-              <Edit3 size={16} />
-            </button>
-            <button
-              onClick={() => onDelete(index, category.name)}
-              className="p-2 rounded-lg text-[color:var(--color-danger)] hover:bg-[var(--color-danger-10)] transition-colors duration-150"
-              aria-label={t('app.delete', { defaultValue: 'Eliminar' })}
-            >
-              <Trash2 size={16} />
-            </button>
-          </div>
-        </div>
+  // Color azul uniforme del donut chart - simple y sencillo
+  const bgColor = isDanger ? '#FFF0F0' : isWarning ? '#FFF9E6' : '#EFF6FF';
+  const accentColor = isDanger ? '#E57373' : isWarning ? '#FFA726' : '#60A5FA';
 
-        {/* Progress Bar */}
-        <div className="space-y-2">
-          <div className="h-3 w-full rounded-full bg-[color:var(--color-text-10)] overflow-hidden">
-            <div
-              className={`${barColor} h-full rounded-full transition-all duration-500 ease-out relative`}
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-          <div className="flex items-center justify-between text-xs">
-            <span className={`font-bold ${textColor}`}>{riskPercent.toFixed(1)}%</span>
-            <span className="text-[color:var(--color-text-60)]">
-              {t('finance.budget.used', { defaultValue: 'Usado/Comprometido' })}
-            </span>
-          </div>
+  return (
+    <div style={{
+      backgroundColor: bgColor,
+      borderRadius: '20px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+      border: '1px solid #EEF2F7',
+      padding: '24px',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Barra acento inferior - exacto como Home2 */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '4px',
+        backgroundColor: accentColor,
+        opacity: 0.6,
+      }} />
+
+      {/* Header: Título + Botones */}
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1">
+          <h3 style={{
+            fontFamily: "'DM Sans', 'Inter', sans-serif",
+            fontSize: '16px',
+            fontWeight: 600,
+            color: '#1F2937',
+            marginBottom: '2px',
+          }}>{category.name}</h3>
+          {sourceTag && (
+            <span style={{
+              fontSize: '10px',
+              color: '#9CA3AF',
+              fontWeight: 500,
+            }}>✨ AI</span>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => onEdit(category, index)}
+            style={{
+              padding: '6px',
+              borderRadius: '6px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              color: '#9CA3AF',
+              cursor: 'pointer',
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#60A5FA'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#9CA3AF'}
+            aria-label={t('app.edit', { defaultValue: 'Editar' })}
+          >
+            <Edit3 size={14} />
+          </button>
+          <button
+            onClick={() => onDelete(index, category.name)}
+            style={{
+              padding: '6px',
+              borderRadius: '6px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              color: '#9CA3AF',
+              cursor: 'pointer',
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#E57373'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#9CA3AF'}
+            aria-label={t('app.delete', { defaultValue: 'Eliminar' })}
+          >
+            <Trash2 size={14} />
+          </button>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="p-4 grid grid-cols-4 divide-x divide-[color:var(--color-border)]">
-        <div className="text-center px-2">
-          <p className="text-xs text-[color:var(--color-text-60)] mb-1">
-            {t('finance.budget.assigned', { defaultValue: 'Asignado' })}
+      {/* Stats - Layout horizontal compacto */}
+      <div className="flex items-center justify-between" style={{ marginBottom: '12px' }}>
+        <div>
+          <p style={{
+            fontSize: '10px',
+            color: '#9CA3AF',
+            fontWeight: 500,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            fontFamily: "'DM Sans', 'Inter', sans-serif",
+            marginBottom: '2px',
+          }}>
+            {t('finance.budget.assigned', { defaultValue: 'Presupuesto' })}
           </p>
-          <p className="text-sm font-black text-body">{formatCurrency(assignedAmount)}</p>
+          <p style={{
+            fontSize: '20px',
+            fontWeight: 600,
+            color: '#1F2937',
+            fontFamily: "'DM Sans', 'Inter', sans-serif",
+          }}>{formatCurrency(assignedAmount)}</p>
         </div>
-        <div className="text-center px-2">
-          <p className="text-xs text-[color:var(--color-text-60)] mb-1">
-            {t('finance.budget.committedAmount', { defaultValue: 'Comprom.' })}
-          </p>
-          <p
-            className={`text-sm font-black ${
-              isCommittedOverBudget ? 'text-[color:var(--color-danger)]' : 'text-body'
-            }`}
-          >
-            {formatCurrency(committed)}
-          </p>
-        </div>
-        <div className="text-center px-2">
-          <p className="text-xs text-[color:var(--color-text-60)] mb-1">
+        
+        <div style={{ textAlign: 'right' }}>
+          <p style={{
+            fontSize: '10px',
+            color: isDanger ? '#E57373' : '#9CA3AF',
+            fontWeight: 500,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            fontFamily: "'DM Sans', 'Inter', sans-serif",
+            marginBottom: '2px',
+          }}>
             {t('finance.budget.spent', { defaultValue: 'Gastado' })}
           </p>
-          <p
-            className={`text-sm font-black ${isDanger ? 'text-[color:var(--color-danger)]' : 'text-body'}`}
-          >
+          <p style={{
+            fontSize: '20px',
+            fontWeight: 600,
+            color: isDanger ? '#E57373' : '#1F2937',
+            fontFamily: "'DM Sans', 'Inter', sans-serif",
+          }}>
             {formatCurrency(spent)}
           </p>
         </div>
-        <div className="text-center px-2">
-          <p className="text-xs text-[color:var(--color-text-60)] mb-1">
-            {t('finance.budget.remaining', { defaultValue: 'Restante' })}
-          </p>
-          <p className={`text-sm font-black ${textColor}`}>
-            {remaining < 0 ? (
-              <span className="inline-flex items-center gap-1">
-                <TrendingDown size={14} />
-                -{formatCurrency(Math.abs(remaining))}
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1">
-                <TrendingUp size={14} />
-                {formatCurrency(remaining)}
-              </span>
-            )}
-          </p>
-        </div>
       </div>
-    </Card>
+
+      {/* Info secundaria - más compacta */}
+      <div style={{
+        fontSize: '11px',
+        color: '#9CA3AF',
+        lineHeight: 1.4,
+      }}>
+        {remaining !== 0 && (
+          <span style={{ 
+            color: remaining < 0 ? '#E57373' : accentColor, 
+            fontWeight: 600,
+            fontSize: '12px',
+          }}>
+            {remaining < 0 ? '-' : ''}{formatCurrency(Math.abs(remaining))} {remaining < 0 ? 'sobre presupuesto' : 'disponible'}
+          </span>
+        )}
+        {committed > 0 && remaining !== 0 && <span style={{ margin: '0 6px', opacity: 0.5 }}>•</span>}
+        {committed > 0 && (
+          <span style={{ color: isCommittedOverBudget ? '#E57373' : '#9CA3AF' }}>
+            {formatCurrency(committed)} comprometido
+          </span>
+        )}
+      </div>
+    </div>
   );
 }

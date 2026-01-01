@@ -14,7 +14,7 @@ export default function UpcomingTasksList({ tasks = [], onTaskClick }) {
       .slice(0, 4)
       .map((task, index) => ({
         id: task.id || index,
-        title: task.title || task.name || task.label || t('home2.tasks.untitled', { defaultValue: 'Untitled task' }),
+        title: task.title || task.name || task.label || t('home2.tasks.untitled'),
         icon: task.icon || 'circle',
         color: task.color || '#9ca3af',
         completed: task.completed || task.done || task.isDone || false,
@@ -23,15 +23,15 @@ export default function UpcomingTasksList({ tasks = [], onTaskClick }) {
 
   if (sortedTasks.length === 0) {
     return (
-      <Card className="p-6 rounded-2xl shadow-sm" style={{ backgroundColor: 'transparent' }}>
+      <Card className="p-6 rounded-2xl shadow-sm" style={{ backgroundColor: 'white' }}>
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-800">
-            {t('home2.tasks.title', { defaultValue: 'Upcoming Tasks' })}
+            {t('home2.tasks.title')}
           </h3>
           <button className="text-sm text-gray-500 hover:text-gray-700">•••</button>
         </div>
         <p className="text-sm text-gray-500 text-center py-8">
-          {t('home2.tasks.noTasks', { defaultValue: 'No pending tasks. Great job!' })}
+          {t('home2.tasks.noTasks')}
         </p>
       </Card>
     );
@@ -39,7 +39,7 @@ export default function UpcomingTasksList({ tasks = [], onTaskClick }) {
 
   return (
     <Card style={{
-      backgroundColor: 'transparent',
+      backgroundColor: 'white',
       borderRadius: '20px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
       border: '1px solid #EEF2F7',

@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../hooks/useAuth';
 import useTranslations from '../hooks/useTranslations';
 import { acceptInvitation } from '../services/WeddingService';
-
 export default function AcceptInvitation() {
   const { code } = useParams();
   const navigate = useNavigate();
@@ -31,12 +30,16 @@ export default function AcceptInvitation() {
   }, [code, currentUser, navigate]);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-4 py-12">
+    
+      
+<div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 text-center shadow-sm">
         <p placeholder={t('acceptInvitation.namePlaceholder')} className="text-[color:var(--color-text)]">
           {t(`common.public.invitation.accept.${statusKey}`, { message: errorMessage })}
         </p>
       </div>
     </div>
+      
+    
   );
 }

@@ -6,7 +6,7 @@ const path = require('path');
 async function main() {
   console.log('📋 Para desplegar las reglas de Firestore manualmente:\n');
   console.log('1️⃣  Abre esta URL en tu navegador:');
-  console.log('   https://console.firebase.google.com/project/lovenda-98c77/firestore/rules\n');
+  console.log('   https://console.firebase.google.com/project/planivia-98c77/firestore/rules\n');
   
   console.log('2️⃣  Copia y pega las reglas que se muestran a continuación:\n');
   console.log('─'.repeat(80));

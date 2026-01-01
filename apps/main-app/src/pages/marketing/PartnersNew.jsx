@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -28,7 +29,7 @@ import {
 
 export default function PartnersNew() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['marketing']);
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactMessage, setContactMessage] = useState('');
@@ -40,43 +41,43 @@ export default function PartnersNew() {
   const benefits = [
     {
       icon: DollarSign,
-      title: t('partners.benefits.commissions.title', { defaultValue: 'Attractive Commissions' }),
-      description: t('partners.benefits.commissions.description', { defaultValue: 'Earn recurring commissions for every subscription you sell' }),
+      title: t('marketing:partners.benefits.items.0.title'),
+      description: t('marketing:partners.benefits.items.0.description'),
       color: theme.colors.yellow,
       accentColor: theme.colors.yellowAccent,
     },
     {
       icon: BarChart3,
-      title: t('partners.benefits.dashboard.title', { defaultValue: 'Tracking Dashboard' }),
-      description: t('partners.benefits.dashboard.description', { defaultValue: 'Monitor your conversions, commissions and statistics in real time' }),
+      title: t('marketing:partners.benefits.items.1.title'),
+      description: t('marketing:partners.benefits.items.1.description'),
       color: theme.colors.green,
       accentColor: theme.colors.greenAccent,
     },
     {
       icon: Target,
-      title: t('partners.benefits.materials.title', { defaultValue: 'Marketing Materials' }),
-      description: t('partners.benefits.materials.description', { defaultValue: 'Access presentations, demos and resources to facilitate your sales' }),
+      title: t('marketing:partners.benefits.items.2.title'),
+      description: t('marketing:partners.benefits.items.2.description'),
       color: theme.colors.pink,
       accentColor: theme.colors.pinkAccent,
     },
     {
       icon: Users,
-      title: t('partners.benefits.support.title', { defaultValue: 'Dedicated Support' }),
-      description: t('partners.benefits.support.description', { defaultValue: 'Support team available to help you with your clients' }),
+      title: t('marketing:partners.benefits.items.3.title'),
+      description: t('marketing:partners.benefits.items.3.description'),
       color: theme.colors.lavender,
       accentColor: theme.colors.primary,
     },
     {
       icon: Award,
-      title: t('partners.benefits.training.title', { defaultValue: 'Training Included' }),
-      description: t('partners.benefits.training.description', { defaultValue: 'Complete training on the platform and best sales practices' }),
+      title: t('marketing:partners.benefits.items.4.title'),
+      description: t('marketing:partners.benefits.items.4.description'),
       color: theme.colors.peach,
       accentColor: theme.colors.yellowAccent,
     },
     {
       icon: TrendingUp,
-      title: t('partners.benefits.unlimited.title', { defaultValue: 'No Limits' }),
-      description: t('partners.benefits.unlimited.description', { defaultValue: 'No ceiling on your commissions. The more you sell, the more you earn' }),
+      title: t('marketing:partners.benefits.items.5.title'),
+      description: t('marketing:partners.benefits.items.5.description'),
       color: theme.colors.sage,
       accentColor: theme.colors.greenAccent,
     },
@@ -85,57 +86,57 @@ export default function PartnersNew() {
   const processSteps = [
     {
       number: '1',
-      title: t('partners.process.step1.title', { defaultValue: 'Join the Program' }),
-      description: t('partners.process.step1.description', { defaultValue: 'Complete the application form and await our approval' }),
+      title: t('marketing:partners.process.steps.0.title'),
+      description: t('marketing:partners.process.steps.0.description'),
     },
     {
       number: '2',
-      title: t('partners.process.step2.title', { defaultValue: 'Receive Training' }),
-      description: t('partners.process.step2.description', { defaultValue: 'Access materials and training sessions about the platform' }),
+      title: t('marketing:partners.process.steps.1.title'),
+      description: t('marketing:partners.process.steps.1.description'),
     },
     {
       number: '3',
-      title: t('partners.process.step3.title', { defaultValue: 'Share Your Link' }),
-      description: t('partners.process.step3.description', { defaultValue: 'Receive your unique affiliate link to track your conversions' }),
+      title: t('marketing:partners.process.steps.2.title'),
+      description: t('marketing:partners.process.steps.2.description'),
     },
     {
       number: '4',
-      title: t('partners.process.step4.title', { defaultValue: 'Earn Commissions' }),
-      description: t('partners.process.step4.description', { defaultValue: 'Receive recurring commissions for every client who subscribes' }),
+      title: t('marketing:partners.process.steps.3.title'),
+      description: t('marketing:partners.process.steps.3.description'),
     },
   ];
 
   const profiles = [
     {
       icon: UserPlus,
-      title: t('partners.profiles.consultants.title', { defaultValue: 'Wedding Consultants' }),
-      description: t('partners.profiles.consultants.description', { defaultValue: 'Advisors who work with couples and can recommend professional tools' }),
+      title: t('marketing:partners.profiles.items.0.title'),
+      description: t('marketing:partners.profiles.items.0.description'),
     },
     {
       icon: Star,
-      title: t('partners.profiles.influencers.title', { defaultValue: 'Industry Influencers' }),
-      description: t('partners.profiles.influencers.description', { defaultValue: 'Content creators with audiences interested in wedding organization' }),
+      title: t('marketing:partners.profiles.items.1.title'),
+      description: t('marketing:partners.profiles.items.1.description'),
     },
     {
       icon: Users,
-      title: t('partners.profiles.eventPros.title', { defaultValue: 'Event Professionals' }),
-      description: t('partners.profiles.eventPros.description', { defaultValue: 'Event organizers who can introduce our platform to their contact network' }),
+      title: t('marketing:partners.profiles.items.2.title'),
+      description: t('marketing:partners.profiles.items.2.description'),
     },
   ];
 
   const experienceOptions = [
-    { value: 'consultant', label: t('partners.form.experience.consultant', { defaultValue: 'Wedding Consultant' }) },
-    { value: 'influencer', label: t('partners.form.experience.influencer', { defaultValue: 'Influencer / Content Creator' }) },
-    { value: 'event-pro', label: t('partners.form.experience.eventPro', { defaultValue: 'Event Professional' }) },
-    { value: 'supplier', label: t('partners.form.experience.supplier', { defaultValue: 'Wedding Services Provider' }) },
-    { value: 'other', label: t('partners.form.experience.other', { defaultValue: 'Other' }) },
+    { value: 'consultant', label: t('marketing:partners.form.fields.experience.options.0.label') },
+    { value: 'influencer', label: t('marketing:partners.form.fields.experience.options.1.label') },
+    { value: 'event-pro', label: t('marketing:partners.form.fields.experience.options.2.label') },
+    { value: 'supplier', label: t('marketing:partners.form.fields.experience.options.3.label') },
+    { value: 'other', label: t('marketing:partners.form.fields.experience.options.4.label') },
   ];
 
   const handleContactSubmit = (event) => {
     event.preventDefault();
 
     if (!contactName.trim() || !contactEmail.trim()) {
-      setFormMessage(t('partners.form.error', { defaultValue: 'Please complete all required fields' }));
+      setFormMessage(t('marketing:partners.form.messages.error'));
       setFormStatus('error');
       return;
     }
@@ -145,7 +146,7 @@ export default function PartnersNew() {
     setFormStatus(null);
 
     window.setTimeout(() => {
-      setFormMessage(t('partners.form.success', { defaultValue: 'Thank you for your interest! We will review your application and contact you soon' }));
+      setFormMessage(t('marketing:partners.form.messages.success'));
       setFormStatus('success');
       setContactName('');
       setContactEmail('');
@@ -156,26 +157,77 @@ export default function PartnersNew() {
   };
 
   return (
-    <PageWrapper>
-      <HeroSection
-        title={t('partners.hero.title', { defaultValue: 'Earn Commissions Helping Couples Organize Their Perfect Wedding' })}
-        subtitle={t('partners.hero.subtitle', { defaultValue: 'Join our partner program and receive recurring commissions for every client you refer. No initial investment. Attractive commissions. Marketing materials included.' })}
+    <>
+      <Helmet>
+        <title>Planivia para Proveedores de Bodas | Recibe Contactos Cualificados</title>
+        <meta name="description" content="Únete a la red de proveedores de bodas de Planivia. Genera leads cualificados, gestiona solicitudes y haz crecer tu negocio. Sistema de pago por vista." />
+        <meta name="keywords" content="proveedores bodas, red proveedores boda, leads bodas, contactos bodas, marketplace bodas" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Planivia para Proveedores de Bodas" />
+        <meta property="og:description" content="Genera leads cualificados y haz crecer tu negocio de bodas con Planivia. Sistema justo de pago por vista." />
+        <meta property="og:url" content="https://planivia.net/para-proveedores" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Planivia para Proveedores de Bodas" />
+        <meta name="twitter:description" content="Genera leads y haz crecer tu negocio de bodas" />
+        
+        {/* Canonical */}
+        <link rel="canonical" href="https://planivia.net/para-proveedores" />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": "Planivia para Proveedores",
+            "serviceType": "Generación de leads cualificados para proveedores de bodas",
+            "provider": {
+              "@type": "Organization",
+              "name": "Planivia",
+              "url": "https://planivia.net"
+            },
+            "areaServed": {
+              "@type": "Country",
+              "name": "España"
+            },
+            "serviceAudience": {
+              "@type": "Audience",
+              "audienceType": "Proveedores y profesionales de bodas"
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": "https://planivia.net/para-proveedores",
+              "priceCurrency": "EUR",
+              "availability": "https://schema.org/InStock",
+              "description": "Sistema de pago por visualización con portafolio, analítica y mensajería integrada"
+            }
+          })}
+        </script>
+      </Helmet>
+      
+      <PageWrapper>
+        <HeroSection
+        title={t('marketing:partners.hero.title')}
+        subtitle={t('marketing:partners.hero.description.0') + ' ' + t('marketing:partners.hero.description.1')}
         image="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&auto=format&fit=crop&q=80"
       >
         <div className="flex gap-4">
           <PrimaryButton onClick={() => document.getElementById('partners-form')?.scrollIntoView({ behavior: 'smooth' })}>
-            {t('partners.hero.cta', { defaultValue: 'Apply to Program' })}
+            {t('marketing:partners.hero.cta')}
           </PrimaryButton>
           <SecondaryButton onClick={() => navigate('/contacto')}>
-            {t('partners.hero.secondary', { defaultValue: 'Contact Us' })}
+            {t('marketing:nav.contact')}
           </SecondaryButton>
         </div>
       </HeroSection>
 
       <Container>
         <SectionTitle
-          title={t('partners.benefits.title', { defaultValue: 'Why Be a Partner' })}
-          subtitle={t('partners.benefits.subtitle', { defaultValue: 'Benefits designed to maximize your income potential' })}
+          title={t('marketing:partners.benefits.title')}
+          subtitle={t('marketing:partners.benefits.subtitle')}
         />
         <div className="grid md:grid-cols-3 gap-6">
           {benefits.map((benefit, index) => (
@@ -186,8 +238,8 @@ export default function PartnersNew() {
 
       <Container>
         <SectionTitle
-          title={t('partners.process.title', { defaultValue: 'How It Works' })}
-          subtitle={t('partners.process.subtitle', { defaultValue: 'Start generating income in 4 simple steps' })}
+          title={t('marketing:partners.process.title')}
+          subtitle={t('marketing:partners.process.subtitle')}
         />
         <div className="grid md:grid-cols-4 gap-8">
           {processSteps.map((step, index) => (
@@ -232,8 +284,8 @@ export default function PartnersNew() {
 
       <Container>
         <SectionTitle
-          title={t('partners.profiles.title', { defaultValue: 'Are You a Good Candidate?' })}
-          subtitle={t('partners.profiles.subtitle', { defaultValue: 'We seek professionals with connections in the wedding industry' })}
+          title={t('marketing:partners.profiles.title')}
+          subtitle={t('marketing:partners.profiles.subtitle')}
         />
         <div className="grid md:grid-cols-3 gap-6">
           {profiles.map((profile, index) => (
@@ -298,7 +350,7 @@ export default function PartnersNew() {
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
               }}>
-                {t('partners.form.badge', { defaultValue: 'Access Request' })}
+                {t('marketing:partners.form.badge')}
               </span>
             </div>
             <h2 style={{
@@ -309,7 +361,7 @@ export default function PartnersNew() {
               marginBottom: '12px',
               letterSpacing: '-0.01em',
             }}>
-              {t('partners.form.title', { defaultValue: 'Join the Partner Program' })}
+              {t('marketing:partners.form.title')}
             </h2>
             <p style={{
               fontFamily: theme.fonts.body,
@@ -317,7 +369,7 @@ export default function PartnersNew() {
               color: theme.colors.textSecondary,
               lineHeight: '1.6',
             }}>
-              {t('partners.form.description', { defaultValue: 'Complete the form and our team will review your application. We will contact you within 48 hours.' })}
+              {t('marketing:partners.form.description')}
             </p>
           </div>
 
@@ -334,14 +386,14 @@ export default function PartnersNew() {
                   marginBottom: '8px',
                 }}
               >
-                {t('partners.form.name', { defaultValue: 'Full Name *' })}
+                {t('marketing:partners.form.fields.name.label')}
               </label>
               <input
                 id="contact-name"
                 type="text"
                 value={contactName}
                 onChange={(e) => setContactName(e.target.value)}
-                placeholder={t('partners.form.namePlaceholder', { defaultValue: 'Your name' })}
+                placeholder={t('marketing:partners.form.fields.name.placeholder')}
                 required
                 style={{
                   width: '100%',
@@ -371,14 +423,14 @@ export default function PartnersNew() {
                   marginBottom: '8px',
                 }}
               >
-                {t('partners.form.email', { defaultValue: 'Email *' })}
+                {t('marketing:partners.form.fields.email.label')}
               </label>
               <input
                 id="contact-email"
                 type="email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
-                placeholder={t('partners.form.emailPlaceholder', { defaultValue: 'your@email.com' })}
+                placeholder={t('marketing:partners.form.fields.email.placeholder')}
                 required
                 style={{
                   width: '100%',
@@ -408,7 +460,7 @@ export default function PartnersNew() {
                   marginBottom: '8px',
                 }}
               >
-                {t('partners.form.experienceLabel', { defaultValue: 'Industry Experience' })}
+                {t('marketing:partners.form.fields.experience.label')}
               </label>
               <select
                 id="contact-experience"
@@ -429,7 +481,7 @@ export default function PartnersNew() {
                 onBlur={(e) => e.target.style.borderColor = theme.colors.borderSoft}
               >
                 <option value="">
-                  {t('partners.form.experiencePlaceholder', { defaultValue: 'Select an option' })}
+                  {t('marketing:partners.form.fields.experience.placeholder')}
                 </option>
                 {experienceOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -451,13 +503,13 @@ export default function PartnersNew() {
                   marginBottom: '8px',
                 }}
               >
-                {t('partners.form.about', { defaultValue: 'Tell us about you' })}
+                {t('marketing:partners.form.fields.about.label')}
               </label>
               <textarea
                 id="contact-message"
                 value={contactMessage}
                 onChange={(e) => setContactMessage(e.target.value)}
-                placeholder={t('partners.form.aboutPlaceholder', { defaultValue: 'Describe your experience, your contact network and why you want to be a partner...' })}
+                placeholder={t('marketing:partners.form.fields.about.placeholder')}
                 rows={5}
                 style={{
                   width: '100%',
@@ -479,8 +531,8 @@ export default function PartnersNew() {
             <PrimaryButton type="submit" disabled={isSubmitting} style={{ width: '100%' }}>
               <Send className="w-4 h-4 mr-2" />
               {isSubmitting
-                ? t('partners.form.submitting', { defaultValue: 'Sending...' })
-                : t('partners.form.submit', { defaultValue: 'Submit Application' })}
+                ? t('marketing:partners.form.submitting')
+                : t('marketing:partners.form.submit')}
             </PrimaryButton>
 
             {formMessage && (
@@ -516,7 +568,7 @@ export default function PartnersNew() {
               color: theme.colors.textSecondary,
               lineHeight: '1.6',
             }}>
-              {t('partners.form.consent', { defaultValue: 'By submitting this form you agree that we review your profile and contact you. We do not share your information with third parties.' })}
+              {t('marketing:partners.form.consent')}
             </p>
           </div>
         </div>
@@ -540,7 +592,7 @@ export default function PartnersNew() {
             marginBottom: '16px',
             letterSpacing: '-0.01em',
           }}>
-            {t('partners.cta.title', { defaultValue: 'Ready to Start Generating Recurring Income?' })}
+            {t('marketing:partners.finalCta.title')}
           </h2>
           <p style={{
             fontFamily: theme.fonts.body,
@@ -548,10 +600,10 @@ export default function PartnersNew() {
             color: theme.colors.textSecondary,
             marginBottom: '32px',
           }}>
-            {t('partners.cta.subtitle', { defaultValue: 'Join our partner program and start earning commissions today' })}
+            {t('marketing:partners.finalCta.description')}
           </p>
           <PrimaryButton onClick={() => document.getElementById('partners-form')?.scrollIntoView({ behavior: 'smooth' })}>
-            {t('partners.cta.primary', { defaultValue: 'Apply Now' })}
+            {t('marketing:partners.finalCta.primary')}
           </PrimaryButton>
         </div>
       </Container>
@@ -566,10 +618,11 @@ export default function PartnersNew() {
             fontSize: '14px',
             color: theme.colors.textSecondary,
           }}>
-            {t('footer.copyright', { defaultValue: '© 2025 Wedding Planner. Making dream weddings come true.' })}
+            {t('marketing:common.copyright', { year: 2025 })}
           </p>
         </div>
       </footer>
-    </PageWrapper>
+      </PageWrapper>
+    </>
   );
 }

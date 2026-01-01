@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   AlignLeft, 
   AlignCenter, 
@@ -10,6 +11,7 @@ import {
 } from 'lucide-react';
 
 export default function AlignmentTools({ canvasRef }) {
+  const { t } = useTranslation(['designs']);
   const align = (type) => {
     const canvas = canvasRef.current?.getCanvas();
     if (!canvas) return;
@@ -59,7 +61,7 @@ export default function AlignmentTools({ canvasRef }) {
 
     const activeSelection = canvas.getActiveObject();
     if (!activeSelection || activeSelection.type !== 'activeSelection') {
-      alert('Selecciona múltiples elementos para distribuir');
+      alert(t('designs:editor.alignment.alerts.selectMultiple'));
       return;
     }
 
@@ -72,7 +74,7 @@ export default function AlignmentTools({ canvasRef }) {
     });
 
     if (objects.length < 3) {
-      alert('Necesitas al menos 3 elementos para distribuir');
+      alert(t('designs:editor.alignment.alerts.needThree'));
       return;
     }
 
@@ -100,30 +102,30 @@ export default function AlignmentTools({ canvasRef }) {
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 px-4 py-2">
+    <div className=" border-b  px-4 py-2" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
       <div className="flex items-center gap-1">
-        <span className="text-xs font-medium text-gray-600 mr-2">Alinear:</span>
+        <span className="text-xs font-medium  mr-2" style={{ color: 'var(--color-text-secondary)' }}>{t('designs:editor.alignment.label')}</span>
         
         <button
           onClick={() => align('left')}
-          className="p-1.5 hover:bg-gray-100 rounded"
-          title="Alinear a la izquierda"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          title={t('designs:editor.alignment.alignLeft')}
         >
           <AlignLeft className="w-4 h-4" />
         </button>
         
         <button
           onClick={() => align('center-h')}
-          className="p-1.5 hover:bg-gray-100 rounded"
-          title="Centrar horizontalmente"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          title={t('designs:editor.alignment.alignCenterH')}
         >
           <AlignHorizontalJustifyCenter className="w-4 h-4" />
         </button>
         
         <button
           onClick={() => align('right')}
-          className="p-1.5 hover:bg-gray-100 rounded"
-          title="Alinear a la derecha"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          title={t('designs:editor.alignment.alignRight')}
         >
           <AlignRight className="w-4 h-4" />
         </button>
@@ -132,24 +134,24 @@ export default function AlignmentTools({ canvasRef }) {
         
         <button
           onClick={() => align('top')}
-          className="p-1.5 hover:bg-gray-100 rounded"
-          title="Alinear arriba"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          title={t('designs:editor.alignment.alignTop')}
         >
           <AlignLeft className="w-4 h-4 rotate-90" />
         </button>
         
         <button
           onClick={() => align('center-v')}
-          className="p-1.5 hover:bg-gray-100 rounded"
-          title="Centrar verticalmente"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          title={t('designs:editor.alignment.alignCenterV')}
         >
           <AlignVerticalJustifyCenter className="w-4 h-4" />
         </button>
         
         <button
           onClick={() => align('bottom')}
-          className="p-1.5 hover:bg-gray-100 rounded"
-          title="Alinear abajo"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          title={t('designs:editor.alignment.alignBottom')}
         >
           <AlignRight className="w-4 h-4 rotate-90" />
         </button>
@@ -158,28 +160,28 @@ export default function AlignmentTools({ canvasRef }) {
         
         <button
           onClick={() => align('center')}
-          className="p-1.5 hover:bg-gray-100 rounded"
-          title="Centrar en canvas"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          title={t('designs:editor.alignment.alignCenter')}
         >
           <AlignCenter className="w-4 h-4" />
         </button>
 
         <div className="h-5 w-px bg-gray-300 mx-2" />
         
-        <span className="text-xs font-medium text-gray-600 mr-2">Distribuir:</span>
+        <span className="text-xs font-medium  mr-2" style={{ color: 'var(--color-text-secondary)' }}>{t('designs:editor.alignment.distribute')}</span>
         
         <button
           onClick={() => distribute('horizontal')}
-          className="p-1.5 hover:bg-gray-100 rounded"
-          title="Distribuir horizontalmente"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          title={t('designs:editor.alignment.distributeH')}
         >
           <AlignHorizontalSpaceAround className="w-4 h-4" />
         </button>
         
         <button
           onClick={() => distribute('vertical')}
-          className="p-1.5 hover:bg-gray-100 rounded"
-          title="Distribuir verticalmente"
+          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          title={t('designs:editor.alignment.distributeV')}
         >
           <AlignVerticalSpaceAround className="w-4 h-4" />
         </button>

@@ -33,7 +33,7 @@ const EmailSetupForm = ({
     if (!USERNAME_REGEX.test(trimmed)) {
       setAvailabilityStatus('unavailable');
       setError(
-        'El nombre solo puede contener letras, n�meros, puntos, guiones y guiones bajos. M�nimo 3 caracteres.'
+        'El nombre solo puede contener letras, números, puntos, guiones y guiones bajos. Mínimo 3 caracteres.'
       );
       return;
     }
@@ -56,13 +56,13 @@ const EmailSetupForm = ({
         setError('');
       } else {
         setAvailabilityStatus('unavailable');
-        setError(`El nombre "${trimmed}" ya est� en uso. Por favor elige otro.`);
+        setError(`El nombre "${trimmed}" ya está en uso. Por favor elige otro.`);
       }
     } catch (err) {
       // console.error('Error al comprobar disponibilidad:', err);
       if (lastCheckIdRef.current !== checkId) return;
       setAvailabilityStatus('unavailable');
-      setError('No se pudo verificar la disponibilidad. Int�ntalo nuevamente.');
+      setError('No se pudo verificar la disponibilidad. Inténtalo nuevamente.');
     }
   };
 
@@ -89,7 +89,7 @@ const EmailSetupForm = ({
       }
     } catch (err) {
       // console.error('Error al guardar alias:', err);
-      setError('Error al guardar. Int�ntalo de nuevo m�s tarde.');
+      setError('Error al guardar. Inténtalo de nuevo más tarde.');
     } finally {
       setIsSaving(false);
     }
@@ -98,17 +98,17 @@ const EmailSetupForm = ({
   return (
     <div className="p-5 bg-white border rounded-lg shadow-sm">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">
-        Configura tu correo electr�nico myWed360
+        Configura tu correo electrónico myWed360
       </h2>
 
       <p className="text-gray-600 mb-5">
-        Elige un nombre de usuario �nico para tu correo electr�nico myWed360. Este ser� tu correo
+        Elige un nombre de usuario único para tu correo electrónico myWed360. Este será tu correo
         oficial dentro de la plataforma.
       </p>
 
       <div className="mb-4">
         <label htmlFor="email-username" className="block text-sm font-medium text-gray-700 mb-1">
-          Tu direcci�n de correo:
+          Tu dirección de correo:
         </label>
 
         <div className="flex items-center">
@@ -146,7 +146,7 @@ const EmailSetupForm = ({
           {availabilityStatus === 'available' && username && (
             <div className="flex items-center text-green-600">
               <Check size={16} className="mr-2" />
-              <span className="text-sm">�Nombre disponible!</span>
+              <span className="text-sm">¡Nombre disponible!</span>
             </div>
           )}
 
@@ -171,7 +171,7 @@ const EmailSetupForm = ({
               Guardando...
             </>
           ) : (
-            'Guardar direcci�n de correo'
+            'Guardar dirección de correo'
           )}
         </Button>
       </div>
@@ -180,10 +180,10 @@ const EmailSetupForm = ({
         <p>Notas:</p>
         <ul className="list-disc pl-5 space-y-1 mt-1">
           <li>
-            Tu direcci�n de correo ser� <strong>{username || 'tunombre'}@mywed360</strong>
+            Tu dirección de correo será <strong>{username || 'tunombre'}@mywed360</strong>
           </li>
-          <li>Podr�s enviar y recibir correos desde esta direcci�n</li>
-          <li>Este correo se utilizar� para todas las comunicaciones con proveedores</li>
+          <li>Podrás enviar y recibir correos desde esta dirección</li>
+          <li>Este correo se utilizará para todas las comunicaciones con proveedores</li>
         </ul>
       </div>
     </div>

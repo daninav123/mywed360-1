@@ -231,11 +231,16 @@ router.post('/login', async (req, res) => {
     const cfg = getConfig();
     const normalized = String(email || '').trim().toLowerCase();
 
+    console.log('[ADMIN-LOGIN] Intento de login:', { email: normalized, allowedDomains: getAllowedDomains() });
+
     // Validación de dominio permitido
     if (!isDomainAllowed(normalized)) {
+      console.log('[ADMIN-LOGIN] Dominio rechazado:', normalized);
       registerFailedAttempt(normalized);
       return res.status(401).json({ code: 'domain_not_allowed', message: 'Dominio no autorizado' });
     }
+    
+    console.log('[ADMIN-LOGIN] Dominio aceptado:', normalized);
 
     // Verificar bloqueos por intentos
     const stats = ensureAttemptStats(normalized);

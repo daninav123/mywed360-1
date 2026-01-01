@@ -99,41 +99,27 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
     const paidValue = formData.paidAmount === '' ? 0 : Number(formData.paidAmount);
 
     if (!formData.concept.trim()) {
-      newErrors.concept = t('finance.form.errors.conceptRequired', {
-        defaultValue: 'El concepto es obligatorio',
-      });
+      newErrors.concept = t('finance.form.errors.conceptRequired');
     }
 
     if (!formData.amount || Number.isNaN(amountValue) || amountValue <= 0) {
-      newErrors.amount = t('finance.form.errors.amountPositive', {
-        defaultValue: 'El monto debe ser un Número positivo',
-      });
+      newErrors.amount = t('finance.form.errors.amountPositive');
     }
 
     if (!formData.date) {
-      newErrors.date = t('finance.form.errors.dateRequired', {
-        defaultValue: 'La fecha es obligatoria',
-      });
+      newErrors.date = t('finance.form.errors.dateRequired');
     }
 
     if (!formData.category) {
-      newErrors.category = t('finance.form.errors.categoryRequired', {
-        defaultValue: 'La categoria es obligatoria',
-      });
+      newErrors.category = t('finance.form.errors.categoryRequired');
     }
 
     if (formData.paidAmount !== '' && (Number.isNaN(paidValue) || paidValue < 0)) {
-      newErrors.paidAmount = t('finance.form.errors.paidAmountPositive', {
-        defaultValue: 'El monto pagado debe ser un Número positivo',
-      });
+      newErrors.paidAmount = t('finance.form.errors.paidAmountPositive');
     } else if (!Number.isNaN(amountValue) && paidValue > amountValue) {
-      newErrors.paidAmount = t('finance.form.errors.paidAmountExceeds', {
-        defaultValue: 'El monto pagado no puede superar el total',
-      });
+      newErrors.paidAmount = t('finance.form.errors.paidAmountExceeds');
     } else if (formData.type === 'expense' && formData.status === 'partial' && paidValue <= 0) {
-      newErrors.paidAmount = t('finance.form.errors.paidAmountRequired', {
-        defaultValue: 'Registra cunto has pagado para marcar el estado como parcial',
-      });
+      newErrors.paidAmount = t('finance.form.errors.paidAmountRequired');
     }
 
     setErrors(newErrors);
@@ -256,7 +242,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
   // Obtener categorias segn el tipo
   const availableCategories = categories[formData.type] || [];
-  const categoryLabel = t('finance.form.category', { defaultValue: 'Categoría' });
+  const categoryLabel = t('finance.form.category');
   const paymentMethods = [
     'Transferencia',
     'Tarjeta',
@@ -270,23 +256,23 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       ? [
           {
             value: 'expected',
-            label: t('finance.form.status.expected', { defaultValue: 'Esperado' }),
+            label: t('finance.form.status.expected'),
           },
           {
             value: 'received',
-            label: t('finance.form.status.received', { defaultValue: 'Recibido' }),
+            label: t('finance.form.status.received'),
           },
         ]
       : [
           {
             value: 'pending',
-            label: t('finance.form.status.pending', { defaultValue: 'Pendiente' }),
+            label: t('finance.form.status.pending'),
           },
           {
             value: 'partial',
-            label: t('finance.form.status.partial', { defaultValue: 'Pago parcial' }),
+            label: t('finance.form.status.partial'),
           },
-          { value: 'paid', label: t('finance.form.status.paid', { defaultValue: 'Pagado' }) },
+          { value: 'paid', label: t('finance.form.status.paid') },
         ];
 
   const numericAmount = Number(formData.amount) || 0;
@@ -304,7 +290,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Tipo de transacción */}
       <div>
         <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-2">
-          {t('finance.form.type', { defaultValue: 'Tipo de transacción' })}
+          {t('finance.form.type')}
         </label>
         <div className="flex space-x-4">
           <label className="flex items-center">
@@ -316,7 +302,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
               className="mr-2"
             />
             <span className="text-sm text-[color:var(--color-text-80)]">
-              {t('finance.transactions.expense', { defaultValue: 'Gasto' })}
+              {t('finance.transactions.expense')}
             </span>
           </label>
           <label className="flex items-center">
@@ -328,7 +314,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
               className="mr-2"
             />
             <span className="text-sm text-[color:var(--color-text-80)]">
-              {t('finance.transactions.income', { defaultValue: 'Ingreso' })}
+              {t('finance.transactions.income')}
             </span>
           </label>
         </div>
@@ -337,15 +323,13 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Concepto */}
       <div>
         <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
-          {t('finance.form.concept', { defaultValue: 'Concepto' })} *
+          {t('finance.form.concept')} *
         </label>
         <input
           type="text"
           value={formData.concept}
           onChange={(e) => handleChange('concept', e.target.value)}
-          placeholder={t('finance.form.conceptPlaceholder', {
-            defaultValue: 'Ej: Pago de catering, Regalo de boda...',
-          })}
+          placeholder={t('finance.form.conceptPlaceholder')}
           className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] ${
             errors.concept
               ? 'border-[color:var(--color-danger)]'
@@ -360,28 +344,24 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Proveedor / Fuente */}
       <div>
         <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
-          {t('finance.form.provider', { defaultValue: 'Proveedor / Fuente' })}
+          {t('finance.form.provider')}
         </label>
         <input
           type="text"
           value={formData.provider}
           onChange={(e) => handleChange('provider', e.target.value)}
-          placeholder={t('finance.form.providerPlaceholder', {
-            defaultValue: 'Ej: Catering Gourmet, Banco BBVA...',
-          })}
+          placeholder={t('finance.form.providerPlaceholder')}
           className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent border-[color:var(--color-text-20)] bg-[var(--color-surface)] text-[color:var(--color-text)]"
         />
         <p className="mt-1 text-sm text-[color:var(--color-text-70)]">
-          {t('finance.form.providerHint', {
-            defaultValue: 'Identifica con quin se contrata o de dnde proviene el dinero.',
-          })}
+          {t('finance.form.providerHint')}
         </p>
       </div>
 
       {/* Método de pago */}
       <div>
         <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
-          {t('finance.form.paymentMethod', { defaultValue: 'Método de pago' })}
+          {t('finance.form.paymentMethod')}
         </label>
         <select
           value={formData.paymentMethod}
@@ -389,7 +369,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
           className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] border-[color:var(--color-text-20)]"
         >
           <option value="">
-            {t('finance.form.paymentMethodPlaceholder', { defaultValue: 'Selecciona un método' })}
+            {t('finance.form.paymentMethodPlaceholder')}
           </option>
           {paymentMethods.map((method) => (
             <option key={method} value={method}>
@@ -402,7 +382,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Monto */}
       <div>
         <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
-          {t('finance.form.amount', { defaultValue: 'Monto (€)' })} *
+          {t('finance.form.amount')} *
         </label>
         <input
           type="number"
@@ -422,7 +402,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         )}
         {formData.amount && !isNaN(formData.amount) && (
           <p className="mt-1 text-sm text-[color:var(--color-text-70)]">
-            {t('finance.form.amountLabel', { defaultValue: 'Monto:' })}{' '}
+            {t('finance.form.amountLabel')}{' '}
             {formatCurrency(Number(formData.amount))}
           </p>
         )}
@@ -431,7 +411,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Fecha */}
       <div>
         <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
-          {t('finance.form.date', { defaultValue: 'Fecha' })} *
+          {t('finance.form.date')} *
         </label>
         <input
           type="date"
@@ -463,7 +443,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
           }`}
         >
           <option value="">
-            {t('finance.form.selectCategory', { defaultValue: 'Selecciona una categoria' })}
+            {t('finance.form.selectCategory')}
           </option>
           {availableCategories.map((category) => (
             <option key={category} value={category}>
@@ -479,12 +459,12 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Seguimiento de pago */}
       <div>
         <h3 className="text-sm font-medium text-[color:var(--color-text-80)] mb-2">
-          {t('finance.form.paymentTracking', { defaultValue: 'Seguimiento de pago' })}
+          {t('finance.form.paymentTracking')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-[color:var(--color-text-80)] mb-1">
-              {t('finance.form.dueDate', { defaultValue: 'Fecha limite' })}
+              {t('finance.form.dueDate')}
             </label>
             <input
               type="date"

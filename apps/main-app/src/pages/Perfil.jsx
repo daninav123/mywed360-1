@@ -1,15 +1,20 @@
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { Users, X } from 'lucide-react';
+﻿import axios from 'axios';
+import { Users, X, User, Mail, Phone, Calendar, MapPin, Save, Loader, Moon, LogOut, Check } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Mail, Phone, Calendar, MapPin, Save, Loader } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+
+import useDebounce from '../hooks/useDebounce';
 
 import { Card, Button, Input } from '../components/ui';
 import LanguageSelector from '../components/ui/LanguageSelector';
+import NotificationCenter from '../components/NotificationCenter';
+import DarkModeToggle from '../components/DarkModeToggle';
+import Nav from '../components/Nav';
 import SubscriptionWidget from '../components/subscription/SubscriptionWidget';
 import { useWedding } from '../context/WeddingContext';
-import { auth, db } from '../firebaseConfig';
+import { auth } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
 import useRoles from '../hooks/useRoles';
 import { changeLanguage, getCurrentLanguage } from '../i18n';
@@ -18,6 +23,7 @@ import { invitePlanner, getWeddingIdForOwner } from '../services/WeddingService'
 
 function Perfil() {
   const { t } = useTranslation();
+  const [openMenu, setOpenMenu] = useState(false);
   const [subscription, setSubscription] = useState('free');
   const [account, setAccount] = useState({
     name: '',
@@ -42,6 +48,8 @@ function Perfil() {
     dni: '',
   });
   const [lastSavedAt, setLastSavedAt] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const { userProfile, user: authUser } = useAuth();
   const fallbackUid = authUser?.uid || auth.currentUser?.uid || null;
@@ -54,10 +62,17 @@ function Perfil() {
     removeRole,
   } = useRoles(weddingId);
 
-  const handleAccountChange = (e) =>
+  const handleAccountChange = (e) => {
     setAccount((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  const handleBillingChange = (e) =>
+    setHasUnsavedChanges(true);
+  };
+  const handleBillingChange = (e) => {
     setBilling((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setHasUnsavedChanges(true);
+  };
+
+  const debouncedAccount = useDebounce(account, 2000);
+  const debouncedBilling = useDebounce(billing, 2000);
 
   const accountFields = [
     { name: 'name', labelKey: 'profile.account.name', defaultValue: 'Nombre' },
@@ -94,13 +109,13 @@ function Perfil() {
   ];
 
   const billingFields = [
-    { name: 'fullName', labelKey: 'profile.billing.fullName', defaultValue: 'Nombre completo' },
-    { name: 'address', labelKey: 'profile.billing.address', defaultValue: 'Dirección' },
-    { name: 'zip', labelKey: 'profile.billing.zip', defaultValue: 'CP' },
-    { name: 'city', labelKey: 'profile.billing.city', defaultValue: 'Localidad' },
-    { name: 'state', labelKey: 'profile.billing.state', defaultValue: 'Provincia' },
-    { name: 'country', labelKey: 'profile.billing.country', defaultValue: 'País' },
-    { name: 'dni', labelKey: 'profile.billing.dni', defaultValue: 'DNI' },
+    { name: 'fullName', labelKey: 'profile.billing.fullName' },
+    { name: 'address', labelKey: 'profile.billing.address' },
+    { name: 'zip', labelKey: 'profile.billing.zip' },
+    { name: 'city', labelKey: 'profile.billing.city' },
+    { name: 'state', labelKey: 'profile.billing.state' },
+    { name: 'country', labelKey: 'profile.billing.country' },
+    { name: 'dni', labelKey: 'profile.billing.dni' },
   ];
 
   const handleCreateInvite = async () => {
@@ -175,87 +190,260 @@ function Perfil() {
         { account, subscription, billing, updatedAt: serverTimestamp() },
         { merge: true }
       );
-      toast.success(t('profile.success.saved', { defaultValue: 'Perfil guardado' }));
+      toast.success(t('profile.success.saved'));
       try {
         setLastSavedAt(new Date());
       } catch {}
     } catch (e) {
       // console.error(e);
       toast.error(
-        t('profile.errors.savingProfile', { defaultValue: 'Error al guardar el perfil' })
+        t('profile.errors.savingProfile')
       );
     }
   };
 
   useEffect(() => {
     const loadProfileData = async () => {
-      const uid = fallbackUid;
-      if (!uid) return;
+      if (!authUser) return;
       try {
-        const userSnap = await getDoc(doc(db, 'users', uid));
-        if (userSnap.exists()) {
-          const d = userSnap.data();
-          if (d.account) setAccount((prev) => ({ ...prev, ...d.account }));
-          if (d.subscription) setSubscription(d.subscription);
-          if (d.billing) setBilling(d.billing);
-          // Apply saved language preference if any
-          try {
-            const savedLang = d?.preferences?.language;
-            if (savedLang && savedLang !== getCurrentLanguage()) {
-              await changeLanguage(savedLang);
-              try {
-                localStorage.setItem('i18nextLng', savedLang);
-              } catch {}
-              try {
-                if (auth) auth.languageCode = savedLang;
-              } catch {}
-            }
-          } catch {}
-          // Preferencias musicales ahora se gestionan desde Momentos Especiales
-          try {
-            if (d.updatedAt && typeof d.updatedAt.toDate === 'function') {
-              setLastSavedAt(d.updatedAt.toDate());
-            }
-          } catch {}
+        const token = await authUser.getIdToken();
+        const response = await axios.get('http://localhost:4004/api/users/profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (response.data.success) {
+          const { account, billing, subscription, updatedAt } = response.data.profile;
+          if (account) setAccount((prev) => ({ ...prev, ...account }));
+          if (subscription) setSubscription(subscription);
+          if (billing) setBilling(billing);
+          if (updatedAt) setLastSavedAt(new Date(updatedAt));
         }
       } catch (e) {
-        // console.error('Error cargando perfil', e);
-        toast.error(
-          t('profile.errors.loadingProfile', { defaultValue: 'Error al cargar el perfil' })
-        );
+        if (e.response?.status !== 404) {
+          console.error('Error cargando perfil:', e);
+          toast.error(t('profile.errors.loadingProfile', { defaultValue: 'Error cargando perfil' }));
+        }
       }
     };
-    // Preferencias musicales ahora se gestionan desde Momentos Especiales
     loadProfileData();
-  }, [weddingId]);
+  }, [authUser]);
 
-  return (
-    <div className="p-4 max-w-3xl mx-auto space-y-6">
-      <div className="page-header">
-        <h1 className="page-title">{t('navigation.profile', { defaultValue: 'Perfil' })}</h1>
-        <div className="mt-2">
-          <LanguageSelector />
-        </div>
-        {lastSavedAt && (
-          <div className="text-sm text-muted">
-            {t('profile.lastSaved', { defaultValue: 'Último guardado:' })}{' '}
-            {new Date(lastSavedAt).toLocaleString()}
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+
+    const autoSave = async () => {
+      const uid = fallbackUid;
+      if (!uid) return;
+
+      try {
+        if (debouncedAccount.email && !/^\S+@\S+\.\S+$/.test(debouncedAccount.email)) {
+          return;
+        }
+        if (debouncedAccount.whatsNumber && !/^\+?[0-9]{8,15}$/.test(debouncedAccount.whatsNumber.trim())) {
+          return;
+        }
+      } catch {}
+
+      try {
+        setIsSaving(true);
+        await setDoc(
+          doc(db, 'users', uid),
+          { 
+            account: debouncedAccount, 
+            subscription, 
+            billing: debouncedBilling, 
+            updatedAt: serverTimestamp() 
+          },
+          { merge: true }
+        );
+        setLastSavedAt(new Date());
+        setHasUnsavedChanges(false);
+      } catch (e) {
+        console.error('Error auto-guardando perfil:', e);
+      } finally {
+        setIsSaving(false);
+      }
+    };
+
+    autoSave();
+  }, [debouncedAccount, debouncedBilling, subscription, hasUnsavedChanges, fallbackUid]);
+
+   return (<div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        {/* Botones superiores derechos */}
+        <div className="absolute top-4 right-4 flex items-center space-x-3" style={{ zIndex: 100 }}>
+          <LanguageSelector variant="minimal" />
+          
+          <div className="relative" data-user-menu>
+            <button
+              onClick={() => setOpenMenu(!openMenu)}
+              className="w-11 h-11 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center"
+              title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })}
+              style={{
+                backgroundColor: openMenu ? 'var(--color-lavender)' : 'rgba(255, 255, 255, 0.95)',
+                border: `2px solid ${openMenu ? 'var(--color-primary)' : 'rgba(255,255,255,0.8)'}`,
+                boxShadow: openMenu ? '0 4px 12px rgba(94, 187, 255, 0.3)' : '0 2px 8px rgba(0,0,0,0.15)',
+              }}
+            >
+              <User className="w-5 h-5" style={{ color: openMenu ? 'var(--color-primary)' : 'var(--color-text-secondary)' }} />
+            </button>
+            
+            {openMenu && (
+              <div 
+                className="absolute right-0 mt-3 bg-[var(--color-surface)] p-2 space-y-1"
+                style={{
+                  minWidth: '220px',
+                  border: '1px solid var(--color-border-soft)',
+                  borderRadius: 'var(--radius-lg)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  zIndex: 9999,
+                }}
+              >
+                <div className="px-2 py-1">
+                  <NotificationCenter />
+                </div>
+
+                <Link
+                  to="/perfil"
+                  onClick={() => setOpenMenu(false)}
+                  className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
+                  style={{ color: 'var(--color-text)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <User className="w-4 h-4 mr-3" />
+                  {t('navigation.profile', { defaultValue: 'Perfil' })}
+                </Link>
+
+                <Link
+                  to="/email"
+                  onClick={() => setOpenMenu(false)}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
+                  style={{ color: 'var(--color-text)' }}
+                >
+                  <Mail className="w-4 h-4 mr-3" />
+                  {t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
+                </Link>
+
+                <div 
+                  className="px-3 py-2.5 rounded-xl transition-all duration-200"
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm flex items-center" style={{ color: 'var(--color-text)' }}>
+                      <Moon className="w-4 h-4 mr-3" />
+                      {t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}
+                    </span>
+                    <DarkModeToggle className="ml-2" />
+                  </div>
+                </div>
+
+                <div style={{ height: '1px', backgroundColor: 'var(--color-border-soft)', margin: '8px 0' }}></div>
+                
+                <button
+                  onClick={() => {
+                    auth.signOut();
+                    setOpenMenu(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center"
+                  style={{ color: 'var(--color-danger)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <LogOut className="w-4 h-4 mr-3" />
+                  {t('navigation.logout', { defaultValue: 'Cerrar sesión' })}
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      {/* Suscripción Real con Stripe */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-medium">
-          {t('profile.subscription.type', { defaultValue: 'Tipo de suscripción' })}
-        </h2>
-        <SubscriptionWidget />
-      </div>
+        </div>
+      <div className="mx-auto my-8" style={{
+        maxWidth: '1024px',
+        width: '100%',
+        backgroundColor: '#FFFBF7',
+        borderRadius: '32px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        overflow: 'hidden'
+      }}>
+        
+        {/* Hero con degradado beige-dorado */}
+        <header className="relative overflow-hidden" style={{
+          background: 'linear-gradient(135deg, #FFF4E6 0%, #F8EFE3 50%, #E8D5C4 100%)',
+          padding: '48px 32px 32px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div className="max-w-4xl mx-auto" style={{ textAlign: 'center' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              gap: '16px',
+              marginBottom: '12px'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to right, transparent, #D4A574)',
+              }} />
+              <h1 style={{
+                fontFamily: "'Playfair Display', 'Cormorant Garamond', serif",
+                fontSize: '40px',
+                fontWeight: 400,
+                color: '#1F2937',
+                letterSpacing: '-0.01em',
+                margin: 0,
+              }}>{t('navigation.profile')}</h1>
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(to left, transparent, #D4A574)',
+              }} />
+            </div>
+            <p style={{
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginBottom: 0,
+            }}>Perfil de Usuario</p>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            {isSaving ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" style={{ color: 'var(--color-primary)' }} />
+                <span style={{ color: 'var(--color-text-secondary)' }}>Guardando...</span>
+              </>
+            ) : lastSavedAt ? (
+              <>
+                <Check className="w-4 h-4" style={{ color: '#10B981' }} />
+                <span style={{ color: 'var(--color-text-secondary)' }}>
+                  {t('profile.synced', { defaultValue: 'Sincronizado' })}
+                </span>
+              </>
+            ) : null}
+          </div>
+        </header>
 
-      <Card className="space-y-4">
-        <h2 className="text-lg font-medium">
-          {t('profile.account.title', { defaultValue: 'Información de la cuenta' })}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Contenido */}
+        <div className="px-6 py-6 space-y-6">
+          
+          {/* Suscripción Real con Stripe */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-medium">
+              {t('profile.subscription.type')}
+            </h2>
+            <SubscriptionWidget />
+          </div>
+
+          <Card className="space-y-4">
+            <h2 className="text-lg font-medium">
+              {t('profile.account.title')}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {accountFields.map((field) => (
             <Input
               key={field.name}
@@ -264,20 +452,17 @@ function Perfil() {
               type={field.type}
               placeholder={
                 field.placeholderKey
-                  ? t(field.placeholderKey, { defaultValue: field.placeholderDefault })
+                  ? t(field.placeholderKey)
                   : field.placeholder
               }
               value={account[field.name] ?? ''}
               onChange={handleAccountChange}
             />
-          ))}
-        </div>
-        <div className="text-right">
-          <Button onClick={saveProfile}>{t('app.save', { defaultValue: 'Guardar' })}</Button>
-        </div>
-      </Card>
+              ))}
+            </div>
+          </Card>
 
-      <Card className="space-y-4">
+          <Card className="space-y-4">
         <h2 className="text-lg font-medium flex items-center">
           <Users className="w-5 h-5 mr-2" />
           {t('profile.collaborators.title', { defaultValue: 'Colaboradores' })}
@@ -348,7 +533,7 @@ function Perfil() {
                     {c.role !== 'owner' && (
                       <button
                         onClick={() => removeRole(c.userId || c.uid)}
-                        className="text-red-500 hover:text-red-700"
+                        className=" hover:text-red-700" style={{ color: 'var(--color-danger)' }}
                       >
                         <X size={16} />
                       </button>
@@ -376,12 +561,13 @@ function Perfil() {
             />
           ))}
         </div>
-        <div className="text-right">
-          <Button onClick={saveProfile}>{t('app.save', { defaultValue: 'Guardar' })}</Button>
-        </div>
       </Card>
+        </div>
+      </div>
+      <Nav />
     </div>
   );
 }
 
 export default Perfil;
+

@@ -458,7 +458,7 @@ const distributeIncrease = (amounts, indices, delta) => {
     
     // Validar que se haya seleccionado una categoría (solo para nuevas)
     if (!editingCategory && !newCategory.categoryId) {
-      toast.error(t('finance.budget.errors.categoryRequired', { defaultValue: 'Por favor selecciona una categoría' }));
+      toast.error(t('finance.budget.errors.categoryRequired'));
       return;
     }
     
@@ -496,7 +496,6 @@ const distributeIncrease = (amounts, indices, delta) => {
   const handleDeleteCategory = (index, categoryName) => {
     const confirmMessage = t('finance.budget.confirmDelete', {
       category: categoryName,
-      defaultValue: 'Are you sure you want to delete the category "{{category}}"?',
     });
     if (window.confirm(confirmMessage)) {
       onRemoveCategory(index);
@@ -547,11 +546,8 @@ const distributeIncrease = (amounts, indices, delta) => {
         const message = result.reason
           ? t('finance.budget.advisorErrors.applyFailedWithReason', {
               reason: result.reason,
-              defaultValue: 'Unable to apply the scenario ({{reason}}).',
             })
-          : t('finance.budget.advisorErrors.applyFailed', {
-              defaultValue: 'Unable to apply the recommended scenario.',
-            });
+          : t('finance.budget.advisorErrors.applyFailed');
         toast.error(message);
       } else {
         setShowAdvisorModal(false);
@@ -577,63 +573,6 @@ const distributeIncrease = (amounts, indices, delta) => {
 
   return (
     <div className="space-y-6">
-      {/* Stats Cards Premium */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4 border-[color:var(--color-primary-30)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
-                {t('finance.budget.totalBudget', { defaultValue: 'Presupuesto Total' })}
-              </p>
-              <p className="text-2xl font-black text-body">{formatCurrency(totalBudgetValue)}</p>
-            </div>
-            <Wallet className="w-8 h-8 text-[color:var(--color-primary-40)]" />
-          </div>
-        </Card>
-
-        <Card className="p-4 border-[color:var(--color-danger-30)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-danger)] mb-1">
-                {t('finance.budget.totalSpent', { defaultValue: 'Total Gastado' })}
-              </p>
-              <p className="text-2xl font-black text-[color:var(--color-danger)]">
-                {formatCurrency(totalSpent)}
-              </p>
-            </div>
-            <TrendingDown className="w-8 h-8 text-[color:var(--color-danger-40)]" />
-          </div>
-        </Card>
-
-        <Card className="p-4 border-[color:var(--color-success-30)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
-                {t('finance.budget.remaining', { defaultValue: 'Restante' })}
-              </p>
-              <p className="text-2xl font-black text-[color:var(--color-success)]">
-                {formatCurrency(budgetRemaining)}
-              </p>
-            </div>
-            <TrendingUp className="w-8 h-8 text-[color:var(--color-success-40)]" />
-          </div>
-        </Card>
-
-        <Card className="p-4 border-[color:var(--color-warning-30)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
-                {t('finance.budget.usage', { defaultValue: 'Uso' })}
-              </p>
-              <p className="text-2xl font-black text-[color:var(--color-warning)]">
-                {totalUsagePercent.toFixed(1)}%
-              </p>
-            </div>
-            <PieChart className="w-8 h-8 text-[color:var(--color-warning-40)]" />
-          </div>
-        </Card>
-      </div>
-
       {/* Actions Bar */}
       <Card className="p-4">
         <div className="flex justify-between items-center flex-wrap gap-3">

@@ -1,4 +1,4 @@
-import { doc, onSnapshot, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore';
+﻿import { doc, onSnapshot, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore';
 import { ArrowLeft, CheckCircle, Circle } from 'lucide-react';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -198,27 +198,22 @@ export default function BodaDetalle() {
   };
 
   return (
-    <PageWrapper
-      title={wedding.name?.trim() ? wedding.name : fallbackTitle}
-      actions={
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold px-2 py-1 rounded bg-blue-100 text-blue-700">
-            {eventLabel}
-          </span>
-          <span
-            className={`text-xs font-semibold px-2 py-1 rounded ${
-              isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
-            }`}
-          >
-            {isActive ? 'Activa' : 'Archivada'}
-          </span>
-          <Button variant="outline" size="sm" disabled={updatingState} onClick={toggleArchive}>
-            {isActive ? 'Archivar' : 'Restaurar'}
-          </Button>
-        </div>
-      }
-      className="max-w-4xl mx-auto"
-    >
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-xs font-semibold px-2 py-1 rounded bg-blue-100 text-blue-700">
+          {eventLabel}
+        </span>
+        <span
+          className={`text-xs font-semibold px-2 py-1 rounded ${
+            isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
+          }`}
+        >
+          {isActive ? 'Activa' : 'Archivada'}
+        </span>
+        <Button variant="outline" size="sm" disabled={updatingState} onClick={toggleArchive}>
+          {isActive ? 'Archivar' : 'Restaurar'}
+        </Button>
+      </div>
       <button
         onClick={() => navigate(-1)}
         className="flex items-center text-[color:var(--color-accent)] hover:underline"
@@ -240,37 +235,37 @@ export default function BodaDetalle() {
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-[color:var(--color-text)]">
             {styleLabel && (
               <div>
-                <dt className="font-medium text-gray-500">Estilo</dt>
+                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Estilo</dt>
                 <dd>{styleLabel}</dd>
               </div>
             )}
             {guestLabel && (
               <div>
-                <dt className="font-medium text-gray-500">Tamaño estimado</dt>
+                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Tamaño estimado</dt>
                 <dd>{guestLabel}</dd>
               </div>
             )}
             {formalityLabel && (
               <div>
-                <dt className="font-medium text-gray-500">Formalidad</dt>
+                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Formalidad</dt>
                 <dd>{formalityLabel}</dd>
               </div>
             )}
             {ceremonyLabel && (
               <div>
-                <dt className="font-medium text-gray-500">Tipo de ceremonia</dt>
+                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Tipo de ceremonia</dt>
                 <dd>{ceremonyLabel}</dd>
               </div>
             )}
             {relatedLabels.length > 0 && (
               <div className="sm:col-span-2">
-                <dt className="font-medium text-gray-500">Eventos relacionados</dt>
+                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Eventos relacionados</dt>
                 <dd>{relatedLabels.join(', ')}</dd>
               </div>
             )}
             {notes && (
               <div className="sm:col-span-2">
-                <dt className="font-medium text-gray-500">Notas</dt>
+                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Notas</dt>
                 <dd>{notes}</dd>
               </div>
             )}
@@ -363,6 +358,6 @@ export default function BodaDetalle() {
           )}
         </ul>
       </section>
-    </PageWrapper>
+    </div>
   );
 }

@@ -284,7 +284,7 @@ function fallbackArticle(input) {
   const conclusion =
     'Con planificación y un buen equipo de profesionales, cualquier idea puede transformarse en un recuerdo inolvidable.';
   const cta =
-    '¿Quieres más inspiración personalizada? Inicia sesión en Lovenda y descubre herramientas exclusivas.';
+    '¿Quieres más inspiración personalizada? Inicia sesión en Planivia y descubre herramientas exclusivas.';
 
   const markdown = buildMarkdownFromAi({ title, excerpt: '', sections, tips, conclusion, cta });
 
@@ -323,8 +323,8 @@ export async function generateBlogArticle(options) {
 
     const baseSystemPrompt =
       language === 'en'
-        ? 'You are a senior wedding editor for Lovenda. You craft helpful, actionable wedding articles with a warm, empathetic tone — sounding like a trusted planner speaking directly to engaged couples. Provide vivid examples grounded in verified information and never invent facts.'
-        : 'Eres editor senior de bodas en Lovenda. Redactas artículos útiles y accionables con un tono cercano, humano y experto, como una planner de confianza que asesora a la pareja. Incluye ejemplos concretos basados en información verificada y nunca inventes datos.';
+        ? 'You are a senior wedding editor for Planivia. You craft helpful, actionable wedding articles with a warm, empathetic tone — sounding like a trusted planner speaking directly to engaged couples. Provide vivid examples grounded in verified information and never invent facts.'
+        : 'Eres editor senior de bodas en Planivia. Redactas artículos útiles y accionables con un tono cercano, humano y experto, como una planner de confianza que asesora a la pareja. Incluye ejemplos concretos basados en información verificada y nunca inventes datos.';
     const authorRolePrompt = input.author
       ? language === 'en'
         ? `Your byline is ${input.author.name}${input.author.title ? `, ${input.author.title}` : ''}.`
@@ -457,7 +457,7 @@ export async function translateBlogArticleToLanguages({
   const baseConclusion = typeof article.conclusion === 'string' ? article.conclusion : '';
   const baseCta = typeof article.cta === 'string' ? article.cta : '';
   const baseTags = Array.isArray(article.tags) ? article.tags : [];
-  const baseTitle = article.title || 'Artículo de Lovenda';
+  const baseTitle = article.title || 'Artículo de Planivia';
   const baseExcerpt = typeof article.excerpt === 'string' ? article.excerpt : '';
 
   const uniqueTargets = Array.from(
@@ -500,9 +500,9 @@ export async function translateBlogArticleToLanguages({
             author.title ? `, ${author.title}` : ''
           }. Preserve this voice, cadence, and personality.`
         : 'Preserve the original narrative voice and warmth.';
-      const systemPrompt = `You are a bilingual wedding editor for Lovenda. Translate wedding content from ${fromDescriptor.english} into ${targetDescriptor.english} while keeping a warm, human, conversational tone. Preserve structure, actionable advice, and factual accuracy. ${authorStyle}`;
+      const systemPrompt = `You are a bilingual wedding editor for Planivia. Translate wedding content from ${fromDescriptor.english} into ${targetDescriptor.english} while keeping a warm, human, conversational tone. Preserve structure, actionable advice, and factual accuracy. ${authorStyle}`;
 
-      const userPrompt = `Translate the following Lovenda wedding article.
+      const userPrompt = `Translate the following Planivia wedding article.
 Source language: ${fromDescriptor.english} (${fromDescriptor.native}).
 Target language: ${targetDescriptor.english} (${targetDescriptor.native}).
 Desired tone: ${tone}.
@@ -655,7 +655,7 @@ export async function generateCoverImageFromPrompt(prompt, options = {}) {
 
     const response = await client.images.generate({
       model: DEFAULT_IMAGE_MODEL,
-      prompt: `${prompt}\nEscenario editorial de bodas, estilo Lovenda, alta calidad.`,
+      prompt: `${prompt}\nEscenario editorial de bodas, estilo Planivia, alta calidad.`,
       size,
       quality,
       n: 1,

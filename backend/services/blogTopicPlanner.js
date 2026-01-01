@@ -30,7 +30,7 @@ function createFallbackPlan(startDate, days, language = 'es') {
     'Bienestar de los novios',
     'Planificación financiera',
     'Ideas para bodas civiles',
-    'Experiencias de parejas Lovenda',
+    'Experiencias de parejas Planivia',
   ];
 
   const entries = [];
@@ -46,7 +46,7 @@ function createFallbackPlan(startDate, days, language = 'es') {
       angle: language.startsWith('en')
         ? 'Actionable tips for engaged couples'
         : 'Consejos prácticos para parejas que se casan',
-      keywords: ['lovenda', 'bodas', 'proveedores'],
+      keywords: ['planivia', 'bodas', 'proveedores'],
       tone: language.startsWith('en') ? 'warm expert' : 'experto cercano',
       audience: language.startsWith('en') ? 'engaged couples' : 'parejas comprometidas',
       language,
@@ -81,8 +81,8 @@ export async function generateDailyTopicPlan({
     const client = await getOpenAiClient();
     const systemPrompt =
       languageCode === 'en'
-        ? 'You are a senior wedding content strategist for Lovenda. Build practical daily blog topics tailored to engaged couples in Spain.'
-        : 'Eres estratega senior de contenidos de bodas para Lovenda. Diseñas temas diarios accionables para parejas que se casan en España.';
+        ? 'You are a senior wedding content strategist for Planivia. Build practical daily blog topics tailored to engaged couples in Spain.'
+        : 'Eres estratega senior de contenidos de bodas para Planivia. Diseñas temas diarios accionables para parejas que se casan en España.';
 
     const userPrompt =
       languageCode === 'en'

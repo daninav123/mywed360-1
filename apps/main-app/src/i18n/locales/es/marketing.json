@@ -16,13 +16,17 @@
     "logoAlt": "Logo MaLove.App",
     "contactLabel": "Contacto MaLove.App"
   },
-  "marketing": {
-    "landing": {
+  "landing": {
       "hero": {
+        "title": "Planifica Tu Boda Perfecta",
+        "subtitle": "Desde '¡Sí!' hasta 'Sí, acepto' - organiza cada momento mágico con la plataforma amada por miles de parejas en todo el mundo",
+        "cta": {
+          "primary": "Empezar a Planificar Gratis",
+          "secondary": "Ver Cómo Funciona"
+        },
         "brandLabel": "MaLove.App",
         "logoAlt": "Logotipo de MaLove.App",
         "badge": "Plataforma todo en uno para planear bodas",
-        "title": "Coordina tu boda soñada en menos tiempo con herramientas profesionales listas para tu equipo.",
         "description": [
           "MaLove.App combina planificación, finanzas, comunicación y diseño en un espacio centralizado.",
           "Simplifica tareas diarias, involucra a proveedores y ofrece a tus invitados una experiencia memorable."
@@ -75,6 +79,22 @@
             "label": "Asistente MaLove.App",
             "message": "\"Tu cronograma está en 82 %. Recomiendo enviar el recordatorio de alojamiento antes del lunes y confirmar proveedores restantes.\""
           }
+        }
+      },
+      "features": {
+        "title": "Todo lo Que Necesitas, Bellamente Organizado",
+        "subtitle": "Herramientas poderosas diseñadas para parejas modernas",
+        "planning": {
+          "title": "Planificación Inteligente",
+          "description": "Organiza cada detalle con cronogramas inteligentes y recordatorios automatizados"
+        },
+        "guests": {
+          "title": "Gestión de Invitados",
+          "description": "Rastrea confirmaciones, preferencias dietéticas y distribución de asientos sin esfuerzo"
+        },
+        "vendors": {
+          "title": "Red de Proveedores",
+          "description": "Conecta con profesionales de bodas de confianza y gestiona todas las comunicaciones"
         }
       },
       "modules": {
@@ -132,8 +152,16 @@
         }
       },
       "benefits": {
+        "title": "Diseñado para Tu Viaje",
+        "subtitle": "Desde el compromiso hasta la luna de miel, te tenemos cubierto",
+        "collaboration": "Colaboración en tiempo real con tu pareja",
+        "time": "Ahorra horas con flujos de trabajo automatizados",
+        "security": "Almacenamiento seguro de documentos y contratos",
+        "design": "Hermosos diseños personalizables",
+        "registry": "Gestión integrada de lista de regalos",
+        "ai": "Asistente de planificación con IA",
         "badge": "Beneficios clave",
-        "title": "Una operación cuidada de principio a fin",
+        "title_extended": "Una operación cuidada de principio a fin",
         "description": "Diseñada para organizadores que necesitan visibilidad y parejas que buscan tranquilidad. MaLove.App automatiza tareas repetitivas y mantiene a todos alineados.",
         "items": {
           "timelines": {
@@ -153,6 +181,17 @@
             "description": "Infraestructura cloud y permisos granulares para resguardar contratos, pagos y contactos."
           }
         }
+      },
+      "social": {
+        "title": "Únete a 50,000+ Parejas Planificando la Boda de Sus Sueños",
+        "quote": "Esta plataforma transformó nuestra planificación de boda de abrumadora a disfrutable. Cada detalle organizado hermosamente en un solo lugar.",
+        "author": "— Sara y Miguel, casados en junio 2024"
+      },
+      "stats": {
+        "couples": "Parejas Felices",
+        "vendors": "Proveedores de Confianza",
+        "tasks": "Tareas Completadas",
+        "rating": "Calificación Promedio"
       },
       "stories": {
         "badge": "Historias reales",
@@ -220,11 +259,41 @@
         "description": "Crea tu cuenta, importa tu lista de invitados y activa automatizaciones que te acompañen desde el primer día.",
         "primary": "Crear cuenta gratuita",
         "secondary": "Comparar planes"
+      },
+      "blog": {
+        "title": "Inspiración y Consejos",
+        "description": "Descubre artículos, guías y tendencias para planificar tu boda perfecta. Desde decoración hasta protocolo, todo lo que necesitas saber.",
+        "cta": {
+          "primary": "Visitar Blog",
+          "secondary": "Ver Artículos"
+        }
+      },
+      "explore": {
+        "title": "Explora Nuestra Plataforma",
+        "subtitle": "Descubre todas las funciones y servicios que ofrecemos",
+        "app": {
+          "title": "App de Planificación",
+          "description": "Suite completa de herramientas para organizar tu día perfecto"
+        },
+        "suppliers": {
+          "title": "Para Proveedores",
+          "description": "Haz crecer tu negocio de bodas con nuestra red de proveedores"
+        },
+        "planners": {
+          "title": "Para Planners",
+          "description": "Herramientas profesionales para negocios de planificación de bodas"
+        },
+        "learnMore": "Saber Más"
       }
     },
     "appOverview": {
       "hero": {
-        "title": "La app que reune todo tu flujo de planificacion en un solo lugar.",
+        "title": "Plataforma Todo-en-Uno para Planificar Bodas",
+        "subtitle": "Todo lo que necesitas para planificar, organizar y celebrar el día perfecto de tu boda - todo en una plataforma hermosa",
+        "cta": {
+          "primary": "Prueba Gratuita",
+          "secondary": "Ver Precios"
+        },
         "description": "Desde el primer checklist hasta el informe final, MaLove.App acompaña a equipos profesionales y parejas que buscan tener control total del evento.",
         "stats": [
           {
@@ -247,9 +316,35 @@
           "tags": ["Panel", "Invitados", "Finanzas", "Comunicacion", "Diseno", "Automatizaciones"]
         }
       },
+      "modulesTitle": "Módulos Principales",
+      "modulesSubtitle": "Herramientas poderosas diseñadas para simplificar cada aspecto de la planificación de bodas",
       "modules": {
         "title": "Modulos clave listos para tu equipo",
         "description": "Cada modulo esta disenado para integrarse con el resto, evitando informacion dispersa y manteniendo a todos en la misma pagina.",
+        "timeline": {
+          "title": "Cronograma Inteligente",
+          "description": "Organiza cada detalle con gestión inteligente de tareas y recordatorios automatizados"
+        },
+        "guests": {
+          "title": "Gestión de Invitados",
+          "description": "Sistema completo de RSVP con planos de asientos y seguimiento dietético"
+        },
+        "budget": {
+          "title": "Presupuesto y Finanzas",
+          "description": "Rastrea gastos, pagos y contratos de proveedores en tiempo real"
+        },
+        "communication": {
+          "title": "Centro de Comunicación",
+          "description": "Envía invitaciones, actualizaciones y recordatorios a todos los invitados"
+        },
+        "design": {
+          "title": "Estudio de Diseño",
+          "description": "Crea hermosas invitaciones y sitios web de bodas"
+        },
+        "analytics": {
+          "title": "Panel de Analíticas",
+          "description": "Información en tiempo real y seguimiento de progreso para tu boda"
+        },
         "items": [
           {
             "title": "Panel colaborativo",
@@ -277,6 +372,32 @@
           }
         ]
       },
+      "features": {
+        "vendors": "Gestión de proveedores y contratos",
+        "notifications": "Notificaciones y recordatorios inteligentes",
+        "storage": "Almacenamiento seguro de documentos",
+        "mobile": "App móvil para iOS y Android",
+        "collaboration": "Herramientas de planificación colaborativa",
+        "export": "Herramientas de exportación y reportes"
+      },
+      "integration": {
+        "title": "Todo Funciona Perfectamente Integrado",
+        "subtitle": "Todos los módulos están profundamente integrados para proporcionar una experiencia unificada. Los cambios se sincronizan automáticamente en cada función."
+      },
+      "collaboration": {
+        "title": "Construido para Colaboración",
+        "description": "Invita a tu pareja, familia y wedding planner a colaborar en tiempo real. Todos se mantienen actualizados con notificaciones automáticas y acceso compartido a planes, presupuestos y listas de invitados.",
+        "sync": "Sincronización en tiempo real en todos los dispositivos",
+        "permissions": "Permisos basados en roles para miembros del equipo",
+        "activity": "Feed de actividad con historial completo",
+        "comments": "Comentarios y notas en cada elemento"
+      },
+      "cta": {
+        "title": "¿Listo para Comenzar?",
+        "subtitle": "Únete a miles de parejas planificando la boda de sus sueños",
+        "primary": "Empezar Gratis",
+        "secondary": "Ver Planes de Precios"
+      },
       "integrations": {
         "title": "Integraciones y automatizaciones que trabajan por ti.",
         "description": "Conecta MaLove.App con servicios de pago, calendarios y herramientas de comunicacion. Configura disparadores automaticos para RSVP, confirmaciones de proveedores o seguimiento de tareas.",
@@ -294,12 +415,91 @@
     },
     "pricing": {
       "title": "Precios simples y transparentes",
+      "subtitle": "Elige el plan perfecto para tu boda. Todos los planes incluyen 14 días de prueba gratuita.",
+      "billingCycle": {
+        "monthly": "Mensual",
+        "annual": "Anual",
+        "savePercent": "Ahorra 17%"
+      },
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "description": "Perfecto para bodas pequeñas e íntimas",
+          "features": {
+            "guests": "Hasta 50 invitados",
+            "budgetTracking": "Seguimiento básico de presupuesto",
+            "taskChecklist": "Lista de tareas",
+            "emailSupport": "Soporte por email",
+            "mobileApp": "Acceso a app móvil",
+            "weddingEvents": "1 evento de boda"
+          }
+        },
+        "professional": {
+          "name": "Professional",
+          "description": "El más popular para bodas completas",
+          "badge": "Más Popular",
+          "features": {
+            "guests": "Hasta 250 invitados",
+            "budgetTools": "Herramientas avanzadas de presupuesto y finanzas",
+            "seatingChart": "Diseñador de planos de mesa",
+            "website": "Sitio web personalizado de boda",
+            "prioritySupport": "Soporte prioritario",
+            "unlimitedVendors": "Proveedores ilimitados",
+            "rsvpManagement": "Gestión de confirmaciones",
+            "giftRegistry": "Integración de lista de regalos"
+          }
+        },
+        "premium": {
+          "name": "Premium",
+          "description": "Para wedding planners y eventos de lujo",
+          "features": {
+            "unlimitedGuests": "Invitados ilimitados",
+            "multiWedding": "Gestión de múltiples bodas",
+            "whiteLabel": "Opciones de marca blanca",
+            "accountManager": "Gestor de cuenta dedicado",
+            "customIntegrations": "Integraciones personalizadas",
+            "teamTools": "Herramientas de colaboración en equipo",
+            "analytics": "Analíticas avanzadas",
+            "apiAccess": "Acceso a API"
+          }
+        }
+      },
+      "perMonth": "mes",
+      "perYear": "año",
+      "startFreeTrial": "Empezar Prueba Gratuita",
+      "faq": {
+        "title": "Preguntas Frecuentes",
+        "subtitle": "Todo lo que necesitas saber sobre nuestros precios",
+        "questions": {
+          "changePlans": {
+            "q": "¿Puedo cambiar de plan más tarde?",
+            "a": "¡Sí! Puedes actualizar o cambiar tu plan en cualquier momento. Los cambios tienen efecto inmediato."
+          },
+          "afterTrial": {
+            "q": "¿Qué pasa después de la prueba gratuita?",
+            "a": "Después de tu prueba de 14 días, se te cobrará según el plan seleccionado. Cancela en cualquier momento durante la prueba sin cargos."
+          },
+          "refunds": {
+            "q": "¿Ofrecen reembolsos?",
+            "a": "Sí, ofrecemos una garantía de devolución de dinero de 30 días en todos los planes anuales."
+          },
+          "multipleWeddings": {
+            "q": "¿Puedo usarlo para múltiples bodas?",
+            "a": "El plan Premium soporta bodas ilimitadas. Los otros planes son para un solo evento de boda."
+          }
+        }
+      },
+      "finalCta": {
+        "title": "¿Aún tienes preguntas?",
+        "subtitle": "Nuestro equipo está aquí para ayudarte a encontrar el plan perfecto",
+        "button": "Contactar Ventas"
+      },
+      "footer": "© 2025 Wedding Planner. Haciendo realidad bodas de ensueño.",
       "free": "Gratis",
       "pro": "Profesional",
       "enterprise": "Empresa",
       "cta": "Empezar ahora"
-    }
-  },
+    },
   "planners": {
     "meta": {
       "title": "MaLove.App para organizadores | Opera múltiples bodas en un solo espacio de trabajo",
@@ -997,5 +1197,23 @@
         "description": "Sistema de pago por visualización con herramientas de portafolio, analítica y mensajería integrada."
       }
     }
+  },
+  "footer": {
+    "product": "Producto",
+    "features": "Funcionalidades",
+    "pricing": "Precios",
+    "demo": "Solicitar Demo",
+    "forProfessionals": "Para Profesionales",
+    "suppliers": "Proveedores",
+    "planners": "Wedding Planners",
+    "partners": "Partners",
+    "company": "Empresa",
+    "about": "Sobre Nosotros",
+    "contact": "Contacto",
+    "blog": "Blog",
+    "support": "Soporte",
+    "help": "Centro de Ayuda",
+    "privacy": "Privacidad",
+    "terms": "Términos"
   }
 }

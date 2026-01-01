@@ -161,7 +161,7 @@ async function seedSettings() {
   if (templates.empty) {
     await ensureOne('adminTemplates', {
       name: 'email-welcome',
-      content: 'Bienvenida Lovenda {nombre}',
+      content: 'Bienvenida Planivia {nombre}',
       updatedAt: new Date().toISOString(),
     }, 'email-welcome');
   }

@@ -1,0 +1,144 @@
+{
+  "header": {
+    "title": "Bienvenidos, {{name}}",
+    "subtitle": "Cada detalle hace que tu boda sea inolvidable",
+    "logoAlt": "Logo de la boda",
+    "titleFallback": "tu boda",
+    "redo": {
+      "button": "Rehacer tutorial",
+      "confirm": "Esto eliminará datos locales y creará una nueva boda de prueba. ¿Continuar?",
+      "success": "Tutorial reiniciado. Recargando...",
+      "error": "No se pudo reiniciar el tutorial"
+    }
+  },
+  "progress": {
+    "tasksLabel": "Progreso de tareas",
+    "completion": "{{value}}% completado",
+    "expected": " · Objetivo: {{value}}%",
+    "loading": "Actualizando progreso...",
+    "error": "No pudimos sincronizar el avance. Se muestra el último valor guardado.",
+    "status": {
+      "complete": "¡Progreso completo!",
+      "ahead": "Vas adelantado al plan previsto",
+      "behind": "Vas por detrás del plan. Revisa tus tareas clave.",
+      "onTrack": "Todo en marcha según el calendario"
+    }
+  },
+  "quickActions": {
+    "provider": "Buscar proveedor",
+    "guest": "Añadir invitado",
+    "movement": "Registrar movimiento",
+    "note": "Nueva nota"
+  },
+  "stats": {
+    "confirmedGuests": "Invitados confirmados",
+    "budgetSpent": "Presupuesto gastado",
+    "budgetValue": "{{spent}}",
+    "budgetValueWithTotal": "{{spent}} / {{total}}",
+    "providers": "Proveedores contratados",
+    "tasksCompleted": "Tareas completadas",
+    "tasksAssigned": "Tareas asignadas",
+    "providersAssigned": "Proveedores asignados"
+  },
+  "gallery": {
+    "title": "Inspiración para tu boda"
+  },
+  "blog": {
+    "title": "Blog",
+    "source": "Fuente:",
+    "viewAll": "Ver todos",
+    "exploreAll": "Explorar todo el blog"
+  },
+  "news": {
+    "error": "No se pudieron encontrar cuatro noticias con imagen en tu idioma en este momento. Inténtalo más tarde."
+  },
+  "providers": {
+    "fallbackName": "Proveedor sin nombre",
+    "addSuccess": "Proveedor añadido al panel de acceso rápido",
+    "addError": "No pudimos guardar el proveedor seleccionado."
+  },
+  "weddingName": {
+    "connector": " y "
+  },
+  "home2": {
+    "header": {
+      "greeting": "¡Hola {{name}} y {{partner}}!",
+      "greetingSingle": "¡Hola {{name}}!",
+      "subtitle": "Planifiquemos tu boda soñada",
+      "guest": "Invitado"
+    },
+    "countdown": {
+      "title": "Cuenta Atrás",
+      "daysToGo": "Días Restantes",
+      "noDate": "Configura la fecha de tu boda",
+      "past": "¡Tu boda ya pasó!"
+    },
+    "budget": {
+      "title": "Presupuesto",
+      "of": "de",
+      "spent": "Gastado"
+    },
+    "guestList": {
+      "title": "Lista de Invitados",
+      "confirmed": "Confirmados",
+      "pending": "Pendientes"
+    },
+    "tasks": {
+      "title": "Próximas Tareas",
+      "noTasks": "No hay tareas pendientes. ¡Buen trabajo!",
+      "untitled": "Tarea sin título"
+    },
+    "budgetChart": {
+      "title": "Resumen del Presupuesto",
+      "spent": "Gastado",
+      "total": "Total",
+      "venue": "Lugar",
+      "catering": "Catering",
+      "flowers": "Flores",
+      "noData": "Aún no hay datos de presupuesto"
+    },
+    "inspiration": {
+      "title": "Tablero de Inspiración",
+      "viewAll": "Ver todas las inspiraciones"
+    }
+  },
+  "modals": {
+    "shared": {
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "goToGuests": "Ir a Invitados",
+      "goToFinance": "Ir a Finanzas",
+      "goToIdeas": "Ir a Ideas"
+    },
+    "guest": {
+      "title": "Añadir invitado",
+      "name": "Nombre",
+      "side": "Pertenece a",
+      "sideBride": "Novia",
+      "sideGroom": "Novio",
+      "sideBoth": "Ambos",
+      "contact": "Contacto",
+      "missingName": "Añade un nombre para el invitado.",
+      "contactNote": "Contacto: {{value}}",
+      "note": "Añadido desde la pantalla de inicio",
+      "success": "Invitado añadido",
+      "error": "No se pudo añadir el invitado",
+      "unknownError": "Ocurrió un error al añadir el invitado."
+    },
+    "movement": {
+      "title": "Registrar movimiento",
+      "concept": "Concepto",
+      "amount": "Cantidad",
+      "date": "Fecha",
+      "type": "Tipo",
+      "expense": "Gasto",
+      "income": "Ingreso",
+      "success": "Movimiento guardado"
+    },
+    "note": {
+      "title": "Nueva nota",
+      "placeholder": "Escribe tu nota aquí...",
+      "success": "Nota guardada"
+    }
+  }
+}

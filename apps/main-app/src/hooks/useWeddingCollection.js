@@ -27,6 +27,15 @@ const lsSet = (wid, name, data) => {
 };
 
 /**
+ * @deprecated Este hook usa Firebase Firestore.
+ * RECOMENDACIÓN: Usa hooks específicos de PostgreSQL en su lugar:
+ * - useGuests() para guests
+ * - useChecklist() para tasks
+ * - useWeddingData() para info de boda
+ * - etc.
+ * 
+ * Este hook seguirá funcionando por compatibilidad, pero se eliminará en versiones futuras.
+ * 
  * Hook para suscribirse a subcolecciones dentro de una boda:
  * weddings/{weddingId}/{subName}
  * Soporta modo offline usando localStorage.

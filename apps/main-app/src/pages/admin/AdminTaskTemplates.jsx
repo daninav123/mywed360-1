@@ -494,8 +494,8 @@ const AdminTaskTemplates = () => {
   const renderVisualView = () => {
     if (!selectedTemplate) {
       return (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 text-center">
-          <p className="text-gray-500">Selecciona una plantilla para ver su estructura visual</p>
+        <div className="rounded-lg border   p-6 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+          <p className="" style={{ color: 'var(--color-muted)' }}>Selecciona una plantilla para ver su estructura visual</p>
         </div>
       );
     }
@@ -510,8 +510,8 @@ const AdminTaskTemplates = () => {
 
     if (blocks.length === 0) {
       return (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 text-center">
-          <p className="text-gray-500">Esta plantilla no tiene bloques definidos</p>
+        <div className="rounded-lg border   p-6 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+          <p className="" style={{ color: 'var(--color-muted)' }}>Esta plantilla no tiene bloques definidos</p>
         </div>
       );
     }
@@ -528,7 +528,7 @@ const AdminTaskTemplates = () => {
               return (
                 <div
                   key={blockIndex}
-                  className="flex-shrink-0 w-80 rounded-lg border border-gray-200 bg-white"
+                  className="flex-shrink-0 w-80 rounded-lg border  " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}
                 >
                   {/* Cabecera - Tarea Padre */}
                   <div className="bg-[var(--color-primary)] px-4 py-3 rounded-t-lg">
@@ -540,7 +540,7 @@ const AdminTaskTemplates = () => {
                           onBlur={(e) => handleSaveBlockEdit(blockIndex, 'name', e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && handleSaveBlockEdit(blockIndex, 'name', e.target.value)}
                           autoFocus
-                          className="bg-white text-gray-900 px-2 py-1 rounded text-sm w-full"
+                          className="  px-2 py-1 rounded text-sm w-full" style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}
                         />
                       ) : (
                         <h3 
@@ -566,14 +566,14 @@ const AdminTaskTemplates = () => {
                             type="number"
                             defaultValue={(block.startPct * 100).toFixed(0)}
                             onBlur={(e) => handleSaveBlockEdit(blockIndex, 'startPct', parseFloat(e.target.value) / 100)}
-                            className="bg-white text-gray-900 px-1 py-0.5 rounded w-12 text-xs"
+                            className="  px-1 py-0.5 rounded w-12 text-xs" style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}
                           />
                           <span className="text-white">-</span>
                           <input
                             type="number"
                             defaultValue={(block.endPct * 100).toFixed(0)}
                             onBlur={(e) => handleSaveBlockEdit(blockIndex, 'endPct', parseFloat(e.target.value) / 100)}
-                            className="bg-white text-gray-900 px-1 py-0.5 rounded w-12 text-xs"
+                            className="  px-1 py-0.5 rounded w-12 text-xs" style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}
                           />
                           <span className="text-white">%</span>
                         </div>
@@ -595,12 +595,12 @@ const AdminTaskTemplates = () => {
                         setSelectedBlockForAdd(blockIndex);
                         setShowAddSubtaskModal(true);
                       }}
-                      className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-xs text-gray-500 hover:border-blue-500 hover:text-blue-600 transition"
+                      className="w-full py-2 border-2 border-dashed  rounded-lg text-xs  hover:border-blue-500 hover: transition" style={{ color: 'var(--color-primary)' }} style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-muted)' }}
                     >
                       + Añadir Subtarea
                     </button>
                     {items.length === 0 ? (
-                      <div className="text-center py-6 text-gray-400 text-sm">
+                      <div className="text-center py-6  text-sm" style={{ color: 'var(--color-muted)' }}>
                         Sin subtareas
                       </div>
                     ) : (
@@ -611,11 +611,11 @@ const AdminTaskTemplates = () => {
                         return (
                           <div
                             key={itemIndex}
-                            className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:bg-gray-100 transition relative group"
+                            className=" border  rounded-lg p-3 hover: transition relative group" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }} style={{ backgroundColor: 'var(--color-bg)' }}
                           >
                             <button
                               onClick={() => handleDeleteItem(blockIndex, itemIndex)}
-                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition bg-red-500 text-white rounded px-2 py-0.5 text-xs hover:bg-red-600"
+                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition bg-red-500 text-white rounded px-2 py-0.5 text-xs hover:" style={{ backgroundColor: 'var(--color-danger)' }}
                             >
                               🗑️
                             </button>
@@ -628,18 +628,18 @@ const AdminTaskTemplates = () => {
                                     onBlur={(e) => handleSaveItemEdit(blockIndex, itemIndex, 'title', e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSaveItemEdit(blockIndex, itemIndex, 'title', e.target.value)}
                                     autoFocus
-                                    className="text-sm font-medium text-gray-900 w-full border rounded px-2 py-1"
+                                    className="text-sm font-medium  w-full border rounded px-2 py-1" style={{ color: 'var(--color-text)' }}
                                   />
                                 ) : (
                                   <p 
-                                    className="text-sm font-medium text-gray-900 truncate cursor-pointer hover:bg-gray-200 px-2 py-1 rounded"
+                                    className="text-sm font-medium  truncate cursor-pointer hover:bg-gray-200 px-2 py-1 rounded" style={{ color: 'var(--color-text)' }}
                                     onClick={() => setEditingItem(`${blockIndex}-${itemIndex}-title`)}
                                   >
                                     {itemTitle} ✏️
                                   </p>
                                 )}
                                 {item.assigneeSuggestion && (
-                                  <p className="text-xs text-gray-500 mt-1">
+                                  <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
                                     👤 {item.assigneeSuggestion}
                                   </p>
                                 )}
@@ -648,7 +648,7 @@ const AdminTaskTemplates = () => {
                                     {item.tags.map((tag, tagIdx) => (
                                       <span
                                         key={tagIdx}
-                                        className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded"
+                                        className="text-xs bg-gray-200  px-2 py-0.5 rounded" style={{ color: 'var(--color-text)' }}
                                       >
                                         {tag}
                                       </span>
@@ -683,14 +683,14 @@ const AdminTaskTemplates = () => {
                                     }}
                                   />
                                 </div>
-                                <div className="text-xs text-gray-500 mt-1">
+                                <div className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
                                   {(item.startPct * 100).toFixed(0)}% → {(item.endPct * 100).toFixed(0)}%
                                 </div>
                               </div>
                             )}
 
                             {/* Dependencias */}
-                            <div className="mt-3 pt-2 border-t border-gray-200 flex items-center justify-between">
+                            <div className="mt-3 pt-2 border-t  flex items-center justify-between" style={{ borderColor: 'var(--color-border)' }}>
                               <div className="flex items-center gap-2">
                                 {item.dependsOn && item.dependsOn.length > 0 ? (
                                   <div className="flex items-center gap-1 text-xs text-orange-600">
@@ -698,7 +698,7 @@ const AdminTaskTemplates = () => {
                                     <span>Depende de {item.dependsOn.length} tarea(s)</span>
                                   </div>
                                 ) : (
-                                  <span className="text-xs text-gray-400">Sin dependencias</span>
+                                  <span className="text-xs " style={{ color: 'var(--color-muted)' }}>Sin dependencias</span>
                                 )}
                               </div>
                               <button
@@ -711,9 +711,9 @@ const AdminTaskTemplates = () => {
 
                             {/* Checklist */}
                             {item.checklist && item.checklist.length > 0 && (
-                              <div className="mt-2 pt-2 border-t border-gray-200">
-                                <p className="text-xs text-gray-600 font-medium mb-1">Checklist:</p>
-                                <ul className="text-xs text-gray-600 space-y-0.5">
+                              <div className="mt-2 pt-2 border-t " style={{ borderColor: 'var(--color-border)' }}>
+                                <p className="text-xs  font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Checklist:</p>
+                                <ul className="text-xs  space-y-0.5" style={{ color: 'var(--color-text-secondary)' }}>
                                   {item.checklist.slice(0, 3).map((check, checkIdx) => (
                                     <li key={checkIdx} className="flex items-start gap-1">
                                       <span>•</span>
@@ -721,7 +721,7 @@ const AdminTaskTemplates = () => {
                                     </li>
                                   ))}
                                   {item.checklist.length > 3 && (
-                                    <li className="text-gray-400">
+                                    <li className="" style={{ color: 'var(--color-muted)' }}>
                                       +{item.checklist.length - 3} más
                                     </li>
                                   )}
@@ -735,11 +735,11 @@ const AdminTaskTemplates = () => {
                   </div>
 
                   {/* Footer con estadísticas */}
-                  <div className="border-t border-gray-200 px-4 py-2 bg-gray-50 rounded-b-lg">
-                    <div className="flex items-center justify-between text-xs text-gray-600">
+                  <div className="border-t  px-4 py-2  rounded-b-lg" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+                    <div className="flex items-center justify-between text-xs " style={{ color: 'var(--color-text-secondary)' }}>
                       <span>Duración: {((block.endPct - block.startPct) * 100).toFixed(0)}%</span>
                       {block.admin?.editable !== false && (
-                        <span className="text-green-600">✏️ Editable</span>
+                        <span className="" style={{ color: 'var(--color-success)' }}>✏️ Editable</span>
                       )}
                     </div>
                   </div>
@@ -750,7 +750,7 @@ const AdminTaskTemplates = () => {
         </div>
 
         {/* Leyenda */}
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div className="rounded-lg border   p-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-semibold">Leyenda:</h4>
             <div className="flex gap-2">
@@ -763,13 +763,13 @@ const AdminTaskTemplates = () => {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="text-xs px-3 py-1 bg-green-600 text-white hover:bg-green-700 rounded disabled:opacity-50"
+                className="text-xs px-3 py-1  text-white hover:bg-green-700 rounded disabled:opacity-50" style={{ backgroundColor: 'var(--color-success)' }}
               >
                 {saving ? 'Guardando...' : '💾 Guardar Cambios'}
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs text-gray-600">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs " style={{ color: 'var(--color-text-secondary)' }}>
             <div>
               <span className="font-medium">✏️ Click para editar:</span> Nombre y timing de tareas
             </div>
@@ -818,14 +818,14 @@ const AdminTaskTemplates = () => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-semibold">Tareas Creadas por Usuarios</h2>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                   Analiza las tareas más repetidas que los usuarios añaden manualmente para considerar incluirlas en el seed.
                 </p>
               </div>
               <button
                 onClick={loadUserTasks}
                 disabled={loadingUserTasks}
-                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-50 disabled:opacity-50"
+                className="rounded-md border  px-4 py-2 text-sm font-semibold hover: disabled:opacity-50" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
               >
                 {loadingUserTasks ? 'Analizando...' : '🔄 Actualizar'}
               </button>
@@ -834,15 +834,15 @@ const AdminTaskTemplates = () => {
             {userTasksMeta.totalWeddings > 0 && (
               <div className="mb-4 grid grid-cols-3 gap-4">
                 <div className="rounded-lg bg-blue-50 p-3">
-                  <div className="text-xs text-gray-600">Bodas Analizadas</div>
-                  <div className="text-2xl font-bold text-blue-600">{userTasksMeta.totalWeddings}</div>
+                  <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Bodas Analizadas</div>
+                  <div className="text-2xl font-bold " style={{ color: 'var(--color-primary)' }}>{userTasksMeta.totalWeddings}</div>
                 </div>
                 <div className="rounded-lg bg-green-50 p-3">
-                  <div className="text-xs text-gray-600">Tareas Únicas</div>
-                  <div className="text-2xl font-bold text-green-600">{userTasksMeta.totalUniqueTasks}</div>
+                  <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Tareas Únicas</div>
+                  <div className="text-2xl font-bold " style={{ color: 'var(--color-success)' }}>{userTasksMeta.totalUniqueTasks}</div>
                 </div>
                 <div className="rounded-lg bg-purple-50 p-3">
-                  <div className="text-xs text-gray-600">Filtradas (≥{minOccurrences})</div>
+                  <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Filtradas (≥{minOccurrences})</div>
                   <div className="text-2xl font-bold text-purple-600">{filteredUserTasks.length}</div>
                 </div>
               </div>
@@ -864,27 +864,27 @@ const AdminTaskTemplates = () => {
             </div>
 
             {loadingUserTasks ? (
-              <div className="text-center py-8 text-gray-500">Analizando tareas de usuarios...</div>
+              <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>Analizando tareas de usuarios...</div>
             ) : filteredUserTasks.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
                 No se encontraron tareas con al menos {minOccurrences} apariciones
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="" style={{ backgroundColor: 'var(--color-bg)' }}>
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Apariciones</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categorías</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duración Prom.</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium  uppercase" style={{ color: 'var(--color-muted)' }}>Título</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium  uppercase" style={{ color: 'var(--color-muted)' }}>Tipo</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium  uppercase" style={{ color: 'var(--color-muted)' }}>Apariciones</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium  uppercase" style={{ color: 'var(--color-muted)' }}>Categorías</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium  uppercase" style={{ color: 'var(--color-muted)' }}>Duración Prom.</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium  uppercase" style={{ color: 'var(--color-muted)' }}>Acciones</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className=" divide-y divide-gray-200" style={{ backgroundColor: 'var(--color-surface)' }}>
                     {filteredUserTasks.map((task, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50">
+                      <tr key={idx} className="hover:" style={{ backgroundColor: 'var(--color-bg)' }}>
                         <td className="px-4 py-3 text-sm">{task.title}</td>
                         <td className="px-4 py-3 text-sm">
                           <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
@@ -909,7 +909,7 @@ const AdminTaskTemplates = () => {
                               navigator.clipboard.writeText(textToCopy);
                               alert('JSON copiado al portapapeles. Pégalo en el editor JSON.');
                             }}
-                            className="text-blue-600 hover:text-blue-800 font-medium text-xs"
+                            className=" hover:text-blue-800 font-medium text-xs" style={{ color: 'var(--color-primary)' }}
                           >
                             📋 Copiar JSON
                           </button>
@@ -925,7 +925,7 @@ const AdminTaskTemplates = () => {
       ) : (
         <>
           {/* Toggle de vista */}
-          <div className="flex items-center gap-2 border-b border-gray-200 pb-4">
+          <div className="flex items-center gap-2 border-b  pb-4" style={{ borderColor: 'var(--color-border)' }}>
             <button
               onClick={() => setViewMode('visual')}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition ${
@@ -951,7 +951,7 @@ const AdminTaskTemplates = () => {
           {viewMode === 'visual' ? (
             <div className="space-y-4">
               {/* Selector de plantilla en vista visual */}
-              <div className="rounded-lg border border-gray-200 bg-white p-4">
+              <div className="rounded-lg border   p-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
                 <label className="block text-sm font-medium mb-2">Plantilla seleccionada:</label>
                 <select
                   value={selectedId || ''}
@@ -959,7 +959,7 @@ const AdminTaskTemplates = () => {
                     const id = e.target.value;
                     if (id) selectTemplate(id);
                   }}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded-md border  px-3 py-2 text-sm" style={{ borderColor: 'var(--color-border)' }}
                 >
                   <option value="">-- Selecciona una plantilla --</option>
                   {templates.map((tpl) => (
@@ -1226,7 +1226,7 @@ const AdminTaskTemplates = () => {
       {/* Modal para añadir subtarea */}
       {showAddSubtaskModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+          <div className=" rounded-xl shadow-xl max-w-md w-full p-6 space-y-4" style={{ backgroundColor: 'var(--color-surface)' }}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Añadir Subtarea</h3>
               <button
@@ -1235,7 +1235,7 @@ const AdminTaskTemplates = () => {
                   setSelectedBlockForAdd(null);
                   setNewSubtask({ title: '', startPct: 0, endPct: 0, priority: 'medium' });
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}
               >
                 ✕
               </button>
@@ -1249,7 +1249,7 @@ const AdminTaskTemplates = () => {
                   value={newSubtask.title}
                   onChange={(e) => setNewSubtask(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Ej: Reservar fotógrafo"
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  className="w-full border  rounded px-3 py-2 text-sm" style={{ borderColor: 'var(--color-border)' }}
                 />
               </div>
 
@@ -1262,7 +1262,7 @@ const AdminTaskTemplates = () => {
                     max="100"
                     value={newSubtask.startPct}
                     onChange={(e) => setNewSubtask(prev => ({ ...prev, startPct: e.target.value }))}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    className="w-full border  rounded px-3 py-2 text-sm" style={{ borderColor: 'var(--color-border)' }}
                   />
                 </div>
                 <div>
@@ -1273,7 +1273,7 @@ const AdminTaskTemplates = () => {
                     max="100"
                     value={newSubtask.endPct}
                     onChange={(e) => setNewSubtask(prev => ({ ...prev, endPct: e.target.value }))}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    className="w-full border  rounded px-3 py-2 text-sm" style={{ borderColor: 'var(--color-border)' }}
                   />
                 </div>
               </div>
@@ -1283,7 +1283,7 @@ const AdminTaskTemplates = () => {
                 <select
                   value={newSubtask.priority}
                   onChange={(e) => setNewSubtask(prev => ({ ...prev, priority: e.target.value }))}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  className="w-full border  rounded px-3 py-2 text-sm" style={{ borderColor: 'var(--color-border)' }}
                 >
                   <option value="low">Baja</option>
                   <option value="medium">Media</option>
@@ -1299,14 +1299,14 @@ const AdminTaskTemplates = () => {
                   setSelectedBlockForAdd(null);
                   setNewSubtask({ title: '', startPct: 0, endPct: 0, priority: 'medium' });
                 }}
-                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                className="px-4 py-2 text-sm  hover: rounded" style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
               >
                 Cancelar
               </button>
               <button
                 onClick={handleAddSubtask}
                 disabled={!newSubtask.title.trim()}
-                className="px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm  text-white hover:bg-blue-700 rounded disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 Añadir Subtarea
               </button>
@@ -1318,12 +1318,12 @@ const AdminTaskTemplates = () => {
       {/* Modal de Gestión de Dependencias */}
       {showDependenciesModal && editingDepsTask && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
+          <div className=" rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="px-6 py-4 border-b " style={{ borderColor: 'var(--color-border)' }}>
+              <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>
                 🔗 Gestionar Dependencias
               </h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm  mt-1" style={{ color: 'var(--color-muted)' }}>
                 Selecciona las tareas que deben completarse antes de esta tarea
               </p>
             </div>
@@ -1351,17 +1351,17 @@ const AdminTaskTemplates = () => {
                         checked={isSelected}
                         disabled={task.isCurrentTask}
                         onChange={() => toggleDependency(task.blockIndex, task.itemIndex)}
-                        className="mt-0.5 h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                        className="mt-0.5 h-4 w-4 text-purple-600 rounded  focus:ring-purple-500" style={{ borderColor: 'var(--color-border)' }}
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs text-gray-500 font-medium">
+                        <div className="text-xs  font-medium" style={{ color: 'var(--color-muted)' }}>
                           {task.blockName}
                         </div>
-                        <div className="text-sm text-gray-900 mt-0.5">
+                        <div className="text-sm  mt-0.5" style={{ color: 'var(--color-text)' }}>
                           {task.itemTitle}
                         </div>
                         {task.isCurrentTask && (
-                          <div className="text-xs text-gray-400 mt-1">
+                          <div className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
                             (Tarea actual - no puede depender de sí misma)
                           </div>
                         )}
@@ -1371,7 +1371,7 @@ const AdminTaskTemplates = () => {
                 })}
 
                 {getAllTasksForDependencies().length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
                     No hay otras tareas disponibles
                   </div>
                 )}
@@ -1396,14 +1396,14 @@ const AdminTaskTemplates = () => {
               )}
             </div>
 
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-2">
+            <div className="px-6 py-4 border-t  flex justify-end gap-2" style={{ borderColor: 'var(--color-border)' }}>
               <button
                 onClick={() => {
                   setShowDependenciesModal(false);
                   setEditingDepsTask(null);
                   setSelectedDependencies([]);
                 }}
-                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded transition"
+                className="px-4 py-2 text-sm  hover: rounded transition" style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
               >
                 Cancelar
               </button>

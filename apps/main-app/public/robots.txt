@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /suppliers/
 
-Sitemap: https://malove.app/sitemap.xml
+Sitemap: https://planivia.net/sitemap.xml

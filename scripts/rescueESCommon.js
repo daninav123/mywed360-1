@@ -93,8 +93,8 @@ const newESData = applySpanishTranslations(enData);
 // Añadir traducciones comunes que sabemos que existen
 const commonSpanishTranslations = {
   // app
-  name: 'MaLove.App',
-  brandName: 'Lovenda',
+  name: 'Planivia',
+  brandName: 'Planivia',
   tagline: 'Tu boda perfecta, organizada digitalmente',
   loading: 'Cargando...',
   error: 'Error',

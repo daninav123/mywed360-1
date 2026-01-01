@@ -1,12 +1,11 @@
-import { MessageSquare, Clock, RefreshCcw } from 'lucide-react';
+﻿import { MessageSquare, Clock, RefreshCcw } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../components/PageWrapper';
 import { useAuth } from '../hooks/useAuth';
-import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
+import useWeddingData from '../hooks/useWeddingData';
 import { EVENT_TYPE_LABELS } from '../config/eventStyles';
-
 const CEREMONY_MOMENTS = [
   { name: 'Ceremonia', items: ['Entrada', 'Lectura de votos', 'Intercambio de anillos'] },
   { name: 'Cocktail', items: ['Aperitivos', 'Brindis'] },
@@ -67,7 +66,7 @@ export default function AyudaCeremonia() {
 
   if (isLoading) {
     return (
-      <div className="p-6 text-sm text-gray-600">
+      <div className="p-6 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
         Validando permisos…
       </div>
     );
@@ -75,7 +74,7 @@ export default function AyudaCeremonia() {
 
   if (!allowed) {
     return (
-      <div className="p-6 text-sm text-red-600">
+      <div className="p-6 text-sm " style={{ color: 'var(--color-danger)' }}>
         Acceso denegado. Este asistente está disponible para owners, planners y asistentes del evento.
       </div>
     );
@@ -83,14 +82,15 @@ export default function AyudaCeremonia() {
 
   if (loadingWedding) {
     return (
-      <div className="p-6 text-sm text-gray-600">
+      <div className="p-6 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
         Cargando datos del evento…
       </div>
     );
   }
 
   return (
-    <PageWrapper title={pageTitle}>
+    
+      
       <p className="text-sm text-muted mb-4">
         {isBoda
           ? 'Genera lecturas y guiones dinámicos para tu ceremonia.'
@@ -134,7 +134,7 @@ export default function AyudaCeremonia() {
         </button>
         <button
           onClick={handleSaveVersion}
-          className="bg-green-600 text-white px-3 py-1 rounded flex items-center text-sm"
+          className=" text-white px-3 py-1 rounded flex items-center text-sm" style={{ backgroundColor: 'var(--color-success)' }}
         >
           <RefreshCcw className="mr-1" size={16} /> Guardar versión
         </button>
@@ -142,7 +142,7 @@ export default function AyudaCeremonia() {
 
       <div className="space-y-3 mb-6">
         <h3 className="font-semibold text-base">Vista previa</h3>
-        <div className="flex items-center gap-1 text-sm text-gray-600">
+        <div className="flex items-center gap-1 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
           <Clock size={14} />
           <span>Tiempo estimado: {previewTime} min</span>
         </div>
@@ -167,21 +167,22 @@ export default function AyudaCeremonia() {
                 <p className="font-medium">
                   {new Date(version.timestamp).toLocaleString('es-ES')}
                 </p>
-                {version.moment && <p className="text-gray-500">{version.moment.replace('|', ' · ')}</p>}
+                {version.moment && <p className="" style={{ color: 'var(--color-muted)' }}>{version.moment.replace('|', ' · ')}</p>}
               </div>
               <button
                 onClick={() => handleRevert(version)}
-                className="text-blue-600 hover:underline text-sm"
+                className=" hover:underline text-sm" style={{ color: 'var(--color-primary)' }}
               >
                 Revertir
               </button>
             </li>
           ))}
           {versions.length === 0 && (
-            <li className="text-sm text-gray-500">Aún no has guardado versiones.</li>
+            <li className="text-sm " style={{ color: 'var(--color-muted)' }}>Aún no has guardado versiones.</li>
           )}
         </ul>
       </div>
-    </PageWrapper>
+    
+    
   );
 }

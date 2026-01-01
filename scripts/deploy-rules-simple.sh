@@ -51,7 +51,7 @@ EOF
 echo "📤 Creando ruleset..."
 # Crear ruleset
 RESPONSE=$(curl -s -X POST \
-  "https://firebaserules.googleapis.com/v1/projects/lovenda-98c77/rulesets" \
+  "https://firebaserules.googleapis.com/v1/projects/planivia-98c77/rulesets" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d "$PAYLOAD")
@@ -72,7 +72,7 @@ echo "🚀 Desplegando ruleset..."
 RELEASE_PAYLOAD="{\"rulesetName\":\"$RULESET_NAME\"}"
 
 RELEASE_RESPONSE=$(curl -s -X PATCH \
-  "https://firebaserules.googleapis.com/v1/projects/lovenda-98c77/releases/cloud.firestore" \
+  "https://firebaserules.googleapis.com/v1/projects/planivia-98c77/releases/cloud.firestore" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d "$RELEASE_PAYLOAD")

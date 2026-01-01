@@ -1,0 +1,261 @@
+{
+  "gestion-invitados-boda": {
+    "name": "Gestión de Invitados",
+    "slug": "gestion-invitados-boda",
+    "icon": "Users",
+    "heroImage": "https://images.unsplash.com/photo-1527525443983-6e60c75fff46?w=1200",
+    "shortDesc": "Software para gestionar tu lista de invitados, RSVPs y seating plan",
+    "longDesc": "Control completo de invitados con confirmaciones en tiempo real, gestión de dietas y alergias, seating plan drag & drop, invitaciones digitales y exportación a Excel/PDF.",
+    "benefits": [
+      "Control de confirmaciones en tiempo real",
+      "Gestión de dietas y alergias",
+      "Seating plan visual drag & drop",
+      "Invitaciones digitales por email/WhatsApp",
+      "Exportación a Excel y PDF",
+      "Sincronización automática con tu pareja"
+    ],
+    "features": [
+      {
+        "title": "Lista Centralizada",
+        "description": "Todos tus invitados en un solo lugar. Añade, edita y organiza sin límites.",
+        "icon": "Users"
+      },
+      {
+        "title": "Control de RSVPs",
+        "description": "Confirmaciones en tiempo real. Sabe quién viene, quién no y quién aún no ha respondido.",
+        "icon": "CheckCircle"
+      },
+      {
+        "title": "Invitaciones Digitales",
+        "description": "Envía invitaciones por email o WhatsApp. Seguimiento automático de aperturas.",
+        "icon": "Mail"
+      }
+    ],
+    "keywords": ["gestión invitados boda", "lista invitados boda online", "control rsvp boda", "seating plan boda", "software invitados boda"],
+    "ctaText": "Gestiona tus Invitados Gratis",
+    "ctaUrl": "/signup",
+    "relatedServices": ["presupuesto-boda-online", "seating-plan-boda"]
+  },
+  "presupuesto-boda-online": {
+    "name": "Presupuesto de Boda",
+    "slug": "presupuesto-boda-online",
+    "icon": "DollarSign",
+    "heroImage": "https://images.unsplash.com/photo-1554224311-beee460c201f?w=1200",
+    "shortDesc": "Calculadora y control de gastos de boda en tiempo real",
+    "longDesc": "Controla el presupuesto de tu boda con alertas inteligentes, proyecciones de gastos, gestión de contratos con proveedores y distribución visual por categorías.",
+    "benefits": [
+      "Control total de gastos en tiempo real",
+      "Alertas cuando te acerques al límite",
+      "Distribución visual por categorías",
+      "Gestión de contratos y pagos",
+      "Proyecciones de gastos futuros",
+      "Soporte para múltiples monedas"
+    ],
+    "features": [
+      {
+        "title": "Control Total de Gastos",
+        "description": "Registra todos tus gastos y pagos. Sabe exactamente cuánto llevas gastado en tiempo real.",
+        "icon": "DollarSign"
+      },
+      {
+        "title": "Distribución Visual",
+        "description": "Gráficos claros por categoría. Identifica dónde se va tu presupuesto de un vistazo.",
+        "icon": "PieChart"
+      },
+      {
+        "title": "Alertas Inteligentes",
+        "description": "Te avisamos cuando te acerques al límite. Evita sorpresas de último momento.",
+        "icon": "Bell"
+      }
+    ],
+    "keywords": ["presupuesto boda online", "calculadora boda", "control gastos boda", "cuanto cuesta boda", "presupuesto boda media"],
+    "ctaText": "Calcula tu Presupuesto Gratis",
+    "ctaUrl": "/signup",
+    "relatedServices": ["gestion-invitados-boda", "seating-plan-boda"]
+  },
+  "seating-plan-boda": {
+    "name": "Seating Plan",
+    "slug": "seating-plan-boda",
+    "icon": "Grid3x3",
+    "heroImage": "https://images.unsplash.com/photo-1519167758481-83f29da8fd8e?w=1200",
+    "shortDesc": "Crea el seating plan perfecto con drag & drop y visualización en vivo",
+    "longDesc": "Arrastra y suelta invitados entre mesas con un solo clic. Vista previa en tiempo real, detección de conflictos automática, exportación a PDF/PNG y tarjetas de mesa generadas automáticamente.",
+    "benefits": [
+      "Drag & drop intuitivo",
+      "Vista previa en tiempo real",
+      "Detección de conflictos automática",
+      "Exportación PDF, PNG y Excel",
+      "Tarjetas de mesa automáticas",
+      "Colaboración en tiempo real"
+    ],
+    "features": [
+      {
+        "title": "Drag & Drop",
+        "description": "Arrastra invitados entre mesas con un solo clic. Reorganiza todo en segundos.",
+        "icon": "MousePointer2"
+      },
+      {
+        "title": "Vista Previa en Vivo",
+        "description": "Ve cómo queda tu distribución en tiempo real. Ajusta hasta que sea perfecto.",
+        "icon": "Grid3x3"
+      },
+      {
+        "title": "Detección de Conflictos",
+        "description": "Te avisamos si hay incompatibilidades o mesas desbalanceadas automáticamente.",
+        "icon": "Users"
+      }
+    ],
+    "keywords": ["seating plan boda", "distribucion mesas boda", "plano mesas boda", "seating chart boda", "organizar mesas boda"],
+    "ctaText": "Crea tu Seating Plan Gratis",
+    "ctaUrl": "/signup",
+    "relatedServices": ["gestion-invitados-boda", "presupuesto-boda-online"]
+  },
+  "checklist-boda": {
+    "name": "Checklist de Boda",
+    "slug": "checklist-boda",
+    "icon": "CheckSquare",
+    "heroImage": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=1200",
+    "shortDesc": "Timeline completo con todas las tareas para organizar tu boda",
+    "longDesc": "Checklist inteligente que se adapta a tu fecha de boda. Tareas organizadas por meses, recordatorios automáticos, seguimiento de progreso y colaboración en tiempo real con tu pareja.",
+    "benefits": [
+      "Checklist completo con +200 tareas",
+      "Organizado por meses hasta tu boda",
+      "Recordatorios automáticos por email",
+      "Seguimiento visual de progreso",
+      "Añade tus propias tareas personalizadas",
+      "Sincronización con tu pareja en tiempo real"
+    ],
+    "features": [
+      {
+        "title": "Timeline Inteligente",
+        "description": "Tareas organizadas automáticamente según tu fecha de boda. Siempre sabes qué hacer.",
+        "icon": "Calendar"
+      },
+      {
+        "title": "Seguimiento de Progreso",
+        "description": "Barra visual que muestra tu avance. Mantén la motivación viendo tu progreso.",
+        "icon": "TrendingUp"
+      },
+      {
+        "title": "Recordatorios Automáticos",
+        "description": "Te avisamos cuando una tarea importante se acerca. Nunca olvides nada crítico.",
+        "icon": "Bell"
+      }
+    ],
+    "keywords": ["checklist boda", "tareas boda", "timeline boda", "cronograma boda", "organizador boda", "planificador boda"],
+    "ctaText": "Ver mi Checklist Gratis",
+    "ctaUrl": "/signup",
+    "relatedServices": ["presupuesto-boda-online", "gestion-invitados-boda"]
+  },
+  "invitaciones-boda-online": {
+    "name": "Invitaciones de Boda",
+    "slug": "invitaciones-boda-online",
+    "icon": "Mail",
+    "heroImage": "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=1200",
+    "shortDesc": "Diseña y envía invitaciones digitales elegantes en minutos",
+    "longDesc": "Crea invitaciones personalizadas con plantillas profesionales. Envío por email y WhatsApp, RSVP integrado, seguimiento de aperturas y confirmaciones en tiempo real.",
+    "benefits": [
+      "+50 plantillas profesionales",
+      "Personalización completa de colores y textos",
+      "Envío por email y WhatsApp",
+      "RSVP integrado automático",
+      "Seguimiento de aperturas en tiempo real",
+      "Recordatorios automáticos a no respondidos"
+    ],
+    "features": [
+      {
+        "title": "Plantillas Elegantes",
+        "description": "Más de 50 diseños profesionales. Desde clásicas hasta modernas y minimalistas.",
+        "icon": "Sparkles"
+      },
+      {
+        "title": "Envío Masivo Inteligente",
+        "description": "Envía a todos tus invitados en un clic. Por email, WhatsApp o ambos.",
+        "icon": "Send"
+      },
+      {
+        "title": "RSVP Automático",
+        "description": "Invitados confirman con un clic. Actualizaciones automáticas en tu lista.",
+        "icon": "CheckCircle"
+      }
+    ],
+    "keywords": ["invitaciones boda online", "invitaciones digitales boda", "diseñar invitaciones boda", "plantillas invitaciones boda", "invitaciones whatsapp boda"],
+    "ctaText": "Crear mis Invitaciones Gratis",
+    "ctaUrl": "/signup",
+    "relatedServices": ["gestion-invitados-boda", "web-boda-gratis"]
+  },
+  "buscar-proveedores-boda": {
+    "name": "Buscar Proveedores",
+    "slug": "buscar-proveedores-boda",
+    "icon": "Search",
+    "heroImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200",
+    "shortDesc": "Encuentra y compara proveedores de boda verificados en tu ciudad",
+    "longDesc": "Búsqueda avanzada de fotógrafos, catering, venues, floristas y más. Compara precios, lee reseñas reales, solicita presupuestos y gestiona contratos desde un solo lugar.",
+    "benefits": [
+      "Miles de proveedores verificados",
+      "Filtros avanzados por precio y disponibilidad",
+      "Reseñas y valoraciones reales",
+      "Solicita presupuestos gratis",
+      "Compara hasta 4 proveedores",
+      "Gestión de contratos integrada"
+    ],
+    "features": [
+      {
+        "title": "Búsqueda Avanzada",
+        "description": "Filtra por categoría, precio, disponibilidad y ubicación. Encuentra exactamente lo que buscas.",
+        "icon": "Filter"
+      },
+      {
+        "title": "Comparador de Proveedores",
+        "description": "Compara precios, servicios y reseñas lado a lado. Toma decisiones informadas.",
+        "icon": "GitCompare"
+      },
+      {
+        "title": "Solicitud de Presupuestos",
+        "description": "Pide presupuestos a múltiples proveedores con un clic. Recibe respuestas en tu inbox.",
+        "icon": "MessageSquare"
+      }
+    ],
+    "keywords": ["proveedores boda", "fotógrafos boda", "catering boda", "venues boda", "floristas boda", "buscar proveedores boda"],
+    "ctaText": "Explorar Proveedores",
+    "ctaUrl": "/signup",
+    "relatedServices": ["presupuesto-boda-online", "checklist-boda"]
+  },
+  "web-boda-gratis": {
+    "name": "Web de Boda",
+    "slug": "web-boda-gratis",
+    "icon": "Globe",
+    "heroImage": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200",
+    "shortDesc": "Crea una página web hermosa para compartir todos los detalles de tu boda",
+    "longDesc": "Web personalizable con dominio propio, información del evento, RSVP online, galería de fotos, mapa de ubicación, cuenta regresiva y lista de regalos integrada.",
+    "benefits": [
+      "Dominio personalizado incluido",
+      "+30 plantillas elegantes",
+      "RSVP online integrado",
+      "Galería de fotos ilimitada",
+      "Cuenta regresiva automática",
+      "Mapa y direcciones integradas"
+    ],
+    "features": [
+      {
+        "title": "Diseño Personalizable",
+        "description": "Elige entre 30+ plantillas elegantes. Personaliza colores, fuentes y contenido.",
+        "icon": "Palette"
+      },
+      {
+        "title": "RSVP Online",
+        "description": "Invitados confirman directamente desde la web. Sincronización automática con tu lista.",
+        "icon": "UserCheck"
+      },
+      {
+        "title": "Compartir Fácil",
+        "description": "Dominio personalizado tipo tuyosnombres.planivia.net. Comparte por WhatsApp o redes.",
+        "icon": "Share2"
+      }
+    ],
+    "keywords": ["web boda gratis", "pagina web boda", "website boda", "sitio web boda", "web boda personalizada"],
+    "ctaText": "Crear mi Web Gratis",
+    "ctaUrl": "/signup",
+    "relatedServices": ["invitaciones-boda-online", "gestion-invitados-boda"]
+  }
+}

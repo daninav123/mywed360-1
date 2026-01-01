@@ -28,15 +28,15 @@ export default function QuickGuide({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+      <div className=" rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className="p-6 border-b  flex items-center justify-between" style={{ borderColor: 'var(--color-border)' }}>
           <h2 className="text-2xl font-bold">Guía Rápida</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text)' }}>
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        <div className="flex border-b border-gray-200">
+        <div className="flex border-b " style={{ borderColor: 'var(--color-border)' }}>
           <button
             onClick={() => setActiveTab('shortcuts')}
             className={`flex-1 px-4 py-3 font-medium ${
@@ -64,12 +64,12 @@ export default function QuickGuide({ isOpen, onClose }) {
             <div className="space-y-3">
               {shortcuts.map((shortcut, i) => (
                 <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-700">{shortcut.action}</span>
+                  <span className="" style={{ color: 'var(--color-text)' }}>{shortcut.action}</span>
                   <div className="flex gap-1">
                     {shortcut.keys.map((key, j) => (
                       <kbd
                         key={j}
-                        className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-sm font-mono"
+                        className="px-2 py-1  border  rounded text-sm font-mono" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
                       >
                         {key}
                       </kbd>
@@ -82,10 +82,10 @@ export default function QuickGuide({ isOpen, onClose }) {
             <div className="grid gap-4">
               {tips.map((tip, i) => (
                 <div key={i} className="flex gap-4 p-4 bg-blue-50 rounded-lg">
-                  <div className="flex-shrink-0 text-blue-600">{tip.icon}</div>
+                  <div className="flex-shrink-0 " style={{ color: 'var(--color-primary)' }}>{tip.icon}</div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">{tip.title}</h3>
-                    <p className="text-sm text-gray-600">{tip.desc}</p>
+                    <h3 className="font-semibold  mb-1" style={{ color: 'var(--color-text)' }}>{tip.title}</h3>
+                    <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{tip.desc}</p>
                   </div>
                 </div>
               ))}
@@ -93,8 +93,8 @@ export default function QuickGuide({ isOpen, onClose }) {
           )}
         </div>
 
-        <div className="p-4 bg-gray-50 border-t border-gray-200 text-sm text-gray-600 text-center">
-          <p>¿Necesitas más ayuda? <a href="#" className="text-blue-600 hover:underline">Ver documentación completa</a></p>
+        <div className="p-4  border-t  text-sm  text-center" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+          <p>¿Necesitas más ayuda? <a href="#" className=" hover:underline" style={{ color: 'var(--color-primary)' }}>Ver documentación completa</a></p>
         </div>
       </div>
     </div>

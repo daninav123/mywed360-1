@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import InvitationCanvas from '../components/invitations/InvitationCanvas';
@@ -8,7 +8,6 @@ import TemplateGallery from '../components/invitations/TemplateGallery';
 import Toolbar from '../components/invitations/Toolbar';
 import useHistory from '../hooks/useHistory';
 import { exportElementToPdf } from '../utils/pdfExport';
-
 function InvitationDesigner() {
   const [template, setTemplate] = useState(null);
   // scale for zoom
@@ -68,7 +67,7 @@ function InvitationDesigner() {
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Side panels */}
-      <aside className="md:w-60 border-r p-2 overflow-y-auto bg-white shadow-md">
+      <aside className="md:w-60 border-r p-2 overflow-y-auto  shadow-md" style={{ backgroundColor: 'var(--color-surface)' }}>
         <Toolbar
           onUndo={undo}
           onRedo={redo}
@@ -98,7 +97,7 @@ function InvitationDesigner() {
       </aside>
 
       {/* Canvas area */}
-      <main className="flex-1 flex flex-col items-center justify-center bg-gray-100">
+      <main className="flex-1 flex flex-col items-center justify-center " style={{ backgroundColor: 'var(--color-bg)' }}>
         <InvitationCanvas
           ref={canvasRef}
           template={template}
@@ -110,6 +109,8 @@ function InvitationDesigner() {
         />
       </main>
     </div>
+      
+    
   );
 }
 

@@ -27,20 +27,20 @@ export default function PhotosPanel({ onAdd }) {
   return (
     <div className="p-4 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-gray-900">Fotos</h3>
-        <p className="text-xs text-gray-600">
+        <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Fotos</h3>
+        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
           Sube tus propias fotos para personalizar el diseño
         </p>
       </div>
 
       <button
         onClick={() => fileInputRef.current?.click()}
-        className="w-full aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-3 hover:border-blue-500 hover:bg-blue-50 transition-all group"
+        className="w-full aspect-square border-2 border-dashed  rounded-lg flex flex-col items-center justify-center gap-3 hover:border-blue-500 hover:bg-blue-50 transition-all group" style={{ borderColor: 'var(--color-border)' }}
       >
-        <Upload className="w-8 h-8 text-gray-400 group-hover:text-blue-600" />
+        <Upload className="w-8 h-8  group-hover:" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-muted)' }} />
         <div className="text-center">
-          <div className="text-sm font-medium text-gray-900">Subir foto</div>
-          <div className="text-xs text-gray-500">PNG, JPG hasta 10MB</div>
+          <div className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>Subir foto</div>
+          <div className="text-xs " style={{ color: 'var(--color-muted)' }}>PNG, JPG hasta 10MB</div>
         </div>
       </button>
 
@@ -52,9 +52,9 @@ export default function PhotosPanel({ onAdd }) {
         className="hidden"
       />
 
-      <div className="pt-4 border-t border-gray-200">
-        <div className="text-xs text-gray-600 mb-2">Sugerencias</div>
-        <ul className="text-xs text-gray-500 space-y-1 list-disc list-inside">
+      <div className="pt-4 border-t " style={{ borderColor: 'var(--color-border)' }}>
+        <div className="text-xs  mb-2" style={{ color: 'var(--color-text-secondary)' }}>Sugerencias</div>
+        <ul className="text-xs  space-y-1 list-disc list-inside" style={{ color: 'var(--color-muted)' }}>
           <li>Usa imágenes de alta resolución (300 DPI)</li>
           <li>Formatos recomendados: PNG o JPG</li>
           <li>Asegúrate de tener derechos de uso</li>

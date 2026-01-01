@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../components/PageWrapper';
 import { Card, Button } from '../components/ui';
 import { useUserContext } from '../context/UserContext';
 import useTranslations from '../hooks/useTranslations';
-  getNotificationPreferences,
+getNotificationPreferences,
   saveNotificationPreferences,
 } from '../services/notificationPreferencesService';
 
@@ -63,9 +63,9 @@ export default function NotificationPreferences() {
 
   if (loading) {
     return (
-      <PageWrapper title={t('notificationPreferences.title')} className="layout-container max-w-xl space-y-6">
+      <div className="p-6">
         <Card className="text-sm text-[color:var(--color-muted)]">{t('notificationPreferences.loading')}</Card>
-      </PageWrapper>
+      </div>
     );
   }
 

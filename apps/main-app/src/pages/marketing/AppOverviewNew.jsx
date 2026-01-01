@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -26,90 +27,106 @@ import {
 
 export default function AppOverviewNew() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['marketing']);
 
   const coreModules = [
     {
       icon: Calendar,
-      title: t('appOverview.modules.timeline.title', { defaultValue: 'Smart Timeline' }),
-      description: t('appOverview.modules.timeline.description', { defaultValue: 'Organize every detail with intelligent task management and automated reminders' }),
+      title: t('marketing:appOverview.modules.timeline.title'),
+      description: t('marketing:appOverview.modules.timeline.description'),
       color: theme.colors.yellow,
       accentColor: theme.colors.yellowAccent,
     },
     {
       icon: Users,
-      title: t('appOverview.modules.guests.title', { defaultValue: 'Guest Management' }),
-      description: t('appOverview.modules.guests.description', { defaultValue: 'Complete RSVP system with seating charts and dietary tracking' }),
+      title: t('marketing:appOverview.modules.guests.title'),
+      description: t('marketing:appOverview.modules.guests.description'),
       color: theme.colors.pink,
       accentColor: theme.colors.pinkAccent,
     },
     {
       icon: DollarSign,
-      title: t('appOverview.modules.budget.title', { defaultValue: 'Budget & Finance' }),
-      description: t('appOverview.modules.budget.description', { defaultValue: 'Track expenses, payments, and vendor contracts in real-time' }),
+      title: t('marketing:appOverview.modules.budget.title'),
+      description: t('marketing:appOverview.modules.budget.description'),
       color: theme.colors.green,
       accentColor: theme.colors.greenAccent,
     },
     {
       icon: Mail,
-      title: t('appOverview.modules.communication.title', { defaultValue: 'Communication Hub' }),
-      description: t('appOverview.modules.communication.description', { defaultValue: 'Send invitations, updates, and reminders to all guests' }),
+      title: t('marketing:appOverview.modules.communication.title'),
+      description: t('marketing:appOverview.modules.communication.description'),
       color: theme.colors.lavender,
       accentColor: theme.colors.primary,
     },
     {
       icon: Palette,
-      title: t('appOverview.modules.design.title', { defaultValue: 'Design Studio' }),
-      description: t('appOverview.modules.design.description', { defaultValue: 'Create beautiful invitations and wedding websites' }),
+      title: t('marketing:appOverview.modules.design.title'),
+      description: t('marketing:appOverview.modules.design.description'),
       color: theme.colors.peach,
       accentColor: theme.colors.yellowAccent,
     },
     {
       icon: BarChart3,
-      title: t('appOverview.modules.analytics.title', { defaultValue: 'Analytics Dashboard' }),
-      description: t('appOverview.modules.analytics.description', { defaultValue: 'Real-time insights and progress tracking for your wedding' }),
+      title: t('marketing:appOverview.modules.analytics.title'),
+      description: t('marketing:appOverview.modules.analytics.description'),
       color: theme.colors.sage,
       accentColor: theme.colors.greenAccent,
     },
   ];
 
   const additionalFeatures = [
-    { icon: CheckCircle, text: t('appOverview.features.vendors', { defaultValue: 'Vendor management & contracts' }) },
-    { icon: Bell, text: t('appOverview.features.notifications', { defaultValue: 'Smart notifications & reminders' }) },
-    { icon: Lock, text: t('appOverview.features.storage', { defaultValue: 'Secure document storage' }) },
-    { icon: Zap, text: t('appOverview.features.mobile', { defaultValue: 'Mobile app for iOS & Android' }) },
-    { icon: Users, text: t('appOverview.features.collaboration', { defaultValue: 'Collaborative planning tools' }) },
-    { icon: BarChart3, text: t('appOverview.features.export', { defaultValue: 'Export & reporting tools' }) },
+    { icon: CheckCircle, text: t('marketing:appOverview.features.vendors') },
+    { icon: Bell, text: t('marketing:appOverview.features.notifications') },
+    { icon: Lock, text: t('marketing:appOverview.features.storage') },
+    { icon: Zap, text: t('marketing:appOverview.features.mobile') },
+    { icon: Users, text: t('marketing:appOverview.features.collaboration') },
+    { icon: BarChart3, text: t('marketing:appOverview.features.export') },
   ];
 
   const collaborationBenefits = [
-    t('appOverview.collaboration.sync', { defaultValue: 'Real-time sync across all devices' }),
-    t('appOverview.collaboration.permissions', { defaultValue: 'Role-based permissions for team members' }),
-    t('appOverview.collaboration.activity', { defaultValue: 'Activity feed with full history' }),
-    t('appOverview.collaboration.comments', { defaultValue: 'Comments and notes on every item' }),
+    t('marketing:appOverview.collaboration.sync'),
+    t('marketing:appOverview.collaboration.permissions'),
+    t('marketing:appOverview.collaboration.activity'),
+    t('marketing:appOverview.collaboration.comments'),
   ];
 
   return (
-    <PageWrapper>
-      <HeroSection
-        title={t('appOverview.hero.title', { defaultValue: 'All-in-One Wedding Planning Platform' })}
-        subtitle={t('appOverview.hero.subtitle', { defaultValue: 'Everything you need to plan, organize, and celebrate your perfect wedding day - all in one beautiful platform' })}
+    <>
+      <Helmet>
+        <title>Funcionalidades de Planivia | Gestión Completa de Bodas</title>
+        <meta name="description" content="Descubre todas las funcionalidades de Planivia: gestión de invitados, presupuestos, proveedores, timeline, diseño web y más. Todo en una plataforma." />
+        <meta name="keywords" content="funcionalidades planivia, módulos boda, gestión invitados, timeline boda, presupuesto boda" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Funcionalidades de Planivia" />
+        <meta property="og:description" content="Plataforma completa con todos los módulos para planificar tu boda" />
+        <meta property="og:url" content="https://planivia.net/app" />
+        
+        {/* Canonical */}
+        <link rel="canonical" href="https://planivia.net/app" />
+      </Helmet>
+      
+      <PageWrapper>
+        <HeroSection
+        title={t('marketing:appOverview.hero.title')}
+        subtitle={t('marketing:appOverview.hero.subtitle')}
         image="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&auto=format&fit=crop&q=80"
       >
         <div className="flex gap-4">
           <PrimaryButton onClick={() => navigate('/signup')}>
-            {t('appOverview.hero.cta.primary', { defaultValue: 'Start Free Trial' })}
+            {t('marketing:appOverview.hero.cta.primary')}
           </PrimaryButton>
           <SecondaryButton onClick={() => navigate('/precios')}>
-            {t('appOverview.hero.cta.secondary', { defaultValue: 'See Pricing' })}
+            {t('marketing:appOverview.hero.cta.secondary')}
           </SecondaryButton>
         </div>
       </HeroSection>
 
       <Container>
         <SectionTitle 
-          title={t('appOverview.modulesTitle', { defaultValue: 'Core Modules' })}
-          subtitle={t('appOverview.modulesSubtitle', { defaultValue: 'Powerful tools designed to simplify every aspect of wedding planning' })}
+          title={t('marketing:appOverview.modulesTitle')}
+          subtitle={t('marketing:appOverview.modulesSubtitle')}
         />
         <div className="grid md:grid-cols-3 gap-6">
           {coreModules.map((module, index) => (
@@ -133,7 +150,7 @@ export default function AppOverviewNew() {
             color: theme.colors.textPrimary,
             marginBottom: '16px',
           }}>
-            {t('appOverview.integration.title', { defaultValue: 'Everything Works Together Seamlessly' })}
+            {t('marketing:appOverview.integration.title')}
           </h2>
           <p style={{
             fontFamily: theme.fonts.body,
@@ -143,7 +160,7 @@ export default function AppOverviewNew() {
             maxWidth: '600px',
             margin: '0 auto 32px',
           }}>
-            {t('appOverview.integration.subtitle', { defaultValue: 'All modules are deeply integrated to provide a unified experience. Changes sync automatically across every feature.' })}
+            {t('marketing:appOverview.integration.subtitle')}
           </p>
           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {additionalFeatures.map((feature, index) => (
@@ -195,7 +212,7 @@ export default function AppOverviewNew() {
               color: theme.colors.textPrimary,
               marginBottom: '16px',
             }}>
-              {t('appOverview.collaboration.title', { defaultValue: 'Built for Collaboration' })}
+              {t('marketing:appOverview.collaboration.title')}
             </h2>
             <p style={{
               fontFamily: theme.fonts.body,
@@ -204,7 +221,7 @@ export default function AppOverviewNew() {
               lineHeight: '1.6',
               marginBottom: '24px',
             }}>
-              {t('appOverview.collaboration.description', { defaultValue: 'Invite your partner, family, and wedding planner to collaborate in real-time. Everyone stays updated with automatic notifications and shared access to plans, budgets, and guest lists.' })}
+              {t('marketing:appOverview.collaboration.description')}
             </p>
             <div className="space-y-3">
               {collaborationBenefits.map((item, index) => (
@@ -244,7 +261,7 @@ export default function AppOverviewNew() {
             color: theme.colors.textPrimary,
             marginBottom: '16px',
           }}>
-            {t('appOverview.cta.title', { defaultValue: 'Ready to Get Started?' })}
+            {t('marketing:appOverview.cta.title')}
           </h2>
           <p style={{
             fontFamily: theme.fonts.body,
@@ -252,14 +269,14 @@ export default function AppOverviewNew() {
             color: theme.colors.textSecondary,
             marginBottom: '32px',
           }}>
-            {t('appOverview.cta.subtitle', { defaultValue: 'Join thousands of couples planning their dream wedding' })}
+            {t('marketing:appOverview.cta.subtitle')}
           </p>
           <div className="flex gap-4 justify-center">
             <PrimaryButton onClick={() => navigate('/signup')}>
-              {t('appOverview.cta.primary', { defaultValue: 'Start Planning Free' })}
+              {t('marketing:appOverview.cta.primary')}
             </PrimaryButton>
             <SecondaryButton onClick={() => navigate('/precios')}>
-              {t('appOverview.cta.secondary', { defaultValue: 'View Pricing Plans' })}
+              {t('marketing:appOverview.cta.secondary')}
             </SecondaryButton>
           </div>
         </div>
@@ -275,10 +292,11 @@ export default function AppOverviewNew() {
             fontSize: '14px',
             color: theme.colors.textSecondary,
           }}>
-            {t('footer.copyright', { defaultValue: '© 2025 Wedding Planner. Making dream weddings come true.' })}
+            {t('marketing:common.copyright', { year: 2025 })}
           </p>
         </div>
       </footer>
-    </PageWrapper>
+      </PageWrapper>
+    </>
   );
 }

@@ -1,0 +1,600 @@
+{
+  "additionalCountries": [
+    {
+      "code": "es",
+      "name": "España",
+      "locale": "es-ES",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 1,
+      "marketSize": "22000M_EUR",
+      "status": "IMPLEMENTED",
+      "cities": 10
+    },
+    {
+      "code": "br",
+      "name": "Brasil",
+      "locale": "pt-BR",
+      "currency": "BRL",
+      "currencySymbol": "R$",
+      "priority": 5,
+      "marketSize": "15000M_USD",
+      "cities": [
+        {"name": "São Paulo", "slug": "sao-paulo", "lat": "-23.5505", "lng": "-46.6333", "population": 12325232},
+        {"name": "Rio de Janeiro", "slug": "rio-de-janeiro", "lat": "-22.9068", "lng": "-43.1729", "population": 6748000},
+        {"name": "Brasília", "slug": "brasilia", "lat": "-15.8267", "lng": "-47.9218", "population": 3094325},
+        {"name": "Salvador", "slug": "salvador", "lat": "-12.9714", "lng": "-38.5014", "population": 2900319},
+        {"name": "Fortaleza", "slug": "fortaleza", "lat": "-3.7172", "lng": "-38.5433", "population": 2703391},
+        {"name": "Belo Horizonte", "slug": "belo-horizonte", "lat": "-19.9167", "lng": "-43.9345", "population": 2722406},
+        {"name": "Florianópolis", "slug": "florianopolis", "lat": "-27.5954", "lng": "-48.5480", "population": 508826},
+        {"name": "Búzios", "slug": "buzios", "lat": "-22.7469", "lng": "-41.8819", "population": 33870}
+      ]
+    },
+    {
+      "code": "it",
+      "name": "Italia",
+      "locale": "it-IT",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 3,
+      "marketSize": "12000M_EUR",
+      "cities": [
+        {"name": "Roma", "slug": "roma", "lat": "41.9028", "lng": "12.4964", "population": 2872800},
+        {"name": "Milano", "slug": "milano", "lat": "45.4642", "lng": "9.1900", "population": 1396059},
+        {"name": "Venezia", "slug": "venezia", "lat": "45.4408", "lng": "12.3155", "population": 258685},
+        {"name": "Firenze", "slug": "firenze", "lat": "43.7696", "lng": "11.2558", "population": 382258},
+        {"name": "Napoli", "slug": "napoli", "lat": "40.8518", "lng": "14.2681", "population": 967069},
+        {"name": "Torino", "slug": "torino", "lat": "45.0703", "lng": "7.6869", "population": 886837},
+        {"name": "Bologna", "slug": "bologna", "lat": "44.4949", "lng": "11.3426", "population": 394463},
+        {"name": "Como", "slug": "como", "lat": "45.8081", "lng": "9.0852", "population": 84834},
+        {"name": "Verona", "slug": "verona", "lat": "45.4384", "lng": "10.9916", "population": 258031},
+        {"name": "Amalfi", "slug": "amalfi", "lat": "40.6340", "lng": "14.6027", "population": 5000}
+      ]
+    },
+    {
+      "code": "fr",
+      "name": "Francia",
+      "locale": "fr-FR",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 4,
+      "marketSize": "18000M_EUR",
+      "cities": [
+        {"name": "París", "slug": "paris", "lat": "48.8566", "lng": "2.3522", "population": 2161000},
+        {"name": "Lyon", "slug": "lyon", "lat": "45.7640", "lng": "4.8357", "population": 513275},
+        {"name": "Marsella", "slug": "marsella", "lat": "43.2965", "lng": "5.3698", "population": 869815},
+        {"name": "Niza", "slug": "niza", "lat": "43.7102", "lng": "7.2620", "population": 340017},
+        {"name": "Burdeos", "slug": "burdeos", "lat": "44.8378", "lng": "-0.5792", "population": 249712},
+        {"name": "Toulouse", "slug": "toulouse", "lat": "43.6047", "lng": "1.4442", "population": 471941},
+        {"name": "Estrasburgo", "slug": "estrasburgo", "lat": "48.5734", "lng": "7.7521", "population": 277270},
+        {"name": "Cannes", "slug": "cannes", "lat": "43.5528", "lng": "7.0174", "population": 74545}
+      ]
+    },
+    {
+      "code": "uk",
+      "name": "Reino Unido",
+      "locale": "en-GB",
+      "currency": "GBP",
+      "currencySymbol": "£",
+      "priority": 2,
+      "marketSize": "25000M_GBP",
+      "cities": [
+        {"name": "London", "slug": "london", "lat": "51.5074", "lng": "-0.1278", "population": 9002488},
+        {"name": "Manchester", "slug": "manchester", "lat": "53.4808", "lng": "-2.2426", "population": 547627},
+        {"name": "Birmingham", "slug": "birmingham", "lat": "52.4862", "lng": "-1.8904", "population": 1141816},
+        {"name": "Edinburgh", "slug": "edinburgh", "lat": "55.9533", "lng": "-3.1883", "population": 524930},
+        {"name": "Glasgow", "slug": "glasgow", "lat": "55.8642", "lng": "-4.2518", "population": 633120},
+        {"name": "Liverpool", "slug": "liverpool", "lat": "53.4084", "lng": "-2.9916", "population": 494814},
+        {"name": "Oxford", "slug": "oxford", "lat": "51.7520", "lng": "-1.2577", "population": 154600},
+        {"name": "Cambridge", "slug": "cambridge", "lat": "52.2053", "lng": "0.1218", "population": 145674},
+        {"name": "Bath", "slug": "bath", "lat": "51.3811", "lng": "-2.3590", "population": 94782}
+      ]
+    },
+    {
+      "code": "de",
+      "name": "Alemania",
+      "locale": "de-DE",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 6,
+      "marketSize": "20000M_EUR",
+      "cities": [
+        {"name": "Berlín", "slug": "berlin", "lat": "52.5200", "lng": "13.4050", "population": 3769495},
+        {"name": "Múnich", "slug": "munich", "lat": "48.1351", "lng": "11.5820", "population": 1484226},
+        {"name": "Hamburgo", "slug": "hamburgo", "lat": "53.5511", "lng": "9.9937", "population": 1852478},
+        {"name": "Frankfurt", "slug": "frankfurt", "lat": "50.1109", "lng": "8.6821", "population": 753056},
+        {"name": "Colonia", "slug": "colonia", "lat": "50.9375", "lng": "6.9603", "population": 1085664},
+        {"name": "Düsseldorf", "slug": "dusseldorf", "lat": "51.2277", "lng": "6.7735", "population": 619294}
+      ]
+    },
+    {
+      "code": "gr",
+      "name": "Grecia",
+      "locale": "el-GR",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 7,
+      "marketSize": "3000M_EUR",
+      "cities": [
+        {"name": "Atenas", "slug": "atenas", "lat": "37.9838", "lng": "23.7275", "population": 664046},
+        {"name": "Santorini", "slug": "santorini", "lat": "36.3932", "lng": "25.4615", "population": 15550},
+        {"name": "Mykonos", "slug": "mykonos", "lat": "37.4467", "lng": "25.3289", "population": 10134},
+        {"name": "Creta", "slug": "creta", "lat": "35.2401", "lng": "24.8093", "population": 623065},
+        {"name": "Tesalónica", "slug": "tesalonica", "lat": "40.6401", "lng": "22.9444", "population": 325182}
+      ]
+    },
+    {
+      "code": "pt",
+      "name": "Portugal",
+      "locale": "pt-PT",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 8,
+      "marketSize": "2500M_EUR",
+      "cities": [
+        {"name": "Lisboa", "slug": "lisboa", "lat": "38.7223", "lng": "-9.1393", "population": 504718},
+        {"name": "Oporto", "slug": "oporto", "lat": "41.1579", "lng": "-8.6291", "population": 231962},
+        {"name": "Algarve", "slug": "algarve", "lat": "37.0179", "lng": "-7.9304", "population": 450484},
+        {"name": "Sintra", "slug": "sintra", "lat": "38.8029", "lng": "-9.3817", "population": 377835},
+        {"name": "Cascais", "slug": "cascais", "lat": "38.6979", "lng": "-9.4215", "population": 206479}
+      ]
+    },
+    {
+      "code": "in",
+      "name": "India",
+      "locale": "en-IN",
+      "currency": "INR",
+      "currencySymbol": "₹",
+      "priority": 3,
+      "marketSize": "50000M_USD",
+      "cities": [
+        {"name": "Mumbai", "slug": "mumbai", "lat": "19.0760", "lng": "72.8777", "population": 20411000},
+        {"name": "Delhi", "slug": "delhi", "lat": "28.7041", "lng": "77.1025", "population": 16753235},
+        {"name": "Bangalore", "slug": "bangalore", "lat": "12.9716", "lng": "77.5946", "population": 12765000},
+        {"name": "Jaipur", "slug": "jaipur", "lat": "26.9124", "lng": "75.7873", "population": 3046163},
+        {"name": "Goa", "slug": "goa", "lat": "15.2993", "lng": "74.1240", "population": 1458545},
+        {"name": "Udaipur", "slug": "udaipur", "lat": "24.5854", "lng": "73.7125", "population": 451100},
+        {"name": "Agra", "slug": "agra", "lat": "27.1767", "lng": "78.0081", "population": 1585705},
+        {"name": "Hyderabad", "slug": "hyderabad", "lat": "17.3850", "lng": "78.4867", "population": 10004000}
+      ]
+    },
+    {
+      "code": "th",
+      "name": "Tailandia",
+      "locale": "th-TH",
+      "currency": "THB",
+      "currencySymbol": "฿",
+      "priority": 9,
+      "marketSize": "3500M_USD",
+      "cities": [
+        {"name": "Bangkok", "slug": "bangkok", "lat": "13.7563", "lng": "100.5018", "population": 10722000},
+        {"name": "Phuket", "slug": "phuket", "lat": "7.8804", "lng": "98.3923", "population": 416582},
+        {"name": "Chiang Mai", "slug": "chiang-mai", "lat": "18.7883", "lng": "98.9853", "population": 127240},
+        {"name": "Koh Samui", "slug": "koh-samui", "lat": "9.5357", "lng": "100.0629", "population": 62500},
+        {"name": "Krabi", "slug": "krabi", "lat": "8.0863", "lng": "98.9063", "population": 32644}
+      ]
+    },
+    {
+      "code": "ae",
+      "name": "Emiratos Árabes Unidos",
+      "locale": "ar-AE",
+      "currency": "AED",
+      "currencySymbol": "د.إ",
+      "priority": 4,
+      "marketSize": "8000M_USD",
+      "cities": [
+        {"name": "Dubai", "slug": "dubai", "lat": "25.2048", "lng": "55.2708", "population": 3411200},
+        {"name": "Abu Dhabi", "slug": "abu-dhabi", "lat": "24.4539", "lng": "54.3773", "population": 1482816},
+        {"name": "Sharjah", "slug": "sharjah", "lat": "25.3463", "lng": "55.4209", "population": 1684649}
+      ]
+    },
+    {
+      "code": "tr",
+      "name": "Turquía",
+      "locale": "tr-TR",
+      "currency": "TRY",
+      "currencySymbol": "₺",
+      "priority": 10,
+      "marketSize": "4000M_USD",
+      "cities": [
+        {"name": "Estambul", "slug": "estambul", "lat": "41.0082", "lng": "28.9784", "population": 15462452},
+        {"name": "Ankara", "slug": "ankara", "lat": "39.9334", "lng": "32.8597", "population": 5663322},
+        {"name": "Bodrum", "slug": "bodrum", "lat": "37.0344", "lng": "27.4305", "population": 182000},
+        {"name": "Antalya", "slug": "antalya", "lat": "36.8969", "lng": "30.7133", "population": 2548308}
+      ]
+    },
+    {
+      "code": "za",
+      "name": "Sudáfrica",
+      "locale": "en-ZA",
+      "currency": "ZAR",
+      "currencySymbol": "R",
+      "priority": 11,
+      "marketSize": "2000M_USD",
+      "cities": [
+        {"name": "Ciudad del Cabo", "slug": "ciudad-del-cabo", "lat": "-33.9249", "lng": "18.4241", "population": 433688},
+        {"name": "Johannesburgo", "slug": "johannesburgo", "lat": "-26.2041", "lng": "28.0473", "population": 5635127},
+        {"name": "Durban", "slug": "durban", "lat": "-29.8587", "lng": "31.0218", "population": 595061},
+        {"name": "Pretoria", "slug": "pretoria", "lat": "-25.7479", "lng": "28.2293", "population": 741651}
+      ]
+    },
+    {
+      "code": "au",
+      "name": "Australia",
+      "locale": "en-AU",
+      "currency": "AUD",
+      "currencySymbol": "$",
+      "priority": 5,
+      "marketSize": "12000M_AUD",
+      "cities": [
+        {"name": "Sydney", "slug": "sydney", "lat": "-33.8688", "lng": "151.2093", "population": 5312000},
+        {"name": "Melbourne", "slug": "melbourne", "lat": "-37.8136", "lng": "144.9631", "population": 5078000},
+        {"name": "Brisbane", "slug": "brisbane", "lat": "-27.4698", "lng": "153.0251", "population": 2514000},
+        {"name": "Perth", "slug": "perth", "lat": "-31.9505", "lng": "115.8605", "population": 2085973},
+        {"name": "Gold Coast", "slug": "gold-coast", "lat": "-28.0167", "lng": "153.4000", "population": 679127},
+        {"name": "Byron Bay", "slug": "byron-bay", "lat": "-28.6474", "lng": "153.6020", "population": 9246}
+      ]
+    },
+    {
+      "code": "nz",
+      "name": "Nueva Zelanda",
+      "locale": "en-NZ",
+      "currency": "NZD",
+      "currencySymbol": "$",
+      "priority": 12,
+      "marketSize": "1500M_NZD",
+      "cities": [
+        {"name": "Auckland", "slug": "auckland", "lat": "-36.8485", "lng": "174.7633", "population": 1657200},
+        {"name": "Queenstown", "slug": "queenstown", "lat": "-45.0312", "lng": "168.6626", "population": 28224},
+        {"name": "Wellington", "slug": "wellington", "lat": "-41.2865", "lng": "174.7762", "population": 215100},
+        {"name": "Christchurch", "slug": "christchurch", "lat": "-43.5321", "lng": "172.6362", "population": 389300}
+      ]
+    },
+    {
+      "code": "jp",
+      "name": "Japón",
+      "locale": "ja-JP",
+      "currency": "JPY",
+      "currencySymbol": "¥",
+      "priority": 6,
+      "marketSize": "25000M_USD",
+      "cities": [
+        {"name": "Tokyo", "slug": "tokyo", "lat": "35.6762", "lng": "139.6503", "population": 13960000},
+        {"name": "Kyoto", "slug": "kyoto", "lat": "35.0116", "lng": "135.7681", "population": 1475183},
+        {"name": "Osaka", "slug": "osaka", "lat": "34.6937", "lng": "135.5023", "population": 2725006},
+        {"name": "Okinawa", "slug": "okinawa", "lat": "26.2124", "lng": "127.6809", "population": 1467000},
+        {"name": "Yokohama", "slug": "yokohama", "lat": "35.4437", "lng": "139.6380", "population": 3748071}
+      ]
+    },
+    {
+      "code": "sg",
+      "name": "Singapur",
+      "locale": "en-SG",
+      "currency": "SGD",
+      "currencySymbol": "$",
+      "priority": 7,
+      "marketSize": "3000M_SGD",
+      "cities": [
+        {"name": "Singapore", "slug": "singapore", "lat": "1.3521", "lng": "103.8198", "population": 5685807}
+      ]
+    },
+    {
+      "code": "my",
+      "name": "Malasia",
+      "locale": "ms-MY",
+      "currency": "MYR",
+      "currencySymbol": "RM",
+      "priority": 13,
+      "marketSize": "1200M_USD",
+      "cities": [
+        {"name": "Kuala Lumpur", "slug": "kuala-lumpur", "lat": "3.1390", "lng": "101.6869", "population": 1768000},
+        {"name": "Penang", "slug": "penang", "lat": "5.4164", "lng": "100.3327", "population": 708127},
+        {"name": "Langkawi", "slug": "langkawi", "lat": "6.3500", "lng": "99.8000", "population": 99000}
+      ]
+    },
+    {
+      "code": "id",
+      "name": "Indonesia",
+      "locale": "id-ID",
+      "currency": "IDR",
+      "currencySymbol": "Rp",
+      "priority": 8,
+      "marketSize": "5000M_USD",
+      "cities": [
+        {"name": "Bali", "slug": "bali", "lat": "-8.3405", "lng": "115.0920", "population": 4317404},
+        {"name": "Jakarta", "slug": "jakarta", "lat": "-6.2088", "lng": "106.8456", "population": 10562088},
+        {"name": "Yogyakarta", "slug": "yogyakarta", "lat": "-7.7956", "lng": "110.3695", "population": 422732}
+      ]
+    },
+    {
+      "code": "ph",
+      "name": "Filipinas",
+      "locale": "en-PH",
+      "currency": "PHP",
+      "currencySymbol": "₱",
+      "priority": 14,
+      "marketSize": "2500M_USD",
+      "cities": [
+        {"name": "Manila", "slug": "manila", "lat": "14.5995", "lng": "120.9842", "population": 1780148},
+        {"name": "Boracay", "slug": "boracay", "lat": "11.9674", "lng": "121.9248", "population": 37802},
+        {"name": "Palawan", "slug": "palawan", "lat": "9.8349", "lng": "118.7384", "population": 939594},
+        {"name": "Cebu", "slug": "cebu", "lat": "10.3157", "lng": "123.8854", "population": 964169}
+      ]
+    },
+    {
+      "code": "cn",
+      "name": "China",
+      "locale": "zh-CN",
+      "currency": "CNY",
+      "currencySymbol": "¥",
+      "priority": 2,
+      "marketSize": "100000M_USD",
+      "cities": [
+        {"name": "Beijing", "slug": "beijing", "lat": "39.9042", "lng": "116.4074", "population": 21540000},
+        {"name": "Shanghai", "slug": "shanghai", "lat": "31.2304", "lng": "121.4737", "population": 27058000},
+        {"name": "Guangzhou", "slug": "guangzhou", "lat": "23.1291", "lng": "113.2644", "population": 15300000},
+        {"name": "Shenzhen", "slug": "shenzhen", "lat": "22.5431", "lng": "114.0579", "population": 17560000},
+        {"name": "Hangzhou", "slug": "hangzhou", "lat": "30.2741", "lng": "120.1551", "population": 10360000},
+        {"name": "Chengdu", "slug": "chengdu", "lat": "30.5728", "lng": "104.0668", "population": 20938000}
+      ]
+    },
+    {
+      "code": "kr",
+      "name": "Corea del Sur",
+      "locale": "ko-KR",
+      "currency": "KRW",
+      "currencySymbol": "₩",
+      "priority": 9,
+      "marketSize": "20000M_USD",
+      "cities": [
+        {"name": "Seúl", "slug": "seoul", "lat": "37.5665", "lng": "126.9780", "population": 9733509},
+        {"name": "Busan", "slug": "busan", "lat": "35.1796", "lng": "129.0756", "population": 3414950},
+        {"name": "Jeju", "slug": "jeju", "lat": "33.4996", "lng": "126.5312", "population": 692032}
+      ]
+    },
+    {
+      "code": "ca",
+      "name": "Canadá",
+      "locale": "en-CA",
+      "currency": "CAD",
+      "currencySymbol": "$",
+      "priority": 10,
+      "marketSize": "15000M_CAD",
+      "cities": [
+        {"name": "Toronto", "slug": "toronto", "lat": "43.6532", "lng": "-79.3832", "population": 2930000},
+        {"name": "Vancouver", "slug": "vancouver", "lat": "49.2827", "lng": "-123.1207", "population": 675218},
+        {"name": "Montreal", "slug": "montreal", "lat": "45.5017", "lng": "-73.5673", "population": 1780000},
+        {"name": "Banff", "slug": "banff", "lat": "51.1784", "lng": "-115.5708", "population": 8305},
+        {"name": "Quebec City", "slug": "quebec-city", "lat": "46.8139", "lng": "-71.2080", "population": 542298}
+      ]
+    },
+    {
+      "code": "ma",
+      "name": "Marruecos",
+      "locale": "ar-MA",
+      "currency": "MAD",
+      "currencySymbol": "د.م.",
+      "priority": 15,
+      "marketSize": "800M_USD",
+      "cities": [
+        {"name": "Marrakech", "slug": "marrakech", "lat": "31.6295", "lng": "-7.9811", "population": 928850},
+        {"name": "Casablanca", "slug": "casablanca", "lat": "33.5731", "lng": "-7.5898", "population": 3359818},
+        {"name": "Fez", "slug": "fez", "lat": "34.0181", "lng": "-5.0078", "population": 1112072}
+      ]
+    },
+    {
+      "code": "eg",
+      "name": "Egipto",
+      "locale": "ar-EG",
+      "currency": "EGP",
+      "currencySymbol": "E£",
+      "priority": 16,
+      "marketSize": "1500M_USD",
+      "cities": [
+        {"name": "El Cairo", "slug": "el-cairo", "lat": "30.0444", "lng": "31.2357", "population": 9500000},
+        {"name": "Alejandría", "slug": "alejandria", "lat": "31.2001", "lng": "29.9187", "population": 5200000},
+        {"name": "Sharm el-Sheikh", "slug": "sharm-el-sheikh", "lat": "27.9158", "lng": "34.3300", "population": 73000}
+      ]
+    },
+    {
+      "code": "nl",
+      "name": "Países Bajos",
+      "locale": "nl-NL",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 11,
+      "marketSize": "5000M_EUR",
+      "cities": [
+        {"name": "Ámsterdam", "slug": "amsterdam", "lat": "52.3676", "lng": "4.9041", "population": 872680},
+        {"name": "Rotterdam", "slug": "rotterdam", "lat": "51.9225", "lng": "4.4792", "population": 651446},
+        {"name": "Utrecht", "slug": "utrecht", "lat": "52.0907", "lng": "5.1214", "population": 357694}
+      ]
+    },
+    {
+      "code": "be",
+      "name": "Bélgica",
+      "locale": "fr-BE",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 17,
+      "marketSize": "3000M_EUR",
+      "cities": [
+        {"name": "Bruselas", "slug": "bruselas", "lat": "50.8503", "lng": "4.3517", "population": 1209000},
+        {"name": "Brujas", "slug": "brujas", "lat": "51.2093", "lng": "3.2247", "population": 118284},
+        {"name": "Amberes", "slug": "amberes", "lat": "51.2194", "lng": "4.4025", "population": 523248}
+      ]
+    },
+    {
+      "code": "ch",
+      "name": "Suiza",
+      "locale": "de-CH",
+      "currency": "CHF",
+      "currencySymbol": "CHF",
+      "priority": 12,
+      "marketSize": "8000M_CHF",
+      "cities": [
+        {"name": "Zúrich", "slug": "zurich", "lat": "47.3769", "lng": "8.5417", "population": 421878},
+        {"name": "Ginebra", "slug": "ginebra", "lat": "46.2044", "lng": "6.1432", "population": 201818},
+        {"name": "Lucerna", "slug": "lucerna", "lat": "47.0502", "lng": "8.3093", "population": 81691},
+        {"name": "Interlaken", "slug": "interlaken", "lat": "46.6863", "lng": "7.8632", "population": 5592}
+      ]
+    },
+    {
+      "code": "at",
+      "name": "Austria",
+      "locale": "de-AT",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 13,
+      "marketSize": "3500M_EUR",
+      "cities": [
+        {"name": "Viena", "slug": "viena", "lat": "48.2082", "lng": "16.3738", "population": 1920949},
+        {"name": "Salzburgo", "slug": "salzburgo", "lat": "47.8095", "lng": "13.0550", "population": 155021},
+        {"name": "Innsbruck", "slug": "innsbruck", "lat": "47.2692", "lng": "11.4041", "population": 132493}
+      ]
+    },
+    {
+      "code": "cz",
+      "name": "República Checa",
+      "locale": "cs-CZ",
+      "currency": "CZK",
+      "currencySymbol": "Kč",
+      "priority": 14,
+      "marketSize": "1500M_EUR",
+      "cities": [
+        {"name": "Praga", "slug": "praga", "lat": "50.0755", "lng": "14.4378", "population": 1309000},
+        {"name": "Brno", "slug": "brno", "lat": "49.1951", "lng": "16.6068", "population": 381346},
+        {"name": "Český Krumlov", "slug": "cesky-krumlov", "lat": "48.8127", "lng": "14.3175", "population": 13056}
+      ]
+    },
+    {
+      "code": "pl",
+      "name": "Polonia",
+      "locale": "pl-PL",
+      "currency": "PLN",
+      "currencySymbol": "zł",
+      "priority": 15,
+      "marketSize": "2500M_EUR",
+      "cities": [
+        {"name": "Varsovia", "slug": "varsovia", "lat": "52.2297", "lng": "21.0122", "population": 1790658},
+        {"name": "Cracovia", "slug": "cracovia", "lat": "50.0647", "lng": "19.9450", "population": 779115},
+        {"name": "Gdansk", "slug": "gdansk", "lat": "54.3520", "lng": "18.6466", "population": 470907}
+      ]
+    },
+    {
+      "code": "ru",
+      "name": "Rusia",
+      "locale": "ru-RU",
+      "currency": "RUB",
+      "currencySymbol": "₽",
+      "priority": 18,
+      "marketSize": "5000M_USD",
+      "cities": [
+        {"name": "Moscú", "slug": "moscu", "lat": "55.7558", "lng": "37.6173", "population": 12655050},
+        {"name": "San Petersburgo", "slug": "san-petersburgo", "lat": "59.9311", "lng": "30.3609", "population": 5384342},
+        {"name": "Sochi", "slug": "sochi", "lat": "43.6028", "lng": "39.7342", "population": 443562}
+      ]
+    },
+    {
+      "code": "se",
+      "name": "Suecia",
+      "locale": "sv-SE",
+      "currency": "SEK",
+      "currencySymbol": "kr",
+      "priority": 16,
+      "marketSize": "3000M_SEK",
+      "cities": [
+        {"name": "Estocolmo", "slug": "estocolmo", "lat": "59.3293", "lng": "18.0686", "population": 975551},
+        {"name": "Gotemburgo", "slug": "gotemburgo", "lat": "57.7089", "lng": "11.9746", "population": 579281},
+        {"name": "Malmö", "slug": "malmo", "lat": "55.6050", "lng": "13.0038", "population": 344166}
+      ]
+    },
+    {
+      "code": "no",
+      "name": "Noruega",
+      "locale": "no-NO",
+      "currency": "NOK",
+      "currencySymbol": "kr",
+      "priority": 17,
+      "marketSize": "2500M_NOK",
+      "cities": [
+        {"name": "Oslo", "slug": "oslo", "lat": "59.9139", "lng": "10.7522", "population": 697010},
+        {"name": "Bergen", "slug": "bergen", "lat": "60.3913", "lng": "5.3221", "population": 283929},
+        {"name": "Stavanger", "slug": "stavanger", "lat": "58.9700", "lng": "5.7331", "population": 144699}
+      ]
+    },
+    {
+      "code": "dk",
+      "name": "Dinamarca",
+      "locale": "da-DK",
+      "currency": "DKK",
+      "currencySymbol": "kr",
+      "priority": 18,
+      "marketSize": "2000M_DKK",
+      "cities": [
+        {"name": "Copenhague", "slug": "copenhague", "lat": "55.6761", "lng": "12.5683", "population": 794128},
+        {"name": "Aarhus", "slug": "aarhus", "lat": "56.1629", "lng": "10.2039", "population": 282910}
+      ]
+    },
+    {
+      "code": "fi",
+      "name": "Finlandia",
+      "locale": "fi-FI",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 19,
+      "marketSize": "1500M_EUR",
+      "cities": [
+        {"name": "Helsinki", "slug": "helsinki", "lat": "60.1699", "lng": "24.9384", "population": 658864},
+        {"name": "Rovaniemi", "slug": "rovaniemi", "lat": "66.5039", "lng": "25.7294", "population": 63612}
+      ]
+    },
+    {
+      "code": "ie",
+      "name": "Irlanda",
+      "locale": "en-IE",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 14,
+      "marketSize": "2500M_EUR",
+      "cities": [
+        {"name": "Dublín", "slug": "dublin", "lat": "53.3498", "lng": "-6.2603", "population": 1228179},
+        {"name": "Galway", "slug": "galway", "lat": "53.2707", "lng": "-9.0568", "population": 80504},
+        {"name": "Cork", "slug": "cork", "lat": "51.8985", "lng": "-8.4756", "population": 210853}
+      ]
+    },
+    {
+      "code": "il",
+      "name": "Israel",
+      "locale": "he-IL",
+      "currency": "ILS",
+      "currencySymbol": "₪",
+      "priority": 20,
+      "marketSize": "1500M_USD",
+      "cities": [
+        {"name": "Tel Aviv", "slug": "tel-aviv", "lat": "32.0853", "lng": "34.7818", "population": 460613},
+        {"name": "Jerusalén", "slug": "jerusalen", "lat": "31.7683", "lng": "35.2137", "population": 936425}
+      ]
+    }
+  ],
+  "targetStats": {
+    "phase1": {
+      "countries": 15,
+      "cities": 108,
+      "pages": 756,
+      "priority": "Países hispanohablantes"
+    },
+    "phase2": {
+      "countries": 30,
+      "cities": 250,
+      "pages": 1750,
+      "priority": "Europa + Asia top"
+    },
+    "phase3": {
+      "countries": 60,
+      "cities": 450,
+      "pages": 3150,
+      "priority": "Cobertura global completa"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-// pages/WeddingServices.jsx
+﻿// pages/WeddingServices.jsx
 // Página del dashboard de servicios de la boda
 
 import React from 'react';
@@ -7,7 +7,6 @@ import PageWrapper from '../components/PageWrapper';
 import WeddingServicesOverview from '../components/wedding/WeddingServicesOverview';
 import Button from '../components/ui/Button';
 import { Plus } from 'lucide-react';
-
 export default function WeddingServices() {
   const navigate = useNavigate();
   
@@ -17,20 +16,17 @@ export default function WeddingServices() {
   };
   
   return (
-    <PageWrapper
-      title="Servicios de tu boda"
-      subtitle="Gestiona y organiza todos los proveedores que necesitas"
-      action={
-        <Button
+    <div className="p-6">
+      <div className="mb-4">
+        <Button 
           onClick={() => navigate('/proveedores')}
           className="flex items-center gap-2"
         >
           <Plus size={18} />
           Buscar proveedores
         </Button>
-      }
-    >
+      </div>
       <WeddingServicesOverview onSearch={handleSearch} />
-    </PageWrapper>
+    </div>
   );
 }

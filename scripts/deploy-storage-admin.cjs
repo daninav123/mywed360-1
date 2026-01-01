@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { GoogleAuth } = require('google-auth-library');
 
-const PROJECT_ID = 'lovenda-98c77';
+const PROJECT_ID = 'planivia-98c77';
 const serviceAccountPath = path.join(__dirname, '..', 'backend', 'serviceAccount.json');
 
 async function deployStorageRulesWithAdmin() {
@@ -63,7 +63,7 @@ async function deployStorageRulesWithAdmin() {
     
     // IMPORTANTE: Usar el endpoint correcto con updateMask
     console.log('\n📤 Desplegando ruleset...');
-    const bucketName = 'lovenda-98c77.firebasestorage.app';
+    const bucketName = 'planivia-98c77.firebasestorage.app';
     
     // Primero obtener la release actual
     const getUrl = `https://firebaserules.googleapis.com/v1/projects/${PROJECT_ID}/releases/firebase.storage%2F${bucketName}`;

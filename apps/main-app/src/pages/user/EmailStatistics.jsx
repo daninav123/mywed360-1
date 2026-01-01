@@ -27,7 +27,7 @@ const EmailStatistics = () => {
       </Button>
 
       {/* Contenido principal */}
-      <div className="bg-white rounded-lg shadow p-4 md:p-6">
+      <div className=" rounded-lg shadow p-4 md:p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
         {currentUser ? (
           <EmailStats userId={currentUser.uid} />
         ) : (

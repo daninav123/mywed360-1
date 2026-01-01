@@ -54,7 +54,7 @@ export async function researchTopic({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'Lovenda-Blog-Automation/1.0',
+        'User-Agent': 'Planivia-Blog-Automation/1.0',
         'X-Tavily-API-Key': TAVILY_API_KEY,
       },
       body: JSON.stringify({

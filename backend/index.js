@@ -134,8 +134,9 @@ import emailValidationRouter from './routes/email-validation.js';
 import partnerStatsRouter from './routes/partner-stats.js';
 import appStoreWebhookRouter from './routes/app-store-webhook.js';
 import emailTagsRouter from './routes/email-tags.js';
-import emailAliasRouter from './routes/email-alias.js';
-import crmRouter from './routes/crm.js';
+import seatingPlanRouter from './routes/seating-plan.js';
+import ceremonyRouter from './routes/ceremony.js';
+import supplierGroupsRouter from './routes/supplier-groups.js';
 import providersRouter from './routes/providers.js';
 import favoritesRouter from './routes/favorites.js';
 import projectMetricsRouter from './routes/project-metrics.js';
@@ -158,6 +159,14 @@ import blogRouter from './routes/blog.js';
 import { cleanupExpiredFavorites } from './tasks/cleanupExpiredFavorites.js';
 import adminAITraining from './routes/admin-ai-training.js';
 import weddingDesignRouter from './routes/wedding-design.js';
+import tasksRouter from './routes/tasks.js';
+import timelineRouter from './routes/timeline.js';
+import specialMomentsRouter from './routes/special-moments.js';
+import transactionsRouter from './routes/transactions.js';
+import budgetRouter from './routes/budget.js';
+import guestsPostgresRouter from './routes/guests-postgres.js';
+import weddingInfoRouter from './routes/wedding-info.js';
+import authRouter from './routes/auth.js';
 
 const {
   PORT,
@@ -642,7 +651,7 @@ app.use('/api/email/tags', authMiddleware(), emailTagsRouter);
 app.use('/api/email/validate', requireAuth, emailValidationRouter); // Validación DKIM/SPF
 app.use('/api/email', emailDocsRouter);
 app.use('/api/email-templates', optionalAuth, emailTemplatesRouter); // Plantillas de email
-app.use('/api/email-alias', optionalAuth, emailAliasRouter); // Actualizar alias de email
+// app.use('/api/email-alias', optionalAuth, emailAliasRouter); // COMENTADO: router no importado
 
 // IMPORTANTE: Las rutas más específicas (/api/mailgun/events) deben ir ANTES que las generales (/api/mailgun)
 app.use('/api/mailgun/events', requireMailAccess, mailgunEventsRouter); // Eventos de Mailgun
@@ -708,7 +717,15 @@ app.use('/api/weddings', requireAuth, supplierBudgetRouter);
 app.use('/api', weddingServicesRouter);
 // Weddings general (autofix permisos, etc.)
 app.use('/api/weddings', requireAuth, weddingsRouter);
-app.use('/api/crm', crmRouter);
+app.use('/api/seating-plan', requireAuth, seatingPlanRouter);
+app.use('/api/ceremony', requireAuth, ceremonyRouter);
+app.use('/api/supplier-groups', requireAuth, supplierGroupsRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/transactions', requireAuth, transactionsRouter);
+app.use('/api/budget', requireAuth, budgetRouter);
+app.use('/api/guests-pg', requireAuth, guestsPostgresRouter);
+app.use('/api/wedding-info', requireAuth, weddingInfoRouter);
+// app.use('/api/crm', crmRouter); // COMENTADO: router no importado
 // Supplier portal (public entry by token, handled inside router)
 app.use('/api/supplier-portal', supplierPortalRouter);
 // Supplier registration (public, no auth required)

@@ -1,0 +1,57 @@
+{
+  "debugAuth": {
+    "title": "🔍 AUTHENTICATION DIAGNOSTIC",
+    "sections": {
+      "firebase": "1️⃣ Firebase Auth Status:",
+      "token": "2️⃣ Attempting to get token:",
+      "tokenPayload": "3️⃣ Token content:",
+      "backend": "4️⃣ Testing backend call:",
+      "localStorage": "5️⃣ Token in localStorage:"
+    },
+    "status": {
+      "configured": "✅ Configured",
+      "notConfigured": "❌ Not configured",
+      "userExists": "✅ Exists",
+      "userMissing": "❌ No user",
+      "emailVerified": "✅ Verified",
+      "emailUnverified": "❌ Not verified"
+    },
+    "messages": {
+      "auth": "   auth: {{status}}",
+      "currentUser": "   currentUser: {{status}}",
+      "uid": "   UID: {{value}}",
+      "email": "   Email: {{value}}",
+      "emailVerified": "   emailVerified: {{value}}",
+      "noUser": "   ❌ No authenticated user",
+      "tokenObtained": "   ✅ Token obtained successfully",
+      "tokenLength": "   Length: {{value}} characters",
+      "tokenPreview": "   First 50 chars: {{value}}",
+      "issuer": "   iss (issuer): {{value}}",
+      "subject": "   sub (user_id): {{value}}",
+      "audience": "   aud (audience): {{value}}",
+      "expires": "   exp (expiration): {{value}}",
+      "issued": "   iat (issued at): {{value}}",
+      "expiresIn": "   Expires in: {{minutes}} minutes",
+      "tokenExpired": "   ⚠️ TOKEN EXPIRED!",
+      "tokenExpiringSoon": "   ⚠️ Token expires soon (< 5 min)",
+      "tokenValid": "   ✅ Token valid",
+      "tokenParseError": "   ⚠️ Could not parse token: {{error}}",
+      "backendStatus": "   Status: {{status}} {{statusText}}",
+      "backendOk": "   ✅ Response OK",
+      "backendEmails": "   Emails received: {{count}}",
+      "backendError": "   ❌ Error in response",
+      "backendErrorJson": "   Error: {{error}}",
+      "backendErrorText": "   Error (text): {{text}}",
+      "fetchError": "   ❌ Fetch error: {{message}}",
+      "tokenNull": "   ❌ Could not obtain token (null result)",
+      "tokenError": "   ❌ Error getting token: {{message}}",
+      "tokenStack": "   Stack: {{stack}}",
+      "localStorageTokenExists": "   ✅ Stored token exists",
+      "localStorageTokenLength": "   Length: {{value}}",
+      "localStorageTokenMissing": "   ⚠️ No token stored in localStorage",
+      "localStorageError": "   ❌ Error accessing localStorage: {{error}}",
+      "diagnosticDone": "✅ Diagnostic completed",
+      "notAvailable": "N/A"
+    }
+  }
+}

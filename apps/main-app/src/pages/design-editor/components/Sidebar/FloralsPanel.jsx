@@ -95,22 +95,22 @@ export default function FloralsPanel({ onAddElement }) {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Flower2 className="w-5 h-5 text-pink-600" />
-          <h3 className="text-sm font-semibold text-gray-900">Ilustraciones Florales</h3>
+          <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Ilustraciones Florales</h3>
         </div>
-        <p className="text-xs text-gray-600">
+        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
           Elementos florales estilo acuarela para invitaciones elegantes
         </p>
       </div>
 
       {/* Búsqueda */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 " style={{ color: 'var(--color-muted)' }} />
         <input
           type="text"
           placeholder="Buscar flores..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+          className="w-full pl-9 pr-3 py-2 text-sm border  rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
         />
       </div>
 
@@ -133,7 +133,7 @@ export default function FloralsPanel({ onAddElement }) {
       </div>
 
       {/* Tabs: Todos, Recientes, Favoritos */}
-      <div className="flex gap-2 border-b border-gray-200">
+      <div className="flex gap-2 border-b " style={{ borderColor: 'var(--color-border)' }}>
         <button
           onClick={() => setActiveTab('all')}
           className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors ${
@@ -172,7 +172,7 @@ export default function FloralsPanel({ onAddElement }) {
       {/* Grid de ilustraciones */}
       <div className="grid grid-cols-2 gap-3 max-h-[600px] overflow-y-auto pr-2">
         {displayedElements.length === 0 ? (
-          <div className="col-span-2 text-center py-8 text-sm text-gray-500">
+          <div className="col-span-2 text-center py-8 text-sm " style={{ color: 'var(--color-muted)' }}>
             {activeTab === 'recent' && 'No hay elementos recientes'}
             {activeTab === 'favorites' && 'No hay favoritos. Marca elementos con ⭐'}
             {activeTab === 'all' && 'No se encontraron ilustraciones'}
@@ -182,7 +182,7 @@ export default function FloralsPanel({ onAddElement }) {
             <button
               key={illustration.id}
               onClick={() => handleAddFloral(illustration)}
-              className="group relative aspect-square bg-gray-50 rounded-xl overflow-hidden hover:ring-2 hover:ring-pink-500 transition-all"
+              className="group relative aspect-square  rounded-xl overflow-hidden hover:ring-2 hover:ring-pink-500 transition-all" style={{ backgroundColor: 'var(--color-bg)' }}
             >
               {/* Imagen de preview */}
               {illustration.type === 'corner-set' ? (
@@ -220,7 +220,7 @@ export default function FloralsPanel({ onAddElement }) {
               {/* Botón de favorito */}
               <button
                 onClick={(e) => toggleFavorite(illustration, e)}
-                className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors z-10"
+                className="absolute top-2 right-2 p-1.5 rounded-full /80 backdrop-blur-sm hover:bg-white transition-colors z-10" style={{ backgroundColor: 'var(--color-surface)' }}
               >
                 <Star className={`w-3.5 h-3.5 ${isFavorite(illustration) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`} />
               </button>

@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
-
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
 import { useAuth } from './useAuth';
-import { performanceMonitor } from '../services/PerformanceMonitor';
+import { ceremonyAPI } from '../services/apiService';
 
 const DEFAULT_STATE = {
   readings: [],
@@ -53,10 +50,6 @@ export default function useCeremonyTexts() {
   const readingsRef = useRef([]);
   const surprisesRef = useRef([]);
 
-  const docRef = useMemo(() => {
-    if (!activeWedding) return null;
-    return doc(db, 'weddings', activeWedding, 'ceremonyTexts', 'main');
-  }, [activeWedding]);
 
   const canEdit = useMemo(() => {
     try {
@@ -68,26 +61,19 @@ export default function useCeremonyTexts() {
   }, [userProfile?.role, hasRole]);
 
   const persist = useCallback(
-    async (nextReadings, nextSurprises, action = 'update') => {
-      if (!docRef) return;
+    async (nextReadings, nextSurprises) => {
+      if (!activeWedding) return;
       try {
-        await setDoc(
-          docRef,
-          {
-            readings: nextReadings,
-            surprises: nextSurprises,
-            updatedAt: serverTimestamp(),
-            updatedBy: currentUser?.uid || null,
-            lastAction: action,
-          },
-          { merge: true },
-        );
+        await ceremonyAPI.updateTexts(activeWedding, {
+          readings: nextReadings,
+          surprises: nextSurprises,
+        });
       } catch (err) {
-        // console.warn('[useCeremonyTexts] persist failed', err);
+        console.error('[useCeremonyTexts] persist failed', err);
         setError(err);
       }
     },
-    [docRef, currentUser?.uid],
+    [activeWedding],
   );
 
   useEffect(() => {
@@ -140,11 +126,7 @@ export default function useCeremonyTexts() {
       setReadings((prev) => {
         const next = [...prev, base];
         readingsRef.current = next;
-        void persist(next, surprisesRef.current, 'reading_added');
-        performanceMonitor.logEvent('ceremony_text_created', {
-          weddingId: activeWedding,
-          textType: 'reading',
-        });
+        void persist(next, surprisesRef.current);
         return next;
       });
     },

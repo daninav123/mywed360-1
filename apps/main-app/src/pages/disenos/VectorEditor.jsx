@@ -141,7 +141,7 @@ export default function VectorEditorPage() {
         <h1 className="text-xl font-semibold">
           {t('designsLibrary.vectorEditor.title', 'Editor vectorial (IA)')}
         </h1>
-        <Link to="/disenos" className="text-blue-600 hover:underline">
+        <Link to="/disenos" className=" hover:underline" style={{ color: 'var(--color-primary)' }}>
           {t('designsLibrary.myDesigns.backLink', 'Volver a Diseños')}
         </Link>
       </div>
@@ -156,7 +156,7 @@ export default function VectorEditorPage() {
       )}
 
       {canVectorize && (
-        <div className="bg-white border rounded p-3">
+        <div className=" border rounded p-3" style={{ backgroundColor: 'var(--color-surface)' }}>
           <div className="flex flex-wrap gap-3 items-end">
             <div className="flex items-center gap-2">
               <label className="text-sm">
@@ -297,7 +297,7 @@ export default function VectorEditorPage() {
               href={imageUrl}
               target="_blank"
               rel="noreferrer"
-              className="text-sm text-gray-600 hover:underline"
+              className="text-sm  hover:underline" style={{ color: 'var(--color-text-secondary)' }}
             >
               {t('designsLibrary.vectorEditor.controls.viewOriginal', 'Ver original')}
             </a>
@@ -362,13 +362,13 @@ export default function VectorEditorPage() {
 
       {/* Paleta de marca (editable) */}
       {activeWedding && (
-        <div className="bg-white border rounded p-3">
+        <div className=" border rounded p-3" style={{ backgroundColor: 'var(--color-surface)' }}>
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold">
               {t('designsLibrary.vectorEditor.palette.title', 'Paleta de la boda')}
             </h3>
             <button
-              className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+              className="px-3 py-1 rounded  text-white hover:bg-blue-700" style={{ backgroundColor: 'var(--color-primary)' }}
               onClick={async () => {
                 try {
                   await firebaseReady;
@@ -433,7 +433,7 @@ export default function VectorEditorPage() {
       {svg ? (
         <VectorEditor ref={editorRef} svg={svg} palette={palette} />
       ) : canVectorize && !loading ? (
-        <div className="text-sm text-gray-600">
+        <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
           {t('designsLibrary.vectorEditor.messages.noSvg', 'No hay SVG disponible aún.')}
         </div>
       ) : null}

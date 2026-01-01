@@ -113,14 +113,14 @@ export default function LayersPanel({ canvasRef }) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-white border-l border-gray-200">
+    <div className="h-full flex flex-col  border-l " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b " style={{ borderColor: 'var(--color-border)' }}>
         <div className="flex items-center gap-2">
-          <Layers className="w-5 h-5 text-blue-600" />
-          <h3 className="text-sm font-semibold text-gray-900">Capas</h3>
+          <Layers className="w-5 h-5 " style={{ color: 'var(--color-primary)' }} />
+          <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Capas</h3>
         </div>
-        <p className="text-xs text-gray-600 mt-1">
+        <p className="text-xs  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
           {layers.length} {layers.length === 1 ? 'elemento' : 'elementos'}
         </p>
       </div>
@@ -128,7 +128,7 @@ export default function LayersPanel({ canvasRef }) {
       {/* Layers list */}
       <div className="flex-1 overflow-y-auto">
         {layers.length === 0 ? (
-          <div className="p-4 text-center text-sm text-gray-500">
+          <div className="p-4 text-center text-sm " style={{ color: 'var(--color-muted)' }}>
             No hay elementos en el canvas
           </div>
         ) : (
@@ -150,9 +150,9 @@ export default function LayersPanel({ canvasRef }) {
                     className="p-1 rounded hover:bg-gray-200 transition-colors"
                   >
                     {layer.visible ? (
-                      <Eye className="w-4 h-4 text-gray-600" />
+                      <Eye className="w-4 h-4 " style={{ color: 'var(--color-text-secondary)' }} />
                     ) : (
-                      <EyeOff className="w-4 h-4 text-gray-400" />
+                      <EyeOff className="w-4 h-4 " style={{ color: 'var(--color-muted)' }} />
                     )}
                   </button>
 
@@ -162,18 +162,18 @@ export default function LayersPanel({ canvasRef }) {
                     className="p-1 rounded hover:bg-gray-200 transition-colors"
                   >
                     {layer.locked ? (
-                      <Lock className="w-4 h-4 text-gray-600" />
+                      <Lock className="w-4 h-4 " style={{ color: 'var(--color-text-secondary)' }} />
                     ) : (
-                      <Unlock className="w-4 h-4 text-gray-400" />
+                      <Unlock className="w-4 h-4 " style={{ color: 'var(--color-muted)' }} />
                     )}
                   </button>
 
                   {/* Layer name */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-medium  truncate" style={{ color: 'var(--color-text)' }}>
                       {layer.name}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
                       {layer.type}
                     </p>
                   </div>
@@ -184,13 +184,13 @@ export default function LayersPanel({ canvasRef }) {
                       onClick={(e) => { e.stopPropagation(); moveLayer(layer, 'up'); }}
                       className="p-1 rounded hover:bg-gray-200 transition-colors"
                     >
-                      <ChevronUp className="w-4 h-4 text-gray-600" />
+                      <ChevronUp className="w-4 h-4 " style={{ color: 'var(--color-text-secondary)' }} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); moveLayer(layer, 'down'); }}
                       className="p-1 rounded hover:bg-gray-200 transition-colors"
                     >
-                      <ChevronDown className="w-4 h-4 text-gray-600" />
+                      <ChevronDown className="w-4 h-4 " style={{ color: 'var(--color-text-secondary)' }} />
                     </button>
                   </div>
 
@@ -199,7 +199,7 @@ export default function LayersPanel({ canvasRef }) {
                     onClick={(e) => deleteLayer(layer, e)}
                     className="p-1 rounded hover:bg-red-100 transition-colors"
                   >
-                    <Trash2 className="w-4 h-4 text-red-600" />
+                    <Trash2 className="w-4 h-4 " style={{ color: 'var(--color-danger)' }} />
                   </button>
                 </div>
               </div>
@@ -209,9 +209,9 @@ export default function LayersPanel({ canvasRef }) {
       </div>
 
       {/* Shortcuts info */}
-      <div className="p-3 border-t border-gray-200 bg-gray-50">
-        <p className="text-xs font-medium text-gray-700 mb-2">⌨️ Atajos</p>
-        <div className="space-y-1 text-[11px] text-gray-600">
+      <div className="p-3 border-t  " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+        <p className="text-xs font-medium  mb-2" style={{ color: 'var(--color-text)' }}>⌨️ Atajos</p>
+        <div className="space-y-1 text-[11px] " style={{ color: 'var(--color-text-secondary)' }}>
           <div className="flex justify-between">
             <span>Copiar</span>
             <span className="font-mono">⌘+C</span>

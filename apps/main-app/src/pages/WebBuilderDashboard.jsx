@@ -9,7 +9,7 @@ import {
 } from '../services/webBuilder/craftWebService';
 import { toast } from 'react-toastify';
 import { ShareWebTools } from '../components/web/ShareWebTools';
-import { TemplateSelector } from '../components/web/TemplateSelector';
+import { SimpleTemplateSelector as TemplateSelector } from '../components/web/SimpleWebDesigner';
 
 /**
  * Dashboard para gestionar las webs creadas por el usuario
@@ -116,24 +116,24 @@ const WebBuilderDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen  flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Cargando tus webs...</p>
+          <p className=" text-lg" style={{ color: 'var(--color-text-secondary)' }}>Cargando tus webs...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen  py-8" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">🎨 Mis Webs de Boda</h1>
-              <p className="mt-2 text-gray-600">Gestiona todas tus webs creadas</p>
+              <h1 className="text-3xl font-bold " style={{ color: 'var(--color-text)' }}>🎨 Mis Webs de Boda</h1>
+              <p className="mt-2 " style={{ color: 'var(--color-text-secondary)' }}>Gestiona todas tus webs creadas</p>
             </div>
             <button
               onClick={handleCreateNew}
@@ -147,12 +147,12 @@ const WebBuilderDashboard = () => {
 
         {/* Lista de Webs */}
         {webs.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+          <div className=" rounded-xl shadow-sm p-12 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
             <div className="text-6xl mb-4">🎨</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
               Aún no has creado ninguna web
             </h3>
-            <p className="text-gray-600 mb-6">Crea tu primera web de boda personalizada</p>
+            <p className=" mb-6" style={{ color: 'var(--color-text-secondary)' }}>Crea tu primera web de boda personalizada</p>
             <button
               onClick={handleCreateNew}
               className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold"
@@ -165,20 +165,20 @@ const WebBuilderDashboard = () => {
             {webs.map((web) => (
               <div
                 key={web.id}
-                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                className=" rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden" style={{ backgroundColor: 'var(--color-surface)' }}
               >
                 {/* Preview */}
                 <div className="h-48 bg-[var(--color-primary)] flex items-center justify-center relative">
                   {web.published && (
                     <div className="absolute top-3 right-3">
-                      <span className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
+                      <span className="px-3 py-1  text-white text-xs font-semibold rounded-full" style={{ backgroundColor: 'var(--color-success)' }}>
                         ✓ Publicada
                       </span>
                     </div>
                   )}
                   <div className="text-center">
                     <div className="text-5xl mb-2">🎨</div>
-                    <p className="text-sm font-medium text-gray-700">
+                    <p className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>
                       {web.nombre || 'Mi Web de Boda'}
                     </p>
                   </div>
@@ -187,12 +187,12 @@ const WebBuilderDashboard = () => {
                 {/* Información */}
                 <div className="p-5">
                   <div className="mb-4">
-                    <p className="text-sm text-gray-500 mb-1">
+                    <p className="text-sm  mb-1" style={{ color: 'var(--color-muted)' }}>
                       Actualizada: {formatDate(web.updatedAt)}
                     </p>
                     {web.published && web.slug && (
                       <div className="mt-2 flex items-center gap-2">
-                        <p className="text-xs text-gray-600 truncate flex-1">/web/{web.slug}</p>
+                        <p className="text-xs  truncate flex-1" style={{ color: 'var(--color-text-secondary)' }}>/web/{web.slug}</p>
                         <button
                           onClick={() => handleCopyUrl(web.slug)}
                           className="text-purple-600 hover:text-purple-700 text-xs font-medium"
@@ -222,7 +222,7 @@ const WebBuilderDashboard = () => {
                       ) : (
                         <button
                           onClick={() => handleEdit(web.id)}
-                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                          className="px-4 py-2  text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium" style={{ backgroundColor: 'var(--color-success)' }}
                         >
                           ✨ Publicar
                         </button>
@@ -232,7 +232,7 @@ const WebBuilderDashboard = () => {
                     {web.published && web.slug && (
                       <button
                         onClick={() => setSharingWeb(web)}
-                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        className="w-full px-4 py-2  text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium" style={{ backgroundColor: 'var(--color-primary)' }}
                       >
                         📱 Compartir
                       </button>
@@ -242,7 +242,7 @@ const WebBuilderDashboard = () => {
                   <button
                     onClick={() => handleDelete(web.id)}
                     disabled={deletingId === web.id}
-                    className="w-full mt-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium disabled:opacity-50"
+                    className="w-full mt-2 px-4 py-2 bg-red-50  rounded-lg hover:bg-red-100 transition-colors text-sm font-medium disabled:opacity-50" style={{ color: 'var(--color-danger)' }}
                   >
                     {deletingId === web.id ? '🗑️ Eliminando...' : '🗑️ Eliminar'}
                   </button>
@@ -265,14 +265,14 @@ const WebBuilderDashboard = () => {
       {/* Modal de Compartir */}
       {sharingWeb && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">
+          <div className=" rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="sticky top-0  border-b  px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
                 Compartir: {sharingWeb.nombre || 'Mi Web'}
               </h2>
               <button
                 onClick={() => setSharingWeb(null)}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
+                className=" hover: text-2xl" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}
               >
                 ×
               </button>

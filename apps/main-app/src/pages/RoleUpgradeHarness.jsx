@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
-
 const ROLE_OPTIONS = [
   { id: 'owner', label: 'Owner', tier: 'free' },
   { id: 'assistant', label: 'Assistant', tier: 'assistant' },

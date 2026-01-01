@@ -77,10 +77,10 @@ export default function DesignGallery({ isOpen, onClose, onLoadDesign }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" data-testid="design-gallery">
-      <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+      <div className=" rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className="p-6 border-b  flex items-center justify-between" style={{ borderColor: 'var(--color-border)' }}>
           <h2 className="text-2xl font-bold">Mis Diseños</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700" data-testid="close-icon">
+          <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text)' }} data-testid="close-icon">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -91,19 +91,19 @@ export default function DesignGallery({ isOpen, onClose, onLoadDesign }) {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           ) : designs.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 " style={{ color: 'var(--color-muted)' }}>
               <p>No tienes diseños guardados aún</p>
               <p className="text-sm mt-2">Crea tu primer diseño para verlo aquí</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {designs.map((design) => (
-                <div key={design.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow" data-testid="design-card">
-                  <div className="aspect-[3/4] bg-gray-100 flex items-center justify-center">
-                    <div className="text-gray-400 text-sm">Preview</div>
+                <div key={design.id} className="border  rounded-lg overflow-hidden hover:shadow-lg transition-shadow" style={{ borderColor: 'var(--color-border)' }} data-testid="design-card">
+                  <div className="aspect-[3/4]  flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+                    <div className=" text-sm" style={{ color: 'var(--color-muted)' }}>Preview</div>
                   </div>
                   <div className="p-4">
-                    <div className="text-sm text-gray-500 mb-3">
+                    <div className="text-sm  mb-3" style={{ color: 'var(--color-muted)' }}>
                       {design.updatedAt?.toDate?.()?.toLocaleDateString() || 'Sin fecha'}
                     </div>
                     <div className="flex gap-2">
@@ -112,21 +112,21 @@ export default function DesignGallery({ isOpen, onClose, onLoadDesign }) {
                           onLoadDesign(design);
                           onClose();
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2  text-white rounded hover:bg-blue-700" style={{ backgroundColor: 'var(--color-primary)' }}
                       >
                         <Edit className="w-4 h-4" />
                         Editar
                       </button>
                       <button
                         onClick={() => handleDuplicate(design)}
-                        className="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                        className="px-3 py-2 border  rounded hover:" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
                         title="Duplicar"
                       >
                         <Copy className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(design.id)}
-                        className="px-3 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50"
+                        className="px-3 py-2 border border-red-300  rounded hover:bg-red-50" style={{ color: 'var(--color-danger)' }}
                         title="Eliminar"
                       >
                         <Trash2 className="w-4 h-4" />

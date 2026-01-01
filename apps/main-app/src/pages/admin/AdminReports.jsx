@@ -177,13 +177,13 @@ const AdminReports = () => {
           </div>
 
           {error && (
-            <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
+            <div className="rounded-md bg-red-50 px-3 py-2 text-sm " style={{ color: 'var(--color-danger)' }}>
               {error}
             </div>
           )}
 
           {success && (
-            <div className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-600">
+            <div className="rounded-md bg-green-50 px-3 py-2 text-sm " style={{ color: 'var(--color-success)' }}>
               {success}
             </div>
           )}
@@ -208,7 +208,7 @@ const AdminReports = () => {
               <button
                 type="button"
                 onClick={() => setShowGenerateModal(false)}
-                className="text-sm text-[color:var(--color-text-soft)] hover:text-gray-900"
+                className="text-sm text-[color:var(--color-text-soft)] hover:" style={{ color: 'var(--color-text)' }}
               >
                 Cerrar
               </button>

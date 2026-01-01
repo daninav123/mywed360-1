@@ -145,8 +145,13 @@ export default function Login() {
 
     setIsSubmitting(true);
     try {
+      console.log('[Login.jsx] Llamando emailLogin...');
       const result = await emailLogin(trimmedEmail, password, remember);
+      console.log('[Login.jsx] Resultado de emailLogin:', result);
+      console.log('[Login.jsx] result.success:', result?.success);
+      
       if (result?.success) {
+        console.log('[Login.jsx] Login exitoso, guardando email y redirigiendo...');
         if (remember) {
           window.localStorage.setItem('maloveapp_login_email', trimmedEmail);
         } else {
@@ -158,14 +163,17 @@ export default function Login() {
           redirect_to: safeRedirect,
         });
 
+        console.log('[Login.jsx] Navegando a:', safeRedirect);
         if (shouldSkipCypressRedirect()) {
           navigate('/home', { replace: true });
         } else {
           navigate(safeRedirect, { replace: true });
         }
+        console.log('[Login.jsx] Navigate llamado');
         return;
       }
 
+      console.log('[Login.jsx] Login no exitoso, mostrando error');
       const errorCode = result?.code || 'unknown';
       const message = resolveAuthError(errorCode);
       setFormError(message);
@@ -348,7 +356,7 @@ export default function Login() {
                   id={FORM_ERROR_ID}
                   role="alert"
                   aria-live="assertive"
-                  className="text-sm text-red-600"
+                  className="text-sm " style={{ color: 'var(--color-danger)' }}
                 >
                   {formError}
                 </p>
@@ -379,7 +387,7 @@ export default function Login() {
                 id={SOCIAL_ERROR_ID}
                 role="alert"
                 aria-live="assertive"
-                className="mt-3 text-center text-sm text-red-600"
+                className="mt-3 text-center text-sm " style={{ color: 'var(--color-danger)' }}
               >
                 {socialError}
               </p>

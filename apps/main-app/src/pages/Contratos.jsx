@@ -1,4 +1,4 @@
-import { Plus, Download, Eye, ChevronDown, ChevronUp, FileText } from 'lucide-react';
+﻿import { Plus, Download, Eye, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +12,6 @@ import { useAuth } from '../hooks/useAuth';
 import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 import { useProveedores } from '../hooks/useProveedores';
 import { uploadEmailAttachments as uploadFiles } from '../services/storageUploadService';
-
 export default function Contratos() {
   const { t } = useTranslation('pages');
   const { currentUser } = useAuth();
@@ -269,7 +268,7 @@ export default function Contratos() {
     (v) => !['providerName', 'service', 'signedDate', 'serviceDate'].includes(v)
   );
   return (
-    <PageWrapper title="Contratos" actions={actionButtons}>
+    <PageWrapper>
       <Card className="p-6 space-y-6">
         {toast && (
           <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
@@ -278,7 +277,7 @@ export default function Contratos() {
         <div className="hidden">
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded flex items-center"
+            className=" text-white px-4 py-2 rounded flex items-center" style={{ backgroundColor: 'var(--color-primary)' }}
           >
             <Plus size={16} className="mr-2" /> Aұadir Contrato
           </button>
@@ -398,9 +397,9 @@ export default function Contratos() {
             />
           ))}
         </div>
-      </Card>
+    </Card>
 
-      {showAddModal && (
+    {showAddModal && (
         <div className="hidden">
           <div className="bg-surface p-6 rounded shadow w-96">
             <h2 className="text-xl font-semibold mb-4">Aұadir Contrato</h2>
@@ -468,7 +467,7 @@ export default function Contratos() {
                 >
                   Cancelar
                 </button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
+                <button type="submit" className="px-4 py-2  text-white rounded" style={{ backgroundColor: 'var(--color-primary)' }}>
                   Guardar
                 </button>
               </div>
@@ -537,7 +536,7 @@ export default function Contratos() {
                 >
                   Cancelar
                 </button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
+                <button type="submit" className="px-4 py-2  text-white rounded" style={{ backgroundColor: 'var(--color-primary)' }}>
                   Guardar cambios
                 </button>
               </div>
@@ -660,7 +659,7 @@ export default function Contratos() {
                     Copiar
                   </button>
                 </div>
-                <div className="border rounded p-2 bg-gray-50 whitespace-pre-wrap text-sm font-mono max-h-56 overflow-auto">
+                <div className="border rounded p-2  whitespace-pre-wrap text-sm font-mono max-h-56 overflow-auto" style={{ backgroundColor: 'var(--color-bg)' }}>
                   {previewContent || '...'}
                 </div>
               </div>
