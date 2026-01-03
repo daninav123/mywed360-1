@@ -4,7 +4,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import AuthDivider from '../components/auth/AuthDivider';
 import SocialLoginButtons from '../components/auth/SocialLoginButtons';
-import { useAuth } from '../hooks/useAuth';
+import LanguageSelector from '../components/ui/LanguageSelector';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import useTranslations from '../hooks/useTranslations';
 
@@ -15,14 +16,10 @@ const INFO_MESSAGE_ID = 'login-info-message';
 export default function Login() {
   const location = useLocation();
   const navigate = useNavigate();
-  const {
-    login: emailLogin,
-    loginWithProvider,
-    isAuthenticated,
-    isLoading,
-    availableSocialProviders,
-    getProviderLabel,
-  } = useAuth();
+  const { loginWithEmail, authUser, loading } = useAuth();
+
+  const isAuthenticated = !!authUser;
+  const isLoading = loading;
   const { t } = useTranslations();
 
   const savedEmail =
@@ -71,11 +68,8 @@ export default function Login() {
   }, [isAuthenticated, isLoading, navigate, safeRedirect]);
 
   const providers = useMemo(() => {
-    if (availableSocialProviders && availableSocialProviders.length > 0) {
-      return availableSocialProviders;
-    }
     return ['google', 'facebook', 'apple'];
-  }, [availableSocialProviders]);
+  }, []);
 
   const getValidationMessage = useCallback(
     (issue) => {
@@ -145,11 +139,11 @@ export default function Login() {
 
     setIsSubmitting(true);
     try {
-      console.log('[Login.jsx] Llamando emailLogin...');
-      const result = await emailLogin(trimmedEmail, password, remember);
-      console.log('[Login.jsx] Resultado de emailLogin:', result);
+      console.log('[Login.jsx] Llamando loginWithEmail...');
+      const result = await loginWithEmail(trimmedEmail, password);
+      console.log('[Login.jsx] Resultado de loginWithEmail:', result);
       console.log('[Login.jsx] result.success:', result?.success);
-      
+
       if (result?.success) {
         console.log('[Login.jsx] Login exitoso, guardando email y redirigiendo...');
         if (remember) {
@@ -199,13 +193,22 @@ export default function Login() {
     resetFeedback();
     setBusyProvider(providerKey);
 
-    const providerName = getProviderLabel?.(providerKey) || providerKey;
+    // TODO: Implementar OAuth propio (Google, Facebook, Apple)
+    // Firebase Auth social login ha sido removido
+    setSocialError(
+      t('authLogin.social.notAvailable', {
+        defaultValue: 'Social login temporalmente no disponible',
+      })
+    );
+    setBusyProvider(null);
+    return;
+
+    /* DESHABILITADO - Requiere OAuth propio
+    const providerName = providerKey;
     const context = { provider: providerKey, remember_me: remember, source: loginSource };
-
     performanceMonitor?.logEvent?.('social_login_submit', context);
-
     try {
-      const result = await loginWithProvider(providerKey, {});
+      const result = { success: false };
       if (result?.success) {
         if (remember && result.user?.email) {
           window.localStorage.setItem('maloveapp_login_email', result.user.email);
@@ -249,14 +252,47 @@ export default function Login() {
     } finally {
       setBusyProvider(null);
     }
+    */
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] px-4 py-8">
+    <div className="min-h-screen bg-[var(--color-bg)] px-4 py-8 relative">
+      {/* Aviso de mantenimiento */}
+      <div className="bg-amber-50 border-l-4 border-amber-500 px-4 py-3 mb-4">
+        <div className="max-w-5xl mx-auto flex items-start">
+          <div className="flex-shrink-0">
+            <svg className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm text-amber-800">
+              <strong className="font-semibold">Aviso importante:</strong> La plataforma estará en
+              mantenimiento programado hasta el <strong>31 de enero de 2026</strong>. Durante este
+              periodo podrías experimentar interrupciones temporales del servicio.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl flex-col items-center justify-center">
         <div className="w-full max-w-5xl overflow-hidden rounded-2xl border border-soft bg-surface shadow-xl md:grid md:grid-cols-2">
           <div className="hidden bg-[color:var(--color-primary-10)] p-10 md:flex md:flex-col md:justify-between">
             <div>
+              <img
+                src="/logo.png"
+                alt="Planivia"
+                style={{ height: '32px', width: 'auto', marginBottom: '24px' }}
+              />
               <h2 className="text-3xl font-bold text-[color:var(--color-primary)]">
                 {t('authLogin.hero.title')}
               </h2>
@@ -356,7 +392,7 @@ export default function Login() {
                   id={FORM_ERROR_ID}
                   role="alert"
                   aria-live="assertive"
-                  className="text-sm " style={{ color: 'var(--color-danger)' }}
+                  className="text-sm text-danger"
                 >
                   {formError}
                 </p>
@@ -372,22 +408,24 @@ export default function Login() {
               </button>
             </form>
 
-            <AuthDivider />
-
+            {/* Social login temporalmente deshabilitado - requiere OAuth propio
+            <AuthDivider text={t('authLogin.divider')} />
             <SocialLoginButtons
               providers={providers}
               onProviderClick={handleSocialLogin}
               busyProvider={busyProvider}
               disabled={isSubmitting}
-              getProviderLabel={getProviderLabel}
+              error={socialError}
+              errorId={SOCIAL_ERROR_ID}
             />
+            */}
 
             {socialError ? (
               <p
                 id={SOCIAL_ERROR_ID}
                 role="alert"
                 aria-live="assertive"
-                className="mt-3 text-center text-sm " style={{ color: 'var(--color-danger)' }}
+                className="mt-3 text-center text-sm text-danger"
               >
                 {socialError}
               </p>

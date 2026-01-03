@@ -1,4 +1,33 @@
 User-agent: *
+
+# Permitir indexación de páginas públicas
 Allow: /
+Allow: /app
+Allow: /precios
+Allow: /acceso
+Allow: /para-proveedores
+Allow: /para-planners
+Allow: /partners
+Allow: /gestion-invitados-boda
+Allow: /presupuesto-boda-online
+Allow: /seating-plan-boda
+Allow: /blog
+Allow: /login
+Allow: /signup
+
+# Bloquear áreas privadas y administrativas
+Disallow: /home
+Disallow: /perfil
+Disallow: /invitados
+Disallow: /finance
+Disallow: /admin/
+Disallow: /supplier/dashboard/
+Disallow: /api/
+
+# Bloquear contenido duplicado y utilidades
+Disallow: /dev/
+Disallow: /test/
+Disallow: /*.json
+Disallow: /*?*
 
 Sitemap: https://malove.app/sitemap.xml
