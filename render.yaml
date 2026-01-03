@@ -12,7 +12,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: ALLOWED_ORIGIN
-        value: https://maloveapp.netlify.app
+        value: https://planivia.vercel.app
       - key: MAILGUN_API_KEY
         sync: false
       - key: MAILGUN_DOMAIN
