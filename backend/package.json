@@ -31,7 +31,6 @@
     "googleapis": "^164.1.0",
     "handlebars": "^4.7.8",
     "helmet": "^7.1.0",
-    "imagetracerjs": "^1.2.6",
     "jsonwebtoken": "^9.0.3",
     "mailgun-js": "^0.22.0",
     "mammoth": "^1.6.0",
