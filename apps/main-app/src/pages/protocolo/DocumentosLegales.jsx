@@ -6,7 +6,11 @@ import {
   collection,
   deleteDoc,
   doc as firestoreDoc,
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
+  getDocs,
+  query,
+  where,
+  serverTimestamp,
+} from 'firebase/firestore';
 
 import PageWrapper from '../../components/PageWrapper';
 import Card from '../../components/ui/Card';
@@ -27,6 +31,8 @@ import LegalDisclaimer from '../../components/legal/LegalDisclaimer';
 import ReportIssueButton from '../../components/legal/ReportIssueButton';
 import { generateLegalTasks, createLegalReminders } from '../../utils/legalTasksGenerator';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
+
 // Persistencia local de progreso de requisitos por boda
 const LEGAL_LS_KEY = (weddingId) => `legalRequirements_${weddingId}`;
 function loadLegalProgress(weddingId) {
@@ -45,11 +51,9 @@ function saveLegalProgress(weddingId, data) {
 const COUNTRY_CATALOG = {
   ...(legalCatalog?.countries || {}),
   ...(legalCatalogExtended?.countries || {}),
-  ...(legalRequirementsComplete?.countries || {})
+  ...(legalRequirementsComplete?.countries || {}),
 };
-const DEFAULT_COUNTRY = COUNTRY_CATALOG.ES
-  ? 'ES'
-  : Object.keys(COUNTRY_CATALOG)[0] || 'ES';
+const DEFAULT_COUNTRY = COUNTRY_CATALOG.ES ? 'ES' : Object.keys(COUNTRY_CATALOG)[0] || 'ES';
 const LEGAL_TYPE_OPTIONS = [
   { key: 'civil', label: 'Civil / Juzgado', icon: '⚖️' },
   { key: 'religious_catholic', label: 'Católico (efectos civiles)', icon: '⛪' },
@@ -59,12 +63,44 @@ const LEGAL_TYPE_OPTIONS = [
 ];
 // Regiones geográficas
 const REGIONS = {
-  europe: { label: 'Europa', countries: ['ES', 'FR', 'DE', 'IT', 'PT', 'BE', 'NL', 'LU', 'AT', 'IE', 'DK', 'SE', 'FI', 'EE', 'LV', 'LT', 'PL', 'CZ', 'SK', 'HU', 'SI', 'HR', 'RO', 'BG', 'GR', 'CY', 'MT', 'GB'] },
+  europe: {
+    label: 'Europa',
+    countries: [
+      'ES',
+      'FR',
+      'DE',
+      'IT',
+      'PT',
+      'BE',
+      'NL',
+      'LU',
+      'AT',
+      'IE',
+      'DK',
+      'SE',
+      'FI',
+      'EE',
+      'LV',
+      'LT',
+      'PL',
+      'CZ',
+      'SK',
+      'HU',
+      'SI',
+      'HR',
+      'RO',
+      'BG',
+      'GR',
+      'CY',
+      'MT',
+      'GB',
+    ],
+  },
   americas: { label: 'América', countries: ['US', 'CA', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE'] },
   asia: { label: 'Asia', countries: ['JP', 'CN', 'IN', 'SG', 'TH', 'KR', 'PH', 'MY'] },
   oceania: { label: 'Oceanía', countries: ['AU', 'NZ'] },
   africa: { label: 'África', countries: ['ZA', 'EG', 'MA', 'NG', 'KE'] },
-  middle_east: { label: 'Oriente Medio', countries: ['AE', 'QA', 'IL', 'TR', 'SA'] }
+  middle_east: { label: 'Oriente Medio', countries: ['AE', 'QA', 'IL', 'TR', 'SA'] },
 };
 
 const COUNTRY_OPTIONS = Object.entries(COUNTRY_CATALOG)
@@ -335,22 +371,21 @@ export default function DocumentosLegales() {
   // Países filtrados por búsqueda y región
   const filteredCountries = useMemo(() => {
     let filtered = COUNTRY_OPTIONS;
-    
+
     // Filtrar por región
     if (selectedRegion !== 'all') {
       const regionCountries = REGIONS[selectedRegion]?.countries || [];
-      filtered = filtered.filter(c => regionCountries.includes(c.code));
+      filtered = filtered.filter((c) => regionCountries.includes(c.code));
     }
-    
+
     // Filtrar por búsqueda
     if (searchCountry.trim()) {
       const search = searchCountry.toLowerCase();
-      filtered = filtered.filter(c => 
-        c.name.toLowerCase().includes(search) || 
-        c.code.toLowerCase().includes(search)
+      filtered = filtered.filter(
+        (c) => c.name.toLowerCase().includes(search) || c.code.toLowerCase().includes(search)
       );
     }
-    
+
     return filtered;
   }, [searchCountry, selectedRegion]);
 
@@ -600,7 +635,9 @@ export default function DocumentosLegales() {
   // Handler para generar tareas automáticas
   const handleGenerateTasks = async () => {
     if (!activeWedding || !activeCountry || !currentUser?.uid) {
-      toast.error(tr('documents.tasksGenerateError', 'Faltan datos necesarios para generar tareas'));
+      toast.error(
+        tr('documents.tasksGenerateError', 'Faltan datos necesarios para generar tareas')
+      );
       return;
     }
 
@@ -617,9 +654,15 @@ export default function DocumentosLegales() {
 
       if (taskIds.length > 0) {
         await createLegalReminders(activeWedding, taskIds, currentUser.uid);
-        toast.success(tr('documents.tasksCreated', '✅ {count} tareas creadas automáticamente en tu lista de tareas').replace('{count}', taskIds.length), {
-          autoClose: 5000,
-        });
+        toast.success(
+          tr(
+            'documents.tasksCreated',
+            '✅ {count} tareas creadas automáticamente en tu lista de tareas'
+          ).replace('{count}', taskIds.length),
+          {
+            autoClose: 5000,
+          }
+        );
         performanceMonitor.logEvent('legal_tasks_auto_generated', {
           weddingId: activeWedding,
           countryCode: form.region,
@@ -627,7 +670,9 @@ export default function DocumentosLegales() {
           tasksCount: taskIds.length,
         });
       } else {
-        toast.info(tr('documents.noTasksGenerated', 'No se pudieron generar tareas para esta selección'));
+        toast.info(
+          tr('documents.noTasksGenerated', 'No se pudieron generar tareas para esta selección')
+        );
       }
     } catch (error) {
       console.error('Error generando tareas:', error);
@@ -641,7 +686,9 @@ export default function DocumentosLegales() {
     <PageWrapper title="Documentos">
       {!activeWedding && (
         <Card className="p-6">
-          <p className="" className="text-body">Selecciona una boda activa para gestionar documentos.</p>
+          <p className="" className="text-body">
+            Selecciona una boda activa para gestionar documentos.
+          </p>
         </Card>
       )}
 
@@ -656,13 +703,15 @@ export default function DocumentosLegales() {
                 <span>{Object.keys(COUNTRY_CATALOG).length} países disponibles</span>
               </div>
             </div>
-            
+
             {/* Disclaimer Legal */}
             <LegalDisclaimer
               countryName={activeCountry?.name || form.region}
-              officialUrl={activeCountry?.ceremonyTypes?.[legalType]?.requirements?.[0]?.links?.[0]?.url}
+              officialUrl={
+                activeCountry?.ceremonyTypes?.[legalType]?.requirements?.[0]?.links?.[0]?.url
+              }
             />
-            
+
             {/* Estadísticas */}
             <LegalStats
               progress={legalProgress}
@@ -670,7 +719,7 @@ export default function DocumentosLegales() {
               countryInfo={activeCountry}
               legalType={legalType}
             />
-            
+
             {/* Selector de País Mejorado */}
             <div className="mb-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -724,7 +773,9 @@ export default function DocumentosLegales() {
                     ))}
                   </select>
                   {filteredCountries.length === 0 && (
-                    <p className="text-xs  mt-1" className="text-danger">No hay países con ese criterio</p>
+                    <p className="text-xs  mt-1" className="text-danger">
+                      No hay países con ese criterio
+                    </p>
                   )}
                 </div>
               </div>
@@ -769,8 +820,7 @@ export default function DocumentosLegales() {
               )}
               {requirementsList.map(({ key: progressKey, legacyKey, label }, idx) => {
                 const entry =
-                  legalProgress[progressKey] ??
-                  (legacyKey ? legalProgress[legacyKey] : undefined);
+                  legalProgress[progressKey] ?? (legacyKey ? legalProgress[legacyKey] : undefined);
                 const checked = typeof entry === 'object' ? !!entry.done : !!entry;
                 const fileMeta = typeof entry === 'object' ? entry.file : null;
                 const inputId = `file-${idx}-${progressKey.replace(/[^a-z0-9]/gi, '-')}`;
@@ -784,13 +834,10 @@ export default function DocumentosLegales() {
                           updateProgress((current) => {
                             const next = { ...current };
                             const previous =
-                              next[progressKey] ??
-                              (legacyKey ? next[legacyKey] : undefined);
+                              next[progressKey] ?? (legacyKey ? next[legacyKey] : undefined);
                             if (e.target.checked) {
                               next[progressKey] =
-                                typeof previous === 'object'
-                                  ? { ...previous, done: true }
-                                  : true;
+                                typeof previous === 'object' ? { ...previous, done: true } : true;
                             } else {
                               if (typeof previous === 'object' && previous.file) {
                                 next[progressKey] = { ...previous, done: false };
@@ -805,7 +852,10 @@ export default function DocumentosLegales() {
                       />
                       <span>{label}</span>
                     </label>
-                    <div className="pl-6 flex flex-wrap items-center gap-2 text-xs " className="text-secondary">
+                    <div
+                      className="pl-6 flex flex-wrap items-center gap-2 text-xs "
+                      className="text-secondary"
+                    >
                       <input
                         id={inputId}
                         type="file"
@@ -853,7 +903,8 @@ export default function DocumentosLegales() {
                                 source: 'documents-legal',
                               };
                               if (currentUser?.uid) documentBase.uploadedBy = currentUser.uid;
-                              if (currentUser?.email) documentBase.uploadedByEmail = currentUser.email;
+                              if (currentUser?.email)
+                                documentBase.uploadedByEmail = currentUser.email;
 
                               if (documentId) {
                                 const documentRef = firestoreDoc(
@@ -913,7 +964,8 @@ export default function DocumentosLegales() {
                       />
                       <label
                         htmlFor={inputId}
-                        className="px-2 py-1 border rounded cursor-pointer hover:" className="bg-page"
+                        className="px-2 py-1 border rounded cursor-pointer hover:"
+                        className="bg-page"
                       >
                         {uploadingReq[progressKey]
                           ? 'Subiendo...'
@@ -936,7 +988,8 @@ export default function DocumentosLegales() {
                             <span>{fileMeta.filename || 'Archivo'}</span>
                           )}
                           <button
-                            className="" className="text-danger"
+                            className=""
+                            className="text-danger"
                             onClick={async () => {
                               let storageDeletedOk = true;
                               let firestoreDeletedOk = true;
@@ -985,8 +1038,7 @@ export default function DocumentosLegales() {
                               updateProgress((current) => {
                                 const next = { ...current };
                                 const previous =
-                                  next[progressKey] ??
-                                  (legacyKey ? next[legacyKey] : undefined);
+                                  next[progressKey] ?? (legacyKey ? next[legacyKey] : undefined);
                                 if (typeof previous === 'object') {
                                   const cleaned = { ...previous, done: false };
                                   delete cleaned.file;
@@ -1066,7 +1118,8 @@ export default function DocumentosLegales() {
                         href={link.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1  hover:underline" className="text-primary"
+                        className="inline-flex items-center gap-1  hover:underline"
+                        className="text-primary"
                       >
                         {link.label || link.url}
                         <span aria-hidden="true">↗</span>
@@ -1083,7 +1136,9 @@ export default function DocumentosLegales() {
                 steps={activeCountry?.ceremonyTypes?.[legalType]?.requirements?.[0]?.steps || []}
                 leadTimeDays={requirementSummary.leadTimeDays}
                 weddingDate={weddingInfo?.weddingDate || weddingInfo?.date}
-                costEstimate={activeCountry?.ceremonyTypes?.[legalType]?.requirements?.[0]?.costEstimate}
+                costEstimate={
+                  activeCountry?.ceremonyTypes?.[legalType]?.requirements?.[0]?.costEstimate
+                }
               />
             </div>
 
@@ -1098,8 +1153,9 @@ export default function DocumentosLegales() {
                         ✨ Generación automática de tareas
                       </h3>
                       <p className="text-sm text-purple-800 mb-3">
-                        Crea automáticamente todas las tareas necesarias para completar tus trámites legales en {activeCountry?.name}. 
-                        Incluye fechas de vencimiento calculadas según tu fecha de boda y recordatorios automáticos.
+                        Crea automáticamente todas las tareas necesarias para completar tus trámites
+                        legales en {activeCountry?.name}. Incluye fechas de vencimiento calculadas
+                        según tu fecha de boda y recordatorios automáticos.
                       </p>
                       <button
                         onClick={handleGenerateTasks}
@@ -1120,7 +1176,8 @@ export default function DocumentosLegales() {
                       </button>
                       {!weddingInfo?.weddingDate && !weddingInfo?.date && (
                         <p className="text-xs text-orange-700 mt-2">
-                          ⚠️ Configura la fecha de tu boda para calcular fechas de vencimiento precisas
+                          ⚠️ Configura la fecha de tu boda para calcular fechas de vencimiento
+                          precisas
                         </p>
                       )}
                     </div>
@@ -1139,22 +1196,31 @@ export default function DocumentosLegales() {
               </div>
             </div>
             {templatesForSelection.length === 0 && (
-              <p className=" text-sm" className="text-secondary">No hay descargables para la selección actual.</p>
+              <p className=" text-sm" className="text-secondary">
+                No hay descargables para la selección actual.
+              </p>
             )}
             {templatesForSelection.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {templatesForSelection.map((tpl) => (
                   <div
                     key={tpl.id}
-                    placeholder={t('protocol.documents.searchCountryPlaceholder')} className="border rounded-lg p-3 flex items-center justify-between " className="bg-surface"
+                    placeholder={t('protocol.documents.searchCountryPlaceholder')}
+                    className="border rounded-lg p-3 flex items-center justify-between "
+                    className="bg-surface"
                   >
                     <div>
                       <div className="font-medium">{tpl.title}</div>
-                      {tpl.desc && <div className="text-xs " className="text-secondary">{tpl.desc}</div>}
+                      {tpl.desc && (
+                        <div className="text-xs " className="text-secondary">
+                          {tpl.desc}
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:" className="bg-page"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:"
+                        className="bg-page"
                         onClick={() => {
                           try {
                             const data = buildTemplatePrefill(weddingInfo);
@@ -1176,7 +1242,8 @@ export default function DocumentosLegales() {
                         <Download size={16} /> .DOC
                       </button>
                       <button
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:" className="bg-page"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:"
+                        className="bg-page"
                         onClick={async () => {
                           try {
                             const data = buildTemplatePrefill(weddingInfo);
