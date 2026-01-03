@@ -1,10 +1,4 @@
 {
-  "version": 2,
-  "buildCommand": "cd apps/main-app && npm run build",
-  "outputDirectory": "apps/main-app/dist",
-  "framework": "vite",
-  "installCommand": "npm install",
-  "devCommand": "cd apps/main-app && npm run dev",
   "rewrites": [
     {
       "source": "/(.*)",
