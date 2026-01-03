@@ -90,132 +90,65 @@ const buildEventProfileSummary = (eventType, eventProfile, preferences) => ({
 
 /**
  * Crea una nueva boda y asigna al usuario como propietario principal.
+ * MIGRADO A POSTGRESQL
  * @param {string} uid - UID del usuario creador.
  * @param {object} [extraData] - Datos opcionales de la boda (fecha, nombre...)
  * @returns {Promise<string>} weddingId creado
  */
 export async function createWedding(uid, extraData = {}) {
   if (!uid) throw new Error('uid requerido');
-  // Validación de límites si el creador es planner
+  
+  console.log('[WeddingService] Creando boda en PostgreSQL para user:', uid);
+  
   try {
-    const userSnap = await getDoc(doc(db, 'users', uid));
-    if (userSnap.exists()) {
-      const u = userSnap.data() || {};
-      const role = String(u.role || '').toLowerCase();
-      if (role === 'planner') {
-        const tier = u?.subscription?.tier || 'wedding_planner_1';
-        const limit = plannerLimitForTier(tier);
-        const current = Array.isArray(u?.plannerWeddingIds) ? u.plannerWeddingIds.length : 0;
-        if (current >= limit) {
-          throw new Error('planner_limit_exceeded');
-        }
-      }
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      throw new Error('No hay token de autenticación');
     }
-  } catch (e) {
-    if (String(e?.message || '') === 'planner_limit_exceeded') throw e;
-    // Si falla la validación, continuamos (no bloquear creación para owners)
-  }
-  const weddingId = uuidv4();
-  const ref = doc(db, 'weddings', weddingId);
-  const eventType = normalizeEventType(extraData?.eventType);
-  const eventProfile = sanitizeEventProfile(extraData?.eventProfile, eventType);
-  const preferences = sanitizePreferences(extraData?.preferences);
-  const base = {
-    ownerIds: [uid],
-    plannerIds: [],
-    subscription: { tier: 'free', renewedAt: Timestamp.now() },
-    createdAt: Timestamp.now(),
-    creatorRole: (typeof extraData?.creatorRole === 'string' ? extraData.creatorRole : 'owner'),
-    ...extraData,
-    eventType,
-    eventProfile,
-    preferences,
-  };
-  await setDoc(ref, base);
-  // Inicializar subcolección de finanzas
-  try {
-    const financeRef = doc(db, 'weddings', weddingId, 'finance', 'main');
-    await setDoc(financeRef, { movements: [], createdAt: Timestamp.now() }, { merge: true });
-  } catch (e) {
-    // console.warn('No se pudo inicializar finance/main para', weddingId, e);
-  }
-  // Guardar enlace rápido en el perfil del usuario (crea si no existe)
-  await setDoc(
-    doc(db, 'users', uid),
-    {
-      weddingId,
-      activeWeddingId: weddingId,
-      hasActiveWedding: true,
-      lastWeddingCreatedAt: Timestamp.now(),
-    },
-    { merge: true }
-  );
-
-  // Registrar la boda en la subcolección users/{uid}/weddings para que WeddingContext la cargue
-  try {
-    const subRef = doc(db, 'users', uid, 'weddings', weddingId);
-    const eventProfileSummary = buildEventProfileSummary(eventType, eventProfile, preferences);
-    await setDoc(
-      subRef,
-      {
-        id: weddingId,
-        name: base.name || 'Boda',
-        weddingDate: base.weddingDate || '',
-        location: base.location || base.banquetPlace || '',
-        progress: base.progress ?? 0,
-        active: base.active ?? true,
-        createdAt: Timestamp.now(),
-        eventType,
-        eventProfileSummary,
+    
+    const response = await fetch(`${API_URL}/api/weddings`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       },
-      { merge: true }
-    );
-  } catch (e) {
-    // console.warn('No se pudo registrar la boda en users/{uid}/weddings:', e);
-  }
-
-  // Seed de tareas predeterminadas (padres en Gantt, subtareas en lista)
-  try {
-    await seedDefaultTasksForWedding(weddingId, base);
-    // Si ya hay weddingDate, alinear fechas de bloques por porcentajes
+      body: JSON.stringify({
+        coupleName: extraData.name || 'Mi Boda',
+        weddingDate: extraData.weddingDate || extraData.date || null,
+        celebrationPlace: extraData.location || extraData.banquetPlace || null,
+        status: 'planning',
+        numGuests: extraData.numGuests || null,
+        eventType: extraData.eventType || 'boda',
+        ...extraData
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error creando boda');
+    }
+    
+    const result = await response.json();
+    const weddingId = result.data.id;
+    
+    console.log('[WeddingService] Boda creada en PostgreSQL:', weddingId);
+    
+    // Telemetría
     try {
-      if (base?.weddingDate) await fixParentBlockDates(weddingId);
-    } catch (_) {}
-  } catch (e) {
-    // console.warn('No se pudieron crear las tareas predeterminadas para', weddingId, e);
-    try {
-      performanceMonitor?.logEvent?.('event_creation_seed_failed', {
+      performanceMonitor?.logEvent?.('wedding_created_postgresql', {
         weddingId,
-        eventType,
-        error: String(e?.message || e) || 'unknown',
+        userId: uid,
+        source: 'WeddingService'
       });
     } catch {}
-  }
-
-  // Sincronizar con CRM externo (enqueue)
-  try {
-    const crmPayload = {
-      name: base.name || '',
-      eventType,
-      eventDate: base.weddingDate || base.date || null,
-      location: base.location || base.banquetPlace || '',
-      ownerId: uid,
-      plannerIds: Array.isArray(base.plannerIds) ? base.plannerIds : [],
-      createdFrom: base.createdFrom || 'app',
-    };
-    void syncWeddingWithCRM(weddingId, crmPayload).then(() => {
-      try {
-        performanceMonitor?.logEvent?.('wedding_crm_sync_requested', {
-          weddingId,
-          ownerId: uid,
-        });
-      } catch {}
-    });
+    
+    return weddingId;
   } catch (error) {
-    // console.warn('[WeddingService] No se pudo encolar la sincronizacion CRM', error);
+    console.error('[WeddingService] Error creando boda:', error);
+    throw error;
   }
-
-  return weddingId;
 }
 
 export async function updateWeddingModulePermissions(weddingId, modulePermissions = {}) {

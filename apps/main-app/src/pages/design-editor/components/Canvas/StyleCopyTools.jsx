@@ -97,11 +97,11 @@ export default function StyleCopyTools({ canvasRef }) {
 
   return (
     <div className="flex items-center gap-1">
-      <span className="text-xs font-medium  mr-2" style={{ color: 'var(--color-text-secondary)' }}>Estilo:</span>
+      <span className="text-xs font-medium  mr-2" className="text-secondary">Estilo:</span>
       
       <button
         onClick={copyStyle}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 hover: rounded text-xs font-medium" style={{ backgroundColor: 'var(--color-bg)' }}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 hover: rounded text-xs font-medium" className="bg-page"
         title="Copiar estilo del elemento seleccionado"
       >
         <Pipette className="w-4 h-4" />

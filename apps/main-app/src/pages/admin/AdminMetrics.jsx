@@ -68,7 +68,7 @@ const AdminMetrics = () => {
 
   // Renderizar tabs
   const renderTabs = () => (
-    <div className="border-b " style={{ borderColor: 'var(--color-border)' }}>
+    <div className="border-b " className="border-default">
       <div className="flex gap-1 overflow-x-auto">
         {TABS.map(tab => (
           <button
@@ -106,12 +106,12 @@ const AdminMetrics = () => {
               {userStats && (
                 <>
                   <div className="rounded-xl border border-soft bg-surface px-4 py-4 shadow-sm">
-                    <p className="text-xs " style={{ color: 'var(--color-muted)' }}>Total Usuarios</p>
-                    <p className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{userStats.total || 0}</p>
-                    <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>📊 {userStats.source || 'realtime'}</p>
+                    <p className="text-xs " className="text-muted">Total Usuarios</p>
+                    <p className="text-2xl font-bold " className="text-body">{userStats.total || 0}</p>
+                    <p className="text-xs  mt-1" className="text-muted">📊 {userStats.source || 'realtime'}</p>
                   </div>
                   <div className="rounded-xl border border-soft bg-green-50 px-4 py-4 shadow-sm">
-                    <p className="text-xs " style={{ color: 'var(--color-success)' }}>Activos 7 días</p>
+                    <p className="text-xs " className="text-success">Activos 7 días</p>
                     <p className="text-2xl font-bold text-green-700">{userStats.active7d || 0}</p>
                     <p className="text-xs text-green-500 mt-1">
                       {userStats.total > 0 ? `${((userStats.active7d / userStats.total) * 100).toFixed(1)}%` : '0%'}
@@ -122,12 +122,12 @@ const AdminMetrics = () => {
               {weddingStats && (
                 <>
                   <div className="rounded-xl border border-soft bg-surface px-4 py-4 shadow-sm">
-                    <p className="text-xs " style={{ color: 'var(--color-muted)' }}>Total Bodas</p>
-                    <p className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{weddingStats.total || 0}</p>
-                    <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>💍 {weddingStats.source || 'realtime'}</p>
+                    <p className="text-xs " className="text-muted">Total Bodas</p>
+                    <p className="text-2xl font-bold " className="text-body">{weddingStats.total || 0}</p>
+                    <p className="text-xs  mt-1" className="text-muted">💍 {weddingStats.source || 'realtime'}</p>
                   </div>
                   <div className="rounded-xl border border-soft bg-blue-50 px-4 py-4 shadow-sm">
-                    <p className="text-xs " style={{ color: 'var(--color-primary)' }}>Bodas Activas</p>
+                    <p className="text-xs " className="text-primary">Bodas Activas</p>
                     <p className="text-2xl font-bold text-blue-700">{weddingStats.active || 0}</p>
                     <p className="text-xs text-blue-500 mt-1">
                       {weddingStats.total > 0 ? `${((weddingStats.active / weddingStats.total) * 100).toFixed(1)}%` : '0%'}
@@ -202,7 +202,7 @@ const AdminMetrics = () => {
                   </div>
                 ))
               ) : (
-                <div className="col-span-3 text-center text-sm " style={{ color: 'var(--color-muted)' }}>Sin datos de funnel disponibles</div>
+                <div className="col-span-3 text-center text-sm " className="text-muted">Sin datos de funnel disponibles</div>
               )}
             </div>
           </section>
@@ -214,19 +214,19 @@ const AdminMetrics = () => {
                 <h3 className="text-sm font-semibold mb-3">Conversión Owner → Planner</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs">
-                    <span className="" style={{ color: 'var(--color-muted)' }}>Total Owners:</span>
+                    <span className="" className="text-muted">Total Owners:</span>
                     <span className="font-medium">{conversionMetrics.totalOwners || 0}</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="" style={{ color: 'var(--color-muted)' }}>Convertidos:</span>
-                    <span className="font-medium " style={{ color: 'var(--color-success)' }}>{conversionMetrics.converted || 0}</span>
+                    <span className="" className="text-muted">Convertidos:</span>
+                    <span className="font-medium " className="text-success">{conversionMetrics.converted || 0}</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="" style={{ color: 'var(--color-muted)' }}>Tasa:</span>
-                    <span className="font-bold text-lg " style={{ color: 'var(--color-primary)' }}>{conversionMetrics.conversionRate}%</span>
+                    <span className="" className="text-muted">Tasa:</span>
+                    <span className="font-bold text-lg " className="text-primary">{conversionMetrics.conversionRate}%</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="" style={{ color: 'var(--color-muted)' }}>Tiempo medio:</span>
+                    <span className="" className="text-muted">Tiempo medio:</span>
                     <span className="font-medium">{conversionMetrics.avgDaysToConvert?.toFixed(1) || 0} días</span>
                   </div>
                 </div>
@@ -237,19 +237,19 @@ const AdminMetrics = () => {
                 <h3 className="text-sm font-semibold mb-3 text-green-700">Ingresos Recurrentes</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs">
-                    <span className="" style={{ color: 'var(--color-success)' }}>MRR:</span>
+                    <span className="" className="text-success">MRR:</span>
                     <span className="font-bold text-lg text-green-700">{recurringRevenue.mrr?.toFixed(2) || 0} €</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="" style={{ color: 'var(--color-success)' }}>ARR:</span>
+                    <span className="" className="text-success">ARR:</span>
                     <span className="font-bold text-lg text-green-700">{recurringRevenue.arr?.toFixed(2) || 0} €</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="" style={{ color: 'var(--color-success)' }}>Suscripciones:</span>
+                    <span className="" className="text-success">Suscripciones:</span>
                     <span className="font-medium">{recurringRevenue.activeSubscriptions || 0}</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="" style={{ color: 'var(--color-success)' }}>Ticket medio:</span>
+                    <span className="" className="text-success">Ticket medio:</span>
                     <span className="font-medium">{recurringRevenue.avgTicket?.toFixed(2) || 0} €</span>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useAuth } from '../../../hooks/useAuth';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 import * as EmailService from '../../../services/emailService';
 // Mocks necesarios - deben declararse antes de importar el componente
 vi.mock('../../../hooks/useAuth', () => ({

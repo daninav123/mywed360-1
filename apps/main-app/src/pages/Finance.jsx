@@ -310,7 +310,7 @@ function Finance() {
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 marginBottom: '32px',
-              }}>Gestión de Boda</p>
+              }}>{t('common:inspiration.weddingManagement')}</p>
               
               {/* Tabs pills sin borde */}
               <div style={{ 
@@ -550,7 +550,6 @@ function Finance() {
           {/* Tab: Análisis */}
           {activeTab === 'analytics' && (
             <>
-              {/* Timeline */}
               <section className="px-6 py-6">
                 <div style={{
                   backgroundColor: '#FFFFFF',
@@ -559,17 +558,16 @@ function Finance() {
                   border: '1px solid #EEF2F7',
                   padding: '24px',
                 }}>
-                <FinanceCashflowTimeline
-              monthlySeries={monthlySeries}
-              predictiveInsights={predictiveInsights}
-              stats={stats}
-              budget={budget}
-              projection={projection}
-                />
+                  <FinanceCashflowTimeline
+                    monthlySeries={monthlySeries}
+                    predictiveInsights={predictiveInsights}
+                    stats={stats}
+                    budget={budget}
+                    projection={projection}
+                  />
                 </div>
               </section>
 
-              {/* Charts */}
               <section className="px-6 py-6">
                 <div style={{
                   backgroundColor: '#FFFFFF',
@@ -578,9 +576,17 @@ function Finance() {
                   border: '1px solid #EEF2F7',
                   padding: '24px',
                 }}>
-                <React.Suspense fallback={<div className="p-4 text-muted">{t("finance.charts.loading")}</div>}>
-                  <FinanceCharts transactions={transactions} budgetUsage={budgetUsage} stats={stats} />
-                </React.Suspense>
+                  <React.Suspense fallback={
+                    <div style={{ padding: '40px', textAlign: 'center', color: '#9CA3AF' }}>
+                      {t("finance.charts.loading")}
+                    </div>
+                  }>
+                    <FinanceCharts 
+                      transactions={transactions} 
+                      budgetUsage={budgetUsage} 
+                      stats={stats} 
+                    />
+                  </React.Suspense>
                 </div>
               </section>
             </>

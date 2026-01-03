@@ -218,14 +218,14 @@ export default function SupplierRequestDetail() {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: 'var(--color-bg)' }}
+        className="bg-page"
       >
         <div className="text-center">
           <div
             className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
             style={{ borderColor: 'var(--color-primary)' }}
           />
-          <p className="mt-4" style={{ color: 'var(--color-muted)' }}>
+          <p className="mt-4" className="text-muted">
             {t('suppliers.requestDetail.loading')}
           </p>
         </div>
@@ -237,16 +237,16 @@ export default function SupplierRequestDetail() {
     return (
       <div
         className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: 'var(--color-bg)' }}
+        className="bg-page"
       >
         <div
           className="rounded-lg shadow-lg p-8 max-w-md"
-          style={{ backgroundColor: 'var(--color-surface)' }}
+          className="bg-surface"
         >
-          <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--color-danger)' }}>
+          <h2 className="text-xl font-bold mb-4" className="text-danger">
             {t('suppliers.requestDetail.errors.title')}
           </h2>
-          <p className="mb-4" style={{ color: 'var(--color-muted)' }}>
+          <p className="mb-4" className="text-muted">
             {error || t('suppliers.requestDetail.errors.notFound')}
           </p>
           <button
@@ -290,13 +290,13 @@ export default function SupplierRequestDetail() {
     });
 
   return (
-    <div className="min-h-screen py-8 px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-screen py-8 px-4" className="bg-page">
       <div className="layout-container max-w-5xl">
         <button
           type="button"
           onClick={() => navigate(`/supplier/dashboard/${id}`)}
           className="flex items-center gap-2 mb-6"
-          style={{ color: 'var(--color-muted)' }}
+          className="text-muted"
         >
           <ArrowLeft size={20} />
           {t('suppliers.requestDetail.navigation.back')}
@@ -306,11 +306,11 @@ export default function SupplierRequestDetail() {
           <div className="lg:col-span-2 space-y-6">
             <div
               className="rounded-lg shadow-lg p-6"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+                  <h1 className="text-3xl font-bold mb-2" className="text-body">
                     {request.coupleName}
                   </h1>
                   {coupleStatusLabel && (
@@ -336,7 +336,7 @@ export default function SupplierRequestDetail() {
                   )}
                 </div>
                 {receivedAt && (
-                  <div className="text-right text-sm" style={{ color: 'var(--color-muted)' }}>
+                  <div className="text-right text-sm" className="text-muted">
                     <Clock size={16} className="inline mr-1" />
                     {t('suppliers.requestDetail.meta.receivedAt', { value: receivedAt })}
                   </div>
@@ -346,14 +346,14 @@ export default function SupplierRequestDetail() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div
                   className="flex items-center gap-3 p-4 rounded-lg"
-                  style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="bg-page"
                 >
-                  <Calendar size={24} style={{ color: 'var(--color-primary)' }} />
+                  <Calendar size={24} className="text-primary" />
                   <div>
-                    <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-sm" className="text-muted">
                       {t('suppliers.requestDetail.labels.weddingDate')}
                     </p>
-                    <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                    <p className="font-semibold" className="text-body">
                       {weddingDate}
                     </p>
                   </div>
@@ -361,14 +361,14 @@ export default function SupplierRequestDetail() {
 
                 <div
                   className="flex items-center gap-3 p-4 rounded-lg"
-                  style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="bg-page"
                 >
-                  <MapPin size={24} style={{ color: 'var(--color-primary)' }} />
+                  <MapPin size={24} className="text-primary" />
                   <div>
-                    <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-sm" className="text-muted">
                       {t('suppliers.requestDetail.labels.location')}
                     </p>
-                    <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                    <p className="font-semibold" className="text-body">
                       {request.location?.city || defaults.location}
                     </p>
                   </div>
@@ -377,14 +377,14 @@ export default function SupplierRequestDetail() {
                 {request.guestCount && (
                   <div
                     className="flex items-center gap-3 p-4 rounded-lg"
-                    style={{ backgroundColor: 'var(--color-bg)' }}
+                    className="bg-page"
                   >
-                    <Users size={24} style={{ color: 'var(--color-primary)' }} />
+                    <Users size={24} className="text-primary" />
                     <div>
-                      <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                      <p className="text-sm" className="text-muted">
                         {t('suppliers.requestDetail.labels.guests')}
                       </p>
-                      <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                      <p className="font-semibold" className="text-body">
                         {formatNumber(request.guestCount)}
                       </p>
                     </div>
@@ -394,14 +394,14 @@ export default function SupplierRequestDetail() {
                 {budgetRange && (
                   <div
                     className="flex items-center gap-3 p-4 rounded-lg"
-                    style={{ backgroundColor: 'var(--color-bg)' }}
+                    className="bg-page"
                   >
-                    <Euro size={24} style={{ color: 'var(--color-primary)' }} />
+                    <Euro size={24} className="text-primary" />
                     <div>
-                      <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                      <p className="text-sm" className="text-muted">
                         {t('suppliers.requestDetail.labels.budget')}
                       </p>
-                      <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                      <p className="font-semibold" className="text-body">
                         {budgetRange}
                       </p>
                     </div>
@@ -413,7 +413,7 @@ export default function SupplierRequestDetail() {
                 <div className="border-t pt-6">
                   <h3
                     className="font-semibold mb-3 flex items-center gap-2"
-                    style={{ color: 'var(--color-text)' }}
+                    className="text-body"
                   >
                     <MessageSquare size={20} />
                     {t('suppliers.requestDetail.labels.messageFromCouple')}
@@ -431,9 +431,9 @@ export default function SupplierRequestDetail() {
                 <div className="border-t pt-6 mt-6">
                   <h3
                     className="font-semibold mb-3 flex items-center gap-2"
-                    style={{ color: 'var(--color-text)' }}
+                    className="text-body"
                   >
-                    <CheckCircle size={20} style={{ color: 'var(--color-success)' }} />
+                    <CheckCircle size={20} className="text-success" />
                     {t('suppliers.requestDetail.labels.responseSent')}
                   </h3>
                   <div
@@ -443,17 +443,17 @@ export default function SupplierRequestDetail() {
                       borderColor: 'var(--color-success)',
                     }}
                   >
-                    <p className="whitespace-pre-wrap mb-4" style={{ color: 'var(--color-text)' }}>
+                    <p className="whitespace-pre-wrap mb-4" className="text-body">
                       {request.response.message}
                     </p>
                     {quotedRange && (
-                      <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                      <div className="text-sm" className="text-muted">
                         <strong>{t('suppliers.requestDetail.labels.quotedPrice')}</strong>{' '}
                         {quotedRange}
                       </div>
                     )}
                     {respondedAt && (
-                      <div className="text-xs mt-2" style={{ color: 'var(--color-muted)' }}>
+                      <div className="text-xs mt-2" className="text-muted">
                         {t('suppliers.requestDetail.labels.sentAt', { value: respondedAt })}
                       </div>
                     )}
@@ -465,9 +465,9 @@ export default function SupplierRequestDetail() {
             {showResponseForm && !alreadyResponded && (
               <div
                 className="rounded-lg shadow-lg p-6"
-                style={{ backgroundColor: 'var(--color-surface)' }}
+                className="bg-surface"
               >
-                <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text)' }}>
+                <h2 className="text-2xl font-bold mb-6" className="text-body">
                   {t('suppliers.requestDetail.response.title')}
                 </h2>
 
@@ -475,7 +475,7 @@ export default function SupplierRequestDetail() {
                   <div>
                     <label
                       className="block text-sm font-medium mb-3"
-                      style={{ color: 'var(--color-text)' }}
+                      className="text-body"
                     >
                       {t('suppliers.requestDetail.labels.templateOptional')}
                     </label>
@@ -500,7 +500,7 @@ export default function SupplierRequestDetail() {
                           <FileText
                             size={16}
                             className="inline mr-2"
-                            style={{ color: 'var(--color-primary)' }}
+                            className="text-primary"
                           />
                           {template.name}
                         </button>
@@ -511,7 +511,7 @@ export default function SupplierRequestDetail() {
                   <div>
                     <label
                       className="block text-sm font-medium mb-2"
-                      style={{ color: 'var(--color-text)' }}
+                      className="text-body"
                     >
                       {t('suppliers.requestDetail.labels.messageRequired')}
                     </label>
@@ -529,7 +529,7 @@ export default function SupplierRequestDetail() {
                       placeholder={t('suppliers.requestDetail.placeholders.message')}
                       required
                     />
-                    <p className="text-sm mt-1" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-sm mt-1" className="text-muted">
                       {charCountLabel}
                     </p>
                   </div>
@@ -537,7 +537,7 @@ export default function SupplierRequestDetail() {
                   <div>
                     <label
                       className="block text-sm font-medium mb-3"
-                      style={{ color: 'var(--color-text)' }}
+                      className="text-body"
                     >
                       {t('suppliers.requestDetail.labels.quotedOptional')}
                     </label>
@@ -545,7 +545,7 @@ export default function SupplierRequestDetail() {
                       <div>
                         <label
                           className="block text-xs mb-1"
-                          style={{ color: 'var(--color-muted)' }}
+                          className="text-muted"
                         >
                           {t('suppliers.requestDetail.labels.rangeFrom')}
                         </label>
@@ -559,7 +559,7 @@ export default function SupplierRequestDetail() {
                             })
                           }
                           className="w-full px-3 py-2 border rounded-lg"
-                          style={{ borderColor: 'var(--color-border)' }}
+                          className="border-default"
                           placeholder={t('suppliers.requestDetail.placeholders.minAmount')}
                           min="0"
                         />
@@ -567,7 +567,7 @@ export default function SupplierRequestDetail() {
                       <div>
                         <label
                           className="block text-xs mb-1"
-                          style={{ color: 'var(--color-muted)' }}
+                          className="text-muted"
                         >
                           {t('suppliers.requestDetail.labels.rangeTo')}
                         </label>
@@ -581,7 +581,7 @@ export default function SupplierRequestDetail() {
                             })
                           }
                           className="w-full px-3 py-2 border rounded-lg"
-                          style={{ borderColor: 'var(--color-border)' }}
+                          className="border-default"
                           placeholder={t('suppliers.requestDetail.placeholders.maxAmount')}
                           min="0"
                         />
@@ -589,7 +589,7 @@ export default function SupplierRequestDetail() {
                       <div>
                         <label
                           className="block text-xs mb-1"
-                          style={{ color: 'var(--color-muted)' }}
+                          className="text-muted"
                         >
                           {t('suppliers.requestDetail.labels.rangeCurrency')}
                         </label>
@@ -605,7 +605,7 @@ export default function SupplierRequestDetail() {
                             })
                           }
                           className="w-full px-3 py-2 border rounded-lg"
-                          style={{ borderColor: 'var(--color-border)' }}
+                          className="border-default"
                         >
                           <option value="EUR">{t('common.currencies.eur')}</option>
                           <option value="USD">{t('common.currencies.usd')}</option>
@@ -636,24 +636,24 @@ export default function SupplierRequestDetail() {
           <div className="space-y-6">
             <div
               className="rounded-lg shadow-lg p-6"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
-              <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+              <h3 className="font-semibold mb-4" className="text-body">
                 {t('suppliers.requestDetail.labels.contactInfo')}
               </h3>
 
               <div className="space-y-4">
                 {request.contactEmail && (
                   <div className="flex items-start gap-3">
-                    <Mail size={20} className="mt-0.5" style={{ color: 'var(--color-primary)' }} />
+                    <Mail size={20} className="mt-0.5" className="text-primary" />
                     <div>
-                      <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                      <p className="text-sm" className="text-muted">
                         {t('suppliers.requestDetail.labels.email')}
                       </p>
                       <a
                         href={`mailto:${request.contactEmail}`}
                         className="font-medium hover:underline break-all"
-                        style={{ color: 'var(--color-primary)' }}
+                        className="text-primary"
                       >
                         {request.contactEmail}
                       </a>
@@ -663,15 +663,15 @@ export default function SupplierRequestDetail() {
 
                 {request.contactPhone && (
                   <div className="flex items-start gap-3">
-                    <Phone size={20} className="mt-0.5" style={{ color: 'var(--color-primary)' }} />
+                    <Phone size={20} className="mt-0.5" className="text-primary" />
                     <div>
-                      <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                      <p className="text-sm" className="text-muted">
                         {t('suppliers.requestDetail.labels.phone')}
                       </p>
                       <a
                         href={`tel:${request.contactPhone}`}
                         className="font-medium hover:underline"
-                        style={{ color: 'var(--color-primary)' }}
+                        className="text-primary"
                       >
                         {request.contactPhone}
                       </a>

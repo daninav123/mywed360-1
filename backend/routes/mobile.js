@@ -1,10 +1,11 @@
 ﻿import express from 'express';
 import { optionalAuth } from '../middleware/authMiddleware.js';
+import { sendSuccess } from '../utils/apiResponse.js';
 
 const router = express.Router();
 
-router.get('/health', (_req, res) => {
-  res.json({ success: true, message: 'mobile api ok', timestamp: new Date().toISOString() });
+router.get('/health', (req, res) => {
+  return sendSuccess(req, res, { message: 'mobile api ok', timestamp: new Date().toISOString() });
 });
 
 router.get('/suppliers/shortlist', optionalAuth, async (req, res) => {
@@ -33,8 +34,7 @@ router.get('/suppliers/shortlist', optionalAuth, async (req, res) => {
       },
     ];
 
-    res.json({
-      success: true,
+    return sendSuccess(req, res, {
       items: mockItems,
       source: 'mock',
       user: req.userProfile?.email || null,

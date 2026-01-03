@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Download, Edit, Trash2, Copy } from 'lucide-react';
-import { db, firebaseReady } from '../../../../firebaseConfig';
 import { useWedding } from '../../../../context/WeddingContext';
 
-const fsImport = () => import('firebase/firestore');
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 export default function DesignGallery({ isOpen, onClose, onLoadDesign }) {
   const [designs, setDesigns] = useState([]);
@@ -77,10 +76,10 @@ export default function DesignGallery({ isOpen, onClose, onLoadDesign }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" data-testid="design-gallery">
-      <div className=" rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--color-surface)' }}>
-        <div className="p-6 border-b  flex items-center justify-between" style={{ borderColor: 'var(--color-border)' }}>
+      <div className=" rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col" className="bg-surface">
+        <div className="p-6 border-b  flex items-center justify-between" className="border-default">
           <h2 className="text-2xl font-bold">Mis Diseños</h2>
-          <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text)' }} data-testid="close-icon">
+          <button onClick={onClose} className=" hover:" className="text-muted" className="text-body" data-testid="close-icon">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -91,19 +90,19 @@ export default function DesignGallery({ isOpen, onClose, onLoadDesign }) {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           ) : designs.length === 0 ? (
-            <div className="text-center py-12 " style={{ color: 'var(--color-muted)' }}>
+            <div className="text-center py-12 " className="text-muted">
               <p>No tienes diseños guardados aún</p>
               <p className="text-sm mt-2">Crea tu primer diseño para verlo aquí</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {designs.map((design) => (
-                <div key={design.id} className="border  rounded-lg overflow-hidden hover:shadow-lg transition-shadow" style={{ borderColor: 'var(--color-border)' }} data-testid="design-card">
-                  <div className="aspect-[3/4]  flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
-                    <div className=" text-sm" style={{ color: 'var(--color-muted)' }}>Preview</div>
+                <div key={design.id} className="border  rounded-lg overflow-hidden hover:shadow-lg transition-shadow" className="border-default" data-testid="design-card">
+                  <div className="aspect-[3/4]  flex items-center justify-center" className="bg-page">
+                    <div className=" text-sm" className="text-muted">Preview</div>
                   </div>
                   <div className="p-4">
-                    <div className="text-sm  mb-3" style={{ color: 'var(--color-muted)' }}>
+                    <div className="text-sm  mb-3" className="text-muted">
                       {design.updatedAt?.toDate?.()?.toLocaleDateString() || 'Sin fecha'}
                     </div>
                     <div className="flex gap-2">
@@ -119,14 +118,14 @@ export default function DesignGallery({ isOpen, onClose, onLoadDesign }) {
                       </button>
                       <button
                         onClick={() => handleDuplicate(design)}
-                        className="px-3 py-2 border  rounded hover:" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                        className="px-3 py-2 border  rounded hover:" className="border-default" className="bg-page"
                         title="Duplicar"
                       >
                         <Copy className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(design.id)}
-                        className="px-3 py-2 border border-red-300  rounded hover:bg-red-50" style={{ color: 'var(--color-danger)' }}
+                        className="px-3 py-2 border border-red-300  rounded hover:bg-red-50" className="text-danger"
                         title="Eliminar"
                       >
                         <Trash2 className="w-4 h-4" />

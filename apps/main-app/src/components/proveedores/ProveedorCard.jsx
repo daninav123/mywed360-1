@@ -8,7 +8,7 @@ import Card from '../../components/ui/Card';
 import Alert from '../../components/ui/Alert';
 import useProviderEmail from '../../hooks/useProviderEmail.jsx';
 import useSupplierBudgets from '../../hooks/useSupplierBudgets';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import useTranslations from '../../hooks/useTranslations';
 import * as EmailService from '../../services/emailService';
 import EmailTemplateService from '../../services/EmailTemplateService';

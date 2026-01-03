@@ -98,7 +98,7 @@ export default function PageIndex() {
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-lg">{route.status}</span>
-            <h3 className="font-semibold" style={{ color: 'var(--color-text)' }}>
+            <h3 className="font-semibold" className="text-body">
               {route.name}
             </h3>
           </div>
@@ -111,10 +111,10 @@ export default function PageIndex() {
           </code>
         </div>
         {!route.port && (
-          <ExternalLink className="w-4 h-4 ml-2 flex-shrink-0" style={{ color: 'var(--color-text-secondary)' }} />
+          <ExternalLink className="w-4 h-4 ml-2 flex-shrink-0" className="text-secondary" />
         )}
       </div>
-      <p className="text-sm mt-2" style={{ color: 'var(--color-text-secondary)' }}>
+      <p className="text-sm mt-2" className="text-secondary">
         <strong>Componente:</strong> {route.component}
       </p>
       {route.port && (
@@ -130,14 +130,14 @@ export default function PageIndex() {
 
   const Section = ({ title, icon: Icon, routes, category, description }) => (
     <div className="mb-8">
-      <div className="flex items-center gap-3 mb-4 pb-3 border-b" style={{ borderColor: 'var(--color-border-soft)' }}>
-        <Icon className="w-6 h-6" style={{ color: 'var(--color-primary)' }} />
+      <div className="flex items-center gap-3 mb-4 pb-3 border-b" className="border-soft">
+        <Icon className="w-6 h-6" className="text-primary" />
         <div>
-          <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
+          <h2 className="text-2xl font-semibold" className="text-body">
             {title}
           </h2>
           {description && (
-            <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-sm mt-1" className="text-secondary">
               {description}
             </p>
           )}
@@ -158,7 +158,7 @@ export default function PageIndex() {
   );
 
   return (
-    <div className="min-h-screen p-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-screen p-8" className="bg-page">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -168,7 +168,7 @@ export default function PageIndex() {
           }}>
             📋 Índice de Páginas del Proyecto
           </h1>
-          <p className="text-lg mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="text-lg mb-2" className="text-secondary">
             Todas las rutas y páginas disponibles en Planivia
           </p>
           <div className="flex items-center justify-center gap-4 mt-4">
@@ -197,7 +197,7 @@ export default function PageIndex() {
               <div className="text-3xl font-bold mb-1" style={{ color: stat.color }}>
                 {stat.count}
               </div>
-              <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              <div className="text-sm" className="text-secondary">
                 {stat.label}
               </div>
             </div>

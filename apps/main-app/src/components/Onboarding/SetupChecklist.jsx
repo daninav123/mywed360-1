@@ -13,7 +13,7 @@ import {
   X
 } from 'lucide-react';
 import { useWedding } from '../../context/WeddingContext';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 
 /**
  * Checklist de Setup Inicial - Onboarding Mejorado

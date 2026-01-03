@@ -1,10 +1,9 @@
 import express from 'express';
-import admin from 'firebase-admin';
-import logger from '../utils/logger.js';
+import { db } from '../db.js';
 
-// Suponemos firebase-admin inicializado en index.js o guests.js
-const db = admin.firestore();
 const router = express.Router();
+const USE_FIREBASE = process.env.USE_FIREBASE !== 'false';
+const FIREBASE_AVAILABLE = USE_FIREBASE && db !== null;
 
 // Helpers ----------------------------------------------------
 async function getUserRole(eventId, uid) {

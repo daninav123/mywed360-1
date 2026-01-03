@@ -62,7 +62,7 @@ const designTypes = [
 
 export default function DesignTypeSelector({ selectedType, onSelectType }) {
   return (
-    <div className="border-b  " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+    <div className="border-b  " className="border-default" className="bg-surface">
       <div className="flex overflow-x-auto">
         {designTypes.map((type) => {
           const Icon = type.icon;

@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 import Spinner from './Spinner';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { useWedding } from '../context/WeddingContext';
 import useTranslations from '../hooks/useTranslations';
 import {

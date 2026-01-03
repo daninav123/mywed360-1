@@ -76,25 +76,25 @@ const result = {
   // 💰 Presupuesto (ya consolidado en JSON)
   budgetData: {
     totalBudget: 25000,
-    items: [...]
+    items: []
   },
   
   // 🪑 Plan de mesas (ya consolidado en JSON)
   seatingData: {
-    layout: {...},
-    tables: [...]
+    layout: {},
+    tables: []
   },
   
   // 👥 Invitados (200 registros)
   guests: [
-    { id: "g1", name: "María", status: "confirmed", ... },
-    { id: "g2", name: "Juan", status: "pending", ... },
+    { id: "g1", name: "María", status: "confirmed" },
+    { id: "g2", name: "Juan", status: "pending" }
     // ... 198 más
   ],
   
   // 🌐 Webs
   craftWebs: [
-    { id: "w1", slug: "ana-y-carlos", published: true, ... }
+    { id: "w1", slug: "ana-y-carlos", published: true }
   ],
   
   // 🏢 Proveedores
@@ -108,9 +108,9 @@ const result = {
   
   // 🔐 Acceso
   access: [
-    { user: { email: "ana@...", displayName: "Ana" }, role: "OWNER" },
-    { user: { email: "carlos@...", displayName: "Carlos" }, role: "OWNER" },
-    { user: { email: "planner@...", displayName: "Laura" }, role: "PLANNER" }
+    { user: { email: "ana@example.com", displayName: "Ana" }, role: "OWNER" },
+    { user: { email: "carlos@example.com", displayName: "Carlos" }, role: "OWNER" },
+    { user: { email: "planner@example.com", displayName: "Laura" }, role: "PLANNER" }
   ]
 };
 

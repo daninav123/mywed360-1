@@ -1,0 +1,46 @@
+{
+  "hero": {
+    "title": "Herramientas Profesionales de Planificación de Bodas",
+    "subtitle": "Gestiona múltiples bodas, colabora con tu equipo y ofrece un servicio excepcional",
+    "cta": {
+      "primary": "Prueba Gratuita",
+      "secondary": "Ver Demo"
+    }
+  },
+  "features": {
+    "templates": {
+      "title": "Plantillas Reutilizables",
+      "description": "Crea plantillas personalizadas para tareas, presupuestos y cronogramas para ahorrar tiempo en cada boda"
+    },
+    "scheduling": {
+      "title": "Programación Inteligente",
+      "description": "Coordina reuniones, citas con proveedores y fechas límite en todos tus clientes"
+    },
+    "automation": {
+      "title": "Automatización de Flujos",
+      "description": "Automatiza tareas repetitivas y notificaciones para enfocarte en lo que más importa"
+    }
+  },
+  "benefits": {
+    "title": "Diseñado para Planners Profesionales",
+    "subtitle": "Herramientas poderosas para gestionar múltiples bodas eficientemente",
+    "multi": {
+      "title": "Gestión Multi-Boda",
+      "description": "Gestiona múltiples bodas simultáneamente con tableros separados y panel unificado"
+    },
+    "team": {
+      "title": "Colaboración en Equipo",
+      "description": "Trabaja sin problemas con tu equipo con permisos basados en roles y actualizaciones en tiempo real"
+    },
+    "analytics": {
+      "title": "Analíticas de Negocio",
+      "description": "Rastrea rendimiento, satisfacción del cliente y métricas de negocio en todos tus eventos"
+    }
+  },
+  "cta": {
+    "title": "¿Listo Para Elevar Tu Negocio de Planificación?",
+    "subtitle": "Únete a planners profesionales usando Planivia",
+    "primary": "Prueba Gratuita",
+    "secondary": "Reservar Demo"
+  }
+}

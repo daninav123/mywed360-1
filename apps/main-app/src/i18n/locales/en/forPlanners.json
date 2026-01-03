@@ -1,0 +1,46 @@
+{
+  "hero": {
+    "title": "Professional Wedding Planning Tools",
+    "subtitle": "Manage multiple weddings, collaborate with your team, and deliver exceptional service",
+    "cta": {
+      "primary": "Start Free Trial",
+      "secondary": "See Demo"
+    }
+  },
+  "features": {
+    "templates": {
+      "title": "Reusable Templates",
+      "description": "Create custom templates for tasks, budgets, and timelines to save time on every wedding"
+    },
+    "scheduling": {
+      "title": "Smart Scheduling",
+      "description": "Coordinate meetings, vendor appointments, and deadlines across all your clients"
+    },
+    "automation": {
+      "title": "Workflow Automation",
+      "description": "Automate repetitive tasks and notifications to focus on what matters most"
+    }
+  },
+  "benefits": {
+    "title": "Built for Professional Planners",
+    "subtitle": "Powerful tools to manage multiple weddings efficiently",
+    "multi": {
+      "title": "Multi-Wedding Management",
+      "description": "Manage multiple weddings simultaneously with separate boards and unified dashboard"
+    },
+    "team": {
+      "title": "Team Collaboration",
+      "description": "Work seamlessly with your team with role-based permissions and real-time updates"
+    },
+    "analytics": {
+      "title": "Business Analytics",
+      "description": "Track performance, client satisfaction, and business metrics across all your events"
+    }
+  },
+  "cta": {
+    "title": "Ready to Elevate Your Planning Business?",
+    "subtitle": "Join professional planners using Planivia",
+    "primary": "Start Free Trial",
+    "secondary": "Book a Demo"
+  }
+}

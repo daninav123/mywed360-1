@@ -7,11 +7,9 @@ import { useSearchParams, Link } from 'react-router-dom';
 
 import VectorEditor from '../../components/VectorEditor';
 import { useWedding } from '../../context/WeddingContext';
-import { db, firebaseReady } from '../../firebaseConfig';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 
-const fsImport = () => import('firebase/firestore');
-const stImport = () => import('firebase/storage');
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 export default function VectorEditorPage() {
   const [params] = useSearchParams();
@@ -141,7 +139,7 @@ export default function VectorEditorPage() {
         <h1 className="text-xl font-semibold">
           {t('designsLibrary.vectorEditor.title', 'Editor vectorial (IA)')}
         </h1>
-        <Link to="/disenos" className=" hover:underline" style={{ color: 'var(--color-primary)' }}>
+        <Link to="/disenos" className=" hover:underline" className="text-primary">
           {t('designsLibrary.myDesigns.backLink', 'Volver a Diseños')}
         </Link>
       </div>
@@ -156,7 +154,7 @@ export default function VectorEditorPage() {
       )}
 
       {canVectorize && (
-        <div className=" border rounded p-3" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className=" border rounded p-3" className="bg-surface">
           <div className="flex flex-wrap gap-3 items-end">
             <div className="flex items-center gap-2">
               <label className="text-sm">
@@ -297,7 +295,7 @@ export default function VectorEditorPage() {
               href={imageUrl}
               target="_blank"
               rel="noreferrer"
-              className="text-sm  hover:underline" style={{ color: 'var(--color-text-secondary)' }}
+              className="text-sm  hover:underline" className="text-secondary"
             >
               {t('designsLibrary.vectorEditor.controls.viewOriginal', 'Ver original')}
             </a>
@@ -362,7 +360,7 @@ export default function VectorEditorPage() {
 
       {/* Paleta de marca (editable) */}
       {activeWedding && (
-        <div className=" border rounded p-3" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className=" border rounded p-3" className="bg-surface">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold">
               {t('designsLibrary.vectorEditor.palette.title', 'Paleta de la boda')}
@@ -433,7 +431,7 @@ export default function VectorEditorPage() {
       {svg ? (
         <VectorEditor ref={editorRef} svg={svg} palette={palette} />
       ) : canVectorize && !loading ? (
-        <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+        <div className="text-sm " className="text-secondary">
           {t('designsLibrary.vectorEditor.messages.noSvg', 'No hay SVG disponible aún.')}
         </div>
       ) : null}

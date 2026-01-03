@@ -92,10 +92,10 @@ export default function AIAssistant({ onClose, canvasRef }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col" className="bg-surface">
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10  bg-opacity-20 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="w-10 h-10  bg-opacity-20 rounded-lg flex items-center justify-center" className="bg-surface">
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
@@ -107,7 +107,7 @@ export default function AIAssistant({ onClose, canvasRef }) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover: hover:bg-opacity-20 rounded-lg transition-colors" style={{ backgroundColor: 'var(--color-surface)' }}
+            className="p-2 hover: hover:bg-opacity-20 rounded-lg transition-colors" className="bg-surface"
           >
             <X className="w-6 h-6" />
           </button>
@@ -131,33 +131,33 @@ export default function AIAssistant({ onClose, canvasRef }) {
                     className={`w-6 h-6 mb-2 ${activeMode === mode.id ? 'text-purple-600' : 'text-gray-400'}`}
                   />
                   <div className="font-semibold text-sm mb-1">{mode.label}</div>
-                  <div className="text-xs " style={{ color: 'var(--color-muted)' }}>{mode.description}</div>
+                  <div className="text-xs " className="text-muted">{mode.description}</div>
                 </button>
               );
             })}
           </div>
 
           <div>
-            <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+            <label className="block text-sm font-medium  mb-2" className="text-body">
               Describe tu diseño
             </label>
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Ej: Invitación de boda minimalista con flores en las esquinas, tipografía elegante, colores tierra..."
-              className="w-full px-4 py-3 border  rounded-lg resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+              className="w-full px-4 py-3 border  rounded-lg resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" className="border-default"
               rows={4}
             />
           </div>
 
           <div>
-            <div className="text-xs font-medium  mb-2" style={{ color: 'var(--color-text)' }}>Sugerencias</div>
+            <div className="text-xs font-medium  mb-2" className="text-body">Sugerencias</div>
             <div className="flex flex-wrap gap-2">
               {suggestions.map((suggestion) => (
                 <button
                   key={suggestion}
                   onClick={() => setPrompt(suggestion)}
-                  className="px-3 py-1.5 text-xs  hover:bg-gray-200 rounded-full transition-colors" style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="px-3 py-1.5 text-xs  hover:bg-gray-200 rounded-full transition-colors" className="bg-page"
                 >
                   {suggestion}
                 </button>
@@ -183,7 +183,7 @@ export default function AIAssistant({ onClose, canvasRef }) {
             )}
           </button>
 
-          <div className="text-xs  text-center" style={{ color: 'var(--color-muted)' }}>
+          <div className="text-xs  text-center" className="text-muted">
             La IA te ayudará a crear diseños profesionales en segundos
           </div>
         </div>

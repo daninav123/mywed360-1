@@ -67,7 +67,7 @@ export default function SupplierLogin() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4 relative"
-      style={{ backgroundColor: 'var(--color-bg)' }}
+      className="bg-page"
     >
       {/* Selector de idioma */}
       <div className="absolute top-4 right-4 z-10">
@@ -83,30 +83,30 @@ export default function SupplierLogin() {
           >
             <LogIn size={32} />
           </div>
-          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+          <h1 className="text-3xl font-bold mb-2" className="text-body">
             {t('suppliers.login.title')}
           </h1>
-          <p style={{ color: 'var(--color-muted)' }}>{t('suppliers.login.subtitle')}</p>
+          <p className="text-muted">{t('suppliers.login.subtitle')}</p>
         </div>
 
         {/* Card de login */}
         <div
           className="rounded-xl shadow-lg p-8"
-          style={{ backgroundColor: 'var(--color-surface)' }}
+          className="bg-surface"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email */}
             <div>
               <label
                 className="block text-sm font-medium mb-2"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
               >
                 {t('suppliers.login.fields.email.label')}
               </label>
               <div className="relative">
                 <div
                   className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                  style={{ color: 'var(--color-muted)' }}
+                  className="text-muted"
                 >
                   <Mail size={20} />
                 </div>
@@ -129,14 +129,14 @@ export default function SupplierLogin() {
             <div>
               <label
                 className="block text-sm font-medium mb-2"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
               >
                 {t('suppliers.login.fields.password.label')}
               </label>
               <div className="relative">
                 <div
                   className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                  style={{ color: 'var(--color-muted)' }}
+                  className="text-muted"
                 >
                   <Lock size={20} />
                 </div>
@@ -144,7 +144,7 @@ export default function SupplierLogin() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border  rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full pl-10 pr-4 py-3 border  rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" className="border-default"
                   placeholder={t('suppliers.login.fields.password.placeholder')}
                   required
                 />
@@ -184,19 +184,19 @@ export default function SupplierLogin() {
             <button
               onClick={() => navigate('/supplier/forgot-password')}
               className="text-sm hover:underline"
-              style={{ color: 'var(--color-primary)' }}
+              className="text-primary"
             >
               {t('suppliers.login.links.forgotPassword')}
             </button>
 
-            <div className="pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
-              <p className="text-sm mb-2" style={{ color: 'var(--color-muted)' }}>
+            <div className="pt-4 border-t" className="border-default">
+              <p className="text-sm mb-2" className="text-muted">
                 {t('suppliers.login.links.noAccount')}
               </p>
               <button
                 onClick={() => navigate('/supplier/registro')}
                 className="hover:underline font-medium"
-                style={{ color: 'var(--color-primary)' }}
+                className="text-primary"
               >
                 {t('suppliers.login.links.register')}
               </button>
@@ -205,7 +205,7 @@ export default function SupplierLogin() {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-sm" style={{ color: 'var(--color-muted)' }}>
+        <div className="mt-8 text-center text-sm" className="text-muted">
           <p>{t('suppliers.login.footer.copyright')}</p>
         </div>
       </div>

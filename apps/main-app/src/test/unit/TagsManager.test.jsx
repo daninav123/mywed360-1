@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import TagsManager from '../../components/email/TagsManager';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import * as tagService from '../../services/tagService';
 
 // Mock de los módulos necesarios

@@ -1,0 +1,50 @@
+{
+  "sections": {
+    "guests": {
+      "title": "Guests & Tables",
+      "description": "Manage your guest list and seating arrangements",
+      "links": {
+        "guests": "Guest List",
+        "seating": "Seating Plan"
+      }
+    },
+    "providers": {
+      "title": "Suppliers",
+      "description": "Find and manage your wedding suppliers",
+      "links": {
+        "providers": "Supplier Directory",
+        "contracts": "Contracts"
+      }
+    },
+    "protocol": {
+      "title": "Protocol & Timeline",
+      "description": "Plan your ceremony and special moments",
+      "links": {
+        "specialMoments": "Special Moments",
+        "timing": "Event Timeline",
+        "checklist": "Ceremony Checklist",
+        "ceremonyHelp": "Ceremony Help",
+        "documents": "Legal Documents"
+      }
+    },
+    "extras": {
+      "title": "Extras",
+      "description": "Website, designs, and additional tools",
+      "links": {
+        "web": "Wedding Website",
+        "designEditor": "Design Editor",
+        "designs": "Designs",
+        "ideas": "Ideas & Notes",
+        "moments": "Moments"
+      }
+    },
+    "weddingInfo": {
+      "title": "Wedding Information",
+      "description": "Configure date, venue, menu, FAQs and more"
+    },
+    "profile": {
+      "title": "Profile & Settings",
+      "description": "Manage your account and preferences"
+    }
+  }
+}

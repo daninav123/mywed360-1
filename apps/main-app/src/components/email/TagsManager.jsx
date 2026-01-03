@@ -2,7 +2,7 @@ import { Tag, Plus, Edit, Trash, X, Check, Circle } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import {
   getUserTags,
   getCustomTags,

@@ -150,14 +150,14 @@ export default function SupplierMessages() {
           <button
             onClick={() => navigate(`/supplier/dashboard/${id}`)}
             className="flex items-center gap-2 hover:opacity-70"
-            style={{ color: 'var(--color-text)' }}
+            className="text-body"
           >
             <ArrowLeft size={20} />
             <span>Volver al Dashboard</span>
           </button>
         </div>
 
-        <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--color-text)' }}>
+        <h1 className="text-3xl font-bold mb-6" className="text-body">
           Mensajes
         </h1>
 
@@ -165,10 +165,10 @@ export default function SupplierMessages() {
           {/* Lista de conversaciones */}
           <div
             className="lg:col-span-1 shadow-md rounded-lg overflow-hidden"
-            style={{ backgroundColor: 'var(--color-surface)' }}
+            className="bg-surface"
           >
             {/* Filtros */}
-            <div className="p-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
+            <div className="p-4 border-b" className="border-default">
               <div className="flex gap-2 mb-3">
                 {['all', 'active', 'archived'].map((f) => (
                   <button
@@ -194,7 +194,7 @@ export default function SupplierMessages() {
                 <Search
                   size={16}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2"
-                  style={{ color: 'var(--color-muted)' }}
+                  className="text-muted"
                 />
                 <input
                   type="text"
@@ -218,9 +218,9 @@ export default function SupplierMessages() {
                   <MessageSquare
                     size={48}
                     className="mx-auto mb-4"
-                    style={{ color: 'var(--color-muted)' }}
+                    className="text-muted"
                   />
-                  <p style={{ color: 'var(--color-muted)' }}>No hay conversaciones</p>
+                  <p className="text-muted">No hay conversaciones</p>
                 </div>
               ) : (
                 filteredConversations.map((conv) => (
@@ -249,7 +249,7 @@ export default function SupplierMessages() {
                         <div className="flex items-center justify-between">
                           <h3
                             className="font-semibold truncate"
-                            style={{ color: 'var(--color-text)' }}
+                            className="text-body"
                           >
                             {conv.client.name}
                           </h3>
@@ -265,12 +265,12 @@ export default function SupplierMessages() {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm truncate" style={{ color: 'var(--color-muted)' }}>
+                        <p className="text-sm truncate" className="text-muted">
                           {conv.lastMessage || 'Sin mensajes'}
                         </p>
                       </div>
                     </div>
-                    <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-xs" className="text-muted">
                       {conv.lastMessageAt && format.date
                         ? format.date(conv.lastMessageAt.toDate(), { dateStyle: 'short' })
                         : ''}
@@ -294,7 +294,7 @@ export default function SupplierMessages() {
                 {/* Header del chat */}
                 <div
                   className="p-4 border-b flex items-center justify-between"
-                  style={{ borderColor: 'var(--color-border)' }}
+                  className="border-default"
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -304,10 +304,10 @@ export default function SupplierMessages() {
                       <User size={20} color="white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                      <h3 className="font-semibold" className="text-body">
                         {selectedConversation.client.name}
                       </h3>
-                      <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                      <p className="text-sm" className="text-muted">
                         {selectedConversation.client.email || ''}
                       </p>
                     </div>
@@ -315,7 +315,7 @@ export default function SupplierMessages() {
                   <button
                     onClick={() => handleArchiveConversation(selectedConversation.id)}
                     className="p-2 hover:opacity-70 rounded-lg"
-                    style={{ color: 'var(--color-muted)' }}
+                    className="text-muted"
                   >
                     <Archive size={20} />
                   </button>
@@ -365,7 +365,7 @@ export default function SupplierMessages() {
                 <form
                   onSubmit={handleSendMessage}
                   className="p-4 border-t"
-                  style={{ borderColor: 'var(--color-border)' }}
+                  className="border-default"
                 >
                   <div className="flex gap-2">
                     <input
@@ -400,9 +400,9 @@ export default function SupplierMessages() {
                   <Inbox
                     size={64}
                     className="mx-auto mb-4"
-                    style={{ color: 'var(--color-muted)' }}
+                    className="text-muted"
                   />
-                  <p style={{ color: 'var(--color-muted)' }}>
+                  <p className="text-muted">
                     Selecciona una conversación para ver los mensajes
                   </p>
                 </div>

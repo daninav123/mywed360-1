@@ -51,10 +51,10 @@ export const WebPreview = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center " style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="min-h-screen flex items-center justify-center " className="bg-page">
         <div className="text-center">
           <div className="text-4xl mb-4">⏳</div>
-          <p className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Cargando vista previa...</p>
+          <p className="text-lg font-semibold " className="text-body">Cargando vista previa...</p>
         </div>
       </div>
     );
@@ -110,7 +110,7 @@ export const WebPreview = () => {
         </div>
         <button
           onClick={() => window.close()}
-          className="px-4 py-2 /10 hover:bg-white/20 rounded-lg transition-colors" style={{ backgroundColor: 'var(--color-surface)' }}
+          className="px-4 py-2 /10 hover:bg-white/20 rounded-lg transition-colors" className="bg-surface"
         >
           ✕ Cerrar
         </button>

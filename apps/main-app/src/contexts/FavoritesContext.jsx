@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { useWedding } from '../context/WeddingContext';
 import { auth } from '../firebaseConfig';
 import useTranslations from '../hooks/useTranslations';

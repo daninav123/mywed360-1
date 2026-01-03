@@ -1,7 +1,7 @@
 import { Trash } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import * as CommentService from '../../services/commentService';
 
 /**

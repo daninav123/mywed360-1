@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { User, Mail, Moon, LogOut } from 'lucide-react';
 
 import ContactsImporter from '../components/guests/ContactsImporter';
+import DarkModeToggle from '../components/DarkModeToggle';
 import GuestBulkGrid from '../components/guests/GuestBulkGrid';
 import GuestFilters from '../components/guests/GuestFilters';
 import GuestForm from '../components/guests/GuestForm';
 import GuestList from '../components/guests/GuestList';
+import LanguageSelector from '../components/ui/LanguageSelector';
 import Modal from '../components/Modal';
+import Nav from '../components/Nav';
+import NotificationCenter from '../components/NotificationCenter';
 import PageWrapper from '../components/PageWrapper';
 import PageTabs from '../components/ui/PageTabs';
 import { formatDate } from '../utils/formatUtils';
@@ -18,7 +24,7 @@ import FormalInvitationModal from '../components/whatsapp/FormalInvitationModal'
 import WhatsAppSender from '../components/whatsapp/WhatsAppSender';
 import { useWedding } from '../context/WeddingContext';
 import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import useGuests from '../hooks/useGuests';
 import useTranslations from '../hooks/useTranslations';
 import { post as apiPost } from '../services/apiClient';
@@ -62,12 +68,13 @@ function Invitados() {
   const [checkInLoading, setCheckInLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scanError, setScanError] = useState('');
+  const [openUserMenu, setOpenUserMenu] = useState(false);
   const videoRef = React.useRef(null);
   const scanIntervalRef = React.useRef(null);
 
   // Hooks reales
   const { t } = useTranslations();
-  const { currentUser } = useAuth();
+  const { currentUser, logout: logoutUnified } = useAuth();
   const { weddings, activeWedding } = useWedding();
   const { info: activeWeddingInfo } = useActiveWeddingInfo();
 
@@ -1166,7 +1173,99 @@ function Invitados() {
   };
 
   return (
-    <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+    <>
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        {/* Botones superiores derechos */}
+        <div className="absolute top-4 right-4 flex items-center space-x-3" style={{ zIndex: 100 }}>
+        <LanguageSelector variant="minimal" />
+        
+        <div className="relative" data-user-menu>
+          <button
+            onClick={() => setOpenUserMenu(!openUserMenu)}
+            className="w-11 h-11 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center"
+            title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })}
+            style={{
+              backgroundColor: openUserMenu ? 'var(--color-lavender)' : 'rgba(255, 255, 255, 0.95)',
+              border: `2px solid ${openUserMenu ? 'var(--color-primary)' : 'rgba(255,255,255,0.8)'}`,
+              boxShadow: openUserMenu ? '0 4px 12px rgba(94, 187, 255, 0.3)' : '0 2px 8px rgba(0,0,0,0.15)',
+            }}
+          >
+            <User className="w-5 h-5" style={{ color: openUserMenu ? 'var(--color-primary)' : 'var(--color-text-secondary)' }} />
+          </button>
+          
+          {openUserMenu && (
+            <div 
+              className="absolute right-0 mt-3 bg-[var(--color-surface)] p-2 space-y-1"
+              style={{
+                minWidth: '220px',
+                border: '1px solid var(--color-border-soft)',
+                borderRadius: 'var(--radius-lg)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                zIndex: 9999,
+              }}
+            >
+              <div className="px-2 py-1">
+                <NotificationCenter />
+              </div>
+
+              <Link
+                to="/perfil"
+                onClick={() => setOpenUserMenu(false)}
+                className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
+                className="text-body"
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <User className="w-4 h-4 mr-3" />
+                {t('navigation.profile', { defaultValue: 'Perfil' })}
+              </Link>
+
+              <Link
+                to="/email"
+                onClick={() => setOpenUserMenu(false)}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
+                className="text-body"
+              >
+                <Mail className="w-4 h-4 mr-3" />
+                {t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
+              </Link>
+
+              <div 
+                className="px-3 py-2.5 rounded-xl transition-all duration-200"
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm flex items-center" className="text-body">
+                    <Moon className="w-4 h-4 mr-3" />
+                    {t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}
+                  </span>
+                  <DarkModeToggle className="ml-2" />
+                </div>
+              </div>
+
+              <div style={{ height: '1px', backgroundColor: 'var(--color-border-soft)', margin: '8px 0' }}></div>
+              
+              <button
+                onClick={() => {
+                  logoutUnified();
+                  setOpenUserMenu(false);
+                }}
+                className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center"
+                className="text-danger"
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <LogOut className="w-4 h-4 mr-3" />
+                {t('navigation.logout', { defaultValue: 'Cerrar sesión' })}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+      
       <div className="mx-auto my-8" style={{
         maxWidth: '1024px',
         width: '100%',
@@ -1220,7 +1319,7 @@ function Invitados() {
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               marginBottom: 0,
-            }}>Gestión de Boda</p>
+            }}>{t('common:inspiration.weddingManagement')}</p>
           </div>
         </header>
 
@@ -1341,12 +1440,12 @@ function Invitados() {
         <Modal open={showRsvpModal} onClose={handleCloseRsvpSummary} title="Resumen RSVP" size="lg">
           <div className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" p-4 rounded-lg border" className="bg-surface">
                 <div className="text-2xl font-bold text-primary">{totalGuestsCount}</div>
                 <div className="text-sm text-muted">Total invitados</div>
               </div>
-              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-success)' }}>
+              <div className=" p-4 rounded-lg border" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-success">
                   {
                     (guests || []).filter((g) => {
                       const s = String(g.status || '').toLowerCase();
@@ -1356,7 +1455,7 @@ function Invitados() {
                 </div>
                 <div className="text-sm text-muted">Confirmados</div>
               </div>
-              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" p-4 rounded-lg border" className="bg-surface">
                 <div className="text-2xl font-bold text-yellow-600">
                   {
                     (guests || []).filter((g) => {
@@ -1367,8 +1466,8 @@ function Invitados() {
                 </div>
                 <div className="text-sm text-muted">Pendientes</div>
               </div>
-              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-danger)' }}>
+              <div className=" p-4 rounded-lg border" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-danger">
                   {
                     (guests || []).filter((g) => {
                       const s = String(g.status || '').toLowerCase();
@@ -1380,7 +1479,7 @@ function Invitados() {
               </div>
             </div>
 
-            <div className=" rounded-lg border overflow-hidden" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className=" rounded-lg border overflow-hidden" className="bg-surface">
               <div className="px-4 py-3 border-b font-medium">Confirmados (Nombre y Mesa)</div>
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
@@ -1429,17 +1528,17 @@ function Invitados() {
         >
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" p-4 rounded-lg border" className="bg-surface">
                 <div className="text-xs uppercase text-muted">Registrados</div>
-                <div className="text-2xl font-semibold " style={{ color: 'var(--color-success)' }}>
+                <div className="text-2xl font-semibold " className="text-success">
                   {checkInStats.checkedIn}
                 </div>
               </div>
-              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" p-4 rounded-lg border" className="bg-surface">
                 <div className="text-xs uppercase text-muted">Pendientes</div>
                 <div className="text-2xl font-semibold text-yellow-600">{checkInStats.pending}</div>
               </div>
-              <div className=" p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" p-4 rounded-lg border" className="bg-surface">
                 <div className="text-xs uppercase text-muted">Total</div>
                 <div className="text-2xl font-semibold">{checkInStats.total}</div>
               </div>
@@ -1463,7 +1562,7 @@ function Invitados() {
                   </Button>
                 )}
               </div>
-              {scanError && <p className="text-sm " style={{ color: 'var(--color-danger)' }}>{scanError}</p>}
+              {scanError && <p className="text-sm " className="text-danger">{scanError}</p>}
             </div>
 
             {isScanning && (
@@ -1478,7 +1577,7 @@ function Invitados() {
               </div>
             ) : (
               <div className="space-y-3">
-                <div className=" border rounded-lg p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className=" border rounded-lg p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between" className="bg-surface">
                   <div>
                     <h3 className="text-lg font-semibold">
                       {checkInGuest.name || 'Invitado sin nombre'}
@@ -1528,7 +1627,7 @@ function Invitados() {
 
                 {Array.isArray(checkInGuest.checkInHistory) &&
                   checkInGuest.checkInHistory.length > 0 && (
-                    <div className=" border rounded-lg p-4" style={{ backgroundColor: 'var(--color-surface)' }}>
+                    <div className=" border rounded-lg p-4" className="bg-surface">
                       <h4 className="font-semibold text-sm mb-2">Historial reciente</h4>
                       <ul className="space-y-1 max-h-40 overflow-auto text-sm">
                         {checkInGuest.checkInHistory
@@ -1652,7 +1751,10 @@ function Invitados() {
       </div>
       </div>
       </div>
-    </div>
+      </div>
+      {/* Bottom Navigation */}
+      <Nav />
+    </>
   );
 };
 

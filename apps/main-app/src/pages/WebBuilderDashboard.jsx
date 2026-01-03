@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import {
   getUserWebs,
   deleteWeb,
@@ -116,24 +116,24 @@ const WebBuilderDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen  flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="min-h-screen  flex items-center justify-center" className="bg-page">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-          <p className=" text-lg" style={{ color: 'var(--color-text-secondary)' }}>Cargando tus webs...</p>
+          <p className=" text-lg" className="text-secondary">Cargando tus webs...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen  py-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-screen  py-8" className="bg-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold " style={{ color: 'var(--color-text)' }}>🎨 Mis Webs de Boda</h1>
-              <p className="mt-2 " style={{ color: 'var(--color-text-secondary)' }}>Gestiona todas tus webs creadas</p>
+              <h1 className="text-3xl font-bold " className="text-body">🎨 Mis Webs de Boda</h1>
+              <p className="mt-2 " className="text-secondary">Gestiona todas tus webs creadas</p>
             </div>
             <button
               onClick={handleCreateNew}
@@ -147,12 +147,12 @@ const WebBuilderDashboard = () => {
 
         {/* Lista de Webs */}
         {webs.length === 0 ? (
-          <div className=" rounded-xl shadow-sm p-12 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className=" rounded-xl shadow-sm p-12 text-center" className="bg-surface">
             <div className="text-6xl mb-4">🎨</div>
-            <h3 className="text-xl font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+            <h3 className="text-xl font-semibold  mb-2" className="text-body">
               Aún no has creado ninguna web
             </h3>
-            <p className=" mb-6" style={{ color: 'var(--color-text-secondary)' }}>Crea tu primera web de boda personalizada</p>
+            <p className=" mb-6" className="text-secondary">Crea tu primera web de boda personalizada</p>
             <button
               onClick={handleCreateNew}
               className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold"
@@ -165,7 +165,7 @@ const WebBuilderDashboard = () => {
             {webs.map((web) => (
               <div
                 key={web.id}
-                className=" rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden" style={{ backgroundColor: 'var(--color-surface)' }}
+                className=" rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden" className="bg-surface"
               >
                 {/* Preview */}
                 <div className="h-48 bg-[var(--color-primary)] flex items-center justify-center relative">
@@ -178,7 +178,7 @@ const WebBuilderDashboard = () => {
                   )}
                   <div className="text-center">
                     <div className="text-5xl mb-2">🎨</div>
-                    <p className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>
+                    <p className="text-sm font-medium " className="text-body">
                       {web.nombre || 'Mi Web de Boda'}
                     </p>
                   </div>
@@ -187,12 +187,12 @@ const WebBuilderDashboard = () => {
                 {/* Información */}
                 <div className="p-5">
                   <div className="mb-4">
-                    <p className="text-sm  mb-1" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-sm  mb-1" className="text-muted">
                       Actualizada: {formatDate(web.updatedAt)}
                     </p>
                     {web.published && web.slug && (
                       <div className="mt-2 flex items-center gap-2">
-                        <p className="text-xs  truncate flex-1" style={{ color: 'var(--color-text-secondary)' }}>/web/{web.slug}</p>
+                        <p className="text-xs  truncate flex-1" className="text-secondary">/web/{web.slug}</p>
                         <button
                           onClick={() => handleCopyUrl(web.slug)}
                           className="text-purple-600 hover:text-purple-700 text-xs font-medium"
@@ -242,7 +242,7 @@ const WebBuilderDashboard = () => {
                   <button
                     onClick={() => handleDelete(web.id)}
                     disabled={deletingId === web.id}
-                    className="w-full mt-2 px-4 py-2 bg-red-50  rounded-lg hover:bg-red-100 transition-colors text-sm font-medium disabled:opacity-50" style={{ color: 'var(--color-danger)' }}
+                    className="w-full mt-2 px-4 py-2 bg-red-50  rounded-lg hover:bg-red-100 transition-colors text-sm font-medium disabled:opacity-50" className="text-danger"
                   >
                     {deletingId === web.id ? '🗑️ Eliminando...' : '🗑️ Eliminar'}
                   </button>
@@ -265,14 +265,14 @@ const WebBuilderDashboard = () => {
       {/* Modal de Compartir */}
       {sharingWeb && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className=" rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)' }}>
-            <div className="sticky top-0  border-b  px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-              <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+          <div className=" rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" className="bg-surface">
+            <div className="sticky top-0  border-b  px-6 py-4 flex items-center justify-between" className="border-default" className="bg-surface">
+              <h2 className="text-xl font-bold " className="text-body">
                 Compartir: {sharingWeb.nombre || 'Mi Web'}
               </h2>
               <button
                 onClick={() => setSharingWeb(null)}
-                className=" hover: text-2xl" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}
+                className=" hover: text-2xl" className="text-muted" className="text-secondary"
               >
                 ×
               </button>

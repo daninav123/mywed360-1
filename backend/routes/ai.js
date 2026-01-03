@@ -359,19 +359,20 @@ router.post('/parse-dialog', async (req, res) => {
     return sendSuccess(req, res, { extracted, reply });
   } catch (err) {
     logger.error('❌ parse-dialog error', err);
-    return sendError(
-      req,
-      res,
-      'openai_request_failed',
-      err?.message || 'Error al procesar la solicitud con OpenAI',
-      502
-    );
+    if (err.message === 'timeout-openai') {
+      return sendServiceUnavailable(
+        req,
+        res,
+        'La solicitud a OpenAI tardó demasiado y fue cancelada. Intenta de nuevo.'
+      );
+    }
+    return sendInternalError(req, res, err);
   }
 });
 
 // GET /api/ai/search-suppliers?q=photographer+Madrid
 router.get('/search-suppliers', async (req, res) => {
-  const q = req.query.q;
+  // ...
   if (!q) {
     return sendValidationError(req, res, [{ message: 'Query parameter "q" is required' }]);
   }

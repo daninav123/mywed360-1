@@ -24,8 +24,8 @@ import { GlobalStylesPanel } from '../components/web/craft/GlobalStylesPanel';
 import { PublishModal } from '../components/web/craft/PublishModal';
 import { TEMA_DEFAULT } from '../components/web/craft/themes';
 import { toast } from 'react-toastify';
-import { useAuth } from '../hooks/useAuth';
-import { useWeddingData } from '../hooks/useWeddingData';
+import { useAuth } from '../hooks/useAuth.jsx';
+import useWeddingData from '../hooks/useWeddingData';
 import { useWedding } from '../context/WeddingContext';
 import { WeddingDataProvider } from '../context/WeddingDataContext';
 import { ThemeProvider, useThemeContext } from '../context/ThemeContext';
@@ -57,19 +57,19 @@ const EditorHeader = ({
   const { query, actions } = useEditor();
 
   return (
-    <header className=" border-b  px-6 py-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+    <header className=" border-b  px-6 py-4" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={onBackToDashboard}
-            className="px-3 py-2  hover: hover: rounded-lg transition-colors flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+            className="px-3 py-2  hover: hover: rounded-lg transition-colors flex items-center gap-2" style={{ color: 'var(--color-text)', backgroundColor: 'var(--color-bg)' }}
             title="Volver a Mis Webs"
           >
             ← Mis Webs
           </button>
           <div>
-            <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>🎨 Diseñador de Webs de Boda</h1>
-            <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <h1 className="text-2xl font-bold " className="text-body">🎨 Diseñador de Webs de Boda</h1>
+            <p className="text-sm  mt-1" className="text-secondary">
               Arrastra componentes para crear tu web perfecta
             </p>
           </div>
@@ -77,7 +77,7 @@ const EditorHeader = ({
 
         <div className="flex items-center gap-4">
           {/* Grupo 1: Tema y Estilos */}
-          <div className="flex items-center gap-2 pr-4 border-r " style={{ borderColor: 'var(--color-border)' }}>
+          <div className="flex items-center gap-2 pr-4 border-r " className="border-default">
             <ThemeSelector temaActual={tema} onTemaChange={onTemaChange} />
             <button
               onClick={onMostrarEstilos}
@@ -89,7 +89,7 @@ const EditorHeader = ({
           </div>
 
           {/* Grupo 2: Vista */}
-          <div className="flex items-center gap-2 pr-4 border-r " style={{ borderColor: 'var(--color-border)' }}>
+          <div className="flex items-center gap-2 pr-4 border-r " className="border-default">
             <button
               onClick={() =>
                 window.open(
@@ -137,7 +137,7 @@ const EditorHeader = ({
             </button>
 
             {ultimoGuardado && (
-              <span className="text-xs  whitespace-nowrap" style={{ color: 'var(--color-muted)' }}>{ultimoGuardado}</span>
+              <span className="text-xs  whitespace-nowrap" className="text-muted">{ultimoGuardado}</span>
             )}
 
             <button
@@ -526,7 +526,7 @@ const WebBuilderPageCraft = () => {
           enabled={enabled}
         >
           <EditorWrapper onActionsReady={setEditorState} />
-          <div className="h-screen flex flex-col " style={{ backgroundColor: 'var(--color-bg)' }}>
+          <div className="h-screen flex flex-col " className="bg-page">
             {/* Header */}
             <EditorHeader
               enabled={enabled}
@@ -544,12 +544,12 @@ const WebBuilderPageCraft = () => {
             {/* Editor principal */}
             <div className="flex-1 flex overflow-hidden">
               {/* Toolbox izquierda */}
-              <div className="w-64 " style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className="w-64 " className="bg-surface">
                 <Toolbox />
               </div>
 
               {/* Canvas centro - Fondo limpio para edición */}
-              <div className="flex-1 overflow-auto " style={{ backgroundColor: 'var(--color-bg)' }}>
+              <div className="flex-1 overflow-auto " className="bg-page">
                 <div className="min-h-full w-full">
                   <div
                     className="min-h-full w-full"
@@ -577,7 +577,7 @@ const WebBuilderPageCraft = () => {
                         data-cy="canvas-root"
                       >
                         {/* Canvas vacío - los usuarios arrastran componentes aquí */}
-                        <div className="flex items-center justify-center min-h-screen " style={{ color: 'var(--color-muted)' }}>
+                        <div className="flex items-center justify-center min-h-screen " className="text-muted">
                           <div className="text-center" style={{ position: 'relative', zIndex: 10 }}>
                             <div className="text-6xl mb-4">⬅️</div>
                             <p className="text-lg font-semibold">
@@ -593,7 +593,7 @@ const WebBuilderPageCraft = () => {
               </div>
 
               {/* Settings derecha */}
-              <div className="w-80 " style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className="w-80 " className="bg-surface">
                 {mostrarEstilosGlobales ? (
                   <GlobalStylesPanel tema={tema} onTemaChange={handleTemaChange} />
                 ) : (
@@ -603,12 +603,12 @@ const WebBuilderPageCraft = () => {
             </div>
 
             {/* Footer con tips */}
-            <footer className=" border-t  px-6 py-3" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+            <footer className=" border-t  px-6 py-3" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
               <div className="flex items-center justify-between text-sm">
-                <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+                <p className="" className="text-secondary">
                   💡 <strong>Tip:</strong> Arrastra componentes al canvas, haz clic para editar
                 </p>
-                <p className="" style={{ color: 'var(--color-muted)' }}>Hecho con ❤️ por MaLoveApp</p>
+                <p className="" className="text-muted">Hecho con ❤️ por MaLoveApp</p>
               </div>
             </footer>
           </div>

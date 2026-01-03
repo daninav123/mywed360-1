@@ -1,52 +1,12 @@
 import express from 'express';
-import admin from 'firebase-admin';
+import { PrismaClient } from '@prisma/client';
 import logger from '../utils/logger.js';
 
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({ credential: admin.credential.applicationDefault() });
-  } catch {}
-}
-const db = admin.firestore();
 const router = express.Router();
-
-// Dev helper: ensure VAPID keys exist in Firestore when allowed
-async function ensureDevVapidKeys() {
-  const allowDev =
-    process.env.ALLOW_MOCK_TOKENS === 'true' || process.env.NODE_ENV !== 'production';
-  if (!allowDev) return null;
-  try {
-    const docRef = db.collection('config').doc('pushVapid');
-    const snap = await docRef.get();
-    if (snap.exists) return snap.data();
-    let webpush;
-    try {
-      const mod = await import('web-push');
-      webpush = mod.default || mod;
-    } catch {
-      return null; // web-push no instalado
-    }
-    const { publicKey, privateKey } = webpush.generateVAPIDKeys();
-    const payload = {
-      publicKey,
-      privateKey,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    };
-    await docRef.set(payload);
-    return payload;
-  } catch (e) {
-    logger.warn('ensureDevVapidKeys error', e?.message || e);
-    return null;
-  }
-}
+const prisma = new PrismaClient();
 
 router.get('/public-key', async (_req, res) => {
-  let key = process.env.VAPID_PUBLIC_KEY || process.env.VITE_VAPID_PUBLIC_KEY || '';
-  if (!key) {
-    // intentar cargar/generar dev keys
-    const dev = await ensureDevVapidKeys();
-    key = dev?.publicKey || '';
-  }
+  const key = process.env.VAPID_PUBLIC_KEY || process.env.VITE_VAPID_PUBLIC_KEY || '';
   if (!key) return res.status(200).json({ key: null });
   return res.json({ key });
 });
@@ -55,16 +15,21 @@ router.post('/subscribe', async (req, res) => {
   try {
     const sub = req.body;
     if (!sub || !sub.endpoint) return res.status(400).json({ error: 'invalid-subscription' });
-    const uid = (req.user && (req.user.uid || req.user.id)) || 'anon';
-    const docId = Buffer.from(sub.endpoint).toString('base64').replace(/=+$/, '');
-    await db.collection('pushSubscriptions').doc(docId).set(
-      {
-        uid,
+    const uid = (req.user && (req.user.uid || req.user.id)) || null;
+    
+    await prisma.pushSubscription.upsert({
+      where: { endpoint: sub.endpoint },
+      update: {
         subscription: sub,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        userId: uid,
       },
-      { merge: true }
-    );
+      create: {
+        endpoint: sub.endpoint,
+        subscription: sub,
+        userId: uid,
+      },
+    });
+    
     return res.json({ ok: true });
   } catch (e) {
     logger.warn('push-subscribe error', e.message);
@@ -76,8 +41,10 @@ router.post('/unsubscribe', async (req, res) => {
   try {
     const sub = req.body;
     if (!sub || !sub.endpoint) return res.status(400).json({ error: 'invalid-subscription' });
-    const docId = Buffer.from(sub.endpoint).toString('base64').replace(/=+$/, '');
-    await db.collection('pushSubscriptions').doc(docId).delete();
+    
+    await prisma.pushSubscription.deleteMany({
+      where: { endpoint: sub.endpoint },
+    });
     return res.json({ ok: true });
   } catch (e) {
     logger.warn('push-unsubscribe error', e.message);

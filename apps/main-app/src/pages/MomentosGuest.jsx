@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import UploadWidget from '@/components/momentos/UploadWidget';
+import LanguageSelector from '@/components/ui/LanguageSelector';
 import {
   getAlbumScenes,
   getGalleryUploadState,
@@ -171,8 +172,11 @@ export default function MomentosGuest() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-        <div className=" border border-slate-200 rounded-xl shadow-sm px-6 py-8 space-y-3 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 relative">
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
+        <div className=" border border-slate-200 rounded-xl shadow-sm px-6 py-8 space-y-3 text-center" className="bg-surface">
           <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
           <p className="text-sm text-slate-600">{t('public.moments.guest.loading')}</p>
         </div>
@@ -182,9 +186,12 @@ export default function MomentosGuest() {
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-        <div className=" border border-red-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3" style={{ backgroundColor: 'var(--color-surface)' }}>
-          <h1 className="text-xl font-semibold " style={{ color: 'var(--color-danger)' }}>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 relative">
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
+        <div className=" border border-red-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3" className="bg-surface">
+          <h1 className="text-xl font-semibold " className="text-danger">
             {t('public.moments.guest.errorTitle')}
           </h1>
           <p className="text-sm text-slate-600">
@@ -200,8 +207,11 @@ export default function MomentosGuest() {
 
   if (status === 'closed') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-        <div className=" border border-amber-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 relative">
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
+        <div className=" border border-amber-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3" className="bg-surface">
           <h1 className="text-xl font-semibold text-amber-600">
             {t('public.moments.guest.closedTitle')}
           </h1>
@@ -223,10 +233,13 @@ export default function MomentosGuest() {
 
   if (status === 'welcome') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 relative">
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
         <form
           onSubmit={handleStart}
-          className=" border border-slate-200 rounded-2xl shadow-md px-8 py-10 w-full max-w-lg space-y-6" style={{ backgroundColor: 'var(--color-surface)' }}
+          className=" border border-slate-200 rounded-2xl shadow-md px-8 py-10 w-full max-w-lg space-y-6" className="bg-surface"
         >
           <header className="space-y-2 text-center">
             <p className="text-sm uppercase tracking-wide text-blue-500 font-semibold">
@@ -329,9 +342,12 @@ export default function MomentosGuest() {
           });
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4">
+    <div className="min-h-screen bg-slate-50 py-10 px-4 relative">
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
       <div className="max-w-3xl mx-auto space-y-6">
-        <header className=" border border-slate-200 rounded-2xl shadow-sm px-6 py-5 space-y-2" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <header className=" border border-slate-200 rounded-2xl shadow-sm px-6 py-5 space-y-2" className="bg-surface">
           <p className="text-xs uppercase tracking-wide text-blue-500 font-semibold">
             {t('public.moments.guest.uploadStates.badge')}
           </p>
@@ -373,7 +389,7 @@ export default function MomentosGuest() {
           disabled={uploadsClosed}
         />
 
-        <section className=" border border-slate-200 rounded-xl shadow-sm px-6 py-5 space-y-3" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <section className=" border border-slate-200 rounded-xl shadow-sm px-6 py-5 space-y-3" className="bg-surface">
           <h2 className="text-lg font-semibold text-slate-800">
             {t('public.moments.guest.uploadStates.progressTitle')}
           </h2>
@@ -401,7 +417,7 @@ export default function MomentosGuest() {
                       })}
                     </p>
                   </div>
-                  <span className="text-xs  font-semibold" style={{ color: 'var(--color-success)' }}>
+                  <span className="text-xs  font-semibold" className="text-success">
                     {t('public.moments.guest.uploadStates.uploadReview')}
                   </span>
                 </div>

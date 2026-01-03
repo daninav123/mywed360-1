@@ -73,7 +73,7 @@ export default function Tasks() {
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 marginBottom: '32px',
-              }}>Gestión de Boda</p>
+              }}>{t('common:inspiration.weddingManagement')}</p>
             </div>
           </header>
 

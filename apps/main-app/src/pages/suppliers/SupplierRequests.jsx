@@ -240,7 +240,7 @@ export default function SupplierRequests() {
     (request) => (
       <div
         key={request.id}
-        className="group  border  rounded-xl p-6 hover:shadow-md hover:border-indigo-300 transition-all duration-300 transform hover:-translate-y-1" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}
+        className="group  border  rounded-xl p-6 hover:shadow-md hover:border-indigo-300 transition-all duration-300 transform hover:-translate-y-1" className="border-default" className="bg-surface"
       >
         {/* Header */}
         <div className="flex items-start justify-between mb-5 pb-4 border-b border-gray-100">
@@ -250,12 +250,12 @@ export default function SupplierRequests() {
                 {request.coupleName?.charAt(0)?.toUpperCase() || '?'}
               </div>
               <div>
-                <h3 className="text-xl font-bold  group-hover:text-indigo-600 transition-colors" style={{ color: 'var(--color-text)' }}>
+                <h3 className="text-xl font-bold  group-hover:text-indigo-600 transition-colors" className="text-body">
                   {request.coupleName}
                 </h3>
                 <div className="flex items-center gap-2 mt-1">
-                  <Clock size={14} className="" style={{ color: 'var(--color-muted)' }} />
-                  <span className="text-xs " style={{ color: 'var(--color-muted)' }}>{formatDate(request.receivedAt)}</span>
+                  <Clock size={14} className="" className="text-muted" />
+                  <span className="text-xs " className="text-muted">{formatDate(request.receivedAt)}</span>
                 </div>
               </div>
             </div>
@@ -263,7 +263,7 @@ export default function SupplierRequests() {
           <div className="flex flex-col items-end gap-2">
             {getStatusBadge(request.status)}
             {request.urgency === 'urgent' && (
-              <span className="animate-pulse flex items-center gap-1 text-xs  font-semibold bg-red-50 px-2 py-1 rounded-full" style={{ color: 'var(--color-danger)' }}>
+              <span className="animate-pulse flex items-center gap-1 text-xs  font-semibold bg-red-50 px-2 py-1 rounded-full" className="text-danger">
                 ⚠️ Urgente
               </span>
             )}
@@ -271,15 +271,15 @@ export default function SupplierRequests() {
         </div>
 
         {/* Detalles de la boda */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 p-5  border  rounded-xl" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 p-5  border  rounded-xl" className="border-default" className="bg-surface">
           {request.weddingDate && (
-            <div className="flex items-center gap-3 p-2  rounded-lg shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="flex items-center gap-3 p-2  rounded-lg shadow-sm hover:shadow-md transition-shadow" className="bg-surface">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-pink-100">
                 <Calendar size={18} className="text-pink-600" />
               </div>
               <div>
-                <p className="text-xs  font-medium" style={{ color: 'var(--color-muted)' }}>Fecha de Boda</p>
-                <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
+                <p className="text-xs  font-medium" className="text-muted">Fecha de Boda</p>
+                <p className="text-sm font-semibold " className="text-body">
                   {new Date(request.weddingDate).toLocaleDateString('es-ES', {
                     day: 'numeric',
                     month: 'long',
@@ -290,35 +290,35 @@ export default function SupplierRequests() {
             </div>
           )}
           {request.location && (
-            <div className="flex items-center gap-3 p-2  rounded-lg shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="flex items-center gap-3 p-2  rounded-lg shadow-sm hover:shadow-md transition-shadow" className="bg-surface">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100">
-                <MapPin size={18} className="" style={{ color: 'var(--color-success)' }} />
+                <MapPin size={18} className="" className="text-success" />
               </div>
               <div>
-                <p className="text-xs  font-medium" style={{ color: 'var(--color-muted)' }}>Ubicación</p>
-                <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{request.location}</p>
+                <p className="text-xs  font-medium" className="text-muted">Ubicación</p>
+                <p className="text-sm font-semibold " className="text-body">{request.location}</p>
               </div>
             </div>
           )}
           {request.guestCount && (
-            <div className="flex items-center gap-3 p-2  rounded-lg shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="flex items-center gap-3 p-2  rounded-lg shadow-sm hover:shadow-md transition-shadow" className="bg-surface">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
-                <Users size={18} className="" style={{ color: 'var(--color-primary)' }} />
+                <Users size={18} className="" className="text-primary" />
               </div>
               <div>
-                <p className="text-xs  font-medium" style={{ color: 'var(--color-muted)' }}>Invitados</p>
-                <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{request.guestCount} personas</p>
+                <p className="text-xs  font-medium" className="text-muted">Invitados</p>
+                <p className="text-sm font-semibold " className="text-body">{request.guestCount} personas</p>
               </div>
             </div>
           )}
           {request.budget && (
-            <div className="flex items-center gap-3 p-2  rounded-lg shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="flex items-center gap-3 p-2  rounded-lg shadow-sm hover:shadow-md transition-shadow" className="bg-surface">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100">
                 <DollarSign size={18} className="text-amber-600" />
               </div>
               <div>
-                <p className="text-xs  font-medium" style={{ color: 'var(--color-muted)' }}>Presupuesto</p>
-                <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{request.budget}€</p>
+                <p className="text-xs  font-medium" className="text-muted">Presupuesto</p>
+                <p className="text-sm font-semibold " className="text-body">{request.budget}€</p>
               </div>
             </div>
           )}
@@ -326,9 +326,9 @@ export default function SupplierRequests() {
 
         {/* Mensaje */}
         {request.message && (
-          <div className="mb-5 p-4  bg-[var(--color-primary)]" style={{ backgroundColor: 'var(--color-surface)' }}>
-            <p className="text-xs  font-semibold mb-1" style={{ color: 'var(--color-muted)' }}>💬 Mensaje del Cliente</p>
-            <p className="text-sm  leading-relaxed" style={{ color: 'var(--color-text)' }}>
+          <div className="mb-5 p-4  bg-[var(--color-primary)]" className="bg-surface">
+            <p className="text-xs  font-semibold mb-1" className="text-muted">💬 Mensaje del Cliente</p>
+            <p className="text-sm  leading-relaxed" className="text-body">
               {request.message.length > 150
                 ? `${request.message.substring(0, 150)}...`
                 : request.message}
@@ -417,7 +417,7 @@ export default function SupplierRequests() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4" />
-          <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando solicitudes...</p>
+          <p className="" className="text-secondary">Cargando solicitudes...</p>
         </div>
       </div>
     );
@@ -431,7 +431,7 @@ export default function SupplierRequests() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/supplier/dashboard/' + localStorage.getItem('supplier_id'))}
-              className="p-2 hover:/10 rounded-lg transition-colors" style={{ backgroundColor: 'var(--color-surface)' }}
+              className="p-2 hover:/10 rounded-lg transition-colors" className="bg-surface"
               title="Volver al dashboard"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -446,7 +446,7 @@ export default function SupplierRequests() {
               localStorage.removeItem('supplier_data');
               navigate('/supplier/login');
             }}
-            className="flex items-center gap-2 px-4 py-2 /10 hover:bg-white/20 rounded-lg transition-colors" style={{ backgroundColor: 'var(--color-surface)' }}
+            className="flex items-center gap-2 px-4 py-2 /10 hover:bg-white/20 rounded-lg transition-colors" className="bg-surface"
             title="Cerrar sesión"
           >
             <LogOut className="h-4 w-4" />
@@ -465,12 +465,12 @@ export default function SupplierRequests() {
       </div>
 
       {/* Filtros */}
-      <div className=" border  rounded-lg p-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" border  rounded-lg p-4" className="border-default" className="bg-surface">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Búsqueda */}
           <div className="relative">
             <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 " style={{ color: 'var(--color-muted)' }}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 " className="text-muted"
               size={20}
             />
             <input
@@ -478,20 +478,20 @@ export default function SupplierRequests() {
               placeholder="Buscar por nombre, email o mensaje..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+              className="w-full pl-10 pr-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" className="border-default"
             />
           </div>
 
           {/* Filtro de estado */}
           <div className="flex items-center gap-2">
-            <Filter size={20} className="" style={{ color: 'var(--color-muted)' }} />
+            <Filter size={20} className="" className="text-muted" />
             <select
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="flex-1 px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+              className="flex-1 px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" className="border-default"
             >
               {STATUS_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -505,16 +505,16 @@ export default function SupplierRequests() {
 
       {/* Lista de solicitudes */}
       {filteredRequests.length === 0 ? (
-        <div className="text-center py-16  border  rounded-lg" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-          <Inbox className="h-16 w-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-          <h3 className="text-xl font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+        <div className="text-center py-16  border  rounded-lg" className="border-default" className="bg-surface">
+          <Inbox className="h-16 w-16  mx-auto mb-4" className="text-muted" />
+          <h3 className="text-xl font-semibold  mb-2" className="text-body">
             {searchTerm
               ? 'No se encontraron solicitudes'
               : statusFilter === 'all'
                 ? 'Aún no tienes solicitudes'
                 : 'No hay solicitudes con este filtro'}
           </h3>
-          <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="" className="text-secondary">
             {searchTerm
               ? 'Intenta con otros términos de búsqueda'
               : 'Las solicitudes de clientes potenciales aparecerán aquí'}
@@ -528,22 +528,22 @@ export default function SupplierRequests() {
 
           {/* Paginación */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between  border  rounded-lg p-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="flex items-center justify-between  border  rounded-lg p-4" className="border-default" className="bg-surface">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="flex items-center gap-2 px-4 py-2 border  rounded-lg hover: disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex items-center gap-2 px-4 py-2 border  rounded-lg hover: disabled:opacity-50 disabled:cursor-not-allowed" className="border-default" className="bg-page"
               >
                 <ChevronLeft size={20} />
                 Anterior
               </button>
-              <span className="" style={{ color: 'var(--color-text)' }}>
+              <span className="" className="text-body">
                 Página {currentPage} de {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="flex items-center gap-2 px-4 py-2 border  rounded-lg hover: disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex items-center gap-2 px-4 py-2 border  rounded-lg hover: disabled:opacity-50 disabled:cursor-not-allowed" className="border-default" className="bg-page"
               >
                 Siguiente
                 <ChevronRight size={20} />

@@ -786,7 +786,8 @@
     "buttons": {
       "cancel": "Cancelar",
       "send": "Enviar",
-      "schedule": "Programar"
+      "schedule": "Programar",
+      "event": "evento"
     },
     "feedback": {
       "missingFields": "Completa destinatario, asunto y mensaje antes de enviar.",

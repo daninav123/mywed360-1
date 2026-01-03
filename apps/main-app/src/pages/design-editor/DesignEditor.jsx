@@ -234,15 +234,15 @@ export default function DesignEditor() {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col " style={{ backgroundColor: 'var(--color-bg)' }} data-testid="design-editor">
-      <header className=" border-b  px-4 py-3 flex items-center justify-between" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+    <div className="h-screen flex flex-col " className="bg-page" data-testid="design-editor">
+      <header className=" border-b  px-4 py-3 flex items-center justify-between" className="border-default" className="bg-surface">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-semibold " style={{ color: 'var(--color-text)' }}>Editor de Diseños</h1>
+          <h1 className="text-xl font-semibold " className="text-body">Editor de Diseños</h1>
           <div className="flex items-center gap-2">
             <button
               onClick={undo}
               disabled={!canUndo}
-              className="p-2 rounded hover: disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: 'var(--color-bg)' }}
+              className="p-2 rounded hover: disabled:opacity-50 disabled:cursor-not-allowed" className="bg-page"
               title="Deshacer"
             >
               <Undo className="w-4 h-4" />
@@ -250,7 +250,7 @@ export default function DesignEditor() {
             <button
               onClick={redo}
               disabled={!canRedo}
-              className="p-2 rounded hover: disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: 'var(--color-bg)' }}
+              className="p-2 rounded hover: disabled:opacity-50 disabled:cursor-not-allowed" className="bg-page"
               title="Rehacer"
             >
               <Redo className="w-4 h-4" />
@@ -277,7 +277,7 @@ export default function DesignEditor() {
           
           <button
             onClick={() => setShowGallery(true)}
-            className="flex items-center gap-2 px-4 py-2 border   rounded-lg hover:" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+            className="flex items-center gap-2 px-4 py-2 border   rounded-lg hover:" className="border-default" className="text-body" className="bg-page"
             data-testid="my-designs-button"
           >
             <FolderOpen className="w-4 h-4" />
@@ -292,22 +292,22 @@ export default function DesignEditor() {
               <Download className="w-4 h-4" />
               Exportar
             </button>
-            <div className="hidden group-hover:block absolute top-full right-0 mt-2  border  rounded-lg shadow-lg p-2 min-w-[150px] z-50" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="hidden group-hover:block absolute top-full right-0 mt-2  border  rounded-lg shadow-lg p-2 min-w-[150px] z-50" className="border-default" className="bg-surface">
               <button
                 onClick={() => handleExport('pdf')}
-                className="w-full text-left px-3 py-2 text-sm hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+                className="w-full text-left px-3 py-2 text-sm hover: rounded" className="bg-page"
               >
                 📄 PDF
               </button>
               <button
                 onClick={() => handleExport('svg')}
-                className="w-full text-left px-3 py-2 text-sm hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+                className="w-full text-left px-3 py-2 text-sm hover: rounded" className="bg-page"
               >
                 🎨 SVG
               </button>
               <button
                 onClick={() => handleExport('png')}
-                className="w-full text-left px-3 py-2 text-sm hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+                className="w-full text-left px-3 py-2 text-sm hover: rounded" className="bg-page"
               >
                 🖼️ PNG
               </button>
@@ -315,14 +315,14 @@ export default function DesignEditor() {
           </div>
           
           {lastSaved && (
-            <div className="text-xs " style={{ color: 'var(--color-muted)' }}>
+            <div className="text-xs " className="text-muted">
               Guardado: {lastSaved.toLocaleTimeString()}
             </div>
           )}
           
           <button
             onClick={() => setShowGuide(true)}
-            className="p-2 rounded hover:" style={{ backgroundColor: 'var(--color-bg)' }}
+            className="p-2 rounded hover:" className="bg-page"
             title="Guía rápida"
           >
             <HelpCircle className="w-5 h-5" />
@@ -353,7 +353,7 @@ export default function DesignEditor() {
         />
 
         {/* Área central de trabajo - con scroll independiente */}
-        <main className="flex-1 flex flex-col  min-w-0" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <main className="flex-1 flex flex-col  min-w-0" className="bg-page">
           <Toolbar 
             canvasRef={canvasRef} 
             canvasSize={canvasSize}

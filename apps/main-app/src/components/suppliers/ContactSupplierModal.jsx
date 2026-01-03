@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { X, Send, Calendar, MapPin, Users, Check, Clock, DollarSign } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { useWedding } from '../../context/WeddingContext';
 import useTranslations from '../../hooks/useTranslations';
 import useFinance from '../../hooks/useFinance';

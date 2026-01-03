@@ -51,7 +51,7 @@ export default function CountryHub() {
         <HeroSection
           title={`Organiza tu Boda Perfecta en ${countryName}`}
           subtitle={`${cities.length} ciudades disponibles con proveedores verificados y herramientas profesionales de planificación`}
-          image="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1200&auto=format&fit=crop&q=80"
+          image="/assets/services/default.webp"
         >
           <div className="flex gap-4">
             <PrimaryButton onClick={() => navigate('/signup')}>

@@ -46,11 +46,11 @@ export default function SavedSuppliers() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold  flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
-              <Heart className="" style={{ color: 'var(--color-danger)' }} fill="currentColor" />
+            <h1 className="text-3xl font-bold  flex items-center gap-2" className="text-body">
+              <Heart className="" className="text-danger" fill="currentColor" />
               {t('suppliers.saved.title')}
             </h1>
-            <p className=" mt-2" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className=" mt-2" className="text-secondary">
               {count === 0
                 ? t('suppliers.saved.count.zero')
                 : tPlural('common.suppliers.saved.count', count, { count })}
@@ -73,10 +73,10 @@ export default function SavedSuppliers() {
       {count === 0 ? (
         <div className="text-center py-16">
           <Heart className="mx-auto text-gray-300 mb-4" size={64} />
-          <h3 className="text-xl font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+          <h3 className="text-xl font-semibold  mb-2" className="text-body">
             {t('suppliers.saved.empty.title')}
           </h3>
-          <p className=" mb-6" style={{ color: 'var(--color-muted)' }}>{t('suppliers.saved.empty.description')}</p>
+          <p className=" mb-6" className="text-muted">{t('suppliers.saved.empty.description')}</p>
           <a
             href="/suppliers"
             className="inline-block px-6 py-3  text-white rounded-md hover:bg-green-700 transition-colors" style={{ backgroundColor: 'var(--color-success)' }}
@@ -112,14 +112,14 @@ export default function SavedSuppliers() {
 
                 {favorite.notes && (
                   <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <p className="text-sm " style={{ color: 'var(--color-text)' }}>
+                    <p className="text-sm " className="text-body">
                       <strong>{t('suppliers.favorites.notesLabel')}</strong> {favorite.notes}
                     </p>
                   </div>
                 )}
 
                 {favorite.addedAt && (
-                  <div className="mt-2 text-xs " style={{ color: 'var(--color-muted)' }}>
+                  <div className="mt-2 text-xs " className="text-muted">
                     {t('suppliers.saved.addedAt', {
                       value: format.dateShort(new Date(favorite.addedAt)),
                     })}
@@ -131,7 +131,7 @@ export default function SavedSuppliers() {
 
           <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="font-semibold text-lg mb-3">{t('suppliers.saved.tips.title')}</h3>
-            <ul className="space-y-2 text-sm " style={{ color: 'var(--color-text)' }}>
+            <ul className="space-y-2 text-sm " className="text-body">
               {[
                 t('suppliers.saved.tips.compare'),
                 t('suppliers.saved.tips.contact'),

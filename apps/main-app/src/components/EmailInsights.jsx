@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { get as apiGet, post as apiPost } from '../services/apiClient';
 import { getUserFolders, createFolder, assignEmailToFolder } from '../services/folderService';
 import { getUserTags, createTag, addTagToEmail } from '../services/tagService';

@@ -123,15 +123,15 @@ export default function ContextualSidebar({
       case 'uploads':
         return <UploadsPanel onAddUpload={onAddElement} />;
       default:
-        return <div className="p-4 " style={{ color: 'var(--color-muted)' }}>Selecciona una pestaña</div>;
+        return <div className="p-4 " className="text-muted">Selecciona una pestaña</div>;
     }
   };
 
   return (
-    <aside className="w-80  border-r  flex flex-col" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+    <aside className="w-80  border-r  flex flex-col" className="border-default" className="bg-surface">
       {/* Título contextual */}
-      <div className="px-4 py-3 border-b  " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
-        <h2 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
+      <div className="px-4 py-3 border-b  " className="border-default" className="bg-page">
+        <h2 className="text-sm font-semibold " className="text-body">
           {designType === 'invitation' && '💌 Diseño de Invitación'}
           {designType === 'logo' && '🎨 Diseño de Logo'}
           {designType === 'menu' && '🍽️ Diseño de Menú'}
@@ -141,13 +141,13 @@ export default function ContextualSidebar({
           {designType === 'signage' && '🪧 Señalética'}
           {designType === 'other' && '✨ Diseño Libre'}
         </h2>
-        <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
+        <p className="text-xs  mt-1" className="text-muted">
           Elementos para tu {designType === 'invitation' ? 'invitación' : 'diseño'}
         </p>
       </div>
 
       {/* Configuración de dimensiones - Para todos los tipos */}
-      <div className="px-4 py-3 border-b  " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className="px-4 py-3 border-b  " className="border-default" className="bg-surface">
         <DoubleSidedToggle
           currentSide={currentSide}
           onSideChange={onSideChange}
@@ -160,7 +160,7 @@ export default function ContextualSidebar({
       </div>
 
       {/* Tabs horizontales */}
-      <div className="flex border-b  overflow-x-auto" style={{ borderColor: 'var(--color-border)' }}>
+      <div className="flex border-b  overflow-x-auto" className="border-default">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (

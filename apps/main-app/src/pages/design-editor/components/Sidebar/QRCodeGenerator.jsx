@@ -48,7 +48,7 @@ export default function QRCodeGenerator({ onAdd }) {
 
       {showDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className=" rounded-lg p-6 w-96" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className=" rounded-lg p-6 w-96" className="bg-surface">
             <h3 className="text-lg font-semibold mb-4">Crear Código QR</h3>
             
             <div className="space-y-4">
@@ -59,9 +59,9 @@ export default function QRCodeGenerator({ onAdd }) {
                   value={qrText}
                   onChange={(e) => setQrText(e.target.value)}
                   placeholder="https://miboda.com o texto cualquiera"
-                  className="w-full px-3 py-2 border  rounded" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-3 py-2 border  rounded" className="border-default"
                 />
-                <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-xs  mt-1" className="text-muted">
                   Puede ser un link a tu web de boda, ubicación en Google Maps, etc.
                 </p>
               </div>
@@ -78,7 +78,7 @@ export default function QRCodeGenerator({ onAdd }) {
                     setShowDialog(false);
                     setQrText('');
                   }}
-                  className="flex-1 px-4 py-2 border  rounded hover:" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="flex-1 px-4 py-2 border  rounded hover:" className="border-default" className="bg-page"
                 >
                   Cancelar
                 </button>

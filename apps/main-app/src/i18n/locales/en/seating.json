@@ -1,22 +1,22 @@
 {
-  "title": "Distribución de Mesas",
-  "newTable": "Nueva mesa",
-  "editTable": "Editar mesa",
-  "deleteTable": "Eliminar mesa",
-  "assignGuests": "Asignar invitados",
-  "autoAssign": "Asignación automática",
-  "noTables": "No hay mesas configuradas",
-  "createFirst": "Crear primera mesa",
+  "title": "Table Distribution",
+  "newTable": "New Table",
+  "editTable": "Edit Table",
+  "deleteTable": "Delete Table",
+  "assignGuests": "Assign Guests",
+  "autoAssign": "Automatic Assignment",
+  "noTables": "No Tables Configured",
+  "createFirst": "Create First Table",
   "form": {
-    "tableName": "Nombre de la mesa",
-    "capacity": "Capacidad",
-    "shape": "Forma",
-    "notes": "Notas"
+    "tableName": "Table Name",
+    "capacity": "Capacity",
+    "shape": "Shape",
+    "notes": "Notes"
   },
   "shapes": {
-    "round": "Redonda",
+    "round": "Round",
     "rectangular": "Rectangular",
-    "square": "Cuadrada"
+    "square": "Square"
   },
   "messages": {
     "created": "Table created successfully",
@@ -189,33 +189,33 @@
       }
     }
   },
-  "configureCeremony": "Configurar Ceremonia",
+  "configureCeremony": "Configure Ceremony",
   "ceremony": {
-    "rows": "Filas",
-    "seatsPerRow": "Sillas por fila",
-    "spacing": "Espacio entre sillas (cm)",
-    "aisleAfter": "Pasillo despus de col",
-    "vipReservations": "Reservas VIP",
-    "reservedRows": "Filas reservadas (ej. 1,2)",
-    "reservedLabel": "Etiqueta para asientos reservados",
-    "lockVipSeats": "Bloquear asientos VIP hasta asignarlos manualmente",
-    "notesPlaceholder": "Ej. Reservar para padrinos y padres",
-    "totalSeats": "Total de sillas",
-    "saveConfiguration": "Guardar configuración"
+    "rows": "Rows",
+    "seatsPerRow": "Seats per Row",
+    "spacing": "Spacing Between Seats (cm)",
+    "aisleAfter": "Aisle After Col",
+    "vipReservations": "VIP Reservations",
+    "reservedRows": "Reserved Rows (e.g. 1,2)",
+    "reservedLabel": "Label for Reserved Seats",
+    "lockVipSeats": "Lock VIP Seats Until Manually Assigned",
+    "notesPlaceholder": "E.g. Reserve for Godparents and Parents",
+    "totalSeats": "Total Seats",
+    "saveConfiguration": "Save Configuration"
   },
-  "configureBanquet": "Configurar Banquete",
+  "configureBanquet": "Configure Banquet",
   "banquet": {
-    "tableRows": "Filas de mesas",
-    "tableCols": "Columnas de mesas",
-    "seatsPerTable": "Asientos por mesa",
-    "spacingX": "Espacio X",
-    "spacingY": "Espacio Y",
-    "generate": "Generar"
+    "tableRows": "Table Rows",
+    "tableCols": "Table Columns",
+    "seatsPerTable": "Seats per Table",
+    "spacingX": "Spacing X",
+    "spacingY": "Spacing Y",
+    "generate": "Generate"
   },
   "space": {
-    "dimensions": "Dimensiones del Saln",
-    "width": "Ancho (cm)",
-    "height": "Alto (cm)"
+    "dimensions": "Room Dimensions",
+    "width": "Width (cm)",
+    "height": "Height (cm)"
   },
   "footer": {
     "stats": {

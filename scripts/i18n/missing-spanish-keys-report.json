@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-01-02T01:55:26.863Z",
+  "totalMissing": 14,
+  "files": [
+    {
+      "file": "email.json",
+      "totalEnKeys": 449,
+      "totalEsKeys": 457,
+      "missingCount": 1,
+      "missingKeys": [
+        "smartComposer.buttons.event"
+      ]
+    },
+    {
+      "file": "finance.json",
+      "totalEnKeys": 358,
+      "totalEsKeys": 361,
+      "missingCount": 2,
+      "missingKeys": [
+        "cashflow.cashFlow",
+        "cashflow.cashFlowHint"
+      ]
+    },
+    {
+      "file": "marketing.json",
+      "totalEnKeys": 490,
+      "totalEsKeys": 507,
+      "missingCount": 11,
+      "missingKeys": [
+        "appOverview.hero.analytics.description",
+        "appOverview.hero.analytics.title",
+        "appOverview.hero.design.description",
+        "appOverview.hero.design.title",
+        "appOverview.hero.finance.description",
+        "appOverview.hero.finance.title",
+        "appOverview.hero.guests.description",
+        "appOverview.hero.guests.title",
+        "appOverview.hero.items",
+        "appOverview.hero.tasks.description",
+        "appOverview.hero.tasks.title"
+      ]
+    }
+  ]
+}

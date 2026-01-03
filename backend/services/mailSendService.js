@@ -154,7 +154,20 @@ export async function sendMailAndPersist({
 
   let messageId = null;
 
+  console.log('[mailSendService] 📧 Preparando envío de email:', {
+    from: resolvedFrom,
+    to: recipients,
+    subject,
+    hasBody: !!bodyText,
+    attachmentsCount: attachments.length
+  });
+
   const { mailgun, mailgunAlt } = createMailgunClients();
+  
+  console.log('[mailSendService] Clientes Mailgun creados:', {
+    hasMailgun: !!mailgun,
+    hasMailgunAlt: !!mailgunAlt
+  });
 
   const mailgunForAttachments = mailgun || mailgunAlt;
 
@@ -195,33 +208,42 @@ export async function sendMailAndPersist({
   const testMode = String(process.env.MAILGUN_TEST_MODE || '').toLowerCase() === 'true';
   
   if (!recordOnly && mailgun && !testMode) {
+    console.log('[mailSendService] ✅ Intentando enviar email con Mailgun...');
     try {
       let result = await mailgun.messages().send(mailData);
+      console.log('[mailSendService] ✅ Email enviado exitosamente con mailgun principal');
       let rawId = (result && (result.id || result.messageId)) || null;
       if (!rawId && mailgunAlt) {
+        console.log('[mailSendService] ⚠️ Sin messageId del principal, intentando con alternativo...');
         result = await mailgunAlt.messages().send(mailData);
         rawId = (result && (result.id || result.messageId)) || null;
       }
       if (rawId) {
         messageId = String(rawId).trim().toLowerCase().replace(/^<|>$/g, '');
+        console.log('[mailSendService] ✅ MessageId obtenido:', messageId);
       }
     } catch (error) {
-      console.error('[mailSendService] Error enviando correo con Mailgun', error?.message || error);
+      console.error('[mailSendService] ❌ Error enviando correo con Mailgun:', error?.message || error);
+      console.error('[mailSendService] Error completo:', error);
       if (!mailgunAlt) {
         throw error;
       }
       try {
+        console.log('[mailSendService] Reintentando con dominio alternativo...');
         const result = await mailgunAlt.messages().send(mailData);
         const rawId = (result && (result.id || result.messageId)) || null;
         if (rawId) {
           messageId = String(rawId).trim().toLowerCase().replace(/^<|>$/g, '');
+          console.log('[mailSendService] ✅ Email enviado con dominio alternativo, messageId:', messageId);
         }
       } catch (altError) {
-        console.error('[mailSendService] Error con dominio alternativo de Mailgun', altError?.message || altError);
+        console.error('[mailSendService] ❌ Error con dominio alternativo de Mailgun:', altError?.message || altError);
+        console.error('[mailSendService] Error alternativo completo:', altError);
         throw altError;
       }
     }
   } else if (!recordOnly && testMode) {
+    console.log('[mailSendService] 🧪 TEST MODE activado - email NO enviado realmente');
     // Modo test: generar messageId falso pero válido
     messageId = `<test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@malove.app>`;
     logger.info('[mailSendService] TEST MODE: Email no enviado realmente, messageId mockeado');

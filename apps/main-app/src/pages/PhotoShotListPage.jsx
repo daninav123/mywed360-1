@@ -4,8 +4,7 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { useWedding } from '../context/WeddingContext';
 import PhotoShotList from '../components/shotlist/PhotoShotList';
 import PageWrapper from '../components/PageWrapper';
@@ -78,7 +77,7 @@ export default function PhotoShotListPage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2  mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
-            <p className="" style={{ color: 'var(--color-text-secondary)' }}>{t('photoShots.descriptionPlaceholder')}</p>
+            <p className="" className="text-secondary">{t('photoShots.descriptionPlaceholder')}</p>
           </div>
         </div>
       </PageWrapper>

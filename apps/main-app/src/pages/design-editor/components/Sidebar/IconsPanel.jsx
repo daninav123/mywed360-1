@@ -41,21 +41,21 @@ export default function IconsPanel({ onAddElement }) {
   return (
     <div className="p-4 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Iconos de Boda</h3>
-        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
+        <h3 className="text-sm font-semibold " className="text-body">Iconos de Boda</h3>
+        <p className="text-xs " className="text-secondary">
           {filteredIcons.length} iconos disponibles
         </p>
       </div>
 
       {/* Búsqueda */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 " style={{ color: 'var(--color-muted)' }} />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 " className="text-muted" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar iconos..."
-          className="w-full pl-10 pr-3 py-2 text-xs border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+          className="w-full pl-10 pr-3 py-2 text-xs border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
         />
       </div>
 
@@ -94,12 +94,12 @@ export default function IconsPanel({ onAddElement }) {
           <button
             key={`${icon.id}-${index}`}
             onClick={() => handleAddIcon(icon)}
-            className="group relative aspect-square p-3 border-2  rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all" style={{ borderColor: 'var(--color-border)' }}
+            className="group relative aspect-square p-3 border-2  rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all" className="border-default"
             title={icon.name}
           >
             <svg
               viewBox="0 0 24 24"
-              className="w-full h-full  group-hover: transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text)' }}
+              className="w-full h-full  group-hover: transition-colors" className="text-primary" className="text-body"
               fill="currentColor"
             >
               <path d={icon.path} />
@@ -112,7 +112,7 @@ export default function IconsPanel({ onAddElement }) {
       </div>
 
       {filteredIcons.length === 0 && (
-        <div className="text-center py-8  text-sm" style={{ color: 'var(--color-muted)' }}>
+        <div className="text-center py-8  text-sm" className="text-muted">
           No se encontraron iconos
         </div>
       )}

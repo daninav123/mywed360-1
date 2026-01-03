@@ -161,17 +161,53 @@ export default function InspirationGallery({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+    <div className="space-y-6">
+      {/* Pestañas mejoradas */}
+      <div className="flex flex-wrap gap-2.5">
         <button
           onClick={() => {
             setFilter('all');
             onTagClick('all');
           }}
           data-testid="inspiration-tag-all"
-          className={`px-3 py-1 rounded text-xs border ${
-            (activeTag || filter) === 'all' ? 'bg-blue-600 text-white' : 'bg-white'
-          }`}
+          className="transition-all duration-300"
+          style={{
+            fontFamily: "'DM Sans', 'Inter', sans-serif",
+            fontSize: '13px',
+            fontWeight: (activeTag || filter) === 'all' ? 600 : 500,
+            padding: '10px 20px',
+            borderRadius: '12px',
+            border: (activeTag || filter) === 'all' 
+              ? '2px solid #F8A5B7'
+              : '1px solid #E5E7EB',
+            backgroundColor: (activeTag || filter) === 'all' 
+              ? '#FCE4EC'
+              : '#FFFFFF',
+            color: (activeTag || filter) === 'all' 
+              ? '#F8A5B7'
+              : '#6B7280',
+            boxShadow: (activeTag || filter) === 'all'
+              ? '0 4px 12px rgba(248, 165, 183, 0.2)'
+              : '0 1px 3px rgba(0, 0, 0, 0.05)',
+            cursor: 'pointer',
+            letterSpacing: '0.01em',
+          }}
+          onMouseEnter={(e) => {
+            if ((activeTag || filter) !== 'all') {
+              e.currentTarget.style.borderColor = '#F8A5B7';
+              e.currentTarget.style.color = '#F8A5B7';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.08)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if ((activeTag || filter) !== 'all') {
+              e.currentTarget.style.borderColor = '#E5E7EB';
+              e.currentTarget.style.color = '#6B7280';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
+            }
+          }}
         >
           {t('all', 'Todos')}
         </button>
@@ -183,9 +219,44 @@ export default function InspirationGallery({
               onTagClick(tag);
             }}
             data-testid={`inspiration-tag-${tag}`}
-            className={`px-3 py-1 rounded text-xs border ${
-              (activeTag || filter) === tag ? 'bg-blue-600 text-white' : 'bg-white'
-            }`}
+            className="transition-all duration-300"
+            style={{
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+              fontSize: '13px',
+              fontWeight: (activeTag || filter) === tag ? 600 : 500,
+              padding: '10px 20px',
+              borderRadius: '12px',
+              border: (activeTag || filter) === tag 
+                ? '2px solid #F8A5B7'
+                : '1px solid #E5E7EB',
+              backgroundColor: (activeTag || filter) === tag 
+                ? '#FCE4EC'
+                : '#FFFFFF',
+              color: (activeTag || filter) === tag 
+                ? '#F8A5B7'
+                : '#6B7280',
+              boxShadow: (activeTag || filter) === tag
+                ? '0 4px 12px rgba(248, 165, 183, 0.2)'
+                : '0 1px 3px rgba(0, 0, 0, 0.05)',
+              cursor: 'pointer',
+              letterSpacing: '0.01em',
+            }}
+            onMouseEnter={(e) => {
+              if ((activeTag || filter) !== tag) {
+                e.currentTarget.style.borderColor = '#F8A5B7';
+                e.currentTarget.style.color = '#F8A5B7';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.08)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if ((activeTag || filter) !== tag) {
+                e.currentTarget.style.borderColor = '#E5E7EB';
+                e.currentTarget.style.color = '#6B7280';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
+              }
+            }}
           >
             {label}
           </button>

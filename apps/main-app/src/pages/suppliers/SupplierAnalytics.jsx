@@ -112,7 +112,7 @@ export default function SupplierAnalytics() {
           <button
             onClick={() => navigate(`/supplier/dashboard/${id}`)}
             className="flex items-center gap-2 hover:opacity-70"
-            style={{ color: 'var(--color-text)' }}
+            className="text-body"
           >
             <ArrowLeft size={20} />
             <span>Volver al Dashboard</span>
@@ -120,7 +120,7 @@ export default function SupplierAnalytics() {
 
           {/* Selector de período */}
           <div className="flex items-center gap-2">
-            <Calendar size={20} style={{ color: 'var(--color-text)' }} />
+            <Calendar size={20} className="text-body" />
             {['7d', '30d', '90d'].map((p) => (
               <button
                 key={p}
@@ -141,7 +141,7 @@ export default function SupplierAnalytics() {
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--color-text)' }}>
+        <h1 className="text-3xl font-bold mb-6" className="text-body">
           Analíticas Avanzadas
         </h1>
 
@@ -150,10 +150,10 @@ export default function SupplierAnalytics() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div
               className="shadow-md rounded-lg p-6"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
               <div className="flex items-center justify-between mb-2">
-                <Eye size={24} style={{ color: 'var(--color-primary)' }} />
+                <Eye size={24} className="text-primary" />
                 <div
                   className={`flex items-center gap-1 text-sm ${
                     viewsTrend >= 0 ? 'text-green-600' : 'text-red-600'
@@ -164,20 +164,20 @@ export default function SupplierAnalytics() {
                   {viewsTrend.toFixed(1)}%
                 </div>
               </div>
-              <div className="text-3xl font-bold mb-1" style={{ color: 'var(--color-text)' }}>
+              <div className="text-3xl font-bold mb-1" className="text-body">
                 {metrics.views}
               </div>
-              <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
+              <div className="text-sm" className="text-muted">
                 Vistas del perfil
               </div>
             </div>
 
             <div
               className="shadow-md rounded-lg p-6"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
               <div className="flex items-center justify-between mb-2">
-                <MousePointer size={24} style={{ color: 'var(--color-success)' }} />
+                <MousePointer size={24} className="text-success" />
                 <div
                   className={`flex items-center gap-1 text-sm ${
                     clicksTrend >= 0 ? 'text-green-600' : 'text-red-600'
@@ -188,17 +188,17 @@ export default function SupplierAnalytics() {
                   {clicksTrend.toFixed(1)}%
                 </div>
               </div>
-              <div className="text-3xl font-bold mb-1" style={{ color: 'var(--color-text)' }}>
+              <div className="text-3xl font-bold mb-1" className="text-body">
                 {metrics.clicks}
               </div>
-              <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
+              <div className="text-sm" className="text-muted">
                 Clics en contacto
               </div>
             </div>
 
             <div
               className="shadow-md rounded-lg p-6"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
               <div className="flex items-center justify-between mb-2">
                 <Mail size={24} style={{ color: 'var(--color-warning)' }} />
@@ -212,28 +212,28 @@ export default function SupplierAnalytics() {
                   {requestsTrend.toFixed(1)}%
                 </div>
               </div>
-              <div className="text-3xl font-bold mb-1" style={{ color: 'var(--color-text)' }}>
+              <div className="text-3xl font-bold mb-1" className="text-body">
                 {metrics.requests}
               </div>
-              <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
+              <div className="text-sm" className="text-muted">
                 Solicitudes recibidas
               </div>
             </div>
 
             <div
               className="shadow-md rounded-lg p-6"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
               <div className="flex items-center justify-between mb-2">
-                <TrendingUp size={24} style={{ color: 'var(--color-primary)' }} />
+                <TrendingUp size={24} className="text-primary" />
               </div>
-              <div className="text-3xl font-bold mb-1" style={{ color: 'var(--color-text)' }}>
+              <div className="text-3xl font-bold mb-1" className="text-body">
                 {metrics.conversionRate}%
               </div>
-              <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
+              <div className="text-sm" className="text-muted">
                 Tasa de conversión
               </div>
-              <div className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>
+              <div className="text-xs mt-1" className="text-muted">
                 (Solicitudes / Vistas)
               </div>
             </div>
@@ -243,10 +243,10 @@ export default function SupplierAnalytics() {
         {/* Selector de tipo de gráfico */}
         <div
           className="shadow-md rounded-lg p-6 mb-6"
-          style={{ backgroundColor: 'var(--color-surface)' }}
+          className="bg-surface"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold" style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-semibold" className="text-body">
               Evolución temporal
             </h2>
             <div className="flex gap-2">
@@ -339,9 +339,9 @@ export default function SupplierAnalytics() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div
             className="shadow-md rounded-lg p-6"
-            style={{ backgroundColor: 'var(--color-surface)' }}
+            className="bg-surface"
           >
-            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+            <h3 className="text-lg font-semibold mb-4" className="text-body">
               📊 Insights
             </h3>
             <div className="space-y-3">
@@ -350,7 +350,7 @@ export default function SupplierAnalytics() {
                   className="w-2 h-2 rounded-full mt-2"
                   style={{ backgroundColor: 'var(--color-primary)' }}
                 />
-                <p className="text-sm" style={{ color: 'var(--color-text)' }}>
+                <p className="text-sm" className="text-body">
                   Tu perfil ha recibido <strong>{metrics?.views}</strong> vistas en los últimos{' '}
                   {period === '7d' ? '7 días' : period === '30d' ? '30 días' : '90 días'}
                 </p>
@@ -360,7 +360,7 @@ export default function SupplierAnalytics() {
                   className="w-2 h-2 rounded-full mt-2"
                   style={{ backgroundColor: 'var(--color-success)' }}
                 />
-                <p className="text-sm" style={{ color: 'var(--color-text)' }}>
+                <p className="text-sm" className="text-body">
                   Tasa de conversión del <strong>{metrics?.conversionRate}%</strong>
                   {metrics?.conversionRate > 5
                     ? ' - ¡Excelente! Estás por encima del promedio'
@@ -372,9 +372,9 @@ export default function SupplierAnalytics() {
 
           <div
             className="shadow-md rounded-lg p-6"
-            style={{ backgroundColor: 'var(--color-surface)' }}
+            className="bg-surface"
           >
-            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+            <h3 className="text-lg font-semibold mb-4" className="text-body">
               💡 Recomendaciones
             </h3>
             <div className="space-y-3">
@@ -384,7 +384,7 @@ export default function SupplierAnalytics() {
                     className="w-2 h-2 rounded-full mt-2"
                     style={{ backgroundColor: 'var(--color-warning)' }}
                   />
-                  <p className="text-sm" style={{ color: 'var(--color-text)' }}>
+                  <p className="text-sm" className="text-body">
                     Tus vistas han disminuido. Actualiza tu portfolio con nuevas fotos.
                   </p>
                 </div>
@@ -395,7 +395,7 @@ export default function SupplierAnalytics() {
                     className="w-2 h-2 rounded-full mt-2"
                     style={{ backgroundColor: 'var(--color-error)' }}
                   />
-                  <p className="text-sm" style={{ color: 'var(--color-text)' }}>
+                  <p className="text-sm" className="text-body">
                     Tu tasa de conversión es baja. Mejora tu descripción y añade más detalles de
                     precios.
                   </p>
@@ -406,7 +406,7 @@ export default function SupplierAnalytics() {
                   className="w-2 h-2 rounded-full mt-2"
                   style={{ backgroundColor: 'var(--color-primary)' }}
                 />
-                <p className="text-sm" style={{ color: 'var(--color-text)' }}>
+                <p className="text-sm" className="text-body">
                   Responde rápido a las solicitudes para aumentar tus conversiones.
                 </p>
               </div>

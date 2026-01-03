@@ -3,7 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { sendEmailVerification } from 'firebase/auth';
 
 import { getFirebaseAuth } from '../firebaseConfig';
-import { useAuth } from '../hooks/useAuth';
+import LanguageSelector from '../components/ui/LanguageSelector';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 const STATUS_ID = 'verify-email-status';
 const ERROR_ID = 'verify-email-error';
@@ -79,7 +80,10 @@ export default function VerifyEmail() {
   // En ausencia de sesión, los botones devolverán errores controlados visibles por el usuario
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12">
+    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12 relative">
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
       <div className="w-full max-w-md space-y-5 rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 text-center shadow-sm">
         <h2 className="text-2xl font-semibold text-[color:var(--color-text)]">Verifica tu email</h2>
         <p className="text-sm text-[color:var(--color-muted)]">

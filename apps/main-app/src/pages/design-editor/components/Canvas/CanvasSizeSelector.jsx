@@ -40,31 +40,31 @@ export default function CanvasSizeSelector({ currentSize, onSizeChange }) {
       <div className="relative">
         <button
           onClick={() => setShowMenu(!showMenu)}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm border  rounded hover:" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm border  rounded hover:" className="border-default" className="bg-page"
         >
           <Maximize2 className="w-4 h-4" />
           {currentSizeName}
-          <span className="text-xs " style={{ color: 'var(--color-muted)' }}>
+          <span className="text-xs " className="text-muted">
             {currentSize?.width} × {currentSize?.height}px
           </span>
         </button>
 
         {showMenu && (
-          <div className="absolute top-full left-0 mt-1  border  rounded-lg shadow-lg z-50 min-w-[240px]" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className="absolute top-full left-0 mt-1  border  rounded-lg shadow-lg z-50 min-w-[240px]" className="border-default" className="bg-surface">
             <div className="p-2">
-              <div className="text-xs font-semibold  px-2 py-1" style={{ color: 'var(--color-muted)' }}>Tamaño del canvas</div>
+              <div className="text-xs font-semibold  px-2 py-1" className="text-muted">Tamaño del canvas</div>
               {CANVAS_SIZES.map((size) => (
                 <button
                   key={size.id}
                   onClick={() => handleSizeSelect(size)}
-                  className="w-full text-left px-3 py-2 hover: rounded flex items-center justify-between" style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="w-full text-left px-3 py-2 hover: rounded flex items-center justify-between" className="bg-page"
                 >
                   <div>
                     <div className="font-medium text-sm">{size.name}</div>
-                    <div className="text-xs " style={{ color: 'var(--color-muted)' }}>{size.desc}</div>
+                    <div className="text-xs " className="text-muted">{size.desc}</div>
                   </div>
                   {size.width > 0 && (
-                    <div className="text-xs " style={{ color: 'var(--color-muted)' }}>{size.width}×{size.height}</div>
+                    <div className="text-xs " className="text-muted">{size.width}×{size.height}</div>
                   )}
                 </button>
               ))}
@@ -75,7 +75,7 @@ export default function CanvasSizeSelector({ currentSize, onSizeChange }) {
 
       {showCustomDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className=" rounded-lg p-6 w-96" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className=" rounded-lg p-6 w-96" className="bg-surface">
             <h3 className="text-lg font-semibold mb-4">Tamaño Personalizado</h3>
             <div className="space-y-4">
               <div>
@@ -84,7 +84,7 @@ export default function CanvasSizeSelector({ currentSize, onSizeChange }) {
                   type="number"
                   value={customWidth}
                   onChange={(e) => setCustomWidth(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border  rounded" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-3 py-2 border  rounded" className="border-default"
                   min="100"
                   max="5000"
                 />
@@ -95,7 +95,7 @@ export default function CanvasSizeSelector({ currentSize, onSizeChange }) {
                   type="number"
                   value={customHeight}
                   onChange={(e) => setCustomHeight(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border  rounded" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-3 py-2 border  rounded" className="border-default"
                   min="100"
                   max="5000"
                 />
@@ -109,7 +109,7 @@ export default function CanvasSizeSelector({ currentSize, onSizeChange }) {
                 </button>
                 <button
                   onClick={() => setShowCustomDialog(false)}
-                  className="flex-1 px-4 py-2 border  rounded hover:" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="flex-1 px-4 py-2 border  rounded hover:" className="border-default" className="bg-page"
                 >
                   Cancelar
                 </button>

@@ -6,6 +6,7 @@
 
 import express from 'express';
 import logger from '../utils/logger.js';
+import { sendSuccess } from '../utils/apiResponse.js';
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.post('/', (req, res) => {
     assigned: Object.keys(assignments).length,
   });
 
-  res.json({ assignments });
+  return sendSuccess(req, res, { assignments });
 });
 
 export default router;

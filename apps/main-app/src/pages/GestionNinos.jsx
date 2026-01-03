@@ -4,10 +4,16 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Baby, Users, Utensils, Gamepad2, Clock, Plus, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { Link } from 'react-router-dom';
+import { Baby, Users, Utensils, Gamepad2, Clock, Plus, Edit2, Trash2, CheckCircle2, User, Mail, Moon, LogOut } from 'lucide-react';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { useWedding } from '../context/WeddingContext';
+import { useAuth } from '../hooks/useAuth.jsx';
+import DarkModeToggle from '../components/DarkModeToggle';
+import LanguageSelector from '../components/ui/LanguageSelector';
+import Nav from '../components/Nav';
+import NotificationCenter from '../components/NotificationCenter';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
 const getActivityTypes = (t) => [
@@ -65,7 +71,7 @@ const ActivityCard = ({ activity, onEdit, onDelete, onToggle }) => {
                 {typeConfig.name}
               </h3>
             </div>
-            <p className="text-xs  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-xs  mt-1" className="text-secondary">
               Edades: {activity.ageRange || typeConfig.ageRange}
             </p>
           </div>
@@ -74,13 +80,13 @@ const ActivityCard = ({ activity, onEdit, onDelete, onToggle }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(activity)}
-            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" className="text-primary" className="text-secondary"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(activity.id)}
-            className="p-2  hover: hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-red-50 rounded transition-colors" className="text-danger" className="text-secondary"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -88,20 +94,20 @@ const ActivityCard = ({ activity, onEdit, onDelete, onToggle }) => {
       </div>
 
       {activity.time && (
-        <div className="flex items-center gap-2 text-sm  mb-2" style={{ color: 'var(--color-text)' }}>
+        <div className="flex items-center gap-2 text-sm  mb-2" className="text-body">
           <Clock className="w-4 h-4" />
           <span>{activity.time}</span>
         </div>
       )}
 
       {activity.provider && (
-        <div className="text-sm  mb-2" style={{ color: 'var(--color-text)' }}>
+        <div className="text-sm  mb-2" className="text-body">
           Proveedor: {activity.provider}
         </div>
       )}
 
       {activity.notes && (
-        <div className="text-xs  mt-2 pt-2 border-t " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text-secondary)' }}>
+        <div className="text-xs  mt-2 pt-2 border-t " className="border-default" className="text-secondary">
           {activity.notes}
         </div>
       )}
@@ -111,29 +117,29 @@ const ActivityCard = ({ activity, onEdit, onDelete, onToggle }) => {
 
 const CaregiverCard = ({ caregiver, onEdit, onDelete }) => {
   return (
-    <div className=" border  rounded-lg p-4 hover:shadow-md transition-shadow" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+    <div className=" border  rounded-lg p-4 hover:shadow-md transition-shadow" className="border-default" className="bg-surface">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
             <Users className="w-6 h-6 text-purple-600" />
           </div>
           <div>
-            <h3 className="font-semibold " style={{ color: 'var(--color-text)' }}>{caregiver.name}</h3>
+            <h3 className="font-semibold " className="text-body">{caregiver.name}</h3>
             {caregiver.role && (
-              <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{caregiver.role}</p>
+              <p className="text-sm " className="text-secondary">{caregiver.role}</p>
             )}
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(caregiver)}
-            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" className="text-primary" className="text-secondary"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(caregiver.id)}
-            className="p-2  hover: hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-red-50 rounded transition-colors" className="text-danger" className="text-secondary"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -141,19 +147,19 @@ const CaregiverCard = ({ caregiver, onEdit, onDelete }) => {
       </div>
 
       {caregiver.contact && (
-        <div className="text-sm  mb-2" style={{ color: 'var(--color-text)' }}>
+        <div className="text-sm  mb-2" className="text-body">
           📞 {caregiver.contact}
         </div>
       )}
 
       {caregiver.hours && (
-        <div className="text-sm  mb-2" style={{ color: 'var(--color-text)' }}>
+        <div className="text-sm  mb-2" className="text-body">
           ⏰ Horario: {caregiver.hours}
         </div>
       )}
 
       {caregiver.notes && (
-        <div className="text-xs  mt-2 pt-2 border-t " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text-secondary)' }}>
+        <div className="text-xs  mt-2 pt-2 border-t " className="border-default" className="text-secondary">
           {caregiver.notes}
         </div>
       )}
@@ -182,18 +188,18 @@ const ActivityModal = ({ activity, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               {activity ? 'Editar actividad' : 'Nueva actividad'}
             </h2>
-            <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className=" hover:" className="text-muted" className="text-secondary">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 Tipo de actividad
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -213,14 +219,14 @@ const ActivityModal = ({ activity, onSave, onClose }) => {
                     }`}
                   >
                     <span className="text-2xl mb-1 block">{type.icon}</span>
-                    <span className="text-xs " style={{ color: 'var(--color-text)' }}>{type.name}</span>
+                    <span className="text-xs " className="text-body">{type.name}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 {t('children.schedule')}
               </label>
               <input
@@ -228,12 +234,12 @@ const ActivityModal = ({ activity, onSave, onClose }) => {
                 value={formData.time}
                 onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                 placeholder={t('children.searchPlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 {t('children.ageRange')}
               </label>
               <input
@@ -241,12 +247,12 @@ const ActivityModal = ({ activity, onSave, onClose }) => {
                 value={formData.ageRange}
                 onChange={(e) => setFormData({ ...formData, ageRange: e.target.value })}
                 placeholder={selectedType.ageRange}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 {t('children.provider')}
               </label>
               <input
@@ -254,12 +260,12 @@ const ActivityModal = ({ activity, onSave, onClose }) => {
                 value={formData.provider}
                 onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
                 placeholder={t('children.namePlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Notas
               </label>
               <textarea
@@ -267,7 +273,7 @@ const ActivityModal = ({ activity, onSave, onClose }) => {
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder={t('children.notesPlaceholder')}
                 rows={3}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
@@ -275,7 +281,7 @@ const ActivityModal = ({ activity, onSave, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
               >
                 Cancelar
               </button>
@@ -315,18 +321,18 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-md w-full" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-md w-full" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               {caregiver ? 'Editar cuidador' : 'Nuevo cuidador'}
             </h2>
-            <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className=" hover:" className="text-muted" className="text-secondary">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Nombre *
               </label>
               <input
@@ -334,13 +340,13 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder={t('children.notesPlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Rol
               </label>
               <input
@@ -348,12 +354,12 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 placeholder="Ej: Canguro, Animador infantil"
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Contacto
               </label>
               <input
@@ -361,12 +367,12 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
                 value={formData.contact}
                 onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
                 placeholder={t('childrenManagement.contactPlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Horario
               </label>
               <input
@@ -374,12 +380,12 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
                 value={formData.hours}
                 onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
                 placeholder="Ej: 17:00 - 23:00"
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Notas
               </label>
               <textarea
@@ -387,7 +393,7 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder={t('childrenManagement.needsPlaceholder')}
                 rows={3}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
@@ -395,7 +401,7 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
               >
                 Cancelar
               </button>
@@ -415,6 +421,9 @@ const CaregiverModal = ({ caregiver, onSave, onClose }) => {
 
 export default function GestionNinos() {
   const { activeWedding } = useWedding();
+  const { logout: logoutUnified } = useAuth();
+  const { t } = useTranslation();
+  const [openUserMenu, setOpenUserMenu] = useState(false);
   const [activities, setActivities] = useState([]);
   const [caregivers, setCaregivers] = useState([]);
   const [menu, setMenu] = useState([]);
@@ -556,7 +565,7 @@ export default function GestionNinos() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2  mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
-            <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando...</p>
+            <p className="" className="text-secondary">Cargando...</p>
           </div>
         </div>
       </PageWrapper>
@@ -564,6 +573,33 @@ export default function GestionNinos() {
   }
 
   return (
+    <>
+    <div className="absolute top-4 right-4 flex items-center space-x-3" style={{ zIndex: 100 }}>
+      <LanguageSelector variant="minimal" />
+      <div className="relative" data-user-menu>
+        <button onClick={() => setOpenUserMenu(!openUserMenu)} className="w-11 h-11 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center" title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })} style={{ backgroundColor: openUserMenu ? 'var(--color-lavender)' : 'rgba(255, 255, 255, 0.95)', border: `2px solid ${openUserMenu ? 'var(--color-primary)' : 'rgba(255,255,255,0.8)'}`, boxShadow: openUserMenu ? '0 4px 12px rgba(94, 187, 255, 0.3)' : '0 2px 8px rgba(0,0,0,0.15)' }}>
+          <User className="w-5 h-5" style={{ color: openUserMenu ? 'var(--color-primary)' : 'var(--color-text-secondary)' }} />
+        </button>
+        {openUserMenu && (
+          <div className="absolute right-0 mt-3 bg-[var(--color-surface)] p-2 space-y-1" style={{ minWidth: '220px', border: '1px solid var(--color-border-soft)', borderRadius: 'var(--radius-lg)', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 9999 }}>
+            <div className="px-2 py-1"><NotificationCenter /></div>
+            <Link to="/perfil" onClick={() => setOpenUserMenu(false)} className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200" className="text-body" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <User className="w-4 h-4 mr-3" />{t('navigation.profile', { defaultValue: 'Perfil' })}
+            </Link>
+            <Link to="/email" onClick={() => setOpenUserMenu(false)} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'} className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200" className="text-body">
+              <Mail className="w-4 h-4 mr-3" />{t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
+            </Link>
+            <div className="px-3 py-2.5 rounded-xl transition-all duration-200" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <div className="flex items-center justify-between"><span className="text-sm flex items-center" className="text-body"><Moon className="w-4 h-4 mr-3" />{t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}</span><DarkModeToggle className="ml-2" /></div>
+            </div>
+            <div style={{ height: '1px', backgroundColor: 'var(--color-border-soft)', margin: '8px 0' }}></div>
+            <button onClick={() => { logoutUnified(); setOpenUserMenu(false); }} className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center" className="text-danger" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <LogOut className="w-4 h-4 mr-3" />{t('navigation.logout', { defaultValue: 'Cerrar sesión' })}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
     <PageWrapper>
       <div className="max-w-6xl mx-auto py-8 px-4">
         <div className="space-y-6">
@@ -571,12 +607,12 @@ export default function GestionNinos() {
           <div className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-3  rounded-lg shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="p-3  rounded-lg shadow-sm" className="bg-surface">
                   <Baby className="w-6 h-6 text-pink-600" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>Gestión de Niños</h1>
-                  <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                  <h1 className="text-2xl font-bold " className="text-body">Gestión de Niños</h1>
+                  <p className="text-sm " className="text-secondary">
                     Actividades, menú y cuidadores
                   </p>
                 </div>
@@ -584,17 +620,17 @@ export default function GestionNinos() {
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{activities.length}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Actividades</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{activities.length}</div>
+                <div className="text-xs " className="text-secondary">Actividades</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{caregivers.length}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Cuidadores</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{caregivers.length}</div>
+                <div className="text-xs " className="text-secondary">Cuidadores</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{menu.length}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Opciones menú</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{menu.length}</div>
+                <div className="text-xs " className="text-secondary">Opciones menú</div>
               </div>
             </div>
           </div>
@@ -640,7 +676,7 @@ export default function GestionNinos() {
           {activeTab === 'activities' && (
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Actividades y Entretenimiento</h2>
+                <h2 className="text-lg font-semibold " className="text-body">Actividades y Entretenimiento</h2>
                 <button
                   onClick={() => {
                     setEditingActivity(null);
@@ -654,12 +690,12 @@ export default function GestionNinos() {
               </div>
 
               {activities.length === 0 ? (
-                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                  <Gamepad2 className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-                  <h3 className="text-lg font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" className="border-default" className="bg-surface">
+                  <Gamepad2 className="w-16 h-16  mx-auto mb-4" className="text-muted" />
+                  <h3 className="text-lg font-semibold  mb-2" className="text-body">
                     No hay actividades
                   </h3>
-                  <p className="text-sm  mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+                  <p className="text-sm  mb-4" className="text-secondary">
                     Planifica entretenimiento para los niños del evento
                   </p>
                   <button
@@ -692,8 +728,8 @@ export default function GestionNinos() {
           {/* Menu Tab */}
           {activeTab === 'menu' && (
             <div>
-              <h2 className="text-lg font-semibold  mb-4" style={{ color: 'var(--color-text)' }}>Menú Infantil</h2>
-              <p className="text-sm  mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+              <h2 className="text-lg font-semibold  mb-4" className="text-body">Menú Infantil</h2>
+              <p className="text-sm  mb-6" className="text-secondary">
                 Selecciona las opciones que incluirás en el menú para niños
               </p>
 
@@ -709,7 +745,7 @@ export default function GestionNinos() {
                     }`}
                   >
                     <span className="text-3xl mb-2 block">{option.icon}</span>
-                    <span className="text-sm font-medium  block" style={{ color: 'var(--color-text)' }}>
+                    <span className="text-sm font-medium  block" className="text-body">
                       {option.name}
                     </span>
                     {menu.includes(option.id) && (
@@ -728,7 +764,7 @@ export default function GestionNinos() {
                     {menu.map((id) => {
                       const option = MENU_OPTIONS.find(o => o.id === id);
                       return option ? (
-                        <span key={id} className="px-3 py-1  rounded-full text-sm border border-green-200" style={{ backgroundColor: 'var(--color-surface)' }}>
+                        <span key={id} className="px-3 py-1  rounded-full text-sm border border-green-200" className="bg-surface">
                           {option.icon} {option.name}
                         </span>
                       ) : null;
@@ -743,7 +779,7 @@ export default function GestionNinos() {
           {activeTab === 'caregivers' && (
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Cuidadores</h2>
+                <h2 className="text-lg font-semibold " className="text-body">Cuidadores</h2>
                 <button
                   onClick={() => {
                     setEditingCaregiver(null);
@@ -757,12 +793,12 @@ export default function GestionNinos() {
               </div>
 
               {caregivers.length === 0 ? (
-                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                  <Users className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-                  <h3 className="text-lg font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" className="border-default" className="bg-surface">
+                  <Users className="w-16 h-16  mx-auto mb-4" className="text-muted" />
+                  <h3 className="text-lg font-semibold  mb-2" className="text-body">
                     No hay cuidadores
                   </h3>
-                  <p className="text-sm  mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+                  <p className="text-sm  mb-4" className="text-secondary">
                     Añade canguros o animadores infantiles
                   </p>
                   <button
@@ -816,5 +852,7 @@ export default function GestionNinos() {
         )}
         </div>
     </PageWrapper>
+    <Nav />
+    </>
   );
 }

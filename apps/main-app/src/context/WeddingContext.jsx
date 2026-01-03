@@ -166,58 +166,106 @@ export function WeddingProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo ejecutar una vez al montar
 
-  // ⚡ OPTIMIZACIÓN: Consolidar inicialización y localStorage en un solo useEffect
+  // ⚡ Cargar bodas desde PostgreSQL API
   useEffect(() => {
+    console.log('[WeddingContext] useEffect ejecutándose');
     // En modo test, los mocks ya están configurados
-    if (isTestMode && window.__MOCK_WEDDING__) return;
-    if (typeof window === 'undefined') return;
+    if (isTestMode && window.__MOCK_WEDDING__) {
+      console.log('[WeddingContext] Modo test - saltando');
+      return;
+    }
+    if (typeof window === 'undefined') {
+      console.log('[WeddingContext] Window undefined - saltando');
+      return;
+    }
 
     let cancelled = false;
+    const token = localStorage.getItem('authToken');
     const uid = currentUser?.uid || getLocalProfileUid() || 'anonymous';
 
-    // Si no hay usuario, limpiar todo
-    if (!uid || uid === 'anonymous') {
+    console.log('[WeddingContext] Estado:', { uid, hasToken: !!token, currentUser: !!currentUser });
+
+    // Si no hay usuario o token, limpiar todo
+    if (!uid || uid === 'anonymous' || !token) {
+      console.log('[WeddingContext] No hay usuario o token - limpiando');
       setActiveWeddingState('');
       setWeddings([]);
       setWeddingsReady(true);
       return;
     }
 
-    const initializeUser = () => {
+    const loadFromPostgreSQL = async () => {
       if (cancelled) return;
 
-      // 1. Inicializar activeWedding desde storage
-      const storedActive = resolveActiveWeddingFromStorage(uid);
-      if (storedActive) {
-        setActiveWeddingState(storedActive);
-      }
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
+        console.log('[WeddingContext] Llamando a:', `${API_URL}/api/user/weddings`);
+        
+        const response = await fetch(`${API_URL}/api/user/weddings`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-      // 2. Cargar weddings desde localStorage
-      const { weddings: localWeddings, activeWeddingId } = loadLocalWeddings(uid);
+        console.log('[WeddingContext] Response status:', response.status);
 
-      // 3. Actualizar localMirror
-      setLocalMirror({
-        weddings: Array.isArray(localWeddings) ? localWeddings : [],
-        activeWeddingId: activeWeddingId || storedActive || '',
-        uid,
-      });
-
-      // 4. Si no estamos usando Firestore, aplicar datos locales
-      if (!usingFirestore) {
-        setWeddings(localWeddings);
-        setWeddingsReady(true);
-        const nextActive =
-          activeWeddingId || storedActive || (localWeddings.length ? localWeddings[0].id : '');
-        if (nextActive) {
-          setActiveWeddingState(nextActive);
+        if (!response.ok) {
+          console.error('[WeddingContext] Error loading weddings:', response.status);
+          setWeddings([]);
+          setWeddingsReady(true);
+          return;
         }
+
+        const result = await response.json();
+        console.log('[WeddingContext] Response data:', result);
+        console.log('[WeddingContext] Bodas recibidas:', result.data);
+        
+        if (result.success && Array.isArray(result.data)) {
+          if (cancelled) return;
+          
+          console.log('[WeddingContext] Setting weddings:', result.data.length);
+          setWeddings(result.data);
+          setWeddingsReady(true);
+          setUsingFirestore(false);
+
+          // Establecer activeWedding
+          console.log('[WeddingContext] Resolviendo activeWedding...');
+          const storedActive = resolveActiveWeddingFromStorage(uid);
+          console.log('[WeddingContext] storedActive:', storedActive);
+          
+          const validActive = result.data.find(w => w.id === storedActive);
+          console.log('[WeddingContext] validActive:', validActive);
+          
+          if (validActive) {
+            console.log('[WeddingContext] Usando stored active:', storedActive);
+            setActiveWeddingState(storedActive);
+          } else if (result.data.length > 0) {
+            const firstWedding = result.data[0].id;
+            console.log('[WeddingContext] Usando primera boda:', firstWedding);
+            setActiveWeddingState(firstWedding);
+            // Guardar en localStorage
+            const key = storageKeyForUser(uid);
+            localStorage.setItem(key, firstWedding);
+          } else {
+            console.log('[WeddingContext] No hay bodas - limpiando');
+            setActiveWeddingState('');
+          }
+          
+          console.log('[WeddingContext] ✅ Carga completada exitosamente');
+        } else {
+          console.warn('[WeddingContext] Response data format invalido:', result);
+        }
+      } catch (error) {
+        console.error('[WeddingContext] Error loading from PostgreSQL:', error);
+        setWeddings([]);
+        setWeddingsReady(true);
       }
     };
 
-    initializeUser();
+    loadFromPostgreSQL();
 
-    // Listener para cambios en localStorage
-    const handleUpdate = () => initializeUser();
+    // Listener para cambios
+    const handleUpdate = () => loadFromPostgreSQL();
     window.addEventListener(LOCAL_WEDDINGS_EVENT, handleUpdate);
 
     return () => {
@@ -226,13 +274,15 @@ export function WeddingProvider({ children }) {
     };
   }, [
     currentUser,
+    userProfile,
     getLocalProfileUid,
     resolveActiveWeddingFromStorage,
-    usingFirestore,
+    storageKeyForUser,
     isTestMode,
   ]);
 
-  // Suscribirse a Firestore usando subcolección users/{uid}/weddings
+  // DEPRECATED: Ya no usamos Firestore - Todo viene de PostgreSQL
+  /*
   useEffect(() => {
     // Si estamos en modo test, no usar Firestore
     if (isTestMode) {
@@ -339,6 +389,7 @@ export function WeddingProvider({ children }) {
       }
     };
   }, [currentUser, getLocalProfileUid]); // ← Removido activeWedding de deps para evitar re-suscripciones
+  */
 
   // Asegurar activeWedding válido cuando cambia la lista
   useEffect(() => {

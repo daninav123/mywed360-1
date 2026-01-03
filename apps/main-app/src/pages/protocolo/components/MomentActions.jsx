@@ -109,7 +109,7 @@ export default function MomentActions({
         <div className="flex flex-col gap-1">
           <button
             type="button"
-            className="inline-flex h-8 w-8 items-center justify-center rounded border    transition hover: hover: disabled:cursor-not-allowed disabled:opacity-40" style={{ borderColor: 'var(--color-border)' }} style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}
+            className="inline-flex h-8 w-8 items-center justify-center rounded border    transition hover: hover: disabled:cursor-not-allowed disabled:opacity-40" className="border-default" className="border-default" className="text-muted" className="text-body" className="bg-surface"
             onClick={() => setOpen((prev) => !prev)}
             aria-haspopup="true"
             aria-expanded={open}
@@ -120,7 +120,7 @@ export default function MomentActions({
         <div className="flex flex-col gap-1">
           <button
             type="button"
-            className="inline-flex h-8 w-8 items-center justify-center rounded border    transition hover: hover: disabled:pointer-events-none disabled:opacity-40" style={{ borderColor: 'var(--color-border)' }} style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}
+            className="inline-flex h-8 w-8 items-center justify-center rounded border    transition hover: hover: disabled:pointer-events-none disabled:opacity-40" className="border-default" className="border-default" className="text-muted" className="text-body" className="bg-surface"
             onClick={onMoveUp}
             disabled={!canMoveUp}
             title={t('protocol.specialMoments.tooltips.moveUp')}
@@ -129,7 +129,7 @@ export default function MomentActions({
           </button>
           <button
             type="button"
-            className="inline-flex h-8 w-8 items-center justify-center rounded border    transition hover: hover: disabled:pointer-events-none disabled:opacity-40" style={{ borderColor: 'var(--color-border)' }} style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}
+            className="inline-flex h-8 w-8 items-center justify-center rounded border    transition hover: hover: disabled:pointer-events-none disabled:opacity-40" className="border-default" className="border-default" className="text-muted" className="text-body" className="bg-surface"
             onClick={onMoveDown}
             disabled={!canMoveDown}
             title={t('protocol.specialMoments.tooltips.moveDown')}
@@ -142,9 +142,9 @@ export default function MomentActions({
       {open && (
         <div
           ref={menuRef}
-          className="absolute right-12 top-0 z-20 w-52 overflow-hidden rounded-md border   shadow-lg" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}
+          className="absolute right-12 top-0 z-20 w-52 overflow-hidden rounded-md border   shadow-lg" className="border-default" className="bg-surface"
         >
-          <ul className="py-1 text-sm " style={{ color: 'var(--color-text)' }}>
+          <ul className="py-1 text-sm " className="text-body">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const tone =

@@ -42,17 +42,17 @@ export default function EmailTemplatesPage() {
       <div>
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-lg font-semibold">{t('emailTemplates.title')}</h2>
-          <button className="text-sm " style={{ color: 'var(--color-primary)' }} onClick={onNew}>{t('emailTemplates.add')}</button>
+          <button className="text-sm " className="text-primary" onClick={onNew}>{t('emailTemplates.add')}</button>
         </div>
         <ul className="divide-y border rounded">
           {items.map(t => (
-            <li key={t.id} className="p-2 cursor-pointer hover:" style={{ backgroundColor: 'var(--color-bg)' }} onClick={()=>onEdit(t)}>
+            <li key={t.id} className="p-2 cursor-pointer hover:" className="bg-page" onClick={()=>onEdit(t)}>
               <div className="font-medium">{t.name}</div>
-              <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{t.subject}</div>
-              <div className="text-xs " style={{ color: 'var(--color-muted)' }}>{t.category || t.owner}</div>
+              <div className="text-sm " className="text-secondary">{t.subject}</div>
+              <div className="text-xs " className="text-muted">{t.category || t.owner}</div>
             </li>
           ))}
-          {items.length === 0 && <li className="p-2 text-sm " style={{ color: 'var(--color-muted)' }}>Sin plantillas</li>}
+          {items.length === 0 && <li className="p-2 text-sm " className="text-muted">Sin plantillas</li>}
         </ul>
       </div>
       <div>
@@ -63,7 +63,7 @@ export default function EmailTemplatesPage() {
           <textarea className="w-full border rounded px-2 py-1 h-40" placeholder={t('emailTemplates.body')} value={form.body} onChange={(e)=>setForm({ ...form, body: e.target.value })} />
           <div>
             <button className="px-3 py-1  text-white rounded" style={{ backgroundColor: 'var(--color-primary)' }} onClick={onSave} disabled={saving}>{saving ? t('app.saving') : t('emailTemplates.save')}</button>
-            {msg && <span className="ml-3 text-sm " style={{ color: 'var(--color-text-secondary)' }}>{msg}</span>}
+            {msg && <span className="ml-3 text-sm " className="text-secondary">{msg}</span>}
           </div>
         </div>
       </div>

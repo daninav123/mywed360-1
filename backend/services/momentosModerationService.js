@@ -2,7 +2,10 @@ import admin from 'firebase-admin';
 import vision from '@google-cloud/vision';
 import { FieldValue } from 'firebase-admin/firestore';
 
-import { db } from '../db.js';
+import { db, USE_FIREBASE } from '../db.js';
+
+// Verificar si Firebase está disponible
+const FIREBASE_AVAILABLE = USE_FIREBASE && db !== null;
 
 const DEFAULT_BATCH_LIMIT = Math.max(
   1,
@@ -125,8 +128,8 @@ export async function moderatePendingMomentosPhotos({
   limit = DEFAULT_BATCH_LIMIT,
   dryRun = false,
 } = {}) {
-  if (AUTO_MODERATION_DISABLED) {
-    return { processed: 0, dryRun, items: [] };
+  if (AUTO_MODERATION_DISABLED || !FIREBASE_AVAILABLE) {
+    return { processed: 0, dryRun, items: [], disabled: !FIREBASE_AVAILABLE };
   }
 
   const query = db

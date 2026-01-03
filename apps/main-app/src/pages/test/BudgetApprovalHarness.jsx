@@ -50,12 +50,12 @@ function BudgetApprovalHarness() {
           <div
             key={budget.id}
             data-testid={`budget-${budget.id}`}
-            className="border rounded-lg p-4  shadow" style={{ backgroundColor: 'var(--color-surface)' }}
+            className="border rounded-lg p-4  shadow" className="bg-surface"
           >
             <div className="flex justify-between items-start mb-2">
               <div>
                 <h3 className="font-semibold text-lg">{budget.supplierName}</h3>
-                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{budget.service}</p>
+                <p className="text-sm " className="text-secondary">{budget.service}</p>
               </div>
               <div className="text-right">
                 <p className="font-bold text-lg">{budget.amount}€</p>
@@ -77,7 +77,7 @@ function BudgetApprovalHarness() {
               </div>
             </div>
             
-            <p className="text-sm  mb-4" style={{ color: 'var(--color-text)' }}>{budget.description}</p>
+            <p className="text-sm  mb-4" className="text-body">{budget.description}</p>
             
             {budget.status === 'pending' && (
               <div className="flex gap-2">
@@ -101,7 +101,7 @@ function BudgetApprovalHarness() {
         ))}
       </div>
       
-      <div className="mt-8 p-4  rounded" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="mt-8 p-4  rounded" className="bg-page">
         <h2 className="font-semibold mb-2">Resumen</h2>
         <p data-testid="summary-pending">
           Pendientes: {budgets.filter((b) => b.status === 'pending').length}

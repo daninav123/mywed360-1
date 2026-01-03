@@ -4,6 +4,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import LanguageSelector from '../../components/ui/LanguageSelector';
 import useTranslations from '../../hooks/useTranslations';
 import { signInWithCustomToken } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
@@ -116,25 +117,30 @@ export default function SupplierRegister() {
   };
   
   return (
-    <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 relative" className="bg-page">
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold " style={{ color: 'var(--color-text)' }}>
+          <h1 className="text-3xl font-bold " className="text-body">
             {t('suppliers.register.title')}
           </h1>
-          <p className="mt-2 " style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="mt-2 " className="text-secondary">
             {t('suppliers.register.subtitle')}
           </p>
         </div>
         
         {/* Formulario */}
-        <div className=" shadow-md rounded-lg p-8" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className=" shadow-md rounded-lg p-8" className="bg-surface">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 {t('suppliers.register.form.email.label')}
               </label>
               <input
@@ -143,7 +149,7 @@ export default function SupplierRegister() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
                 placeholder={t('suppliers.register.form.email.placeholder')}
               />
             </div>
@@ -151,7 +157,7 @@ export default function SupplierRegister() {
             {/* Password */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-2" className="text-body">
                   {t('suppliers.register.form.password.label')}
                 </label>
                 <input
@@ -160,13 +166,13 @@ export default function SupplierRegister() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
                   placeholder={t('suppliers.register.form.password.placeholder')}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-2" className="text-body">
                   {t('suppliers.register.form.confirmPassword.label')}
                 </label>
                 <input
@@ -175,7 +181,7 @@ export default function SupplierRegister() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
                   placeholder={t('supplier.register.confirmPasswordPlaceholder')}
                 />
               </div>
@@ -183,7 +189,7 @@ export default function SupplierRegister() {
             
             {/* Nombre del negocio */}
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 {t('suppliers.register.form.name.label')}
               </label>
               <input
@@ -192,7 +198,7 @@ export default function SupplierRegister() {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
                 placeholder={t('suppliers.register.form.name.placeholder')}
               />
             </div>
@@ -200,7 +206,7 @@ export default function SupplierRegister() {
             {/* Categoría y Ubicación */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-2" className="text-body">
                   {t('suppliers.register.form.category.label')}
                 </label>
                 <select
@@ -208,7 +214,7 @@ export default function SupplierRegister() {
                   required
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
                 >
                   {categories.map(cat => (
                     <option key={cat.value} value={cat.value}>
@@ -219,7 +225,7 @@ export default function SupplierRegister() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-2" className="text-body">
                   {t('suppliers.register.form.location.label')}
                 </label>
                 <input
@@ -228,7 +234,7 @@ export default function SupplierRegister() {
                   required
                   value={formData.location}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
                   placeholder={t('suppliers.register.form.location.placeholder')}
                 />
               </div>
@@ -237,7 +243,7 @@ export default function SupplierRegister() {
             {/* Teléfono y Web */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-2" className="text-body">
                   {t('suppliers.register.form.phone.label')}
                 </label>
                 <input
@@ -245,13 +251,13 @@ export default function SupplierRegister() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
                   placeholder={t('suppliers.register.form.phone.placeholder')}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-2" className="text-body">
                   {t('suppliers.register.form.website.label')}
                 </label>
                 <input
@@ -259,7 +265,7 @@ export default function SupplierRegister() {
                   name="website"
                   value={formData.website}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
                   placeholder={t('suppliers.register.form.website.placeholder')}
                 />
               </div>
@@ -267,7 +273,7 @@ export default function SupplierRegister() {
             
             {/* Descripción */}
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 {t('suppliers.register.form.description.label')}
               </label>
               <textarea
@@ -275,7 +281,7 @@ export default function SupplierRegister() {
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full px-4 py-2 border  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
                 placeholder={t('suppliers.register.form.description.placeholder')}
               />
             </div>
@@ -299,12 +305,12 @@ export default function SupplierRegister() {
             </button>
             
             {/* Login link */}
-            <div className="text-center text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+            <div className="text-center text-sm " className="text-secondary">
               {t('suppliers.register.login.question')}{' '}
               <button
                 type="button"
                 onClick={() => navigate('/supplier/login')}
-                className=" hover:underline font-medium" style={{ color: 'var(--color-primary)' }}
+                className=" hover:underline font-medium" className="text-primary"
               >
                 {t('suppliers.register.login.link')}
               </button>
@@ -313,11 +319,11 @@ export default function SupplierRegister() {
         </div>
         
         {/* Beneficios */}
-        <div className="mt-8  shadow-md rounded-lg p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
-          <h2 className="text-lg font-semibold  mb-4" style={{ color: 'var(--color-text)' }}>
+        <div className="mt-8  shadow-md rounded-lg p-6" className="bg-surface">
+          <h2 className="text-lg font-semibold  mb-4" className="text-body">
             {t('suppliers.register.benefits.title')}
           </h2>
-          <ul className="space-y-2 " style={{ color: 'var(--color-text-secondary)' }}>
+          <ul className="space-y-2 " className="text-secondary">
             {t('suppliers.register.benefits.items', { returnObjects: true }).map((item, index) => (
               <li key={index} className="flex items-start">
                 <span className="text-green-500 mr-2">✓</span>

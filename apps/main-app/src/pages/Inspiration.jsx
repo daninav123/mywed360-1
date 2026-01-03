@@ -10,7 +10,7 @@ import LanguageSelector from '../components/ui/LanguageSelector';
 import NotificationCenter from '../components/NotificationCenter';
 import DarkModeToggle from '../components/DarkModeToggle';
 import Nav from '../components/Nav';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { useWedding } from '../context/WeddingContext';
 import { trackInteraction } from '../services/inspirationService';
 import { saveData, loadData } from '../services/SyncService';
@@ -31,6 +31,7 @@ const normalizeFilterValue = (value) => {
 };
 
 export default function Inspiration() {
+  const { t } = useTranslation();
   const { currentUser, logout: logoutUnified } = useAuth();
   const { activeWedding } = useWedding();
   const userId = currentUser?.uid || 'anon';
@@ -300,7 +301,7 @@ export default function Inspiration() {
             <button
               onClick={() => setOpenMenu(!openMenu)}
               className="w-11 h-11 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center"
-              title="Menú de usuario"
+              title={t('common:inspiration.userMenu')}
               style={{
                 backgroundColor: openMenu ? 'var(--color-lavender)' : 'rgba(255, 255, 255, 0.95)',
                 border: `2px solid ${openMenu ? 'var(--color-primary)' : 'rgba(255,255,255,0.8)'}`,
@@ -329,12 +330,12 @@ export default function Inspiration() {
                   to="/perfil"
                   onClick={() => setOpenMenu(false)}
                   className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
-                  style={{ color: 'var(--color-text)' }}
+                  className="text-body"
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   <User className="w-4 h-4 mr-3" />
-                  Perfil
+                  {t('common:inspiration.profile')}
                 </Link>
 
                 <Link
@@ -343,10 +344,10 @@ export default function Inspiration() {
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
-                  style={{ color: 'var(--color-text)' }}
+                  className="text-body"
                 >
                   <Mail className="w-4 h-4 mr-3" />
-                  Buzón de Emails
+                  {t('common:inspiration.emailInbox')}
                 </Link>
 
                 <div 
@@ -355,9 +356,9 @@ export default function Inspiration() {
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm flex items-center" style={{ color: 'var(--color-text)' }}>
+                    <span className="text-sm flex items-center" className="text-body">
                       <Moon className="w-4 h-4 mr-3" />
-                      Modo oscuro
+                      {t('common:inspiration.darkMode')}
                     </span>
                     <DarkModeToggle className="ml-2" />
                   </div>
@@ -371,12 +372,12 @@ export default function Inspiration() {
                     setOpenMenu(false);
                   }}
                   className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center"
-                  style={{ color: 'var(--color-danger)' }}
+                  className="text-danger"
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   <LogOut className="w-4 h-4 mr-3" />
-                  Cerrar sesión
+                  {t('common:inspiration.logout')}
                 </button>
               </div>
             )}
@@ -418,7 +419,7 @@ export default function Inspiration() {
                 color: '#1F2937',
                 letterSpacing: '-0.01em',
                 margin: 0,
-              }}>Inspiración</h1>
+              }}>{t('common:inspiration.pageTitle')}</h1>
               <div style={{
                 width: '60px',
                 height: '1px',
@@ -435,7 +436,7 @@ export default function Inspiration() {
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               marginBottom: 0,
-            }}>Galería de Boda</p>
+            }}>{t('common:inspiration.pageSubtitle')}</p>
           </div>
         </header>
 

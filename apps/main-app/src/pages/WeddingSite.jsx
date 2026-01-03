@@ -1,6 +1,7 @@
 ﻿import { differenceInSeconds } from 'date-fns';
-import { doc, getDoc, collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -86,11 +87,11 @@ export default function WeddingSite() {
     );
 
   return (
-    <div className="font-sans " style={{ color: 'var(--color-text)' }}>
+    <div className="font-sans " className="text-body">
       {/* Hero */}
       <section
         className="min-h-[80vh] bg-cover bg-center flex flex-col items-center justify-center text-center text-white"
-        style={{ backgroundImage: 'url(https://source.unsplash.com/1600x900/?wedding)' }}
+        style={{ backgroundImage: 'url(/assets/landing/hero-wedding-celebration.webp)' }}
       >
         <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">
           {profile.coupleName || t('public.weddingSite.defaults.title')}
@@ -98,7 +99,7 @@ export default function WeddingSite() {
         <p className="text-2xl mb-6 drop-shadow">
           {profile.date} " {profile.celebrationPlace}
         </p>
-        <div className="flex gap-4 text-xl /20 backdrop-blur-sm px-6 py-2 rounded" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className="flex gap-4 text-xl /20 backdrop-blur-sm px-6 py-2 rounded" className="bg-surface">
           <span>{t('public.weddingSite.countdown.days', { value: countdown.days })}</span>
           <span>{t('public.weddingSite.countdown.hours', { value: countdown.hours })}</span>
           <span>
@@ -122,7 +123,7 @@ export default function WeddingSite() {
 
       {/* Programa */}
       {schedule.length > 0 && (
-        <section className=" py-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <section className=" py-8" className="bg-page">
           <h2 className="text-3xl font-semibold text-center mb-6">
             {t('public.weddingSite.defaults.timelineTitle')}
           </h2>
@@ -213,7 +214,7 @@ export default function WeddingSite() {
 
       {/* Mapa / alojamiento */}
       {profile.celebrationPlace && (
-        <section className="py-8  px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <section className="py-8  px-4" className="bg-page">
           <h2 className="text-3xl font-semibold text-center mb-6">
             {t('public.weddingSite.defaults.mapTitle')}
           </h2>
@@ -286,7 +287,7 @@ export default function WeddingSite() {
 
     {/* Mapa / alojamiento */}
     {profile.celebrationPlace && (
-      <section className="py-8  px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <section className="py-8  px-4" className="bg-page">
         <h2 className="text-3xl font-semibold text-center mb-6">
           {t('public.weddingSite.defaults.mapTitle')}
         </h2>
@@ -302,7 +303,7 @@ export default function WeddingSite() {
       </section>
     )}
 
-    <footer className="py-6 text-center text-sm " style={{ color: 'var(--color-muted)' }}>
+    <footer className="py-6 text-center text-sm " className="text-muted">
       {new Date().getFullYear()} {profile.coupleName || ''}
     </footer>
   </div>

@@ -9,7 +9,7 @@ import { getBackendUrl } from '../../config';
 import { updateQuoteResponseStatus } from '../../services/quoteResponsesService';
 import { cancelProviderQuoteRequests } from '../../services/quoteRequestsService';
 import { getEmailsByProvider } from '../../services/emailsService';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useWeddingServices } from '../../hooks/useWeddingServices';
 import useFinance from '../../hooks/useFinance';

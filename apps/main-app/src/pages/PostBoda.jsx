@@ -5,8 +5,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Heart, Mail, Image, Star, MessageCircle, Plus, Edit2, Trash2, Download, Send, CheckCircle2 } from 'lucide-react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
@@ -70,20 +69,20 @@ const AgradecimientoCard = ({ agradecimiento, onEdit, onDelete, onToggleEnviado 
                 {agradecimiento.destinatario}
               </h3>
             </div>
-            <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{categoria.nombre}</p>
+            <p className="text-xs " className="text-secondary">{categoria.nombre}</p>
           </div>
         </div>
         
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(agradecimiento)}
-            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" className="text-primary" className="text-secondary"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(agradecimiento.id)}
-            className="p-2  hover: hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-red-50 rounded transition-colors" className="text-danger" className="text-secondary"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -91,7 +90,7 @@ const AgradecimientoCard = ({ agradecimiento, onEdit, onDelete, onToggleEnviado 
       </div>
 
       {agradecimiento.mensaje && (
-        <div className="text-sm  mb-2 pl-9" style={{ color: 'var(--color-text)' }}>
+        <div className="text-sm  mb-2 pl-9" className="text-body">
           {agradecimiento.mensaje.length > 100 
             ? `${agradecimiento.mensaje.substring(0, 100)}...` 
             : agradecimiento.mensaje
@@ -100,7 +99,7 @@ const AgradecimientoCard = ({ agradecimiento, onEdit, onDelete, onToggleEnviado 
       )}
 
       {agradecimiento.email && (
-        <div className="text-xs  pl-9 flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
+        <div className="text-xs  pl-9 flex items-center gap-2" className="text-secondary">
           <Mail className="w-3 h-3" />
           {agradecimiento.email}
         </div>
@@ -126,26 +125,26 @@ const ValoracionCard = ({ valoracion, onEdit, onDelete }) => {
   };
 
   return (
-    <div className=" border  rounded-lg p-4 hover:shadow-md transition-shadow" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+    <div className=" border  rounded-lg p-4 hover:shadow-md transition-shadow" className="border-default" className="bg-surface">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
-          <h3 className="font-semibold  mb-1" style={{ color: 'var(--color-text)' }}>{valoracion.proveedor}</h3>
-          <p className="text-sm  mb-2" style={{ color: 'var(--color-text-secondary)' }}>{valoracion.tipo}</p>
+          <h3 className="font-semibold  mb-1" className="text-body">{valoracion.proveedor}</h3>
+          <p className="text-sm  mb-2" className="text-secondary">{valoracion.tipo}</p>
           <div className="flex items-center gap-1">
             {renderStars(valoracion.puntuacion)}
-            <span className="text-sm  ml-2" style={{ color: 'var(--color-text-secondary)' }}>({valoracion.puntuacion}/5)</span>
+            <span className="text-sm  ml-2" className="text-secondary">({valoracion.puntuacion}/5)</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(valoracion)}
-            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" className="text-primary" className="text-secondary"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(valoracion.id)}
-            className="p-2  hover: hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-red-50 rounded transition-colors" className="text-danger" className="text-secondary"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -153,7 +152,7 @@ const ValoracionCard = ({ valoracion, onEdit, onDelete }) => {
       </div>
 
       {valoracion.comentario && (
-        <p className="text-sm  mt-3 pt-3 border-t " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }}>
+        <p className="text-sm  mt-3 pt-3 border-t " className="border-default" className="text-body">
           {valoracion.comentario}
         </p>
       )}
@@ -161,9 +160,9 @@ const ValoracionCard = ({ valoracion, onEdit, onDelete }) => {
       {valoracion.recomendaria !== undefined && (
         <div className="mt-2 text-sm">
           {valoracion.recomendaria ? (
-            <span className="" style={{ color: 'var(--color-success)' }}>✓ {t('postBoda.wouldRecommend')}</span>
+            <span className="" className="text-success">✓ {t('postBoda.wouldRecommend')}</span>
           ) : (
-            <span className="" style={{ color: 'var(--color-danger)' }}>✗ {t('postBoda.wouldNotRecommend')}</span>
+            <span className="" className="text-danger">✗ {t('postBoda.wouldNotRecommend')}</span>
           )}
         </div>
       )}
@@ -203,18 +202,18 @@ const AgradecimientoModal = ({ agradecimiento, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               {agradecimiento ? 'Editar agradecimiento' : 'Nuevo agradecimiento'}
             </h2>
-            <button onClick={onClose} className="hover:text-gray-700" style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className="hover:text-gray-700" className="text-secondary">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 Categoría
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -230,14 +229,14 @@ const AgradecimientoModal = ({ agradecimiento, onSave, onClose }) => {
                     }`}
                   >
                     <span className="text-xl block mb-1">{cat.icon}</span>
-                    <span className="text-xs " style={{ color: 'var(--color-text)' }}>{cat.nombre}</span>
+                    <span className="text-xs " className="text-body">{cat.nombre}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Destinatario *
               </label>
               <input
@@ -245,20 +244,20 @@ const AgradecimientoModal = ({ agradecimiento, onSave, onClose }) => {
                 value={formData.destinatario}
                 onChange={(e) => setFormData({ ...formData, destinatario: e.target.value })}
                 placeholder={t('postBoda.recipientNamePlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Email
               </label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
@@ -284,20 +283,20 @@ const RecuerdoCard = ({ recuerdo, onEdit, onDelete }) => {
         <div className="flex items-center gap-3">
           <span className="text-2xl">{tipo.icon}</span>
           <div>
-            <h3 className="font-semibold " style={{ color: 'var(--color-text)' }}>{recuerdo.titulo}</h3>
-            <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{tipo.nombre}</p>
+            <h3 className="font-semibold " className="text-body">{recuerdo.titulo}</h3>
+            <p className="text-xs " className="text-secondary">{tipo.nombre}</p>
           </div>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => onEdit(recuerdo)}
-            className="p-2  hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }}
+            className="p-2  hover:bg-blue-50 rounded transition-colors" className="text-primary"
           >
             Editar
           </button>
           <button
             onClick={() => onDelete(recuerdo.id)}
-            className="p-2  hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }}
+            className="p-2  hover:bg-red-50 rounded transition-colors" className="text-danger"
           >
             Eliminar
           </button>
@@ -329,18 +328,18 @@ const ValoracionModal = ({ valoracion, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-md w-full" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-md w-full" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               {valoracion ? 'Editar valoración' : 'Nueva valoración'}
             </h2>
-            <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className=" hover:" className="text-muted" className="text-secondary">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Proveedor *
               </label>
               <input
@@ -348,19 +347,19 @@ const ValoracionModal = ({ valoracion, onSave, onClose }) => {
                 value={formData.proveedor}
                 onChange={(e) => setFormData({ ...formData, proveedor: e.target.value })}
                 placeholder={t('common.providerNamePlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Tipo de servicio
               </label>
               <select
                 value={formData.tipo}
                 onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               >
                 <option value="">Seleccionar...</option>
                 {PROVEEDORES_TIPO.map(tipo => (
@@ -370,7 +369,7 @@ const ValoracionModal = ({ valoracion, onSave, onClose }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 Puntuación *
               </label>
               <div className="flex items-center gap-2">
@@ -390,12 +389,12 @@ const ValoracionModal = ({ valoracion, onSave, onClose }) => {
                     />
                   </button>
                 ))}
-                <span className="ml-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>({formData.puntuacion}/5)</span>
+                <span className="ml-2 text-sm " className="text-secondary">({formData.puntuacion}/5)</span>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Comentario
               </label>
               <textarea
@@ -403,7 +402,7 @@ const ValoracionModal = ({ valoracion, onSave, onClose }) => {
                 onChange={(e) => setFormData({ ...formData, comentario: e.target.value })}
                 placeholder={t('postBoda.tellUsExperiencePlaceholder')}
                 rows={4}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
@@ -413,9 +412,9 @@ const ValoracionModal = ({ valoracion, onSave, onClose }) => {
                   type="checkbox"
                   checked={formData.recomendaria}
                   onChange={(e) => setFormData({ ...formData, recomendaria: e.target.checked })}
-                  className="w-4 h-4  rounded" style={{ color: 'var(--color-success)' }}
+                  className="w-4 h-4  rounded" className="text-success"
                 />
-                <span className="text-sm " style={{ color: 'var(--color-text)' }}>¿Recomendarías este proveedor?</span>
+                <span className="text-sm " className="text-body">¿Recomendarías este proveedor?</span>
               </label>
             </div>
 
@@ -423,7 +422,7 @@ const ValoracionModal = ({ valoracion, onSave, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
               >
                 Cancelar
               </button>
@@ -636,7 +635,7 @@ export default function PostBoda() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando post-boda...</p>
+            <p className="" className="text-secondary">Cargando post-boda...</p>
           </div>
         </div>
       </PageWrapper>
@@ -651,12 +650,12 @@ export default function PostBoda() {
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-3  rounded-lg shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="p-3  rounded-lg shadow-sm" className="bg-surface">
                   <Heart className="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>Post-Boda</h1>
-                  <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                  <h1 className="text-2xl font-bold " className="text-body">Post-Boda</h1>
+                  <p className="text-sm " className="text-secondary">
                     Agradecimientos, recuerdos y valoraciones
                   </p>
                 </div>
@@ -664,25 +663,25 @@ export default function PostBoda() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{stats.agradecimientos}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Agradecimientos</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{stats.agradecimientos}</div>
+                <div className="text-xs " className="text-secondary">Agradecimientos</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-success)' }}>{stats.enviados}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Enviados</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-success">{stats.enviados}</div>
+                <div className="text-xs " className="text-secondary">Enviados</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
                 <div className="text-2xl font-bold text-pink-600">{stats.recuerdos}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Recuerdos</div>
+                <div className="text-xs " className="text-secondary">Recuerdos</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
                 <div className="text-2xl font-bold text-yellow-600">{stats.valoraciones}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Valoraciones</div>
+                <div className="text-xs " className="text-secondary">Valoraciones</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
                 <div className="text-2xl font-bold text-purple-600">{stats.puntuacionMedia}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Puntuación media</div>
+                <div className="text-xs " className="text-secondary">Puntuación media</div>
               </div>
             </div>
           </div>
@@ -697,9 +696,9 @@ export default function PostBoda() {
                   : 'border-gray-200 bg-white hover:border-blue-300'
               }`}
             >
-              <Mail className="w-6 h-6 mx-auto mb-2 " style={{ color: 'var(--color-primary)' }} />
-              <div className="font-semibold " style={{ color: 'var(--color-text)' }}>Agradecimientos</div>
-              <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{stats.enviados}/{stats.agradecimientos}</div>
+              <Mail className="w-6 h-6 mx-auto mb-2 " className="text-primary" />
+              <div className="font-semibold " className="text-body">Agradecimientos</div>
+              <div className="text-xs " className="text-secondary">{stats.enviados}/{stats.agradecimientos}</div>
             </button>
 
             <button
@@ -711,8 +710,8 @@ export default function PostBoda() {
               }`}
             >
               <Image className="w-6 h-6 mx-auto mb-2 text-pink-600" />
-              <div className="font-semibold " style={{ color: 'var(--color-text)' }}>Recuerdos</div>
-              <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{stats.recuerdos} archivos</div>
+              <div className="font-semibold " className="text-body">Recuerdos</div>
+              <div className="text-xs " className="text-secondary">{stats.recuerdos} archivos</div>
             </button>
 
             <button
@@ -724,8 +723,8 @@ export default function PostBoda() {
               }`}
             >
               <Star className="w-6 h-6 mx-auto mb-2 text-yellow-600" />
-              <div className="font-semibold " style={{ color: 'var(--color-text)' }}>Valoraciones</div>
-              <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{stats.valoraciones} proveedores</div>
+              <div className="font-semibold " className="text-body">Valoraciones</div>
+              <div className="text-xs " className="text-secondary">{stats.valoraciones} proveedores</div>
             </button>
           </div>
 
@@ -733,7 +732,7 @@ export default function PostBoda() {
           {activeView === 'agradecimientos' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Agradecimientos</h2>
+                <h2 className="text-lg font-semibold " className="text-body">Agradecimientos</h2>
                 <button
                   onClick={() => {
                     setEditingAgradecimiento(null);
@@ -747,12 +746,12 @@ export default function PostBoda() {
               </div>
 
               {agradecimientos.length === 0 ? (
-                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                  <Mail className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-                  <p className=" mb-4" style={{ color: 'var(--color-text-secondary)' }}>No hay agradecimientos registrados</p>
+                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" className="border-default" className="bg-surface">
+                  <Mail className="w-16 h-16  mx-auto mb-4" className="text-muted" />
+                  <p className=" mb-4" className="text-secondary">No hay agradecimientos registrados</p>
                   <button
                     onClick={() => setShowAgradecimientoModal(true)}
-                    className=" hover:text-blue-700" style={{ color: 'var(--color-primary)' }}
+                    className=" hover:text-blue-700" className="text-primary"
                   >
                     Añadir primer agradecimiento
                   </button>
@@ -780,7 +779,7 @@ export default function PostBoda() {
           {activeView === 'recuerdos' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Recuerdos y Álbum</h2>
+                <h2 className="text-lg font-semibold " className="text-body">Recuerdos y Álbum</h2>
                 <button
                   onClick={() => {
                     setEditingRecuerdo(null);
@@ -794,9 +793,9 @@ export default function PostBoda() {
               </div>
 
               {recuerdos.length === 0 ? (
-                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                  <Image className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-                  <p className=" mb-4" style={{ color: 'var(--color-text-secondary)' }}>No hay recuerdos guardados</p>
+                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" className="border-default" className="bg-surface">
+                  <Image className="w-16 h-16  mx-auto mb-4" className="text-muted" />
+                  <p className=" mb-4" className="text-secondary">No hay recuerdos guardados</p>
                   <button
                     onClick={() => setShowRecuerdoModal(true)}
                     className="text-pink-600 hover:text-pink-700"
@@ -826,7 +825,7 @@ export default function PostBoda() {
           {activeView === 'valoraciones' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Valoraciones de Proveedores</h2>
+                <h2 className="text-lg font-semibold " className="text-body">Valoraciones de Proveedores</h2>
                 <button
                   onClick={() => {
                     setEditingValoracion(null);
@@ -840,12 +839,12 @@ export default function PostBoda() {
               </div>
 
               {valoraciones.length === 0 ? (
-                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                  <Star className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-                  <p className=" mb-4" style={{ color: 'var(--color-text-secondary)' }}>No hay valoraciones registradas</p>
+                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" className="border-default" className="bg-surface">
+                  <Star className="w-16 h-16  mx-auto mb-4" className="text-muted" />
+                  <p className=" mb-4" className="text-secondary">No hay valoraciones registradas</p>
                   <button
                     onClick={() => setShowValoracionModal(true)}
-                    className=" hover:text-green-700" style={{ color: 'var(--color-success)' }}
+                    className=" hover:text-green-700" className="text-success"
                   >
                     Añadir primera valoración
                   </button>

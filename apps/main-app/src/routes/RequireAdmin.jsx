@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import { ADMIN_ALLOWED_PATHS } from '../config/adminNavigation';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { recordAdminSecurityEvent } from '../services/adminAuditService';
 import { hasAdminSession } from '../services/adminSession';
 

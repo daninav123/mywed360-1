@@ -21,6 +21,10 @@ export default function Login() {
   const isAuthenticated = !!authUser;
   const isLoading = loading;
   const { t } = useTranslations();
+  
+  // Pre-launch mode check
+  const isPreLaunchMode = import.meta.env.VITE_PRE_LAUNCH_MODE === 'true';
+  const launchDate = import.meta.env.VITE_LAUNCH_DATE || '31 de enero de 2026';
 
   const savedEmail =
     typeof window !== 'undefined' ? window.localStorage.getItem('maloveapp_login_email') || '' : '';
@@ -54,18 +58,7 @@ export default function Login() {
     !!window.Cypress &&
     window.__MALOVEAPP_DISABLE_LOGIN_REDIRECT__ === true;
 
-  useEffect(() => {
-    if (isLoading) return;
-    if (!isAuthenticated) return;
-    if (shouldSkipCypressRedirect()) return;
-
-    try {
-      const target = safeRedirect;
-      navigate(target, { replace: true });
-    } catch (error) {
-      navigate('/home', { replace: true });
-    }
-  }, [isAuthenticated, isLoading, navigate, safeRedirect]);
+  // Redirect se maneja en handleSubmit - no necesitamos useEffect que causa loops
 
   const providers = useMemo(() => {
     return ['google', 'facebook', 'apple'];
@@ -108,6 +101,12 @@ export default function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     resetFeedback();
+    
+    // Block login in pre-launch mode
+    if (isPreLaunchMode) {
+      setFormError(`La plataforma estará disponible a partir del ${launchDate}. Por ahora puedes explorar nuestras funcionalidades.`);
+      return;
+    }
 
     const context = { provider: 'password', remember_me: remember, source: loginSource };
 

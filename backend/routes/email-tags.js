@@ -3,12 +3,20 @@ import { randomUUID } from 'crypto';
 import { FieldValue } from 'firebase-admin/firestore';
 
 import { db } from '../db.js';
-import { requireMailAccess } from '../middleware/authMiddleware.js';
+import { requireAuth } from '../middleware/authMiddleware.js';
+import admin from 'firebase-admin';
+import {
+  sendSuccess,
+  sendError,
+  sendNotFoundError,
+  sendInternalError,
+  sendValidationError,
+} from '../utils/apiResponse.js';
 
 const router = express.Router();
 
 router.use(express.json({ limit: '1mb' }));
-router.use(requireMailAccess);
+router.use(requireAuth);
 
 function ensureUid(req, res) {
   const uid = req?.user?.uid || null;
@@ -239,10 +247,10 @@ router.get('/', async (req, res) => {
     const uid = ensureUid(req, res);
     if (!uid) return;
     const tags = await readTags(uid);
-    res.json({ tags });
+    return sendSuccess(req, res, { tags });
   } catch (error) {
     console.error('[email-tags] GET / failed', error);
-    res.status(500).json({ error: 'internal-error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -255,10 +263,10 @@ router.put('/', async (req, res) => {
       return res.status(400).json({ error: 'tags-array-required' });
     }
     const saved = await writeTags(uid, tags);
-    res.json({ tags: saved });
+    return sendSuccess(req, res, { tags: saved });
   } catch (error) {
     console.error('[email-tags] PUT / failed', error);
-    res.status(500).json({ error: 'internal-error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -294,7 +302,7 @@ router.post('/', async (req, res) => {
       return res.status(409).json({ error: 'tag-already-exists' });
     }
     console.error('[email-tags] POST / failed', error);
-    res.status(500).json({ error: 'internal-error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -328,13 +336,13 @@ router.put('/:tagId', async (req, res) => {
       );
       return current[idx];
     });
-    res.json({ tag: updated });
+    return sendSuccess(req, res, { tag: updated });
   } catch (error) {
     if (error?.message === 'not-found') {
-      return res.status(404).json({ error: 'tag-not-found' });
+      return sendNotFoundError(req, res, 'Tag');
     }
     console.error('[email-tags] PUT /:id failed', error);
-    res.status(500).json({ error: 'internal-error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -360,13 +368,13 @@ router.delete('/:tagId', async (req, res) => {
       );
     });
     await cleanupMappingForTag(uid, tagId);
-    res.json({ ok: true });
+    return sendSuccess(req, res, { deleted: true });
   } catch (error) {
     if (error?.message === 'not-found') {
-      return res.status(404).json({ error: 'tag-not-found' });
+      return sendNotFoundError(req, res, 'Tag');
     }
     console.error('[email-tags] DELETE /:id failed', error);
-    res.status(500).json({ error: 'internal-error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -375,10 +383,10 @@ router.get('/mapping', async (req, res) => {
     const uid = ensureUid(req, res);
     if (!uid) return;
     const mapping = await readMapping(uid);
-    res.json({ mapping });
+    return sendSuccess(req, res, { mapping });
   } catch (error) {
     console.error('[email-tags] GET /mapping failed', error);
-    res.status(500).json({ error: 'internal-error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -388,13 +396,13 @@ router.put('/mapping', async (req, res) => {
     if (!uid) return;
     const { mapping } = req.body || {};
     if (!mapping || typeof mapping !== 'object') {
-      return res.status(400).json({ error: 'mapping-object-required' });
+      return sendValidationError(req, res, [{ message: 'mapping-object-required' }]);
     }
     const saved = await writeMapping(uid, mapping);
     res.json({ mapping: saved });
   } catch (error) {
     console.error('[email-tags] PUT /mapping failed', error);
-    res.status(500).json({ error: 'internal-error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -408,10 +416,10 @@ router.put('/mapping/:emailId', async (req, res) => {
       return res.status(400).json({ error: 'tags-array-required' });
     }
     const mapping = await setMappingForEmail(uid, emailId, tags);
-    res.json({ mapping });
+    return sendSuccess(req, res, { mapping });
   } catch (error) {
     console.error('[email-tags] PUT /mapping/:emailId failed', error);
-    res.status(500).json({ error: 'internal-error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -422,10 +430,10 @@ router.post('/mapping/:emailId', async (req, res) => {
     const { emailId } = req.params;
     const { add, remove } = req.body || {};
     const mapping = await patchMappingForEmail(uid, emailId, { add, remove });
-    res.json({ mapping });
+    return sendSuccess(req, res, { mapping });
   } catch (error) {
     console.error('[email-tags] POST /mapping/:emailId failed', error);
-    res.status(500).json({ error: 'internal-error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -435,10 +443,10 @@ router.delete('/mapping/:emailId', async (req, res) => {
     if (!uid) return;
     const { emailId } = req.params;
     const mapping = await setMappingForEmail(uid, emailId, []);
-    res.json({ mapping });
+    return sendSuccess(req, res, { mapping });
   } catch (error) {
     console.error('[email-tags] DELETE /mapping/:emailId failed', error);
-    res.status(500).json({ error: 'internal-error' });
+    return sendInternalError(req, res, error);
   }
 });
 

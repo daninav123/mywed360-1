@@ -81,7 +81,7 @@ export default function ForPlannersNew() {
         <HeroSection
         title={t('forPlanners.hero.title', { defaultValue: 'Scale Your Planning Business' })}
         subtitle={t('forPlanners.hero.subtitle', { defaultValue: 'Professional tools designed for wedding planners who manage multiple events. Streamline operations and deliver exceptional experiences.' })}
-        image="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&auto=format&fit=crop&q=80"
+        image="/assets/services/planners.png"
       >
         <div className="flex gap-4">
           <PrimaryButton onClick={() => navigate('/signup?planner=true')}>
@@ -113,7 +113,7 @@ export default function ForPlannersNew() {
             style={{ boxShadow: theme.shadow.lg }}
           >
             <img 
-              src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&auto=format&fit=crop&q=80"
+              src="/assets/services/planners.png"
               alt="Planner working"
               className="w-full h-auto"
             />

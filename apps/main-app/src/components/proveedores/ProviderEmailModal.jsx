@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import useWeddingData from '../../hooks/useWeddingData';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import useTranslations from '../../hooks/useTranslations';
 import * as EmailService from '../../services/emailService';
 import { formatDate } from '../../utils/formatUtils';

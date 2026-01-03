@@ -5,8 +5,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, UserPlus, Crown, Heart, CheckCircle2, Plus, Edit2, Trash2, Phone, Mail, ClipboardList } from 'lucide-react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
@@ -117,27 +117,27 @@ const MemberCard = ({ member, onEdit, onDelete, onToggleTask }) => {
   const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
   return (
-    <div className=" border  rounded-lg p-5 hover:shadow-md transition-shadow" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+    <div className=" border  rounded-lg p-5 hover:shadow-md transition-shadow" className="border-default" className="bg-surface">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-2xl">
             {roleConfig.icon}
           </div>
           <div>
-            <h3 className="font-semibold " style={{ color: 'var(--color-text)' }}>{member.name}</h3>
-            <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{roleConfig.name}</p>
+            <h3 className="font-semibold " className="text-body">{member.name}</h3>
+            <p className="text-sm " className="text-secondary">{roleConfig.name}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(member)}
-            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" className="text-primary" className="text-secondary"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(member.id)}
-            className="p-2  hover: hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-red-50 rounded transition-colors" className="text-danger" className="text-secondary"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -145,7 +145,7 @@ const MemberCard = ({ member, onEdit, onDelete, onToggleTask }) => {
       </div>
 
       {(member.phone || member.email) && (
-        <div className="space-y-1 text-sm  mb-3" style={{ color: 'var(--color-text)' }}>
+        <div className="space-y-1 text-sm  mb-3" className="text-body">
           {member.phone && (
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4" />
@@ -164,8 +164,8 @@ const MemberCard = ({ member, onEdit, onDelete, onToggleTask }) => {
       {totalTasks > 0 && (
         <div className="mb-3">
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="" style={{ color: 'var(--color-text-secondary)' }}>Progreso de tareas</span>
-            <span className="font-medium " style={{ color: 'var(--color-text)' }}>{completedTasks}/{totalTasks}</span>
+            <span className="" className="text-secondary">Progreso de tareas</span>
+            <span className="font-medium " className="text-body">{completedTasks}/{totalTasks}</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
@@ -178,12 +178,12 @@ const MemberCard = ({ member, onEdit, onDelete, onToggleTask }) => {
 
       {member.tasks && member.tasks.length > 0 && (
         <div className="space-y-1">
-          <p className="text-xs font-medium  mb-2" style={{ color: 'var(--color-text-secondary)' }}>Tareas:</p>
+          <p className="text-xs font-medium  mb-2" className="text-secondary">Tareas:</p>
           {member.tasks.slice(0, 3).map((task) => (
             <button
               key={task.id}
               onClick={() => onToggleTask(member.id, task.id)}
-              className="w-full flex items-start gap-2 text-left text-sm hover: p-1 rounded transition-colors" style={{ backgroundColor: 'var(--color-bg)' }}
+              className="w-full flex items-start gap-2 text-left text-sm hover: p-1 rounded transition-colors" className="bg-page"
             >
               <div className={`flex-shrink-0 w-4 h-4 rounded border-2 mt-0.5 ${
                 task.completed ? 'bg-purple-600 border-purple-600' : 'border-gray-300'
@@ -196,13 +196,13 @@ const MemberCard = ({ member, onEdit, onDelete, onToggleTask }) => {
             </button>
           ))}
           {member.tasks.length > 3 && (
-            <p className="text-xs  pl-6" style={{ color: 'var(--color-muted)' }}>+{member.tasks.length - 3} más...</p>
+            <p className="text-xs  pl-6" className="text-muted">+{member.tasks.length - 3} más...</p>
           )}
         </div>
       )}
 
       {member.notes && (
-        <div className="text-xs  mt-3 pt-3 border-t " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text-secondary)' }}>
+        <div className="text-xs  mt-3 pt-3 border-t " className="border-default" className="text-secondary">
           {member.notes}
         </div>
       )}
@@ -272,18 +272,18 @@ const MemberModal = ({ member, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               {member ? 'Editar miembro' : 'Nuevo miembro del equipo'}
             </h2>
-            <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className=" hover:" className="text-muted" className="text-secondary">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 Rol en la boda
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -299,15 +299,15 @@ const MemberModal = ({ member, onSave, onClose }) => {
                     }`}
                   >
                     <span className="text-2xl mb-1 block">{role.icon}</span>
-                    <span className="text-xs  line-clamp-2" style={{ color: 'var(--color-text)' }}>{role.name}</span>
+                    <span className="text-xs  line-clamp-2" className="text-body">{role.name}</span>
                   </button>
                 ))}
               </div>
-              <p className="text-xs  mt-2" style={{ color: 'var(--color-text-secondary)' }}>{selectedRole.description}</p>
+              <p className="text-xs  mt-2" className="text-secondary">{selectedRole.description}</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Nombre completo *
               </label>
               <input
@@ -315,14 +315,14 @@ const MemberModal = ({ member, onSave, onClose }) => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder={t('weddingTeam.memberNamePlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 required
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Teléfono
                 </label>
                 <input
@@ -330,12 +330,12 @@ const MemberModal = ({ member, onSave, onClose }) => {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="+34 600 000 000"
-                  className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Email
                 </label>
                 <input
@@ -343,14 +343,14 @@ const MemberModal = ({ member, onSave, onClose }) => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder={t('weddingTeam.emailPlaceholder')}
-                  className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium " style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium " className="text-body">
                   Tareas y responsabilidades
                 </label>
                 {formData.tasks.length === 0 && (
@@ -367,11 +367,11 @@ const MemberModal = ({ member, onSave, onClose }) => {
               <div className="space-y-2 mb-2">
                 {formData.tasks?.map((task) => (
                   <div key={task.id} className="flex items-center gap-2 text-sm">
-                    <span className="flex-1 " style={{ color: 'var(--color-text)' }}>{task.text}</span>
+                    <span className="flex-1 " className="text-body">{task.text}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveTask(task.id)}
-                      className=" hover:text-red-700" style={{ color: 'var(--color-danger)' }}
+                      className=" hover:text-red-700" className="text-danger"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -386,7 +386,7 @@ const MemberModal = ({ member, onSave, onClose }) => {
                   onChange={(e) => setNewTask(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTask())}
                   placeholder="Nueva tarea..."
-                  className="flex-1 border  rounded-lg px-3 py-2 text-sm" style={{ borderColor: 'var(--color-border)' }}
+                  className="flex-1 border  rounded-lg px-3 py-2 text-sm" className="border-default"
                 />
                 <button
                   type="button"
@@ -399,7 +399,7 @@ const MemberModal = ({ member, onSave, onClose }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Notas adicionales
               </label>
               <textarea
@@ -407,7 +407,7 @@ const MemberModal = ({ member, onSave, onClose }) => {
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Cualquier información adicional..."
                 rows={3}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
@@ -415,7 +415,7 @@ const MemberModal = ({ member, onSave, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
               >
                 Cancelar
               </button>
@@ -536,7 +536,7 @@ export default function WeddingTeam() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando equipo...</p>
+            <p className="" className="text-secondary">Cargando equipo...</p>
           </div>
         </div>
       </PageWrapper>
@@ -566,12 +566,12 @@ export default function WeddingTeam() {
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-3  rounded-lg shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="p-3  rounded-lg shadow-sm" className="bg-surface">
                   <Users className="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>Wedding Team</h1>
-                  <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                  <h1 className="text-2xl font-bold " className="text-body">Wedding Team</h1>
+                  <p className="text-sm " className="text-secondary">
                     Gestiona tu equipo y sus responsabilidades
                   </p>
                 </div>
@@ -589,29 +589,29 @@ export default function WeddingTeam() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{teamMembers.length}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Miembros</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{teamMembers.length}</div>
+                <div className="text-xs " className="text-secondary">Miembros</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{roleStats.length}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Roles cubiertos</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{roleStats.length}</div>
+                <div className="text-xs " className="text-secondary">Roles cubiertos</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{totalTasks}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Tareas totales</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{totalTasks}</div>
+                <div className="text-xs " className="text-secondary">Tareas totales</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{Math.round(progressPercent)}%</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Completado</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{Math.round(progressPercent)}%</div>
+                <div className="text-xs " className="text-secondary">Completado</div>
               </div>
             </div>
 
             {totalTasks > 0 && (
               <div className="mt-4">
                 <div className="flex items-center justify-between text-sm mb-2">
-                  <span className=" font-medium" style={{ color: 'var(--color-text)' }}>Progreso general del equipo</span>
-                  <span className="" style={{ color: 'var(--color-text-secondary)' }}>{completedTasks}/{totalTasks} tareas</span>
+                  <span className=" font-medium" className="text-body">Progreso general del equipo</span>
+                  <span className="" className="text-secondary">{completedTasks}/{totalTasks} tareas</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div
@@ -654,12 +654,12 @@ export default function WeddingTeam() {
 
           {/* Team Members */}
           {teamMembers.length === 0 ? (
-            <div className=" border-2 border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-              <Users className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-              <h3 className="text-lg font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+            <div className=" border-2 border-dashed  rounded-lg p-12 text-center" className="border-default" className="bg-surface">
+              <Users className="w-16 h-16  mx-auto mb-4" className="text-muted" />
+              <h3 className="text-lg font-semibold  mb-2" className="text-body">
                 No hay miembros en el equipo
               </h3>
-              <p className="text-sm  mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+              <p className="text-sm  mb-4" className="text-secondary">
                 Añade a las personas que te ayudarán a organizar y coordinar la boda
               </p>
               <button
@@ -671,8 +671,8 @@ export default function WeddingTeam() {
               </button>
             </div>
           ) : filteredMembers.length === 0 ? (
-            <div className=" border  rounded-lg p-8 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-              <p className="" style={{ color: 'var(--color-text-secondary)' }}>No hay miembros con este rol</p>
+            <div className=" border  rounded-lg p-8 text-center" className="border-default" className="bg-surface">
+              <p className="" className="text-secondary">No hay miembros con este rol</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

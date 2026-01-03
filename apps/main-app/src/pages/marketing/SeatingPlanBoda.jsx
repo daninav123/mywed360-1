@@ -143,7 +143,7 @@ export default function SeatingPlanBoda() {
         <HeroSection
           title="Crea tu Seating Plan sin Estrés"
           subtitle="Olvídate del papel y los borrones. Arrastra, visualiza y exporta el plano de mesas perfecto en minutos."
-          image="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&auto=format&fit=crop&q=80"
+          image="/assets/services/default.webp"
         >
           <div className="flex gap-4">
             <PrimaryButton onClick={() => navigate('/signup')}>

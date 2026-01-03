@@ -1,5 +1,7 @@
 import express from 'express';
-import { db } from '../db.js';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 import { requireMailAccess } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -11,21 +13,34 @@ router.get('/search', requireMailAccess, async (req, res) => {
     const q = (req.query.q || '').toString().trim().toLowerCase();
     if (!q || q.length < 2) return res.json([]);
 
-    // Muestreo limitado para evitar scans grandes
-    let snap;
-    try {
-      snap = await db.collection('mails').orderBy('date', 'desc').limit(300).get();
-    } catch (_) {
-      snap = await db.collection('mails').limit(300).get();
-    }
-    const out = [];
-    snap.docs.forEach((d) => {
-      const data = d.data() || {};
-      const hay = `${data.subject || ''} ${data.body || ''} ${data.from || ''} ${data.to || ''}`.toLowerCase();
-      if (hay.includes(q)) {
-        out.push({ id: d.id, subject: data.subject || '(Sin asunto)', from: data.from || '', date: data.date || data.createdAt || null });
-      }
+    // Búsqueda en PostgreSQL usando Prisma
+    const mails = await prisma.mail.findMany({
+      take: 300,
+      orderBy: { date: 'desc' },
+      select: {
+        id: true,
+        subject: true,
+        body: true,
+        from: true,
+        to: true,
+        date: true,
+        createdAt: true,
+      },
     });
+    
+    const out = [];
+    for (const mail of mails) {
+      const hay = `${mail.subject || ''} ${mail.body || ''} ${mail.from || ''} ${mail.to || ''}`.toLowerCase();
+      if (hay.includes(q)) {
+        out.push({
+          id: mail.id,
+          subject: mail.subject || '(Sin asunto)',
+          from: mail.from || '',
+          date: mail.date || mail.createdAt || null,
+        });
+      }
+    }
+    
     res.json(out.slice(0, 50));
   } catch (err) {
     console.error('Error en GET /api/mail/search:', err);

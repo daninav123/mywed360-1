@@ -20,7 +20,7 @@ import {
   getStatusBadge,
   getConfidenceBadge,
 } from '../../services/quoteResponsesService';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 

@@ -7,7 +7,7 @@ import { AlertTriangle, RefreshCw, LogOut, Shield, Clock, Wifi, WifiOff } from '
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 
 /**

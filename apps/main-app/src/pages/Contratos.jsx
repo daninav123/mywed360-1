@@ -8,7 +8,7 @@ import BaseModal from '../components/ui/BaseModal';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import contractTemplates from '../data/templates/contractTemplates';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 import { useProveedores } from '../hooks/useProveedores';
 import { uploadEmailAttachments as uploadFiles } from '../services/storageUploadService';
@@ -659,7 +659,7 @@ export default function Contratos() {
                     Copiar
                   </button>
                 </div>
-                <div className="border rounded p-2  whitespace-pre-wrap text-sm font-mono max-h-56 overflow-auto" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <div className="border rounded p-2  whitespace-pre-wrap text-sm font-mono max-h-56 overflow-auto" className="bg-page">
                   {previewContent || '...'}
                 </div>
               </div>

@@ -185,7 +185,7 @@ router.patch('/profile', async (req, res) => {
 // Obtiene el perfil del usuario desde PostgreSQL
 router.get('/profile', async (req, res) => {
   try {
-    const uid = req?.user?.uid;
+    const uid = req?.user?.uid || '';
     if (!uid) {
       return res.status(401).json({
         success: false,
@@ -219,6 +219,8 @@ router.get('/profile', async (req, res) => {
         billing: profileSettings.billing || {},
         subscription: profileSettings.subscription || 'free',
         updatedAt: user.profile?.updatedAt,
+        myWed360Email: user.profile?.myWed360Email,
+        maLoveEmail: user.profile?.maLoveEmail,
       },
     });
   } catch (e) {

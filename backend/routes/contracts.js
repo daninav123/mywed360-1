@@ -1,5 +1,11 @@
 import express from 'express';
 import admin from 'firebase-admin';
+import {
+  sendSuccess,
+  sendError,
+  sendNotFoundError,
+  sendInternalError,
+} from '../utils/apiResponse.js';
 
 const router = express.Router();
 
@@ -8,9 +14,9 @@ router.get('/', async (req, res) => {
   try {
     const snap = await admin.firestore().collection('contracts').limit(200).get();
     const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    res.json({ items });
+    return sendSuccess(req, res, { items });
   } catch (e) {
-    res.status(500).json({ error: 'list-failed' });
+    return sendInternalError(req, res, e);
   }
 });
 
@@ -46,10 +52,10 @@ router.get('/:id', async (req, res) => {
   try {
     const id = req.params.id;
     const snap = await admin.firestore().collection('contracts').doc(id).get();
-    if (!snap.exists) return res.status(404).json({ error: 'not_found' });
-    res.json({ id: snap.id, ...snap.data() });
+    if (!snap.exists) return sendNotFoundError(req, res, 'Contrato');
+    return sendSuccess(req, res, { id: snap.id, ...snap.data() });
   } catch (e) {
-    res.status(500).json({ error: 'get-failed' });
+    return sendInternalError(req, res, e);
   }
 });
 
@@ -70,9 +76,9 @@ router.patch('/:id', express.json(), async (req, res) => {
     try { data.updatedAt = admin.firestore.FieldValue.serverTimestamp(); }
     catch { try { data.updatedAt = admin.firestore().FieldValue.serverTimestamp(); } catch { data.updatedAt = new Date(); } }
     await admin.firestore().collection('contracts').doc(id).set(data, { merge: true });
-    res.json({ success: true });
+    return sendSuccess(req, res, { updated: true });
   } catch (e) {
-    res.status(500).json({ error: 'update-failed' });
+    return sendInternalError(req, res, e);
   }
 });
 
@@ -87,9 +93,9 @@ router.post('/:id/send', async (req, res) => {
     try { ts = admin.firestore.FieldValue.serverTimestamp(); }
     catch { try { ts = admin.firestore().FieldValue.serverTimestamp(); } catch { ts = new Date(); } }
     await ref.set({ status: 'sent', updatedAt: ts }, { merge: true });
-    res.json({ success: true });
+    return sendSuccess(req, res, { updated: true });
   } catch (e) {
-    res.status(500).json({ error: 'send-failed' });
+    return sendInternalError(req, res, e);
   }
 });
 
@@ -100,8 +106,9 @@ router.get('/:id/payments', async (req, res) => {
     const id = req.params.id;
     const snap = await admin.firestore().collection('_system').doc('config').collection('payments').where('contractId', '==', id).limit(200).get();
     const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    res.json({ items });
+    return sendSuccess(req, res, { items });
   } catch (e) {
-    res.status(200).json({ items: [] });
+    // En caso de error, devolver array vacío
+    return sendSuccess(req, res, { items: [] });
   }
 });

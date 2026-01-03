@@ -1,7 +1,7 @@
 import { X, Plus } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { post as apiPost, get as apiGet, del as apiDel } from '../../services/apiClient';
 import {
   getUserTags,

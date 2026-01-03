@@ -124,7 +124,7 @@ export default function GestionInvitados() {
         <HeroSection
           title="Gestiona Todos tus Invitados en un Solo Lugar"
           subtitle="Olvídate de hojas de cálculo descontroladas. Controla confirmaciones, dietas y seating plan con Planivia."
-          image="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&auto=format&fit=crop&q=80"
+          image="/assets/services/default.webp"
         >
           <div className="flex gap-4">
             <PrimaryButton onClick={() => navigate('/signup')}>

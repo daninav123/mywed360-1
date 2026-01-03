@@ -1,5 +1,4 @@
-﻿import { doc, onSnapshot, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore';
-import { ArrowLeft, CheckCircle, Circle } from 'lucide-react';
+﻿import { ArrowLeft, CheckCircle, Circle } from 'lucide-react';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate } from 'react-router-dom';
@@ -12,7 +11,6 @@ import Button from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Progress } from '../components/ui/Progress';
 import WeddingModulePermissionsCard from '../components/weddings/WeddingModulePermissionsCard.jsx';
-import { db } from '../firebaseConfig';
 import { useWedding } from '../context/WeddingContext';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import { updateWeddingModulePermissions } from '../services/WeddingService';
@@ -23,6 +21,8 @@ import {
   getCeremonyTypeOptions,
   getEventTypeOptions,
 } from '../config/eventStyles';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 const toLabelMap = (options) =>
   options.reduce((map, option) => {
@@ -70,10 +70,18 @@ export default function BodaDetalle() {
 
   useEffect(() => {
     if (!id) return;
-    const unsub = onSnapshot(
-      doc(db, 'weddings', id),
-      (snap) => {
-        const data = snap.exists() ? snap.data() : {};
+    
+    const loadWedding = async () => {
+      try {
+        const response = await fetch(`${API_URL}/wedding-info/${id}`, {
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar boda');
+        }
+        
+        const data = await response.json();
         const resolvedName =
           typeof data.name === 'string' && data.name.trim().length
             ? data.name.trim()
@@ -81,7 +89,7 @@ export default function BodaDetalle() {
             ? data.coupleName.trim()
             : '';
         setWedding({
-          id: snap.id,
+          id: data.id,
           name: resolvedName,
           date: data.weddingDate || data.date || '',
           location: data.location || data.venue || '',
@@ -100,10 +108,13 @@ export default function BodaDetalle() {
           modulePermissions: data.modulePermissions || {},
         });
         setLoading(false);
-      },
-      () => setLoading(false)
-    );
-    return () => unsub();
+      } catch (error) {
+        console.error('Error cargando boda:', error);
+        setLoading(false);
+      }
+    };
+    
+    loadWedding();
   }, [id]);
 
   if (loading) return <p>Cargando detalle...</p>;
@@ -176,10 +187,14 @@ export default function BodaDetalle() {
     if (!window.confirm(confirmMessage)) return;
     try {
       setUpdatingState(true);
-      const ref = doc(db, 'weddings', wedding.id);
-      await updateDoc(ref, {
-        active: nextActive,
-        archivedAt: nextActive ? deleteField() : serverTimestamp(),
+      await fetch(`${API_URL}/wedding-info/${wedding.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          active: nextActive,
+          archivedAt: nextActive ? null : new Date().toISOString(),
+        }),
       });
       performanceMonitor.logEvent(nextActive ? 'wedding_restored' : 'wedding_archived', {
         weddingId: wedding.id,
@@ -235,37 +250,37 @@ export default function BodaDetalle() {
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-[color:var(--color-text)]">
             {styleLabel && (
               <div>
-                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Estilo</dt>
+                <dt className="font-medium " className="text-muted">Estilo</dt>
                 <dd>{styleLabel}</dd>
               </div>
             )}
             {guestLabel && (
               <div>
-                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Tamaño estimado</dt>
+                <dt className="font-medium " className="text-muted">Tamaño estimado</dt>
                 <dd>{guestLabel}</dd>
               </div>
             )}
             {formalityLabel && (
               <div>
-                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Formalidad</dt>
+                <dt className="font-medium " className="text-muted">Formalidad</dt>
                 <dd>{formalityLabel}</dd>
               </div>
             )}
             {ceremonyLabel && (
               <div>
-                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Tipo de ceremonia</dt>
+                <dt className="font-medium " className="text-muted">Tipo de ceremonia</dt>
                 <dd>{ceremonyLabel}</dd>
               </div>
             )}
             {relatedLabels.length > 0 && (
               <div className="sm:col-span-2">
-                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Eventos relacionados</dt>
+                <dt className="font-medium " className="text-muted">Eventos relacionados</dt>
                 <dd>{relatedLabels.join(', ')}</dd>
               </div>
             )}
             {notes && (
               <div className="sm:col-span-2">
-                <dt className="font-medium " style={{ color: 'var(--color-muted)' }}>Notas</dt>
+                <dt className="font-medium " className="text-muted">Notas</dt>
                 <dd>{notes}</dd>
               </div>
             )}

@@ -314,7 +314,53 @@
           "title": "Un ecosistema conectado",
           "description": "Modulos sincronizados, roles personalizados y permisos granulares para colaborar sin perder contexto.",
           "tags": ["Panel", "Invitados", "Finanzas", "Comunicacion", "Diseno", "Automatizaciones"]
-        }
+        },
+        "tasks": {
+          "title": "Gestión de Tareas",
+          "description": "Organiza cada detalle con gestión inteligente de tareas y recordatorios automatizados"
+        },
+        "guests": {
+          "title": "Gestión de Invitados",
+          "description": "Sistema completo de RSVP con planos de asientos y seguimiento dietético"
+        },
+        "finance": {
+          "title": "Presupuesto y Finanzas",
+          "description": "Rastrea gastos, pagos y contratos de proveedores en tiempo real"
+        },
+        "design": {
+          "title": "Herramientas de Diseño",
+          "description": "Crea invitaciones hermosas y sitios web de bodas"
+        },
+        "analytics": {
+          "title": "Panel de Análisis",
+          "description": "Información en tiempo real y seguimiento de progreso para tu equipo"
+        },
+        "items": [
+          {
+            "title": "Gestión de Tareas",
+            "description": "Organiza cada detalle con gestión inteligente de tareas y recordatorios automatizados"
+          },
+          {
+            "title": "Gestión de Invitados",
+            "description": "Sistema completo de RSVP con planos de asientos y seguimiento dietético"
+          },
+          {
+            "title": "Presupuesto y Finanzas",
+            "description": "Rastrea gastos, pagos y contratos de proveedores en tiempo real"
+          },
+          {
+            "title": "Herramientas de Diseño",
+            "description": "Crea invitaciones hermosas y sitios web de bodas"
+          },
+          {
+            "title": "Panel de Análisis",
+            "description": "Información en tiempo real y seguimiento de progreso para tu equipo"
+          },
+          {
+            "title": "Centro de Comunicación",
+            "description": "Envía invitaciones, actualizaciones y recordatorios a todos los invitados"
+          }
+        ]
       },
       "modulesTitle": "Módulos Principales",
       "modulesSubtitle": "Herramientas poderosas diseñadas para simplificar cada aspecto de la planificación de bodas",
@@ -338,12 +384,12 @@
           "description": "Envía invitaciones, actualizaciones y recordatorios a todos los invitados"
         },
         "design": {
-          "title": "Estudio de Diseño",
-          "description": "Crea hermosas invitaciones y sitios web de bodas"
+          "title": "Herramientas de Diseño",
+          "description": "Crea invitaciones hermosas y sitios web de bodas"
         },
         "analytics": {
-          "title": "Panel de Analíticas",
-          "description": "Información en tiempo real y seguimiento de progreso para tu boda"
+          "title": "Panel de Análisis",
+          "description": "Información en tiempo real y seguimiento de progreso para tu equipo"
         },
         "items": [
           {

@@ -363,7 +363,7 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
                 type="button"
                 onClick={() => handleRemovePeriod(period.id)}
                 disabled={disabled}
-                className="text-xs text-[color:var(--color-text-soft)] hover:" style={{ color: 'var(--color-danger)' }}
+                className="text-xs text-[color:var(--color-text-soft)] hover:" className="text-danger"
               >
                 Eliminar periodo
               </button>
@@ -371,13 +371,13 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
 
             <div className="mt-3 overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 text-xs">
-                <thead className="" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <thead className="" className="bg-page">
                   <tr>
-                    <th className="px-3 py-2 text-left font-medium " style={{ color: 'var(--color-muted)' }}>Tramo</th>
-                    <th className="px-3 py-2 text-left font-medium " style={{ color: 'var(--color-muted)' }}>Min facturacion</th>
-                    <th className="px-3 py-2 text-left font-medium " style={{ color: 'var(--color-muted)' }}>Max facturacion</th>
-                    <th className="px-3 py-2 text-left font-medium " style={{ color: 'var(--color-muted)' }}>% Comision</th>
-                    <th className="px-3 py-2 text-left font-medium " style={{ color: 'var(--color-muted)' }}>Bonus fijo</th>
+                    <th className="px-3 py-2 text-left font-medium " className="text-muted">Tramo</th>
+                    <th className="px-3 py-2 text-left font-medium " className="text-muted">Min facturacion</th>
+                    <th className="px-3 py-2 text-left font-medium " className="text-muted">Max facturacion</th>
+                    <th className="px-3 py-2 text-left font-medium " className="text-muted">% Comision</th>
+                    <th className="px-3 py-2 text-left font-medium " className="text-muted">Bonus fijo</th>
                     <th className="px-3 py-2" />
                   </tr>
                 </thead>
@@ -453,7 +453,7 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
                           type="button"
                           onClick={() => handleRemoveTier(period.id, tier.id)}
                           disabled={disabled}
-                          className="text-xs text-[color:var(--color-text-soft)] hover:" style={{ color: 'var(--color-danger)' }}
+                          className="text-xs text-[color:var(--color-text-soft)] hover:" className="text-danger"
                         >
                           Eliminar
                         </button>
@@ -1388,7 +1388,7 @@ const AdminDiscounts = () => {
           Cargando enlaces comerciales...
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-6 text-sm " style={{ color: 'var(--color-danger)' }}>{error}</div>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-6 text-sm " className="text-danger">{error}</div>
       ) : (
         <>
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -1414,13 +1414,13 @@ const AdminDiscounts = () => {
               <div className="mt-3 space-y-1 text-xs text-[color:var(--color-text-soft)]">
                 <div className="flex items-center justify-between">
                   <span>Media por enlace</span>
-                  <span className="font-semibold " style={{ color: 'var(--color-text)' }}>
+                  <span className="font-semibold " className="text-body">
                     {formatCurrency(commissionSummary.average, commissionSummary.currency)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Enlaces sin reglas</span>
-                  <span className="font-semibold " style={{ color: 'var(--color-text)' }}>{commissionSummary.missing}</span>
+                  <span className="font-semibold " className="text-body">{commissionSummary.missing}</span>
                 </div>
               </div>
             </article>
@@ -1491,7 +1491,7 @@ const AdminDiscounts = () => {
                               {commercial.links.map((link) => (
                                 <span
                                   key={link.id || link.code}
-                                  className="inline-flex items-center gap-2 rounded-full  px-3 py-1 text-xs font-medium text-[color:var(--color-text-soft)] shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}
+                                  className="inline-flex items-center gap-2 rounded-full  px-3 py-1 text-xs font-medium text-[color:var(--color-text-soft)] shadow-sm" className="bg-surface"
                                 >
                                   <span className="font-semibold text-[color:var(--color-text)]">{link.code}</span>
                                   <span>{link.uses} usos</span>
@@ -1608,7 +1608,7 @@ const AdminDiscounts = () => {
                         <td className="px-4 py-3 font-medium font-mono">{link.code}</td>
                         <td className="px-4 py-3 capitalize">{TYPE_LABELS[link.type] || link.type || '-'}
                         </td>
-                        <td className="px-4 py-3 text-right font-semibold " style={{ color: 'var(--color-primary)' }}>
+                        <td className="px-4 py-3 text-right font-semibold " className="text-primary">
                           {link.discountPercentage ? `${link.discountPercentage}%` : '-'}
                         </td>
                         <td className="px-4 py-3">
@@ -1643,7 +1643,7 @@ const AdminDiscounts = () => {
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">{link.uses || 0}</td>
-                        <td className="px-4 py-3 text-right font-medium " style={{ color: 'var(--color-success)' }}>
+                        <td className="px-4 py-3 text-right font-medium " className="text-success">
                           {formatCurrency(link.revenue, link.currency || summary.currency)}
                         </td>
                         <td
@@ -1682,7 +1682,7 @@ const AdminDiscounts = () => {
                         <td className="px-4 py-3 space-x-2">
                           <button
                             onClick={() => copyToClipboard(link.code)}
-                            className=" hover:text-blue-800 font-medium text-sm" style={{ color: 'var(--color-primary)' }}
+                            className=" hover:text-blue-800 font-medium text-sm" className="text-primary"
                           >
                             Copiar
                           </button>
@@ -1779,7 +1779,7 @@ const AdminDiscounts = () => {
                 />
               </div>
               {createCommercialError && (
-                <p className="text-sm " style={{ color: 'var(--color-danger)' }}>{createCommercialError}</p>
+                <p className="text-sm " className="text-danger">{createCommercialError}</p>
               )}
               <div className="flex justify-end gap-3">
                 <button
@@ -1859,7 +1859,7 @@ const AdminDiscounts = () => {
                 </div>
               </div>
               {createManagerError && (
-                <p className="text-sm " style={{ color: 'var(--color-danger)' }}>{createManagerError}</p>
+                <p className="text-sm " className="text-danger">{createManagerError}</p>
               )}
               <div className="flex justify-end gap-3">
                 <button
@@ -1939,7 +1939,7 @@ const AdminDiscounts = () => {
                     className="w-full rounded-md border border-soft px-3 py-2 pr-8 text-sm"
                     required
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm " style={{ color: 'var(--color-muted)' }}>%</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm " className="text-muted">%</span>
                 </div>
               </div>
 
@@ -1977,7 +1977,7 @@ const AdminDiscounts = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, validFrom: e.target.value }))}
                     className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                   />
-                  <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>Opcional: desde cu�ndo es v�lido</p>
+                  <p className="text-xs  mt-1" className="text-muted">Opcional: desde cu�ndo es v�lido</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Fecha fin validez</label>
@@ -1987,7 +1987,7 @@ const AdminDiscounts = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, validUntil: e.target.value }))}
                     className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                   />
-                  <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>Opcional: hasta cu�ndo es v�lido</p>
+                  <p className="text-xs  mt-1" className="text-muted">Opcional: hasta cu�ndo es v�lido</p>
                 </div>
               </div>
 
@@ -2065,7 +2065,7 @@ const AdminDiscounts = () => {
                     disabled={updating}
                   />
                 </div>
-                <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-xs  mt-1" className="text-muted">
                   Define quién guía a este comercial y centraliza el seguimiento con su contacto directo.
                 </p>
               </div>
@@ -2088,7 +2088,7 @@ const AdminDiscounts = () => {
               />
 
               {formError && (
-                <p className="text-sm " style={{ color: 'var(--color-danger)' }}>{formError}</p>
+                <p className="text-sm " className="text-danger">{formError}</p>
               )}
 
               <div className="flex justify-end gap-3 pt-2">
@@ -2134,7 +2134,7 @@ const AdminDiscounts = () => {
                   type="text"
                   value={formData.code}
                   disabled
-                  className="w-full rounded-md border border-soft px-3 py-2 text-sm  cursor-not-allowed" style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm  cursor-not-allowed" className="bg-page"
                 />
                 <p className="text-xs text-[color:var(--color-text-soft)] mt-1">El código no se puede modificar</p>
               </div>
@@ -2179,7 +2179,7 @@ const AdminDiscounts = () => {
                     placeholder="10"
                     className="w-full rounded-md border border-soft px-3 py-2 pr-8 text-sm"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm " style={{ color: 'var(--color-muted)' }}>%</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm " className="text-muted">%</span>
                 </div>
               </div>
 
@@ -2217,7 +2217,7 @@ const AdminDiscounts = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, validFrom: e.target.value }))}
                     className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                   />
-                  <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>Opcional: desde cuándo es válido</p>
+                  <p className="text-xs  mt-1" className="text-muted">Opcional: desde cuándo es válido</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Fecha fin validez</label>
@@ -2227,7 +2227,7 @@ const AdminDiscounts = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, validUntil: e.target.value }))}
                     className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                   />
-                  <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>Opcional: hasta cuándo es válido</p>
+                  <p className="text-xs  mt-1" className="text-muted">Opcional: hasta cuándo es válido</p>
                 </div>
               </div>
 
@@ -2280,7 +2280,7 @@ const AdminDiscounts = () => {
               />
 
               {editError && (
-                <p className="text-sm " style={{ color: 'var(--color-danger)' }}>{editError}</p>
+                <p className="text-sm " className="text-danger">{editError}</p>
               )}
 
               <div className="flex justify-end gap-3 pt-2">

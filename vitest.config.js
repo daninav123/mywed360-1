@@ -32,10 +32,8 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
-      // Excluir tests de Firestore rules (requieren emulador)
-      '**/firestore.rules*.test.js',
       // Tests legacy/manuales: pueden arrancar el servidor por orden de imports y duplican cobertura
-      'backend/test/**',
+      'backend/test/**', // ← legacy (Mocha y otros), no tocar
     ],
     passWithNoTests: false,
     testTimeout: 30000,

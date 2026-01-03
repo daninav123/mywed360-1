@@ -1,13 +1,11 @@
 /**
- * @deprecated Este hook usa Firebase y está duplicado.
- * USA EN SU LUGAR: useWeddingData() que usa PostgreSQL
- * Este hook se eliminará en futuras versiones.
+ * Hook para obtener información de la boda activa desde PostgreSQL
+ * Migrado de Firebase a PostgreSQL
  */
-import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 export default function useActiveWeddingInfo() {
   const { activeWedding } = useWedding();
@@ -24,9 +22,16 @@ export default function useActiveWeddingInfo() {
       }
       setLoading(true);
       try {
-        const ref = doc(db, 'weddings', activeWedding);
-        const snap = await getDoc(ref);
-        if (!cancelled) setInfo(snap.exists() ? { id: snap.id, ...snap.data() } : null);
+        const response = await fetch(`${API_URL}/wedding-info/${activeWedding}`, {
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar información de boda');
+        }
+        
+        const data = await response.json();
+        if (!cancelled) setInfo(data ? { id: data.id, ...data } : null);
       } catch (e) {
         if (!cancelled) setError(e.message);
       } finally {

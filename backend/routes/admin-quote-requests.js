@@ -5,10 +5,15 @@
  */
 
 import express from 'express';
-import { db } from '../db.js';
+import { PrismaClient } from '@prisma/client';
 import { requireAuth, requireAdmin } from '../middleware/authMiddleware.js';
+import {
+  sendSuccess,
+  sendInternalError,
+} from '../utils/apiResponse.js';
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 /**
  * GET /api/admin/quote-requests
@@ -18,75 +23,67 @@ router.get('/', requireAuth, requireAdmin, async (req, res) => {
   try {
     const { supplierId, weddingId, status, limit = 100 } = req.query;
 
-    let query = db.collection('quoteRequests');
+    const where = {};
+    if (supplierId) where.supplierId = supplierId;
+    if (weddingId) where.weddingId = weddingId;
+    if (status) where.status = status;
 
-    // Filtros opcionales
-    if (supplierId) {
-      query = query.where('supplierId', '==', supplierId);
-    }
-    if (weddingId) {
-      query = query.where('weddingId', '==', weddingId);
-    }
-    if (status) {
-      query = query.where('status', '==', status);
-    }
+    const requests = await prisma.quoteRequest.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: parseInt(limit),
+      include: {
+        // No incluir relaciones por ahora para simplificar
+      },
+    });
 
-    // Ordenar por fecha de creación (más recientes primero)
-    query = query.orderBy('createdAt', 'desc').limit(parseInt(limit));
+    // Enriquecer con información de supplier y wedding si es necesario
+    const enrichedRequests = await Promise.all(
+      requests.map(async (request) => {
+        let supplierName = request.supplierInfo?.name || 'Desconocido';
+        let weddingOwner = 'Desconocido';
 
-    const snapshot = await query.get();
-
-    const requests = [];
-    for (const doc of snapshot.docs) {
-      const data = doc.data();
-
-      // Enriquecer con información adicional
-      let supplierName = data.supplierInfo?.name || 'Desconocido';
-      let weddingOwner = 'Desconocido';
-
-      // Obtener nombre del proveedor si no está en supplierInfo
-      if (!data.supplierInfo?.name && data.supplierId) {
-        try {
-          const supplierDoc = await db.collection('suppliers').doc(data.supplierId).get();
-          if (supplierDoc.exists) {
-            const supplierData = supplierDoc.data();
-            supplierName = supplierData.name || supplierData.profile?.name || 'Desconocido';
+        if (request.supplierId && !request.supplierInfo?.name) {
+          try {
+            const supplier = await prisma.supplier.findUnique({
+              where: { id: request.supplierId },
+            });
+            if (supplier) {
+              supplierName = supplier.businessName || 'Desconocido';
+            }
+          } catch (err) {
+            console.error(`Error obteniendo proveedor ${request.supplierId}:`, err);
           }
-        } catch (err) {
-          console.error(`Error obteniendo proveedor ${data.supplierId}:`, err);
         }
-      }
 
-      // Obtener información de la boda
-      if (data.weddingId) {
-        try {
-          const weddingDoc = await db.collection('weddings').doc(data.weddingId).get();
-          if (weddingDoc.exists) {
-            const weddingData = weddingDoc.data();
-            weddingOwner =
-              weddingData.owners?.[0] || weddingData.couple?.partner1?.name || 'Desconocido';
+        if (request.weddingId) {
+          try {
+            const wedding = await prisma.wedding.findUnique({
+              where: { id: request.weddingId },
+            });
+            if (wedding) {
+              weddingOwner = wedding.coupleName || 'Desconocido';
+            }
+          } catch (err) {
+            console.error(`Error obteniendo boda ${request.weddingId}:`, err);
           }
-        } catch (err) {
-          console.error(`Error obteniendo boda ${data.weddingId}:`, err);
         }
-      }
 
-      requests.push({
-        id: doc.id,
-        ...data,
-        enriched: {
-          supplierName,
-          weddingOwner,
-        },
-      });
-    }
+        return {
+          ...request,
+          enriched: {
+            supplierName,
+            weddingOwner,
+          },
+        };
+      })
+    );
 
-    console.log(`📋 [admin-quote-requests] ${requests.length} solicitudes encontradas`);
+    console.log(`📋 [admin-quote-requests] ${enrichedRequests.length} solicitudes encontradas`);
 
-    res.json({
-      success: true,
-      requests,
-      count: requests.length,
+    return sendSuccess(req, res, {
+      requests: enrichedRequests,
+      count: enrichedRequests.length,
     });
   } catch (error) {
     console.error('[admin-quote-requests] Error obteniendo solicitudes:', error);
@@ -103,10 +100,10 @@ router.get('/', requireAuth, requireAdmin, async (req, res) => {
  */
 router.get('/stats', requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snapshot = await db.collection('quoteRequests').get();
+    const allRequests = await prisma.quoteRequest.findMany();
 
     const stats = {
-      total: snapshot.size,
+      total: allRequests.length,
       byStatus: {
         pending: 0,
         quoted: 0,
@@ -115,39 +112,31 @@ router.get('/stats', requireAuth, requireAdmin, async (req, res) => {
         cancelled: 0,
       },
       byCategory: {},
-      recent: 0, // Últimas 24 horas
+      recent: 0,
     };
 
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-
+    allRequests.forEach((request) => {
       // Contar por status
-      if (data.status && stats.byStatus.hasOwnProperty(data.status)) {
-        stats.byStatus[data.status]++;
+      if (request.status && stats.byStatus.hasOwnProperty(request.status)) {
+        stats.byStatus[request.status]++;
       }
 
       // Contar por categoría
-      if (data.category) {
-        stats.byCategory[data.category] = (stats.byCategory[data.category] || 0) + 1;
+      if (request.category) {
+        stats.byCategory[request.category] = (stats.byCategory[request.category] || 0) + 1;
       }
 
       // Contar recientes
-      if (data.createdAt) {
-        const createdDate = new Date(data.createdAt);
-        if (createdDate > oneDayAgo) {
-          stats.recent++;
-        }
+      if (request.createdAt && request.createdAt > oneDayAgo) {
+        stats.recent++;
       }
     });
 
     console.log(`📊 [admin-quote-requests] Estadísticas generadas`);
 
-    res.json({
-      success: true,
-      stats,
-    });
+    return sendSuccess(req, res, { stats });
   } catch (error) {
     console.error('[admin-quote-requests] Error obteniendo estadísticas:', error);
     res.status(500).json({
@@ -166,17 +155,25 @@ router.patch('/:id', requireAuth, requireAdmin, async (req, res) => {
     const { id } = req.params;
     const updateData = { ...req.body };
 
-    // Agregar metadata de actualización
-    updateData.updatedAt = new Date().toISOString();
-    updateData.updatedBy = req.user.uid;
-    updateData.updatedByAdmin = true;
+    // Agregar metadata en el campo metadata JSON
+    const metadata = {
+      ...(updateData.metadata || {}),
+      updatedBy: req.user.uid,
+      updatedByAdmin: true,
+      lastAdminUpdate: new Date().toISOString(),
+    };
 
-    await db.collection('quoteRequests').doc(id).update(updateData);
+    await prisma.quoteRequest.update({
+      where: { id },
+      data: {
+        ...updateData,
+        metadata,
+      },
+    });
 
     console.log(`✅ [admin-quote-requests] Solicitud ${id} actualizada por admin`);
 
-    res.json({
-      success: true,
+    return sendSuccess(req, res, {
       message: 'Solicitud actualizada correctamente',
     });
   } catch (error) {
@@ -196,12 +193,13 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
-    await db.collection('quoteRequests').doc(id).delete();
+    await prisma.quoteRequest.delete({
+      where: { id },
+    });
 
     console.log(`🗑️ [admin-quote-requests] Solicitud ${id} eliminada por admin`);
 
-    res.json({
-      success: true,
+    return sendSuccess(req, res, {
       message: 'Solicitud eliminada permanentemente',
     });
   } catch (error) {

@@ -4,10 +4,15 @@
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar, Clock, Phone, CheckCircle2, Edit2, Plus, Trash2, AlertCircle } from 'lucide-react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { Link } from 'react-router-dom';
+import { Calendar, Clock, Phone, CheckCircle2, Edit2, Plus, Trash2, AlertCircle, User, Mail, Moon, LogOut } from 'lucide-react';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { useWedding } from '../context/WeddingContext';
+import { useAuth } from '../hooks/useAuth.jsx';
+import DarkModeToggle from '../components/DarkModeToggle';
+import LanguageSelector from '../components/ui/LanguageSelector';
+import Nav from '../components/Nav';
+import NotificationCenter from '../components/NotificationCenter';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
 import { 
@@ -42,11 +47,11 @@ const ChecklistItem = ({ item, momento, onToggle, onEdit, onDelete }) => {
       
       <div className="flex-1">
         <span className={`text-sm ${item.completado ? 'line-through' : ''}`} style={{ color: item.completado ? 'var(--color-muted)' : 'var(--color-text)' }}>
-          {item.importante && <span className="mr-1" style={{ color: 'var(--color-danger)' }}>*</span>}
+          {item.importante && <span className="mr-1" className="text-danger">*</span>}
           {item.texto}
         </span>
         {item.nota && (
-          <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>{item.nota}</p>
+          <p className="text-xs mt-1" className="text-secondary">{item.nota}</p>
         )}
       </div>
 
@@ -54,7 +59,7 @@ const ChecklistItem = ({ item, momento, onToggle, onEdit, onDelete }) => {
         <button
           onClick={() => onEdit(momento, item)}
           className="p-1 rounded transition-colors"
-          style={{ color: 'var(--color-text-secondary)' }}
+          className="text-secondary"
           onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-primary)'; e.currentTarget.style.backgroundColor = 'var(--color-primary-10)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-secondary)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
         >
@@ -63,7 +68,7 @@ const ChecklistItem = ({ item, momento, onToggle, onEdit, onDelete }) => {
         <button
           onClick={() => onDelete(momento, item.id)}
           className="p-1 rounded transition-colors"
-          style={{ color: 'var(--color-text-secondary)' }}
+          className="text-secondary"
           onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-danger)'; e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-secondary)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
         >
@@ -78,25 +83,25 @@ const TimelineItem = ({ item, onEdit, onDelete }) => {
   return (
     <div className="flex items-start gap-4 p-4 rounded-lg transition-shadow" style={{ backgroundColor: 'var(--color-surface)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--color-border)', boxShadow: 'var(--shadow-sm)' }} onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-md)'} onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-sm)'}>
       <div className="flex-shrink-0 text-center">
-        <div className="text-lg font-bold" style={{ color: 'var(--color-primary)' }}>{item.hora}</div>
-        <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{item.duracion}min</div>
+        <div className="text-lg font-bold" className="text-primary">{item.hora}</div>
+        <div className="text-xs" className="text-muted">{item.duracion}min</div>
       </div>
       
       <div className="flex-1">
-        <h4 className="font-semibold mb-1" style={{ color: 'var(--color-text)' }}>{item.actividad}</h4>
-        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>👤 {item.responsable}</p>
+        <h4 className="font-semibold mb-1" className="text-body">{item.actividad}</h4>
+        <p className="text-sm" className="text-secondary">👤 {item.responsable}</p>
       </div>
 
       <div className="flex items-center gap-1">
         <button
           onClick={() => onEdit(item)}
-          className="p-2  hover: hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }}
+          className="p-2  hover: hover:bg-blue-50 rounded transition-colors" className="text-primary" className="text-secondary"
         >
           <Edit2 className="w-4 h-4" />
         </button>
         <button
           onClick={() => onDelete(item.id)}
-          className="p-2  hover: hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }}
+          className="p-2  hover: hover:bg-red-50 rounded transition-colors" className="text-danger" className="text-secondary"
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -110,22 +115,22 @@ const ContactoCard = ({ contacto, onEdit, onDelete }) => {
     <div className="border-2 rounded-lg p-4" style={{ borderColor: contacto.importante ? '#F97316' : 'var(--color-border)', backgroundColor: contacto.importante ? 'rgba(249, 115, 22, 0.1)' : 'var(--color-surface)' }}>
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
-          <h4 className="font-semibold" style={{ color: 'var(--color-text)' }}>
+          <h4 className="font-semibold" className="text-body">
             {contacto.nombre}
             {contacto.importante && <span className="ml-2 text-xs" style={{ color: '#F97316' }}>⭐ Prioritario</span>}
           </h4>
-          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{contacto.rol}</p>
+          <p className="text-sm" className="text-secondary">{contacto.rol}</p>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={() => onEdit(contacto)}
-            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" className="text-primary" className="text-secondary"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(contacto.id)}
-            className="p-2  hover: hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-red-50 rounded transition-colors" className="text-danger" className="text-secondary"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -134,15 +139,15 @@ const ContactoCard = ({ contacto, onEdit, onDelete }) => {
       
       {contacto.telefono && (
         <div className="flex items-center gap-2 text-sm">
-          <Phone className="w-4 h-4" style={{ color: 'var(--color-muted)' }} />
-          <a href={`tel:${contacto.telefono}`} className="hover:underline" style={{ color: 'var(--color-primary)' }}>
+          <Phone className="w-4 h-4" className="text-muted" />
+          <a href={`tel:${contacto.telefono}`} className="hover:underline" className="text-primary">
             {contacto.telefono}
           </a>
         </div>
       )}
       
       {!contacto.telefono && (
-        <p className="text-xs  italic" style={{ color: 'var(--color-muted)' }}>{t('weddingDay.noPhoneRegistered')}</p>
+        <p className="text-xs  italic" className="text-muted">{t('weddingDay.noPhoneRegistered')}</p>
       )}
     </div>
   );
@@ -169,18 +174,18 @@ const ChecklistModal = ({ momento, item, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-md w-full" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-md w-full" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               {item ? t('weddingDay.editTask') : t('weddingDay.newTask')}
             </h2>
-            <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className=" hover:" className="text-muted" className="text-secondary">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 {t('weddingDay.task')} *
               </label>
               <input
@@ -188,7 +193,7 @@ const ChecklistModal = ({ momento, item, onSave, onClose }) => {
                 value={formData.texto}
                 onChange={(e) => setFormData({ ...formData, texto: e.target.value })}
                 placeholder={t('weddingDay.taskDescriptionPlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 required
               />
             </div>
@@ -199,14 +204,14 @@ const ChecklistModal = ({ momento, item, onSave, onClose }) => {
                   type="checkbox"
                   checked={formData.importante}
                   onChange={(e) => setFormData({ ...formData, importante: e.target.checked })}
-                  className="w-4 h-4  rounded" style={{ color: 'var(--color-primary)' }}
+                  className="w-4 h-4  rounded" className="text-primary"
                 />
-                <span className="text-sm " style={{ color: 'var(--color-text)' }}>{t('weddingDay.markAsImportant')}</span>
+                <span className="text-sm " className="text-body">{t('weddingDay.markAsImportant')}</span>
               </label>
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 {t('weddingDay.additionalNote')}
               </label>
               <textarea
@@ -214,7 +219,7 @@ const ChecklistModal = ({ momento, item, onSave, onClose }) => {
                 onChange={(e) => setFormData({ ...formData, nota: e.target.value })}
                 placeholder={t('weddingDay.momentNamePlaceholder')}
                 rows={2}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
@@ -222,7 +227,7 @@ const ChecklistModal = ({ momento, item, onSave, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
               >
                 Cancelar
               </button>
@@ -262,32 +267,32 @@ const TimelineModal = ({ item, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-md w-full" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-md w-full" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               {item ? t('weddingDay.editActivity') : t('weddingDay.newActivity')}
             </h2>
-            <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className=" hover:" className="text-muted" className="text-secondary">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   {t('weddingDay.time')} *
                 </label>
                 <input
                   type="time"
                   value={formData.hora}
                   onChange={(e) => setFormData({ ...formData, hora: e.target.value })}
-                  className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full border  rounded-lg px-3 py-2" className="border-default"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   {t('weddingDay.duration')}
                 </label>
                 <input
@@ -296,13 +301,13 @@ const TimelineModal = ({ item, onSave, onClose }) => {
                   onChange={(e) => setFormData({ ...formData, duracion: parseInt(e.target.value) })}
                   min="5"
                   step="5"
-                  className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 {t('weddingDay.activity')} *
               </label>
               <input
@@ -310,13 +315,13 @@ const TimelineModal = ({ item, onSave, onClose }) => {
                 value={formData.actividad}
                 onChange={(e) => setFormData({ ...formData, actividad: e.target.value })}
                 placeholder={t('weddingDay.taskDescriptionPlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 {t('weddingDay.responsible')}
               </label>
               <input
@@ -324,7 +329,7 @@ const TimelineModal = ({ item, onSave, onClose }) => {
                 value={formData.responsable}
                 onChange={(e) => setFormData({ ...formData, responsable: e.target.value })}
                 placeholder={t('weddingDay.taskDescriptionPlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
@@ -332,7 +337,7 @@ const TimelineModal = ({ item, onSave, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
               >
                 {t('weddingDay.cancel')}
               </button>
@@ -372,18 +377,18 @@ const ContactoModal = ({ contacto, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-md w-full" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-md w-full" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               {contacto ? t('weddingDay.editContact') : t('weddingDay.newContact')}
             </h2>
-            <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className=" hover:" className="text-muted" className="text-secondary">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 {t('weddingDay.name')} *
               </label>
               <input
@@ -391,13 +396,13 @@ const ContactoModal = ({ contacto, onSave, onClose }) => {
                 value={formData.nombre}
                 onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                 placeholder={t('weddingDay.taskDescriptionPlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Rol
               </label>
               <input
@@ -405,12 +410,12 @@ const ContactoModal = ({ contacto, onSave, onClose }) => {
                 value={formData.rol}
                 onChange={(e) => setFormData({ ...formData, rol: e.target.value })}
                 placeholder={t('weddingDay.rolePlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Teléfono
               </label>
               <input
@@ -418,7 +423,7 @@ const ContactoModal = ({ contacto, onSave, onClose }) => {
                 value={formData.telefono}
                 onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
                 placeholder={t('common.phonePlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
@@ -430,7 +435,7 @@ const ContactoModal = ({ contacto, onSave, onClose }) => {
                   onChange={(e) => setFormData({ ...formData, importante: e.target.checked })}
                   className="w-4 h-4 text-orange-600 rounded"
                 />
-                <span className="text-sm " style={{ color: 'var(--color-text)' }}>Marcar como prioritario</span>
+                <span className="text-sm " className="text-body">Marcar como prioritario</span>
               </label>
             </div>
 
@@ -438,7 +443,7 @@ const ContactoModal = ({ contacto, onSave, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
               >
                 Cancelar
               </button>
@@ -457,7 +462,10 @@ const ContactoModal = ({ contacto, onSave, onClose }) => {
 };
 
 export default function DiaDeBoda() {
+  const { t } = useTranslation();
   const { activeWedding } = useWedding();
+  const { logout: logoutUnified } = useAuth();
+  const [openUserMenu, setOpenUserMenu] = useState(false);
   const [checklist, setChecklist] = useState({});
   const [timeline, setTimeline] = useState([]);
   const [contactos, setContactos] = useState([]);
@@ -676,7 +684,7 @@ export default function DiaDeBoda() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto mb-4"></div>
-            <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando día de la boda...</p>
+            <p className="" className="text-secondary">Cargando día de la boda...</p>
           </div>
         </div>
       </PageWrapper>
@@ -684,6 +692,33 @@ export default function DiaDeBoda() {
   }
 
   return (
+    <>
+    <div className="absolute top-4 right-4 flex items-center space-x-3" style={{ zIndex: 100 }}>
+      <LanguageSelector variant="minimal" />
+      <div className="relative" data-user-menu>
+        <button onClick={() => setOpenUserMenu(!openUserMenu)} className="w-11 h-11 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center" title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })} style={{ backgroundColor: openUserMenu ? 'var(--color-lavender)' : 'rgba(255, 255, 255, 0.95)', border: `2px solid ${openUserMenu ? 'var(--color-primary)' : 'rgba(255,255,255,0.8)'}`, boxShadow: openUserMenu ? '0 4px 12px rgba(94, 187, 255, 0.3)' : '0 2px 8px rgba(0,0,0,0.15)' }}>
+          <User className="w-5 h-5" style={{ color: openUserMenu ? 'var(--color-primary)' : 'var(--color-text-secondary)' }} />
+        </button>
+        {openUserMenu && (
+          <div className="absolute right-0 mt-3 bg-[var(--color-surface)] p-2 space-y-1" style={{ minWidth: '220px', border: '1px solid var(--color-border-soft)', borderRadius: 'var(--radius-lg)', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 9999 }}>
+            <div className="px-2 py-1"><NotificationCenter /></div>
+            <Link to="/perfil" onClick={() => setOpenUserMenu(false)} className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200" className="text-body" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <User className="w-4 h-4 mr-3" />{t('navigation.profile', { defaultValue: 'Perfil' })}
+            </Link>
+            <Link to="/email" onClick={() => setOpenUserMenu(false)} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'} className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200" className="text-body">
+              <Mail className="w-4 h-4 mr-3" />{t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
+            </Link>
+            <div className="px-3 py-2.5 rounded-xl transition-all duration-200" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <div className="flex items-center justify-between"><span className="text-sm flex items-center" className="text-body"><Moon className="w-4 h-4 mr-3" />{t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}</span><DarkModeToggle className="ml-2" /></div>
+            </div>
+            <div style={{ height: '1px', backgroundColor: 'var(--color-border-soft)', margin: '8px 0' }}></div>
+            <button onClick={() => { logoutUnified(); setOpenUserMenu(false); }} className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center" className="text-danger" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <LogOut className="w-4 h-4 mr-3" />{t('navigation.logout', { defaultValue: 'Cerrar sesión' })}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
     <PageWrapper>
       <div className="max-w-6xl mx-auto py-8 px-4">
         <div className="space-y-6">
@@ -691,12 +726,12 @@ export default function DiaDeBoda() {
           <div className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-3  rounded-lg shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="p-3  rounded-lg shadow-sm" className="bg-surface">
                   <Calendar className="w-6 h-6 text-pink-600" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>Día de la Boda</h1>
-                  <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                  <h1 className="text-2xl font-bold " className="text-body">Día de la Boda</h1>
+                  <p className="text-sm " className="text-secondary">
                     Checklist, timeline y contactos de emergencia
                   </p>
                 </div>
@@ -704,33 +739,33 @@ export default function DiaDeBoda() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{stats.totalTareas}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Tareas totales</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{stats.totalTareas}</div>
+                <div className="text-xs " className="text-secondary">Tareas totales</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-success)' }}>{stats.completadas}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Completadas</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-success">{stats.completadas}</div>
+                <div className="text-xs " className="text-secondary">Completadas</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-primary)' }}>{stats.timeline}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Eventos timeline</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-primary">{stats.timeline}</div>
+                <div className="text-xs " className="text-secondary">Eventos timeline</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
                 <div className="text-2xl font-bold text-orange-600">{stats.contactos}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Contactos</div>
+                <div className="text-xs " className="text-secondary">Contactos</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
                 <div className="text-2xl font-bold text-purple-600">{stats.porcentaje}%</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Progreso</div>
+                <div className="text-xs " className="text-secondary">Progreso</div>
               </div>
             </div>
 
             {stats.totalTareas > 0 && (
               <div className="mt-4">
                 <div className="flex items-center justify-between text-sm mb-2">
-                  <span className=" font-medium" style={{ color: 'var(--color-text)' }}>Progreso general</span>
-                  <span className="" style={{ color: 'var(--color-text-secondary)' }}>{stats.completadas}/{stats.totalTareas}</span>
+                  <span className=" font-medium" className="text-body">Progreso general</span>
+                  <span className="" className="text-secondary">{stats.completadas}/{stats.totalTareas}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div
@@ -753,8 +788,8 @@ export default function DiaDeBoda() {
               }`}
             >
               <CheckCircle2 className="w-6 h-6 mx-auto mb-2 text-pink-600" />
-              <div className="font-semibold " style={{ color: 'var(--color-text)' }}>Checklist</div>
-              <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{stats.completadas}/{stats.totalTareas}</div>
+              <div className="font-semibold " className="text-body">Checklist</div>
+              <div className="text-xs " className="text-secondary">{stats.completadas}/{stats.totalTareas}</div>
             </button>
 
             <button
@@ -765,9 +800,9 @@ export default function DiaDeBoda() {
                   : 'border-gray-200 bg-white hover:border-blue-300'
               }`}
             >
-              <Clock className="w-6 h-6 mx-auto mb-2 " style={{ color: 'var(--color-primary)' }} />
-              <div className="font-semibold " style={{ color: 'var(--color-text)' }}>Timeline</div>
-              <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{stats.timeline} eventos</div>
+              <Clock className="w-6 h-6 mx-auto mb-2 " className="text-primary" />
+              <div className="font-semibold " className="text-body">Timeline</div>
+              <div className="text-xs " className="text-secondary">{stats.timeline} eventos</div>
             </button>
 
             <button
@@ -779,8 +814,8 @@ export default function DiaDeBoda() {
               }`}
             >
               <Phone className="w-6 h-6 mx-auto mb-2 text-orange-600" />
-              <div className="font-semibold " style={{ color: 'var(--color-text)' }}>Contactos</div>
-              <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{stats.contactosImportantes} prioritarios</div>
+              <div className="font-semibold " className="text-body">Contactos</div>
+              <div className="text-xs " className="text-secondary">{stats.contactosImportantes} prioritarios</div>
             </button>
           </div>
 
@@ -788,7 +823,7 @@ export default function DiaDeBoda() {
           {activeView === 'checklist' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Checklist del Día</h2>
+                <h2 className="text-lg font-semibold " className="text-body">Checklist del Día</h2>
                 <button
                   onClick={() => {
                     setEditingChecklistItem(null);
@@ -826,10 +861,10 @@ export default function DiaDeBoda() {
               </div>
 
               {/* Checklist Items */}
-              <div className=" border  rounded-lg p-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" border  rounded-lg p-4" className="border-default" className="bg-surface">
                 {(!checklist[activeMomento] || checklist[activeMomento].length === 0) ? (
                   <div className="text-center py-8">
-                    <p className="" style={{ color: 'var(--color-text-secondary)' }}>No hay tareas para este momento</p>
+                    <p className="" className="text-secondary">No hay tareas para este momento</p>
                     <button
                       onClick={() => setShowChecklistModal(true)}
                       className="mt-4 text-pink-600 hover:text-pink-700"
@@ -862,7 +897,7 @@ export default function DiaDeBoda() {
           {activeView === 'timeline' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Timeline del Día</h2>
+                <h2 className="text-lg font-semibold " className="text-body">Timeline del Día</h2>
                 <button
                   onClick={() => {
                     setEditingTimelineItem(null);
@@ -876,12 +911,12 @@ export default function DiaDeBoda() {
               </div>
 
               {timeline.length === 0 ? (
-                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                  <Clock className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-                  <p className=" mb-4" style={{ color: 'var(--color-text-secondary)' }}>No hay eventos en el timeline</p>
+                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" className="border-default" className="bg-surface">
+                  <Clock className="w-16 h-16  mx-auto mb-4" className="text-muted" />
+                  <p className=" mb-4" className="text-secondary">No hay eventos en el timeline</p>
                   <button
                     onClick={() => setShowTimelineModal(true)}
-                    className=" hover:text-blue-700" style={{ color: 'var(--color-primary)' }}
+                    className=" hover:text-blue-700" className="text-primary"
                   >
                     Añadir primer evento
                   </button>
@@ -908,7 +943,7 @@ export default function DiaDeBoda() {
           {activeView === 'contactos' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>Contactos de Emergencia</h2>
+                <h2 className="text-lg font-semibold " className="text-body">Contactos de Emergencia</h2>
                 <button
                   onClick={() => {
                     setEditingContacto(null);
@@ -934,9 +969,9 @@ export default function DiaDeBoda() {
               )}
 
               {contactos.length === 0 ? (
-                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                  <Phone className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-                  <p className=" mb-4" style={{ color: 'var(--color-text-secondary)' }}>No hay contactos registrados</p>
+                <div className=" border-2 border-dashed  rounded-lg p-12 text-center" className="border-default" className="bg-surface">
+                  <Phone className="w-16 h-16  mx-auto mb-4" className="text-muted" />
+                  <p className=" mb-4" className="text-secondary">No hay contactos registrados</p>
                   <button
                     onClick={() => setShowContactoModal(true)}
                     className="text-orange-600 hover:text-orange-700"
@@ -999,5 +1034,7 @@ export default function DiaDeBoda() {
         )}
       </div>
     </PageWrapper>
+    <Nav />
+    </>
   );
 }

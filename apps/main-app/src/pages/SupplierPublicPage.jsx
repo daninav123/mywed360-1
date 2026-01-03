@@ -364,7 +364,7 @@ export default function SupplierPublicPage() {
                 )}
               </div>
             )}
-            <div className="mt-4  text-sm" style={{ color: 'var(--color-muted)' }}>
+            <div className="mt-4  text-sm" className="text-muted">
               {lightboxIndex + 1} / {filteredPortfolio.length}
             </div>
           </div>

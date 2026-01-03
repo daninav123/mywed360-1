@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Sparkles, Mail } from 'lucide-react';
 import QuoteResponsesList from '../components/quotes/QuoteResponsesList';
 import QuoteResponseDetail from '../components/quotes/QuoteResponseDetail';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 export default function QuoteResponsesPage() {
   const { user } = useAuth();
   const [selectedQuote, setSelectedQuote] = useState(null);
@@ -26,12 +26,12 @@ export default function QuoteResponsesPage() {
   };
 
   return (
-    <div className="min-h-screen " style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-screen " className="bg-page">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-4">
-            <div className="p-3  bg-opacity-20 rounded-xl" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="p-3  bg-opacity-20 rounded-xl" className="bg-surface">
               <Mail className="w-8 h-8" />
             </div>
             <div>

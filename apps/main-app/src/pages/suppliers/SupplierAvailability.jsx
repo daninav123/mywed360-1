@@ -187,7 +187,7 @@ export default function SupplierAvailability() {
           <button
             onClick={() => navigate(`/supplier/dashboard/${id}`)}
             className="flex items-center gap-2 hover:opacity-70"
-            style={{ color: 'var(--color-text)' }}
+            className="text-body"
           >
             <ArrowLeft size={20} />
             <span>Volver al Dashboard</span>
@@ -195,7 +195,7 @@ export default function SupplierAvailability() {
         </div>
 
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
+          <h1 className="text-3xl font-bold" className="text-body">
             Calendario de Disponibilidad
           </h1>
           <button
@@ -211,7 +211,7 @@ export default function SupplierAvailability() {
         {/* Calendario */}
         <div
           className="shadow-md rounded-lg p-6"
-          style={{ backgroundColor: 'var(--color-surface)' }}
+          className="bg-surface"
         >
           {/* Navegación de mes */}
           <div className="flex items-center justify-between mb-6">
@@ -226,7 +226,7 @@ export default function SupplierAvailability() {
             >
               ← Anterior
             </button>
-            <h2 className="text-xl font-semibold" style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-semibold" className="text-body">
               {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
             </h2>
             <button
@@ -248,7 +248,7 @@ export default function SupplierAvailability() {
               <div
                 key={day}
                 className="text-center font-semibold py-2"
-                style={{ color: 'var(--color-muted)' }}
+                className="text-muted"
               >
                 {day}
               </div>
@@ -282,7 +282,7 @@ export default function SupplierAvailability() {
                     >
                       {date && (
                         <>
-                          <span style={{ color: 'var(--color-text)' }}>{date.getDate()}</span>
+                          <span className="text-body">{date.getDate()}</span>
                           {blocked && (
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 rounded-lg">
                               <X size={16} color="white" />
@@ -310,7 +310,7 @@ export default function SupplierAvailability() {
           {/* Leyenda */}
           <div
             className="mt-6 flex items-center gap-6 text-sm"
-            style={{ color: 'var(--color-muted)' }}
+            className="text-muted"
           >
             <div className="flex items-center gap-2">
               <div
@@ -334,13 +334,13 @@ export default function SupplierAvailability() {
         {/* Lista de fechas bloqueadas */}
         <div
           className="shadow-md rounded-lg p-6 mt-6"
-          style={{ backgroundColor: 'var(--color-surface)' }}
+          className="bg-surface"
         >
-          <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+          <h2 className="text-xl font-semibold mb-4" className="text-body">
             Fechas Bloqueadas ({blockedDates.length})
           </h2>
           {blockedDates.length === 0 ? (
-            <p style={{ color: 'var(--color-muted)' }}>No hay fechas bloqueadas</p>
+            <p className="text-muted">No hay fechas bloqueadas</p>
           ) : (
             <div className="space-y-2">
               {blockedDates.map((blocked) => (
@@ -350,13 +350,13 @@ export default function SupplierAvailability() {
                   style={{ backgroundColor: 'var(--color-background)' }}
                 >
                   <div className="flex items-center gap-3">
-                    <Calendar size={20} style={{ color: 'var(--color-primary)' }} />
+                    <Calendar size={20} className="text-primary" />
                     <div>
-                      <p className="font-medium" style={{ color: 'var(--color-text)' }}>
+                      <p className="font-medium" className="text-body">
                         {new Date(blocked.date.seconds * 1000).toLocaleDateString('es-ES')}
                       </p>
                       {blocked.reason && (
-                        <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                        <p className="text-sm" className="text-muted">
                           {blocked.reason}
                         </p>
                       )}
@@ -380,16 +380,16 @@ export default function SupplierAvailability() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div
               className="rounded-lg p-6 max-w-2xl w-full mx-4"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
-              <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
+              <h2 className="text-2xl font-bold mb-4" className="text-body">
                 Bloquear Fechas
               </h2>
 
               <div className="mb-4">
                 <label
                   className="block text-sm font-medium mb-2"
-                  style={{ color: 'var(--color-text)' }}
+                  className="text-body"
                 >
                   Tipo de bloqueo
                 </label>
@@ -411,7 +411,7 @@ export default function SupplierAvailability() {
               <div className="mb-4">
                 <label
                   className="block text-sm font-medium mb-2"
-                  style={{ color: 'var(--color-text)' }}
+                  className="text-body"
                 >
                   Motivo (opcional)
                 </label>
@@ -431,7 +431,7 @@ export default function SupplierAvailability() {
               <div className="mb-6">
                 <label
                   className="block text-sm font-medium mb-2"
-                  style={{ color: 'var(--color-text)' }}
+                  className="text-body"
                 >
                   Selecciona las fechas ({selectedDates.length} seleccionadas)
                 </label>
@@ -439,8 +439,8 @@ export default function SupplierAvailability() {
                   className="flex items-center gap-2 p-3 rounded-lg"
                   style={{ backgroundColor: 'rgba(109, 40, 217, 0.1)' }}
                 >
-                  <AlertCircle size={16} style={{ color: 'var(--color-primary)' }} />
-                  <p className="text-sm" style={{ color: 'var(--color-text)' }}>
+                  <AlertCircle size={16} className="text-primary" />
+                  <p className="text-sm" className="text-body">
                     Haz clic en el calendario de arriba para seleccionar las fechas que quieres
                     bloquear
                   </p>

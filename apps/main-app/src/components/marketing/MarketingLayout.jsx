@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import logoApp from '../../assets/logo-mark.svg';
 import LanguageSelector from '../ui/LanguageSelector';
 
 const linkBaseClasses =
@@ -72,13 +71,13 @@ const MarketingLayout = ({ children }) => {
     <div className="flex min-h-screen flex-col bg-app text-body">
       <header className="sticky top-0 z-30 border-b border-soft bg-app shadow-sm">
         <div className="layout-container flex items-center justify-between py-4">
-          <Link to="/" className="flex items-center gap-3 text-lg font-semibold text-body">
+          <Link to="/" className="flex items-center gap-3">
             <img
-              src={logoApp}
-              alt={safeT('common.logoAlt', 'Logo MaLove.App')}
-              className="h-9 w-9 rounded-xl bg-white object-contain shadow-sm ring-1 ring-[color:var(--color-primary-20)]"
+              src="/logo.png"
+              alt={safeT('common.logoAlt', 'Logo Planivia')}
+              className="h-8"
+              style={{ width: 'auto' }}
             />
-            <span>MaLove.App</span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">

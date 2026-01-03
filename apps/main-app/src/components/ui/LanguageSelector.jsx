@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { auth, db } from '../../firebaseConfig';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { changeLanguage, getCurrentLanguage, getAvailableLanguages } from '../../i18n';
 
 // Selector de idioma con dropdown

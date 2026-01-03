@@ -91,7 +91,7 @@ export default function Timing() {
             <div key={key} className="mb-10">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-lg">{labels[key] || key}</h3>
-                <button onClick={() => handleAdd(key)} className="flex items-center gap-1 text-sm hover:underline" style={{ color: 'var(--color-success)' }}>
+                <button onClick={() => handleAdd(key)} className="flex items-center gap-1 text-sm hover:underline" className="text-success">
                   <Plus size={16} /> Añadir
                 </button>
               </div>
@@ -114,7 +114,7 @@ export default function Timing() {
                     />
                     <button 
                       className="hover:text-red-800 self-start" 
-                      style={{ color: 'var(--color-danger)' }} 
+                      className="text-danger" 
                       onClick={() => removeMoment(key, m.id)}
                     >
                       <Trash2 size={18} />

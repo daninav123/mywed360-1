@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { useAuth } from '../hooks/useAuth';
+import LanguageSelector from '../components/ui/LanguageSelector';
+import { useAuth } from '../hooks/useAuth.jsx';
 import useTranslations from '../hooks/useTranslations';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 const STATUS_ID = 'reset-status-message';
@@ -72,7 +73,12 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12">
+    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12 relative">
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md space-y-5 rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 shadow-sm"

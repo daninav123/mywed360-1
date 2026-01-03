@@ -5,13 +5,13 @@
  */
 
 import express from 'express';
-import { db } from '../db.js';
-import { FieldPath } from 'firebase-admin/firestore';
+import { PrismaClient } from '@prisma/client';
 import { requireAuth } from '../middleware/authMiddleware.js';
 import { sendQuoteRequestEmail } from '../services/quoteRequestEmailService.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 /**
  * POST /api/quote-requests
@@ -39,119 +39,82 @@ router.post('/', requireAuth, async (req, res) => {
     }
 
     // Verificar que la boda existe
-    const weddingDoc = await db.collection('weddings').doc(weddingId).get();
-    if (!weddingDoc.exists) {
+    const wedding = await prisma.wedding.findUnique({ where: { id: weddingId } });
+    if (!wedding) {
       return res.status(404).json({ error: 'Boda no encontrada' });
     }
 
     // Verificar que el proveedor existe
-    const supplierDoc = await db.collection('suppliers').doc(supplierId).get();
-    if (!supplierDoc.exists) {
+    const supplier = await prisma.supplier.findUnique({ where: { id: supplierId } });
+    if (!supplier) {
       return res.status(404).json({ error: 'Proveedor no encontrado' });
     }
 
-    const supplierData = supplierDoc.data();
-
-    // Crear la solicitud
-    const quoteRequest = {
-      weddingId,
-      supplierId,
-      category,
-      message: message || '',
-      requestedServices: requestedServices || [],
-      eventDate: eventDate || null,
-      guestCount: guestCount || null,
-      budget: budget || null,
-      contact: contact || {},
-      status: 'pending',
-      supplierInfo: {
-        name: supplierData.name || supplierData.profile?.name,
-        email: supplierData.contact?.email,
-        category: supplierData.category,
+    // Crear la solicitud en PostgreSQL
+    const quoteRequest = await prisma.quoteRequest.create({
+      data: {
+        weddingId,
+        userId: req.user.uid,
+        supplierId,
+        category,
+        service: requestedServices?.join(', ') || null,
+        eventDate: eventDate ? new Date(eventDate) : null,
+        guestCount: guestCount || null,
+        budget: budget || null,
+        description: message || null,
+        contactName: contact?.name || 'Sin nombre',
+        contactEmail: contact?.email || '',
+        contactPhone: contact?.phone || null,
+        status: 'pending',
+        supplierEmail: supplier.email,
+        supplierInfo: {
+          name: supplier.businessName,
+          email: supplier.email,
+          category: supplier.category,
+        },
+        metadata: {
+          requestedServices: requestedServices || [],
+          contact: contact || {},
+        },
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: req.user.uid,
-    };
+    });
 
-    // Guardar en Firestore (colección principal)
-    const docRef = await db.collection('quoteRequests').add(quoteRequest);
-
-    console.log(`✅ [quote-requests] Nueva solicitud creada: ${docRef.id}`);
-    console.log(`   Proveedor: ${supplierData.name}`);
+    console.log(`✅ [quote-requests] Nueva solicitud creada: ${quoteRequest.id}`);
+    console.log(`   Proveedor: ${supplier.businessName}`);
     console.log(`   Categoría: ${category}`);
 
-    // TAMBIÉN guardar en la subcolección del proveedor (para compatibilidad con panel existente)
-    try {
-      // El panel del proveedor lee de suppliers/{id}/requests, NO de quote-requests
-      await db
-        .collection('suppliers')
-        .doc(supplierId)
-        .collection('requests') // ← CORREGIDO: era 'quote-requests'
-        .doc(docRef.id)
-        .set({
-          // Datos en el formato que espera el panel del proveedor
-          id: docRef.id,
-          coupleName: contact?.name || 'Sin nombre',
-          contactEmail: contact?.email,
-          contactPhone: contact?.phone || null,
-          message: message || '',
-          services: requestedServices || [],
-          weddingDate: eventDate || null,
-          guestCount: guestCount || null,
-          budget: budget?.max || budget?.min || null,
-          location: null,
-          preferredContactMethod: 'email',
-          urgency: 'normal',
-          status: 'new', // new | viewed | responded | archived
-          receivedAt: new Date(),
-          viewedAt: null,
-          respondedAt: null,
-          response: null,
-          userId: req.user.uid,
-          weddingId,
-        });
-
-      console.log(
-        `✅ [quote-requests] Solicitud guardada en subcolección del proveedor (suppliers/${supplierId}/requests/${docRef.id})`
-      );
-    } catch (subError) {
-      console.error('[quote-requests] Error guardando en subcolección:', subError);
-      // No fallar la solicitud si esto falla
-    }
-
     // Enviar notificación y email al proveedor (sin bloquear la respuesta)
-    const supplierEmail = supplierData.contact?.email || supplierData.email;
+    const supplierEmail = supplier.email;
     if (supplierEmail) {
       setImmediate(async () => {
         try {
-          // 1. Crear notificación en Firestore para el proveedor
-          await db.collection('notifications').add({
-            type: 'quote_request',
-            recipientId: supplierId,
-            recipientType: 'supplier',
-            title: 'Nueva solicitud de presupuesto',
-            message: `Has recibido una solicitud de presupuesto para ${category}`,
+          // 1. Crear notificación en PostgreSQL para el proveedor
+          await prisma.notification.create({
             data: {
-              quoteRequestId: docRef.id,
-              weddingId,
-              category,
-              guestCount,
-              eventDate,
+              userId: supplierId,
+              type: 'quote_request',
+              title: 'Nueva solicitud de presupuesto',
+              message: `Has recibido una solicitud de presupuesto para ${category}`,
+              data: {
+                quoteRequestId: quoteRequest.id,
+                weddingId,
+                category,
+                guestCount,
+                eventDate,
+              },
+              read: false,
             },
-            status: 'unread',
-            createdAt: new Date().toISOString(),
           });
 
           logger.info(
-            `✅ [quote-requests] Notificación creada para proveedor: ${supplierData.name}`
+            `✅ [quote-requests] Notificación creada para proveedor: ${supplier.businessName}`
           );
 
           // 2. Enviar email al proveedor
           try {
             await sendQuoteRequestEmail({
               supplierEmail,
-              supplierName: supplierData.name || supplierData.profile?.name || 'Proveedor',
+              supplierName: supplier.businessName || 'Proveedor',
               clientName: contact?.name || 'Cliente',
               clientEmail: contact?.email || 'No especificado',
               clientPhone: contact?.phone || null,
@@ -163,12 +126,12 @@ router.post('/', requireAuth, async (req, res) => {
               serviceDetails: {},
               customMessage: message || '',
               responseUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/supplier/requests`,
-              requestId: docRef.id,
+              requestId: quoteRequest.id,
               userId: req.user.uid,
             });
 
             logger.info(
-              `📧 [quote-requests] Email enviado a ${supplierEmail} para solicitud ${docRef.id}`
+              `📧 [quote-requests] Email enviado a ${supplierEmail} para solicitud ${quoteRequest.id}`
             );
           } catch (emailError) {
             logger.error('[quote-requests] Error enviando email al proveedor:', emailError);
@@ -184,7 +147,7 @@ router.post('/', requireAuth, async (req, res) => {
 
     res.status(201).json({
       success: true,
-      requestId: docRef.id,
+      requestId: quoteRequest.id,
       message: 'Solicitud de presupuesto enviada correctamente',
     });
   } catch (error) {
@@ -293,29 +256,19 @@ router.get('/', requireAuth, async (req, res) => {
   try {
     const { weddingId, status } = req.query;
 
-    let query = db.collection('quoteRequests');
-
-    // Filtrar por boda si se proporciona
+    const where = {};
+    
     if (weddingId) {
-      query = query.where('weddingId', '==', weddingId);
+      where.weddingId = weddingId;
     }
-
-    // Filtrar por status si se proporciona
+    
     if (status) {
-      query = query.where('status', '==', status);
+      where.status = status;
     }
 
-    // Ordenar por fecha de creación (más recientes primero)
-    query = query.orderBy('createdAt', 'desc');
-
-    const snapshot = await query.get();
-
-    const requests = [];
-    snapshot.forEach((doc) => {
-      requests.push({
-        id: doc.id,
-        ...doc.data(),
-      });
+    const requests = await prisma.quoteRequest.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
     });
 
     console.log(`📋 [quote-requests] ${requests.length} solicitudes encontradas`);
@@ -342,18 +295,17 @@ router.get('/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const doc = await db.collection('quoteRequests').doc(id).get();
+    const request = await prisma.quoteRequest.findUnique({
+      where: { id },
+    });
 
-    if (!doc.exists) {
+    if (!request) {
       return res.status(404).json({ error: 'Solicitud no encontrada' });
     }
 
     res.json({
       success: true,
-      request: {
-        id: doc.id,
-        ...doc.data(),
-      },
+      request,
     });
   } catch (error) {
     console.error('[quote-requests] Error obteniendo solicitud:', error);
@@ -382,23 +334,21 @@ router.patch('/:id/status', requireAuth, async (req, res) => {
 
     const updateData = {
       status,
-      updatedAt: new Date().toISOString(),
-      updatedBy: req.user.uid,
+      metadata: notes ? { notes } : undefined,
     };
 
-    if (notes) {
-      updateData.notes = notes;
-    }
-
     if (status === 'quoted') {
-      updateData.quotedAt = new Date().toISOString();
+      updateData.respondedAt = new Date();
     } else if (status === 'accepted') {
-      updateData.acceptedAt = new Date().toISOString();
+      updateData.respondedAt = new Date();
     } else if (status === 'rejected') {
-      updateData.rejectedAt = new Date().toISOString();
+      updateData.respondedAt = new Date();
     }
 
-    await db.collection('quoteRequests').doc(id).update(updateData);
+    await prisma.quoteRequest.update({
+      where: { id },
+      data: updateData,
+    });
 
     console.log(`✅ [quote-requests] Solicitud ${id} actualizada a: ${status}`);
 
@@ -425,27 +375,26 @@ router.delete('/:id', requireAuth, async (req, res) => {
 
     console.log(`🗑️ [quote-requests] Cancelando solicitud ${id}`);
 
-    // Intentar en quote-requests-internet primero
-    const internetDoc = await db.collection('quote-requests-internet').doc(id).get();
+    // Buscar en PostgreSQL
+    const request = await prisma.quoteRequest.findUnique({
+      where: { id },
+    });
     
-    if (internetDoc.exists) {
-      const data = internetDoc.data() || {};
-      const ownerUid = data.userId || data.createdBy || data.ownerUid;
-
-      if (ownerUid && ownerUid !== req.user.uid) {
+    if (request) {
+      if (request.userId && request.userId !== req.user.uid) {
         return res.status(403).json({
           error: 'No autorizado para cancelar esta solicitud',
         });
       }
 
-      await db.collection('quote-requests-internet').doc(id).update({
-        status: 'cancelled',
-        cancelledAt: new Date().toISOString(),
-        cancelledBy: req.user.uid,
-        updatedAt: new Date().toISOString(),
+      await prisma.quoteRequest.update({
+        where: { id },
+        data: {
+          status: 'cancelled',
+        },
       });
 
-      console.log(`✅ [quote-requests] Solicitud ${id} cancelada en quote-requests-internet`);
+      console.log(`✅ [quote-requests] Solicitud ${id} cancelada`);
 
       return res.json({
         success: true,
@@ -453,138 +402,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
       });
     }
 
-    // Fallback 1: solicitudes legacy en suppliers/*/quote-requests (de ahí vienen los IDs del quote-stats)
-    const legacyQuoteRequestsSnap = await db
-      .collectionGroup('quote-requests')
-      .where(FieldPath.documentId(), '==', id)
-      .limit(1)
-      .get();
-
-    if (!legacyQuoteRequestsSnap.empty) {
-      const legacyDoc = legacyQuoteRequestsSnap.docs[0];
-      const data = legacyDoc.data() || {};
-      const ownerUid = data.userId || data.createdBy || data.ownerUid;
-
-      if (ownerUid && ownerUid !== req.user.uid) {
-        return res.status(403).json({
-          error: 'No autorizado para cancelar esta solicitud',
-        });
-      }
-
-      await legacyDoc.ref.update({
-        status: 'cancelled',
-        cancelledAt: new Date().toISOString(),
-        cancelledBy: req.user.uid,
-        updatedAt: new Date().toISOString(),
-      });
-
-      console.log(`✅ [quote-requests] Solicitud ${id} cancelada en collectionGroup(quote-requests)`);
-
-      return res.json({
-        success: true,
-        message: 'Solicitud cancelada',
-      });
-    }
-
-    // Fallback 2: solicitudes en suppliers/*/requests
-    const supplierRequestsSnap = await db
-      .collectionGroup('requests')
-      .where(FieldPath.documentId(), '==', id)
-      .limit(1)
-      .get();
-
-    if (!supplierRequestsSnap.empty) {
-      const reqDoc = supplierRequestsSnap.docs[0];
-      const data = reqDoc.data() || {};
-      const ownerUid = data.userId || data.createdBy || data.ownerUid;
-
-      if (ownerUid && ownerUid !== req.user.uid) {
-        return res.status(403).json({
-          error: 'No autorizado para cancelar esta solicitud',
-        });
-      }
-
-      await reqDoc.ref.update({
-        status: 'cancelled',
-        cancelledAt: new Date().toISOString(),
-        cancelledBy: req.user.uid,
-        updatedAt: new Date().toISOString(),
-      });
-
-      console.log(`✅ [quote-requests] Solicitud ${id} cancelada en collectionGroup(requests)`);
-
-      return res.json({
-        success: true,
-        message: 'Solicitud cancelada',
-      });
-    }
-
-    // Si no está en proveedores de internet, intentar en la colección principal quoteRequests
-    const mainDoc = await db.collection('quoteRequests').doc(id).get();
-    if (mainDoc.exists) {
-      const data = mainDoc.data() || {};
-      const ownerUid = data.userId || data.createdBy || data.ownerUid;
-
-      if (ownerUid && ownerUid !== req.user.uid) {
-        return res.status(403).json({
-          error: 'No autorizado para cancelar esta solicitud',
-        });
-      }
-
-      await db.collection('quoteRequests').doc(id).update({
-        status: 'cancelled',
-        cancelledAt: new Date().toISOString(),
-        cancelledBy: req.user.uid,
-        updatedAt: new Date().toISOString(),
-      });
-
-      console.log(`✅ [quote-requests] Solicitud ${id} cancelada en quoteRequests`);
-
-      return res.json({
-        success: true,
-        message: 'Solicitud cancelada',
-      });
-    }
-
-    // Si no está ahí, buscar en suppliers/{supplierId}/requests
-    const suppliersSnapshot = await db.collection('suppliers').get();
-    let found = false;
-
-    for (const supplierDoc of suppliersSnapshot.docs) {
-      const requestDoc = await db
-        .collection('suppliers')
-        .doc(supplierDoc.id)
-        .collection('requests')
-        .doc(id)
-        .get();
-
-      if (requestDoc.exists) {
-        await db
-          .collection('suppliers')
-          .doc(supplierDoc.id)
-          .collection('requests')
-          .doc(id)
-          .update({
-            status: 'cancelled',
-            cancelledAt: new Date().toISOString(),
-            cancelledBy: req.user.uid,
-            updatedAt: new Date().toISOString(),
-          });
-
-        console.log(`✅ [quote-requests] Solicitud ${id} cancelada en suppliers/${supplierDoc.id}/requests`);
-        found = true;
-        break;
-      }
-    }
-
-    if (found) {
-      return res.json({
-        success: true,
-        message: 'Solicitud cancelada',
-      });
-    }
-
-    // Si no se encontró en ningún lado
+    // Si no se encontró
     console.warn(`⚠️ [quote-requests] Solicitud ${id} no encontrada`);
     return res.status(404).json({
       error: 'Solicitud no encontrada',

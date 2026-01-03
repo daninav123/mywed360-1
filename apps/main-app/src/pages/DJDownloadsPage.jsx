@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Download, Music, File, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { Button } from '../components/ui';
 import {
   getAllSpecialSongsWithAudio,
@@ -105,7 +104,7 @@ const DJDownloadsPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="mx-auto text-purple-600 animate-spin mb-4" size={48} />
-          <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando archivos...</p>
+          <p className="" className="text-secondary">Cargando archivos...</p>
         </div>
       </div>
     );
@@ -114,10 +113,10 @@ const DJDownloadsPage = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
-        <div className=" rounded-2xl shadow-xl p-8 max-w-md text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
-          <AlertCircle className="mx-auto  mb-4" style={{ color: 'var(--color-danger)' }} size={48} />
-          <h2 className="text-2xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>Error</h2>
-          <p className="" style={{ color: 'var(--color-text-secondary)' }}>{error}</p>
+        <div className=" rounded-2xl shadow-xl p-8 max-w-md text-center" className="bg-surface">
+          <AlertCircle className="mx-auto  mb-4" className="text-danger" size={48} />
+          <h2 className="text-2xl font-bold  mb-2" className="text-body">Error</h2>
+          <p className="" className="text-secondary">{error}</p>
         </div>
       </div>
     );
@@ -127,14 +126,14 @@ const DJDownloadsPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className=" rounded-2xl shadow-xl p-8 mb-6" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className=" rounded-2xl shadow-xl p-8 mb-6" className="bg-surface">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
               <Music className="text-white" size={32} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold " style={{ color: 'var(--color-text)' }}>Archivos de Audio - DJ</h1>
-              <p className="" style={{ color: 'var(--color-text-secondary)' }}>{weddingData?.weddingInfo?.coupleName || 'Boda'}</p>
+              <h1 className="text-3xl font-bold " className="text-body">Archivos de Audio - DJ</h1>
+              <p className="" className="text-secondary">{weddingData?.weddingInfo?.coupleName || 'Boda'}</p>
             </div>
           </div>
 
@@ -154,10 +153,10 @@ const DJDownloadsPage = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-purple-50 rounded-lg p-4 text-center">
               <div className="text-3xl font-bold text-purple-600">{songsWithAudio.length}</div>
-              <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>Canciones Especiales</div>
+              <div className="text-sm " className="text-secondary">Canciones Especiales</div>
             </div>
             <div className="bg-blue-50 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold " style={{ color: 'var(--color-primary)' }}>
+              <div className="text-3xl font-bold " className="text-primary">
                 {songsWithAudio.reduce((acc, s) => acc + (s.song.audioFile?.fileSize || 0), 0) > 0
                   ? Math.round(
                       songsWithAudio.reduce(
@@ -169,7 +168,7 @@ const DJDownloadsPage = () => {
                   : 0}{' '}
                 MB
               </div>
-              <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>Tamaño Total</div>
+              <div className="text-sm " className="text-secondary">Tamaño Total</div>
             </div>
           </div>
 
@@ -188,12 +187,12 @@ const DJDownloadsPage = () => {
 
         {/* Lista de Canciones */}
         {songsWithAudio.length === 0 ? (
-          <div className=" rounded-2xl shadow-xl p-8 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
-            <Music className="mx-auto  mb-4" style={{ color: 'var(--color-muted)' }} size={48} />
-            <h3 className="text-xl font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+          <div className=" rounded-2xl shadow-xl p-8 text-center" className="bg-surface">
+            <Music className="mx-auto  mb-4" className="text-muted" size={48} />
+            <h3 className="text-xl font-semibold  mb-2" className="text-body">
               No hay archivos disponibles
             </h3>
-            <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="" className="text-secondary">
               Los novios aún no han subido archivos de audio para las canciones especiales.
             </p>
           </div>
@@ -202,7 +201,7 @@ const DJDownloadsPage = () => {
             {songsWithAudio.map((item, index) => (
               <div
                 key={index}
-                className=" rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow" style={{ backgroundColor: 'var(--color-surface)' }}
+                className=" rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow" className="bg-surface"
               >
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
@@ -213,8 +212,8 @@ const DJDownloadsPage = () => {
 
                   <div className="flex-1 min-w-0">
                     {/* Título y artista */}
-                    <h3 className="text-lg font-bold " style={{ color: 'var(--color-text)' }}>{item.song.title}</h3>
-                    <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{item.song.artist}</p>
+                    <h3 className="text-lg font-bold " className="text-body">{item.song.title}</h3>
+                    <p className="text-sm " className="text-secondary">{item.song.artist}</p>
 
                     {/* Metadata */}
                     <div className="flex flex-wrap gap-2 mt-2">
@@ -233,7 +232,7 @@ const DJDownloadsPage = () => {
                                 : 'Especial'}
                       </span>
                       {item.momentTime && (
-                        <span className="px-2 py-1   text-xs rounded-full" style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+                        <span className="px-2 py-1   text-xs rounded-full" className="text-body" className="bg-page">
                           ⏰ {item.momentTime}
                         </span>
                       )}
@@ -249,8 +248,8 @@ const DJDownloadsPage = () => {
 
                     {/* Info del archivo */}
                     {item.song.audioFile && (
-                      <div className="mt-3 flex items-center gap-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
-                        <CheckCircle className="" style={{ color: 'var(--color-success)' }} size={16} />
+                      <div className="mt-3 flex items-center gap-2 text-sm " className="text-secondary">
+                        <CheckCircle className="" className="text-success" size={16} />
                         <span>
                           {item.song.audioFile.fileName} •{' '}
                           {Math.round(((item.song.audioFile.fileSize || 0) / (1024 * 1024)) * 100) /
@@ -285,7 +284,7 @@ const DJDownloadsPage = () => {
         )}
 
         {/* Footer */}
-        <div className="mt-8 text-center text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+        <div className="mt-8 text-center text-sm " className="text-secondary">
           <p>Powered by MaLoveApp 💕</p>
         </div>
       </div>

@@ -26,7 +26,7 @@ vi.mock('../../services/emailService', () => ({
 
 // Importar después de declarar los mocks
 import EmailComposer from '../../components/email/EmailComposer';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 
 describe('EmailComposer', () => {
   // Props por defecto

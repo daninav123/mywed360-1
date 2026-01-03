@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
 import EmailDetail from './EmailDetail';
 import EmailList from './EmailList';
-import { useAuth } from '../../../hooks/useAuth';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 import useTranslations from '../../../hooks/useTranslations';
 import { useEmailMonitoring } from '../../../hooks/useEmailMonitoring';
 import { get as apiGet, post as apiPost, del as apiDel } from '../../../services/apiClient';
@@ -55,6 +55,7 @@ const apiAuthOptions = (extra = {}) => ({
  */
 const InboxContainer = () => {
   const authContext = useAuth();
+  const { userProfile } = useAuth();
   const { t, tVars } = useTranslations();
   const tEmail = useCallback((key, options) => t(key, { ns: 'email', ...options }), [t]);
   const tEmailVars = useCallback(
@@ -574,6 +575,9 @@ const InboxContainer = () => {
     let cancelled = false;
     const initAndLoad = async () => {
       try {
+        console.log('[InboxContainer] userProfile completo:', userProfile);
+        console.log('[InboxContainer] userProfile.myWed360Email:', userProfile?.myWed360Email);
+        
         const localMockEmail = (() => {
           try {
             const raw = typeof window !== 'undefined' ? window.localStorage.getItem('lovenda_user') : '';
@@ -584,8 +588,11 @@ const InboxContainer = () => {
           } catch {}
           return '';
         })();
-        const emailToUse = (user && user.email) || localMockEmail || 'usuario.test@maloveapp.com';
-        await EmailService.initEmailService({ email: emailToUse, ...(user || {}) });
+        
+        // Usar myWed360Email del perfil de PostgreSQL en lugar de user.email
+        const emailToUse = userProfile?.myWed360Email || (user && user.email) || localMockEmail || 'usuario.test@maloveapp.com';
+        console.log('[InboxContainer] ✅ Usando email:', emailToUse);
+        await EmailService.initEmailService({ email: emailToUse, myWed360Email: userProfile?.myWed360Email, ...(user || {}) });
         if (!cancelled) {
           await Promise.all([refreshEmails(folder), refreshCounts()]);
         }
@@ -600,7 +607,7 @@ const InboxContainer = () => {
     return () => {
       cancelled = true;
     };
-  }, [user, folder, refreshEmails, refreshCounts]);
+  }, [user, folder, userProfile, refreshEmails, refreshCounts]);
 
   // Marcar email como leído
   const markAsRead = useCallback(async (emailId) => {

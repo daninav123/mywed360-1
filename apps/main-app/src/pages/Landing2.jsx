@@ -2,6 +2,9 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, Heart, CheckCircle, Sparkles, Gift } from 'lucide-react';
+import LanguageSelector from '../components/ui/LanguageSelector';
+import LocalServicesBanner from '../components/dashboard/LocalServicesBanner';
+
 export default function Landing2() {
   const navigate = useNavigate();
 
@@ -48,9 +51,14 @@ export default function Landing2() {
   ];
 
   return (
-    <div style={{ backgroundColor: '#FFFBF7', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#FFFBF7', minHeight: '100vh' }} className="relative">
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-50">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+      
       {/* Navegación Superior */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+      <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div style={{
             fontFamily: "'Playfair Display', serif",
@@ -208,7 +216,7 @@ export default function Landing2() {
                   style={{ boxShadow: '0 16px 40px rgba(0,0,0,0.12)' }}
                 >
                   <img 
-                    src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80"
+                    src="/assets/services/default.webp"
                     alt="Wedding celebration"
                     className="w-full h-auto"
                     onError={(e) => {
@@ -221,6 +229,11 @@ export default function Landing2() {
           </div>
         </div>
       </section>
+
+      {/* Banner de servicios locales geolocalizados */}
+      <div className="max-w-6xl mx-auto px-6 mb-12">
+        <LocalServicesBanner />
+      </div>
 
       {/* Features Section */}
       <section className="max-w-6xl mx-auto px-6 py-16">
@@ -339,7 +352,7 @@ export default function Landing2() {
             style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
           >
             <img 
-              src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&auto=format&fit=crop&q=80"
+              src="/assets/landing/couple-planning.webp"
               alt="Happy couple planning"
               className="w-full h-auto"
               onError={(e) => {

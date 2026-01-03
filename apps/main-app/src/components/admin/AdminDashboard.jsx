@@ -20,7 +20,7 @@ import { get as apiGet } from '../../services/apiClient';
 import { resolveAdminAlert } from '../../services/adminDataService';
 import { getAdminFetchOptions } from '../../services/adminSession';
 import { decodeMojibakeDeep } from '../../utils/mojibake';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import useTranslations from '../../hooks/useTranslations';
 
 const KPI_CONFIG = {

@@ -81,8 +81,8 @@ export default function TextPanel({ onAdd }) {
   return (
     <div className="p-4 space-y-4" data-testid="text-panel">
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Añadir Texto</h3>
-        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
+        <h3 className="text-sm font-semibold " className="text-body">Añadir Texto</h3>
+        <p className="text-xs " className="text-secondary">
           Haz clic en un estilo para añadirlo al canvas
         </p>
       </div>
@@ -96,22 +96,22 @@ export default function TextPanel({ onAdd }) {
           + Añadir Texto
         </button>
         
-        <div className="text-sm font-medium  mt-4 mb-2" style={{ color: 'var(--color-text)' }}>Estilos de boda:</div>
+        <div className="text-sm font-medium  mt-4 mb-2" className="text-body">Estilos de boda:</div>
         {textStyles.map((style) => {
           const Icon = style.icon;
           return (
             <button
               key={style.id}
               onClick={() => onAdd({ type: 'text', ...style.props })}
-              className="w-full flex items-center gap-3 p-3 text-left  rounded-lg hover: transition-colors group" style={{ backgroundColor: 'var(--color-bg)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+              className="w-full flex items-center gap-3 p-3 text-left  rounded-lg hover: transition-colors group" className="bg-page" className="bg-page"
               data-testid={`text-style-button-${style.id}`}
             >
-              <div className="flex-shrink-0 w-10 h-10  rounded-lg flex items-center justify-center group-hover:bg-blue-50 group-hover: transition-colors" style={{ color: 'var(--color-primary)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className="flex-shrink-0 w-10 h-10  rounded-lg flex items-center justify-center group-hover:bg-blue-50 group-hover: transition-colors" className="text-primary" className="bg-surface">
                 <Icon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>{style.label}</div>
-                <div className="text-xs  truncate" style={{ color: 'var(--color-muted)' }} style={{ fontFamily: style.props.fontFamily }}>
+                <div className="text-sm font-medium " className="text-body">{style.label}</div>
+                <div className="text-xs  truncate" className="text-muted" style={{ fontFamily: style.props.fontFamily }}>
                   {style.props.fontFamily}
                 </div>
               </div>
@@ -121,8 +121,8 @@ export default function TextPanel({ onAdd }) {
       </div>
 
       {/* Categorías de fuentes */}
-      <div className="pt-4 border-t " style={{ borderColor: 'var(--color-border)' }}>
-        <div className="text-xs font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>Todas las fuentes</div>
+      <div className="pt-4 border-t " className="border-default">
+        <div className="text-xs font-semibold  mb-3" className="text-body">Todas las fuentes</div>
         
         {/* Tabs de categorías */}
         <div className="flex gap-1 mb-3 overflow-x-auto pb-2">
@@ -147,13 +147,13 @@ export default function TextPanel({ onAdd }) {
             <button
               key={font}
               onClick={() => onAdd({ type: 'text', fontSize: 48, fontFamily: font, text: 'Aa' })}
-              className="p-3  rounded-lg hover: transition-colors text-center" style={{ backgroundColor: 'var(--color-bg)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+              className="p-3  rounded-lg hover: transition-colors text-center" className="bg-page" className="bg-page"
               title={font}
             >
               <div className="text-2xl mb-1" style={{ fontFamily: font }}>
                 Aa
               </div>
-              <div className="text-[10px]  truncate" style={{ color: 'var(--color-text-secondary)' }}>
+              <div className="text-[10px]  truncate" className="text-secondary">
                 {font}
               </div>
             </button>

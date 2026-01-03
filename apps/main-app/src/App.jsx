@@ -15,7 +15,7 @@ import Loader from './components/ui/Loader';
 import { WeddingProvider } from './context/WeddingContext';
 import { FavoritesProvider } from './contexts/FavoritesContext';
 import { UserPreferencesProvider } from './contexts/UserContext';
-import { useAuth, AuthProvider } from './hooks/useAuth';
+import { useAuth, AuthProvider } from './hooks/useAuth.jsx';
 import useSupplierSpecs from './hooks/useSupplierSpecs';
 import AcceptInvitation from './pages/AcceptInvitation';
 import Login from './pages/Login.jsx';
@@ -171,8 +171,6 @@ const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost.jsx'));
 const BlogAuthor = React.lazy(() => import('./pages/BlogAuthor.jsx'));
-const SEOBlogList = React.lazy(() => import('./pages/marketing/SEOBlogList'));
-const SEOBlogPost = React.lazy(() => import('./pages/marketing/SEOBlogPost'));
 const ProveedoresCompareTest = React.lazy(() => import('./pages/test/ProveedoresCompareTest.jsx'));
 const ProveedoresSmoke = React.lazy(() => import('./pages/test/ProveedoresSmoke.jsx'));
 const ProveedoresFlowHarness = React.lazy(() => import('./pages/test/ProveedoresFlowHarness.jsx'));
@@ -337,9 +335,10 @@ function App() {
                           <Route path="/seating-plan-boda" element={<SeatingPlanBoda />} />
                           <Route path="/:country" element={<CountryHub />} />
                           <Route path="/:country/:city/:service" element={<DynamicServicePage />} />
-                          <Route path="/blog" element={<SEOBlogList />} />
+                          {/* Blog real con IA - Público también */}
+                          <Route path="/blog" element={<Blog />} />
                           <Route path="/blog/autor/:slug" element={<BlogAuthor />} />
-                          <Route path="/blog/:slug" element={<SEOBlogPost />} />
+                          <Route path="/blog/:slug" element={<BlogPost />} />
                           <Route path="/payment/success" element={<PaymentSuccess />} />
                           <Route path="/payment/cancel" element={<PaymentCancel />} />
                           <Route path="/landing2" element={<Landing2 />} />
@@ -372,47 +371,6 @@ function App() {
                               <Route path="debug/payments" element={<AdminDebugPayments />} />
                               <Route path="finance/payouts" element={<AdminPayouts />} />
                               <Route path="finance/revolut" element={<AdminRevolut />} />
-                              <Route path="specs" element={<AdminSpecsManager />} />
-                            </Route>
-                          </Route>
-                          <Route path="/" element={<RootLandingRoute />} />
-                          <Route path="/app" element={<MarketingAppOverview />} />
-                          <Route path="/producto" element={<Navigate to="/app" replace />} />
-                          <Route path="/precios" element={<MarketingPricing />} />
-                          <Route path="/pricing" element={<Navigate to="/precios" replace />} />
-                          <Route path="/acceso" element={<MarketingAccess />} />
-                          <Route path="/payment/success" element={<PaymentSuccess />} />
-                          <Route path="/payment/cancel" element={<PaymentCancel />} />
-                          <Route path="/login" element={<Login />} />
-                          <Route path="/signup" element={<Signup />} />
-                          <Route path="/registro" element={<Navigate to="/signup" replace />} />
-                          <Route path="/verify-email" element={<VerifyEmail />} />
-                          <Route path="/reset-password" element={<ResetPassword />} />
-                          <Route path="/reset-password-confirm" element={<ResetPasswordConfirm />} />
-                          <Route path="/partner/:token" element={<PartnerStats />} />
-                          <Route path="/admin/login" element={<AdminLogin />} />
-                          <Route element={<RequireAdmin />}>
-                            <Route path="/admin" element={<AdminLayout />}>
-                              <Route index element={<Navigate to="dashboard" replace />} />
-                              <Route path="dashboard" element={<AdminDashboard />} />
-                              <Route path="metrics" element={<AdminMetrics />} />
-                              <Route path="portfolio" element={<AdminPortfolio />} />
-                              <Route path="users" element={<AdminUsers />} />
-                              <Route path="suppliers" element={<AdminSuppliers />} />
-                              <Route path="blog" element={<AdminBlog />} />
-                              <Route path="integrations" element={<AdminIntegrations />} />
-                              <Route path="settings" element={<AdminSettings />} />
-                              <Route path="alerts" element={<AdminAlerts />} />
-                              <Route path="broadcast" element={<AdminBroadcast />} />
-                              <Route path="automations" element={<AdminAutomations />} />
-                              <Route path="commerce" element={<AdminDiscounts />} />
-                              <Route path="reports" element={<AdminReports />} />
-                              <Route path="support" element={<AdminSupport />} />
-                              <Route path="task-templates" element={<AdminTaskTemplates />} />
-                              <Route path="debug/payments" element={<AdminDebugPayments />} />
-                              <Route path="finance/payouts" element={<AdminPayouts />} />
-                              <Route path="finance/revolut" element={<AdminRevolut />} />
-                              <Route path="specs" element={<AdminSpecsManager />} />
                               <Route path="specs" element={<AdminSpecsManager />} />
                             </Route>
                           </Route>

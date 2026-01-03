@@ -1,4 +1,43 @@
 {
+  "bodas": {
+    "name": "Organizar Bodas",
+    "slug": "bodas",
+    "icon": "Heart",
+    "heroImage": "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200",
+    "shortDesc": "Todo lo que necesitas para organizar tu boda perfecta en esta ciudad",
+    "longDesc": "Plataforma completa para organizar tu boda: gestión de invitados, presupuesto, proveedores verificados, checklist, seating plan, invitaciones digitales, web de boda y mucho más. Todo en un solo lugar.",
+    "benefits": [
+      "Gestión completa de invitados y RSVPs",
+      "Control total del presupuesto",
+      "Miles de proveedores verificados",
+      "Checklist inteligente personalizado",
+      "Seating plan visual drag & drop",
+      "Invitaciones digitales elegantes",
+      "Web de boda personalizada incluida",
+      "Colaboración en tiempo real con tu pareja"
+    ],
+    "features": [
+      {
+        "title": "Gestión de Invitados",
+        "description": "Control completo de tu lista de invitados con confirmaciones en tiempo real y seating plan.",
+        "icon": "Users"
+      },
+      {
+        "title": "Presupuesto Inteligente",
+        "description": "Controla todos tus gastos con alertas automáticas y distribución visual por categorías.",
+        "icon": "DollarSign"
+      },
+      {
+        "title": "Proveedores Verificados",
+        "description": "Encuentra y compara los mejores proveedores de tu ciudad. Solicita presupuestos gratis.",
+        "icon": "Search"
+      }
+    ],
+    "keywords": ["organizar bodas", "planificador de bodas", "software boda", "organizador boda online", "herramientas boda"],
+    "ctaText": "Organiza tu Boda Gratis",
+    "ctaUrl": "/signup",
+    "relatedServices": ["gestion-invitados-boda", "presupuesto-boda-online", "buscar-proveedores-boda"]
+  },
   "gestion-invitados-boda": {
     "name": "Gestión de Invitados",
     "slug": "gestion-invitados-boda",

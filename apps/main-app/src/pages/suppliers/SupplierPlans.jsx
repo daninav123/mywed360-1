@@ -154,8 +154,8 @@ export default function SupplierPlans() {
       return (
         <>
           <span className="text-4xl font-bold">{monthlyEquivalent}€</span>
-          <span className="text-lg " style={{ color: 'var(--color-text-secondary)' }}>{t('suppliers:plans.monthly')}</span>
-          <div className="text-sm  mt-1" style={{ color: 'var(--color-success)' }}>
+          <span className="text-lg " className="text-secondary">{t('suppliers:plans.monthly')}</span>
+          <div className="text-sm  mt-1" className="text-success">
             {t('suppliers:plans.billedAnnually', { price: yearlyPrice })}
           </div>
         </>
@@ -165,7 +165,7 @@ export default function SupplierPlans() {
     return (
       <>
         <span className="text-4xl font-bold">{plan.price}€</span>
-        <span className="text-lg " style={{ color: 'var(--color-text-secondary)' }}>{plan.period}</span>
+        <span className="text-lg " className="text-secondary">{plan.period}</span>
       </>
     );
   };
@@ -206,8 +206,8 @@ export default function SupplierPlans() {
           >
             <Icon size={32} className={`text-${plan.color}-600`} />
           </div>
-          <h3 className="text-2xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>{plan.name}</h3>
-          <p className="text-sm  mb-4" style={{ color: 'var(--color-text-secondary)' }}>{plan.description}</p>
+          <h3 className="text-2xl font-bold  mb-2" className="text-body">{plan.name}</h3>
+          <p className="text-sm  mb-4" className="text-secondary">{plan.description}</p>
           <div className="mb-4">{getPlanPrice(plan)}</div>
         </div>
 
@@ -250,21 +250,21 @@ export default function SupplierPlans() {
   }
 
   return (
-    <div className="min-h-screen  py-12 px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-screen  py-12 px-4" className="bg-page">
       <div className="max-w-7xl mx-auto">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2  hover: mb-6" style={{ color: 'var(--color-text-secondary)' }} style={{ color: 'var(--color-text)' }}
+          className="flex items-center gap-2  hover: mb-6" className="text-secondary" className="text-body"
         >
           <ArrowLeft size={20} />
           {t('suppliers:plans.back')}
         </button>
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold  mb-4" style={{ color: 'var(--color-text)' }}>
+          <h1 className="text-4xl font-bold  mb-4" className="text-body">
             {t('suppliers:plans.pageTitle')}
           </h1>
-          <p className=" text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className=" text-lg" className="text-secondary">
             {t('suppliers:plans.pageSubtitle')}
           </p>
         </div>

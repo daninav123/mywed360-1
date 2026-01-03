@@ -795,7 +795,7 @@ const FabricCanvas = forwardRef(({ onElementSelect, initialState, initialWidth =
 
         {/* Canvas con borde, sombra - zoom con CSS transform */}
         <div 
-          className=" shadow-2xl relative origin-top-left" style={{ backgroundColor: 'var(--color-surface)' }}
+          className=" shadow-2xl relative origin-top-left" className="bg-surface"
           style={{
             border: '3px solid #3b82f6',
             boxShadow: '0 20px 25px -5px rgba(59, 130, 246, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',

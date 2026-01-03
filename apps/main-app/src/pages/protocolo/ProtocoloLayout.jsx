@@ -6,7 +6,7 @@ import LanguageSelector from '../../components/ui/LanguageSelector';
 import NotificationCenter from '../../components/NotificationCenter';
 import DarkModeToggle from '../../components/DarkModeToggle';
 import Nav from '../../components/Nav';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 
 const SECTION_TITLES = {
   'momentos-especiales': 'Momentos Especiales',
@@ -85,7 +85,7 @@ const ProtocoloLayout = React.memo(() => {
                   to="/perfil"
                   onClick={() => setOpenMenu(false)}
                   className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
-                  style={{ color: 'var(--color-text)' }}
+                  className="text-body"
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
@@ -99,7 +99,7 @@ const ProtocoloLayout = React.memo(() => {
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
-                  style={{ color: 'var(--color-text)' }}
+                  className="text-body"
                 >
                   <Mail className="w-4 h-4 mr-3" />
                   Buzón de Emails
@@ -111,7 +111,7 @@ const ProtocoloLayout = React.memo(() => {
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm flex items-center" style={{ color: 'var(--color-text)' }}>
+                    <span className="text-sm flex items-center" className="text-body">
                       <Moon className="w-4 h-4 mr-3" />
                       Modo oscuro
                     </span>
@@ -127,7 +127,7 @@ const ProtocoloLayout = React.memo(() => {
                     setOpenMenu(false);
                   }}
                   className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center"
-                  style={{ color: 'var(--color-danger)' }}
+                  className="text-danger"
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >

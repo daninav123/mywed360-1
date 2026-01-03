@@ -17,458 +17,522 @@
     "contactLabel": "Contact Planivia"
   },
   "landing": {
-      "hero": {
-        "title": "Plan Your Perfect Wedding",
-        "subtitle": "From 'Yes!' to 'I Do' - organize every magical moment with the platform loved by thousands of couples worldwide",
-        "cta": {
-          "primary": "Start Planning Free",
-          "secondary": "See How It Works"
-        },
-        "brandLabel": "Planivia",
-        "logoAlt": "Planivia logo",
-        "badge": "All-in-one wedding planning platform",
-        "description": [
-          "Planivia unifies planning, finances, communication, and design in one workspace.",
-          "Streamline daily tasks, engage vendors, and deliver a memorable experience for every guest."
-        ],
-        "actions": {
-          "primary": "Start for free",
-          "secondary": "See everything the app includes"
-        },
-        "highlights": [
-          {
-            "value": "360°",
-            "label": "Full event visibility"
-          },
-          {
-            "value": "+50",
-            "label": "Active integrations"
-          },
-          {
-            "value": "24/7",
-            "label": "Access from any device"
-          }
-        ],
-        "widget": {
-          "summaryLabel": "Overview",
-          "eventName": "Valeria & Tomás Wedding",
-          "growth": "+18% this week",
-          "confirmedGuests": {
-            "label": "Confirmed guests",
-            "value": "132"
-          },
-          "budget": {
-            "label": "Budget executed",
-            "value": "$18.4k",
-            "pendingInvoices": "4 invoices pending"
-          },
-          "tasks": {
-            "label": "Critical tasks this week",
-            "items": [
-              {
-                "day": "21",
-                "text": "Confirm menu tasting and send feedback to catering."
-              },
-              {
-                "day": "22",
-                "text": "Draft VIP seating plan and share it with protocol."
-              }
-            ]
-          },
-          "assistant": {
-            "label": "Planivia assistant",
-            "message": "\"Your timeline is 82% complete. Send the lodging reminder before Monday and confirm the remaining vendors.\""
-          }
-        }
-      },
-      "features": {
-        "title": "Everything You Need, Beautifully Organized",
-        "subtitle": "Powerful tools designed for modern couples",
-        "planning": {
-          "title": "Smart Planning",
-          "description": "Organize every detail with intelligent timelines and automated reminders"
-        },
-        "guests": {
-          "title": "Guest Management",
-          "description": "Track RSVPs, dietary preferences, and seating arrangements effortlessly"
-        },
-        "vendors": {
-          "title": "Vendor Network",
-          "description": "Connect with trusted wedding professionals and manage all communications"
-        }
-      },
-      "benefits": {
-        "title": "Designed for Your Journey",
-        "subtitle": "From engagement to honeymoon, we've got you covered",
-        "collaboration": "Real-time collaboration with your partner",
-        "time": "Save hours with automated workflows",
-        "security": "Secure document storage and contracts",
-        "design": "Beautiful customizable designs",
-        "registry": "Integrated gift registry management",
-        "ai": "AI-powered planning assistant"
-      },
-      "blog": {
-        "title": "Inspiration & Advice",
-        "description": "Discover articles, guides and trends to plan your perfect wedding. From decoration to protocol, everything you need to know.",
-        "cta": {
-          "primary": "Visit Blog",
-          "secondary": "See Articles"
-        }
-      },
-      "social": {
-        "title": "Join 50,000+ Couples Planning Their Dream Wedding",
-        "quote": "This platform transformed our wedding planning from overwhelming to enjoyable. Every detail organized beautifully in one place.",
-        "author": "— Sarah & Michael, married June 2024"
-      },
-      "stats": {
-        "couples": "Happy Couples",
-        "vendors": "Trusted Vendors",
-        "tasks": "Tasks Completed",
-        "rating": "Average Rating"
-      },
-      "explore": {
-        "title": "Explore Our Platform",
-        "subtitle": "Discover all the features and services we offer",
-        "app": {
-          "title": "Wedding Planning App",
-          "description": "Complete suite of tools to organize your perfect day"
-        },
-        "suppliers": {
-          "title": "For Suppliers",
-          "description": "Grow your wedding business with our vendor network"
-        },
-        "planners": {
-          "title": "For Planners",
-          "description": "Professional tools for wedding planning businesses"
-        },
-        "learnMore": "Learn More"
-      },
-      "modules": {
-        "title": "Everything you need in one place",
-        "description": "Planivia streamlines logistics with collaborative modules for planners, vendors, and guests.",
-        "items": [
-          {
-            "title": "Guest management",
-            "description": "Centralize RSVPs, seating, and preferences in one place with always-synced information."
-          },
-          {
-            "title": "Finance control",
-            "description": "Track budgets, payments, and contracts with smart reminders and clear reports for your team."
-          },
-          {
-            "title": "Design and communication",
-            "description": "Wedding website, invitations, and email campaigns ready to send from a single workflow."
-          }
-        ]
-      },
-      "planner": {
-        "badge": "Built for planners",
-        "title": "Total control of your event portfolio without spreadsheets.",
-        "description": "Planivia makes it easy to run multiple weddings with dashboards, reusable templates, and exportable reports. Coordinate your team and stay ahead with a single platform.",
-        "highlights": [
-          {
-            "key": "portfolio",
-            "title": "Multi-wedding portfolio",
-            "description": "Manage simultaneous events with independent boards. Switch weddings in one click without losing context."
-          },
-          {
-            "key": "kits",
-            "title": "Repeatable kits",
-            "description": "Duplicate checklists, budgets, and communication templates to reuse your best workflows in seconds."
-          },
-          {
-            "key": "alerts",
-            "title": "Proactive alerts",
-            "description": "Get notified about critical tasks, expiring contracts, and pending payments for every client."
-          }
-        ],
-        "dashboard": {
-          "title": "Planner view",
-          "portfolioLabel": "Current portfolio",
-          "portfolioValue": "8 active weddings",
-          "portfolioBadge": "2 new this month",
-          "statusLabel": "Client status",
-          "statusItems": [
-            "⬢ Ana & Diego – timeline: 92%",
-            "⬢ Laura & Marco – payments: 3 invoices pending",
-            "⬢ Carolina & Javier – guests: 156 confirmed"
-          ],
-          "performanceLabel": "Monthly performance",
-          "performanceNote": "Average time per wedding: 38% less than last year."
-        }
-      },
-      "stories": {
-        "badge": "Real stories",
-        "title": "Planivia empowers planners and couples worldwide",
-        "description": "More than 12k weddings are managed in Planivia. Every team leverages automations, insights, and templates to spend more time on creativity.",
-        "testimonials": [
-          {
-            "quote": "We integrated Planivia into our process and now share dashboards with key vendors. The team arrives prepared to every meeting.",
-            "name": "Martina R.",
-            "role": "Boutique planner in Madrid"
-          },
-          {
-            "quote": "As a couple we needed clarity. The reminders and guest portal let us respond fast without duplicate emails.",
-            "name": "David & Sofía",
-            "role": "250-guest celebration, Bogotá"
-          }
-        ],
-        "trust": {
-          "title": "Trusted by Planivia",
-          "brands": ["Lumiere Events", "Novia Atelier", "Festiva Group", "Urban Weddings"],
-          "note": "200+ active planners across Europe and LATAM rely on Planivia to standardize processes and deliver memorable experiences."
-        }
-      },
-      "faq": {
-        "badge": "Frequently asked questions",
-        "title": "Everything you need to know before getting started",
-        "items": [
-          {
-            "question": "Can I try Planivia for free?",
-            "answer": "Yes. The Essentials plan is free forever and unlocks core features (guests, tasks, website). The Professional plan offers a 14-day trial with advanced integrations."
-          },
-          {
-            "question": "Does Planivia work for planners running multiple events?",
-            "answer": "Absolutely. The multi-event dashboard lets you switch weddings, share permissions with collaborators, and automate updates with vendors for each event."
-          },
-          {
-            "question": "What onboarding support will I receive?",
-            "answer": "We provide guided onboarding, a template library, and optional consulting. The Enterprise plan includes a dedicated manager and training sessions for your team."
-          }
-        ],
-        "form": {
-          "title": "Request a personalized demo",
-          "description": "Tell us about your operation and schedule a video call with our team. You will receive recommendations tailored to your current workflow and a quick-start guide.",
-          "fields": {
-            "name": {
-              "label": "Full name",
-              "placeholder": "Your name"
-            },
-            "email": {
-              "label": "Contact email",
-              "placeholder": "you@youragency.com"
-            }
-          },
-          "messages": {
-            "submit": "Schedule demo",
-            "submitting": "Sending request...",
-            "success": "Thank you! Our team will reach out in less than 24 hours.",
-            "error": "Please fill in your name and email to request a demo."
-          },
-          "consent": "By submitting you agree to receive Planivia related communications. You can unsubscribe at any time."
-        }
-      },
+    "hero": {
+      "title": "Plan Your Perfect Wedding",
+      "subtitle": "From 'Yes!' to 'I Do' - organize every magical moment with the platform loved by thousands of couples worldwide",
       "cta": {
-        "title": "Ready to use in minutes.",
-        "description": "Create your account, import your guest list, and enable automations that support you from day one.",
-        "primary": "Create free account",
-        "secondary": "Compare plans"
-      }
-    },
-    "appOverview": {
-      "hero": {
-        "title": "All-in-One Wedding Planning Platform",
-        "subtitle": "Everything you need to plan, organize, and celebrate your perfect wedding day - all in one beautiful platform",
-        "cta": {
-          "primary": "Start Free Trial",
-          "secondary": "See Pricing"
+        "primary": "Start Planning Free",
+        "secondary": "See How It Works"
+      },
+      "brandLabel": "Planivia",
+      "logoAlt": "Planivia logo",
+      "badge": "All-in-one wedding planning platform",
+      "description": [
+        "Planivia unifies planning, finances, communication, and design in one workspace.",
+        "Streamline daily tasks, engage vendors, and deliver a memorable experience for every guest."
+      ],
+      "actions": {
+        "primary": "Start for free",
+        "secondary": "See everything the app includes"
+      },
+      "highlights": [
+        {
+          "value": "360°",
+          "label": "Full event visibility"
         },
-        "description": "From the first checklist to the final report, Planivia supports professional teams and couples who want complete control of their event.",
-        "stats": [
-          {
-            "value": "12k+",
-            "label": "weddings planned with Planivia"
-          },
-          {
-            "value": "4.8/5",
-            "label": "average planner satisfaction"
-          },
-          {
-            "value": "30%",
-            "label": "time saved in logistics coordination"
-          }
-        ],
-        "workspace": {
-          "badge": "Planivia Workspace",
-          "title": "A connected ecosystem",
-          "description": "Synced modules, personalised roles, and granular permissions so you can collaborate without losing context.",
-          "tags": ["Dashboard", "Guests", "Finance", "Communication", "Design", "Automations"]
+        {
+          "value": "+50",
+          "label": "Active integrations"
+        },
+        {
+          "value": "24/7",
+          "label": "Access from any device"
+        }
+      ],
+      "widget": {
+        "summaryLabel": "Overview",
+        "eventName": "Valeria & Tomás Wedding",
+        "growth": "+18% this week",
+        "confirmedGuests": {
+          "label": "Confirmed guests",
+          "value": "132"
+        },
+        "budget": {
+          "label": "Budget executed",
+          "value": "$18.4k",
+          "pendingInvoices": "4 invoices pending"
         },
         "tasks": {
-          "title": "Task Management",
-          "description": "Organize every detail with intelligent task management and automated reminders"
+          "label": "Critical tasks this week",
+          "items": [
+            {
+              "day": "21",
+              "text": "Confirm menu tasting and send feedback to catering."
+            },
+            {
+              "day": "22",
+              "text": "Draft VIP seating plan and share it with protocol."
+            }
+          ]
         },
-        "guests": {
-          "title": "Guest Management",
-          "description": "Complete RSVP system with seating charts and dietary tracking"
-        },
-        "finance": {
-          "title": "Budget & Finance",
-          "description": "Track expenses, payments and vendor contracts in real-time"
-        },
-        "design": {
-          "title": "Design Tools",
-          "description": "Create beautiful invitations and wedding websites"
-        },
-        "analytics": {
-          "title": "Analytics Dashboard",
-          "description": "Real-time insights and progress tracking for your wedding"
-        },
-        "items": [
-          {
-            "title": "Collaborative dashboard",
-            "description": "Tasks, milestones, and reminders in a central board that updates in real time."
-          },
-          {
-            "title": "Provider CRM",
-            "description": "Compare proposals, manage contracts, and track payments and deliverables."
-          },
-          {
-            "title": "Financial management",
-            "description": "Smart budgets, spending control, and detailed reports by category."
-          },
-          {
-            "title": "Guest experience",
-            "description": "Website, automatic RSVP, interactive seating, and personalised messages in a single flow."
-          },
-          {
-            "title": "Email automation",
-            "description": "Prebuilt flows, dynamic segments, and metrics to measure engagement."
-          },
-          {
-            "title": "Intelligent assistant",
-            "description": "AI-powered recommendations to build agendas, checklists, and answer contextual questions."
-          }
-        ]
-      },
-      "features": {
-        "vendors": "Vendor management & contracts",
-        "notifications": "Smart notifications & reminders",
-        "storage": "Secure document storage",
-        "mobile": "Mobile app for iOS & Android",
-        "collaboration": "Collaborative planning tools",
-        "export": "Export & reporting tools"
-      },
-      "integration": {
-        "title": "Everything Works Together Seamlessly",
-        "subtitle": "All modules are deeply integrated to provide a unified experience. Changes sync automatically across every feature."
-      },
-      "collaboration": {
-        "title": "Built for Collaboration",
-        "description": "Invite your partner, family, and wedding planner to collaborate in real-time. Everyone stays updated with automatic notifications and shared access to plans, budgets, and guest lists.",
-        "sync": "Real-time sync across all devices",
-        "permissions": "Role-based permissions for team members",
-        "activity": "Activity feed with full history",
-        "comments": "Comments and notes on every item"
-      },
-      "cta": {
-        "title": "Ready to Get Started?",
-        "subtitle": "Join thousands of couples planning their dream wedding",
-        "primary": "Start Planning Free",
-        "secondary": "View Pricing Plans"
-      },
-      "integrations": {
-        "title": "Integrations and automations that work for you.",
-        "description": "Connect Planivia with payment services, calendars, and communication tools. Configure automatic triggers for RSVP, provider confirmations, or task follow-ups.",
-        "items": [
-          "Integrations with Google Calendar, Gmail, and productivity suites.",
-          "Visual automations with conditions and reusable templates.",
-          "API for internal developments and connections to external systems."
-        ],
-        "cta": {
-          "title": "Immediate access",
-          "description": "Every account includes a free trial and a guided demo with our onboarding team.",
-          "button": "Request demo"
+        "assistant": {
+          "label": "Planivia assistant",
+          "message": "\"Your timeline is 82% complete. Send the lodging reminder before Monday and confirm the remaining vendors.\""
         }
       }
     },
-    "pricing": {
-      "title": "Simple, transparent pricing",
-      "subtitle": "Choose the perfect plan for your wedding journey. All plans include a 14-day free trial.",
-      "billingCycle": {
-        "monthly": "Monthly",
-        "annual": "Annual",
-        "savePercent": "Save 17%"
+    "features": {
+      "title": "Everything You Need, Beautifully Organized",
+      "subtitle": "Powerful tools designed for modern couples",
+      "planning": {
+        "title": "Smart Planning",
+        "description": "Organize every detail with intelligent timelines and automated reminders"
       },
-      "plans": {
-        "starter": {
-          "name": "Starter",
-          "description": "Perfect for small, intimate weddings",
-          "features": {
-            "guests": "Up to 50 guests",
-            "budgetTracking": "Basic budget tracking",
-            "taskChecklist": "Task checklist",
-            "emailSupport": "Email support",
-            "mobileApp": "Mobile app access",
-            "weddingEvents": "1 wedding event"
-          }
-        },
-        "professional": {
-          "name": "Professional",
-          "description": "Most popular for full-scale weddings",
-          "badge": "Most Popular",
-          "features": {
-            "guests": "Up to 250 guests",
-            "budgetTools": "Advanced budget & finance tools",
-            "seatingChart": "Seating chart designer",
-            "website": "Custom wedding website",
-            "prioritySupport": "Priority support",
-            "unlimitedVendors": "Unlimited vendors",
-            "rsvpManagement": "RSVP management",
-            "giftRegistry": "Gift registry integration"
-          }
-        },
-        "premium": {
-          "name": "Premium",
-          "description": "For wedding planners & luxury events",
-          "features": {
-            "unlimitedGuests": "Unlimited guests",
-            "multiWedding": "Multi-wedding management",
-            "whiteLabel": "White-label options",
-            "accountManager": "Dedicated account manager",
-            "customIntegrations": "Custom integrations",
-            "teamTools": "Team collaboration tools",
-            "analytics": "Advanced analytics",
-            "apiAccess": "API access"
-          }
-        }
+      "guests": {
+        "title": "Guest Management",
+        "description": "Track RSVPs, dietary preferences, and seating arrangements effortlessly"
       },
-      "perMonth": "month",
-      "perYear": "year",
-      "startFreeTrial": "Start Free Trial",
-      "faq": {
-        "title": "Frequently Asked Questions",
-        "subtitle": "Everything you need to know about our pricing",
-        "questions": {
-          "changePlans": {
-            "q": "Can I change plans later?",
-            "a": "Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately."
-          },
-          "afterTrial": {
-            "q": "What happens after the free trial?",
-            "a": "After your 14-day trial, you'll be charged based on your selected plan. Cancel anytime during the trial with no charges."
-          },
-          "refunds": {
-            "q": "Do you offer refunds?",
-            "a": "Yes, we offer a 30-day money-back guarantee on all annual plans."
-          },
-          "multipleWeddings": {
-            "q": "Can I use it for multiple weddings?",
-            "a": "The Premium plan supports unlimited weddings. Other plans are for single wedding events."
-          }
-        }
-      },
-      "finalCta": {
-        "title": "Still Have Questions?",
-        "subtitle": "Our team is here to help you find the perfect plan",
-        "button": "Contact Sales"
-      },
-      "footer": "© 2025 Wedding Planner. Making dream weddings come true.",
-      "free": "Free",
-      "pro": "Professional",
-      "enterprise": "Enterprise",
-      "cta": "Get started"
+      "vendors": {
+        "title": "Vendor Network",
+        "description": "Connect with trusted wedding professionals and manage all communications"
+      }
     },
+    "benefits": {
+      "title": "Designed for Your Journey",
+      "subtitle": "From engagement to honeymoon, we've got you covered",
+      "collaboration": "Real-time collaboration with your partner",
+      "time": "Save hours with automated workflows",
+      "security": "Secure document storage and contracts",
+      "design": "Beautiful customizable designs",
+      "registry": "Integrated gift registry management",
+      "ai": "AI-powered planning assistant"
+    },
+    "blog": {
+      "title": "Inspiration & Advice",
+      "description": "Discover articles, guides and trends to plan your perfect wedding. From decoration to protocol, everything you need to know.",
+      "cta": {
+        "primary": "Visit Blog",
+        "secondary": "See Articles"
+      }
+    },
+    "social": {
+      "title": "Join 50,000+ Couples Planning Their Dream Wedding",
+      "quote": "This platform transformed our wedding planning from overwhelming to enjoyable. Every detail organized beautifully in one place.",
+      "author": "— Sarah & Michael, married June 2024"
+    },
+    "stats": {
+      "couples": "Happy Couples",
+      "vendors": "Trusted Vendors",
+      "tasks": "Tasks Completed",
+      "rating": "Average Rating"
+    },
+    "explore": {
+      "title": "Explore Our Platform",
+      "subtitle": "Discover all the features and services we offer",
+      "app": {
+        "title": "Wedding Planning App",
+        "description": "Complete suite of tools to organize your perfect day"
+      },
+      "suppliers": {
+        "title": "For Suppliers",
+        "description": "Grow your wedding business with our vendor network"
+      },
+      "planners": {
+        "title": "For Planners",
+        "description": "Professional tools for wedding planning businesses"
+      },
+      "learnMore": "Learn More"
+    },
+    "modules": {
+      "title": "Everything you need in one place",
+      "description": "Planivia streamlines logistics with collaborative modules for planners, vendors, and guests.",
+      "timeline": {
+        "title": "Smart Timeline",
+        "description": "Organize every detail with intelligent task management and automated reminders"
+      },
+      "guests": {
+        "title": "Guest Management",
+        "description": "Complete RSVP system with seating charts and dietary tracking"
+      },
+      "budget": {
+        "title": "Budget & Finance",
+        "description": "Track expenses, payments and vendor contracts in real-time"
+      },
+      "communication": {
+        "title": "Communication Center",
+        "description": "Send invitations, updates and reminders to all guests"
+      },
+      "design": {
+        "title": "Design Tools",
+        "description": "Create beautiful invitations and wedding websites"
+      },
+      "analytics": {
+        "title": "Analytics Dashboard",
+        "description": "Real-time insights and progress tracking for your team"
+      },
+      "items": [
+        {
+          "title": "Guest management",
+          "description": "Centralize RSVPs, seating, and preferences in one place with always-synced information."
+        },
+        {
+          "title": "Finance control",
+          "description": "Track budgets, payments, and contracts with smart reminders and clear reports for your team."
+        },
+        {
+          "title": "Design and communication",
+          "description": "Wedding website, invitations, and email campaigns ready to send from a single workflow."
+        }
+      ]
+    },
+    "planner": {
+      "badge": "Built for planners",
+      "title": "Total control of your event portfolio without spreadsheets.",
+      "description": "Planivia makes it easy to run multiple weddings with dashboards, reusable templates, and exportable reports. Coordinate your team and stay ahead with a single platform.",
+      "highlights": [
+        {
+          "key": "portfolio",
+          "title": "Multi-wedding portfolio",
+          "description": "Manage simultaneous events with independent boards. Switch weddings in one click without losing context."
+        },
+        {
+          "key": "kits",
+          "title": "Repeatable kits",
+          "description": "Duplicate checklists, budgets, and communication templates to reuse your best workflows in seconds."
+        },
+        {
+          "key": "alerts",
+          "title": "Proactive alerts",
+          "description": "Get notified about critical tasks, expiring contracts, and pending payments for every client."
+        }
+      ],
+      "dashboard": {
+        "title": "Planner view",
+        "portfolioLabel": "Current portfolio",
+        "portfolioValue": "8 active weddings",
+        "portfolioBadge": "2 new this month",
+        "statusLabel": "Client status",
+        "statusItems": [
+          "⬢ Ana & Diego – timeline: 92%",
+          "⬢ Laura & Marco – payments: 3 invoices pending",
+          "⬢ Carolina & Javier – guests: 156 confirmed"
+        ],
+        "performanceLabel": "Monthly performance",
+        "performanceNote": "Average time per wedding: 38% less than last year."
+      }
+    },
+    "stories": {
+      "badge": "Real stories",
+      "title": "Planivia empowers planners and couples worldwide",
+      "description": "More than 12k weddings are managed in Planivia. Every team leverages automations, insights, and templates to spend more time on creativity.",
+      "testimonials": [
+        {
+          "quote": "We integrated Planivia into our process and now share dashboards with key vendors. The team arrives prepared to every meeting.",
+          "name": "Martina R.",
+          "role": "Boutique planner in Madrid"
+        },
+        {
+          "quote": "As a couple we needed clarity. The reminders and guest portal let us respond fast without duplicate emails.",
+          "name": "David & Sofía",
+          "role": "250-guest celebration, Bogotá"
+        }
+      ],
+      "trust": {
+        "title": "Trusted by Planivia",
+        "brands": [
+          "Lumiere Events",
+          "Novia Atelier",
+          "Festiva Group",
+          "Urban Weddings"
+        ],
+        "note": "200+ active planners across Europe and LATAM rely on Planivia to standardize processes and deliver memorable experiences."
+      }
+    },
+    "faq": {
+      "badge": "Frequently asked questions",
+      "title": "Everything you need to know before getting started",
+      "items": [
+        {
+          "question": "Can I try Planivia for free?",
+          "answer": "Yes. The Essentials plan is free forever and unlocks core features (guests, tasks, website). The Professional plan offers a 14-day trial with advanced integrations."
+        },
+        {
+          "question": "Does Planivia work for planners running multiple events?",
+          "answer": "Absolutely. The multi-event dashboard lets you switch weddings, share permissions with collaborators, and automate updates with vendors for each event."
+        },
+        {
+          "question": "What onboarding support will I receive?",
+          "answer": "We provide guided onboarding, a template library, and optional consulting. The Enterprise plan includes a dedicated manager and training sessions for your team."
+        }
+      ],
+      "form": {
+        "title": "Request a personalized demo",
+        "description": "Tell us about your operation and schedule a video call with our team. You will receive recommendations tailored to your current workflow and a quick-start guide.",
+        "fields": {
+          "name": {
+            "label": "Full name",
+            "placeholder": "Your name"
+          },
+          "email": {
+            "label": "Contact email",
+            "placeholder": "you@youragency.com"
+          }
+        },
+        "messages": {
+          "submit": "Schedule demo",
+          "submitting": "Sending request...",
+          "success": "Thank you! Our team will reach out in less than 24 hours.",
+          "error": "Please fill in your name and email to request a demo."
+        },
+        "consent": "By submitting you agree to receive Planivia related communications. You can unsubscribe at any time."
+      }
+    },
+    "cta": {
+      "title": "Ready to use in minutes.",
+      "description": "Create your account, import your guest list, and enable automations that support you from day one.",
+      "primary": "Create free account",
+      "secondary": "Compare plans"
+    }
+  },
+  "appOverview": {
+    "hero": {
+      "title": "All-in-One Wedding Planning Platform",
+      "subtitle": "Everything you need to plan, organize, and celebrate your perfect wedding day - all in one beautiful platform",
+      "cta": {
+        "primary": "Start Free Trial",
+        "secondary": "See Pricing"
+      },
+      "description": "From the first checklist to the final report, Planivia supports professional teams and couples who want complete control of their event.",
+      "stats": [
+        {
+          "value": "12k+",
+          "label": "weddings planned with Planivia"
+        },
+        {
+          "value": "4.8/5",
+          "label": "average planner satisfaction"
+        },
+        {
+          "value": "30%",
+          "label": "time saved in logistics coordination"
+        }
+      ],
+      "workspace": {
+        "badge": "Planivia Workspace",
+        "title": "A connected ecosystem",
+        "description": "Synced modules, personalised roles, and granular permissions so you can collaborate without losing context.",
+        "tags": [
+          "Dashboard",
+          "Guests",
+          "Finance",
+          "Communication",
+          "Design",
+          "Automations"
+        ]
+      },
+      "tasks": {
+        "title": "Task Management",
+        "description": "Organize every detail with intelligent task management and automated reminders"
+      },
+      "guests": {
+        "title": "Guest Management",
+        "description": "Complete RSVP system with seating charts and dietary tracking"
+      },
+      "finance": {
+        "title": "Budget & Finance",
+        "description": "Track expenses, payments and vendor contracts in real-time"
+      },
+      "design": {
+        "title": "Design Tools",
+        "description": "Create beautiful invitations and wedding websites"
+      },
+      "analytics": {
+        "title": "Analytics Dashboard",
+        "description": "Real-time insights and progress tracking for your wedding"
+      },
+      "items": [
+        {
+          "title": "Collaborative dashboard",
+          "description": "Tasks, milestones, and reminders in a central board that updates in real time."
+        },
+        {
+          "title": "Provider CRM",
+          "description": "Compare proposals, manage contracts, and track payments and deliverables."
+        },
+        {
+          "title": "Financial management",
+          "description": "Smart budgets, spending control, and detailed reports by category."
+        },
+        {
+          "title": "Guest experience",
+          "description": "Website, automatic RSVP, interactive seating, and personalised messages in a single flow."
+        },
+        {
+          "title": "Email automation",
+          "description": "Prebuilt flows, dynamic segments, and metrics to measure engagement."
+        },
+        {
+          "title": "Intelligent assistant",
+          "description": "AI-powered recommendations to build agendas, checklists, and answer contextual questions."
+        }
+      ]
+    },
+    "modulesTitle": "Core Modules",
+    "modulesSubtitle": "Powerful tools designed to simplify every aspect of wedding planning",
+    "modules": {
+      "timeline": {
+        "title": "Smart Timeline",
+        "description": "Organize every detail with intelligent task management and automated reminders"
+      },
+      "guests": {
+        "title": "Guest Management",
+        "description": "Complete RSVP system with seating charts and dietary tracking"
+      },
+      "budget": {
+        "title": "Budget & Finance",
+        "description": "Track expenses, payments and vendor contracts in real-time"
+      },
+      "communication": {
+        "title": "Communication Center",
+        "description": "Send invitations, updates and reminders to all guests"
+      },
+      "design": {
+        "title": "Design Tools",
+        "description": "Create beautiful invitations and wedding websites"
+      },
+      "analytics": {
+        "title": "Analytics Dashboard",
+        "description": "Real-time insights and progress tracking for your team"
+      }
+    },
+    "features": {
+      "vendors": "Vendor management & contracts",
+      "notifications": "Smart notifications & reminders",
+      "storage": "Secure document storage",
+      "mobile": "Mobile app for iOS & Android",
+      "collaboration": "Collaborative planning tools",
+      "export": "Export & reporting tools"
+    },
+    "integration": {
+      "title": "Everything Works Together Seamlessly",
+      "subtitle": "All modules are deeply integrated to provide a unified experience. Changes sync automatically across every feature."
+    },
+    "collaboration": {
+      "title": "Built for Collaboration",
+      "description": "Invite your partner, family, and wedding planner to collaborate in real-time. Everyone stays updated with automatic notifications and shared access to plans, budgets, and guest lists.",
+      "sync": "Real-time sync across all devices",
+      "permissions": "Role-based permissions for team members",
+      "activity": "Activity feed with full history",
+      "comments": "Comments and notes on every item"
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "subtitle": "Join thousands of couples planning their dream wedding",
+      "primary": "Start Planning Free",
+      "secondary": "View Pricing Plans"
+    },
+    "integrations": {
+      "title": "Integrations and automations that work for you.",
+      "description": "Connect Planivia with payment services, calendars, and communication tools. Configure automatic triggers for RSVP, provider confirmations, or task follow-ups.",
+      "items": [
+        "Integrations with Google Calendar, Gmail, and productivity suites.",
+        "Visual automations with conditions and reusable templates.",
+        "API for internal developments and connections to external systems."
+      ],
+      "cta": {
+        "title": "Immediate access",
+        "description": "Every account includes a free trial and a guided demo with our onboarding team.",
+        "button": "Request demo"
+      }
+    }
+  },
+  "pricing": {
+    "title": "Simple, transparent pricing",
+    "subtitle": "Choose the perfect plan for your wedding journey. All plans include a 14-day free trial.",
+    "billingCycle": {
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "savePercent": "Save 17%"
+    },
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "description": "Perfect for small, intimate weddings",
+        "features": {
+          "guests": "Up to 50 guests",
+          "budgetTracking": "Basic budget tracking",
+          "taskChecklist": "Task checklist",
+          "emailSupport": "Email support",
+          "mobileApp": "Mobile app access",
+          "weddingEvents": "1 wedding event"
+        }
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "Most popular for full-scale weddings",
+        "badge": "Most Popular",
+        "features": {
+          "guests": "Up to 250 guests",
+          "budgetTools": "Advanced budget & finance tools",
+          "seatingChart": "Seating chart designer",
+          "website": "Custom wedding website",
+          "prioritySupport": "Priority support",
+          "unlimitedVendors": "Unlimited vendors",
+          "rsvpManagement": "RSVP management",
+          "giftRegistry": "Gift registry integration"
+        }
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "For wedding planners & luxury events",
+        "features": {
+          "unlimitedGuests": "Unlimited guests",
+          "multiWedding": "Multi-wedding management",
+          "whiteLabel": "White-label options",
+          "accountManager": "Dedicated account manager",
+          "customIntegrations": "Custom integrations",
+          "teamTools": "Team collaboration tools",
+          "analytics": "Advanced analytics",
+          "apiAccess": "API access"
+        }
+      }
+    },
+    "perMonth": "month",
+    "perYear": "year",
+    "startFreeTrial": "Start Free Trial",
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about our pricing",
+      "questions": {
+        "changePlans": {
+          "q": "Can I change plans later?",
+          "a": "Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately."
+        },
+        "afterTrial": {
+          "q": "What happens after the free trial?",
+          "a": "After your 14-day trial, you'll be charged based on your selected plan. Cancel anytime during the trial with no charges."
+        },
+        "refunds": {
+          "q": "Do you offer refunds?",
+          "a": "Yes, we offer a 30-day money-back guarantee on all annual plans."
+        },
+        "multipleWeddings": {
+          "q": "Can I use it for multiple weddings?",
+          "a": "The Premium plan supports unlimited weddings. Other plans are for single wedding events."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Still Have Questions?",
+      "subtitle": "Our team is here to help you find the perfect plan",
+      "button": "Contact Sales"
+    },
+    "footer": "© 2025 Wedding Planner. Making dream weddings come true.",
+    "free": "Free",
+    "pro": "Professional",
+    "enterprise": "Enterprise",
+    "cta": "Get started"
+  },
   "planners": {
     "meta": {
       "title": "Planivia for planners | Run multiple weddings from a single workspace",

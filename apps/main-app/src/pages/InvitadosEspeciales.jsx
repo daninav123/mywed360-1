@@ -4,10 +4,14 @@
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, AlertCircle, Utensils, Baby, Heart, Plus, Edit2, Trash2, Search } from 'lucide-react';
-import { doc, getDoc, setDoc, collection, query, getDocs } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { Link } from 'react-router-dom';
+import { Users, AlertCircle, Utensils, Baby, Heart, Plus, Edit2, Trash2, Search, User, Mail, Moon, LogOut } from 'lucide-react';
 import { useWedding } from '../context/WeddingContext';
+import { useAuth } from '../hooks/useAuth.jsx';
+import DarkModeToggle from '../components/DarkModeToggle';
+import LanguageSelector from '../components/ui/LanguageSelector';
+import Nav from '../components/Nav';
+import NotificationCenter from '../components/NotificationCenter';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
 const getDietsAndNeeds = (t) => [
@@ -91,21 +95,21 @@ const NecesidadCard = ({ invitado, onEdit, onDelete }) => {
     }`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
-          <h3 className="font-semibold  mb-1" style={{ color: 'var(--color-text)' }}>{invitado.nombre}</h3>
+          <h3 className="font-semibold  mb-1" className="text-body">{invitado.nombre}</h3>
           {invitado.mesa && (
-            <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Mesa: {invitado.mesa}</p>
+            <p className="text-xs " className="text-secondary">Mesa: {invitado.mesa}</p>
           )}
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(invitado)}
-            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" className="text-primary" className="text-secondary"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(invitado.id)}
-            className="p-2  hover: hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-red-50 rounded transition-colors" className="text-danger" className="text-secondary"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -115,7 +119,7 @@ const NecesidadCard = ({ invitado, onEdit, onDelete }) => {
       <div className="space-y-3">
         {invitado.dietas && invitado.dietas.length > 0 && (
           <div>
-            <p className="text-xs font-medium  mb-1 flex items-center gap-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-xs font-medium  mb-1 flex items-center gap-1" className="text-secondary">
               <Utensils className="w-3 h-3" /> Dietas:
             </p>
             <div className="flex flex-wrap gap-1">
@@ -126,7 +130,7 @@ const NecesidadCard = ({ invitado, onEdit, onDelete }) => {
 
         {invitado.alergias && invitado.alergias.length > 0 && (
           <div>
-            <p className="text-xs font-medium  mb-1 flex items-center gap-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-xs font-medium  mb-1 flex items-center gap-1" className="text-secondary">
               <AlertCircle className="w-3 h-3" /> Alergias:
             </p>
             <div className="flex flex-wrap gap-1">
@@ -141,7 +145,7 @@ const NecesidadCard = ({ invitado, onEdit, onDelete }) => {
 
         {invitado.necesidades && invitado.necesidades.length > 0 && (
           <div>
-            <p className="text-xs font-medium  mb-1 flex items-center gap-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-xs font-medium  mb-1 flex items-center gap-1" className="text-secondary">
               <Wheelchair className="w-3 h-3" /> Necesidades:
             </p>
             <div className="flex flex-wrap gap-1">
@@ -151,13 +155,13 @@ const NecesidadCard = ({ invitado, onEdit, onDelete }) => {
         )}
 
         {invitado.notasEspeciales && (
-          <div className="pt-2 border-t " style={{ borderColor: 'var(--color-border)' }}>
-            <p className="text-xs " style={{ color: 'var(--color-text)' }}>{invitado.notasEspeciales}</p>
+          <div className="pt-2 border-t " className="border-default">
+            <p className="text-xs " className="text-body">{invitado.notasEspeciales}</p>
           </div>
         )}
 
         {!hasSpecialNeeds && (
-          <p className="text-sm  italic" style={{ color: 'var(--color-muted)' }}>Sin necesidades especiales registradas</p>
+          <p className="text-sm  italic" className="text-muted">Sin necesidades especiales registradas</p>
         )}
       </div>
     </div>
@@ -225,19 +229,19 @@ const InvitadoModal = ({ invitado, onClose, onSubmit }) => {
   return (
     <>
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               {invitado ? 'Editar invitado' : 'Nuevo invitado con necesidades'}
             </h2>
-            <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className=" hover:" className="text-muted" className="text-secondary">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Nombre completo *
                 </label>
                 <input
@@ -245,7 +249,7 @@ const InvitadoModal = ({ invitado, onClose, onSubmit }) => {
                   value={formData.nombre}
                   onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                   placeholder={t('specialGuests.namePlaceholder')}
-                  className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full border  rounded-lg px-3 py-2" className="border-default"
                   required
                 />
               </div>
@@ -263,20 +267,20 @@ const InvitadoModal = ({ invitado, onClose, onSubmit }) => {
 
       <div className="flex gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 " style={{ color: 'var(--color-muted)' }} />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 " className="text-muted" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={t('specialGuests.searchPlaceholder')}
-            className="w-full pl-10 pr-3 py-2 border  rounded-lg" style={{ borderColor: 'var(--color-border)' }}
+            className="w-full pl-10 pr-3 py-2 border  rounded-lg" className="border-default"
           />
         </div>
 
         <select
           value={filterDieta}
           onChange={(e) => setFilterDieta(e.target.value)}
-          className="border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+          className="border  rounded-lg px-3 py-2" className="border-default"
         >
           <option value="all">Todas las dietas</option>
           {DIETAS_ESPECIALES.map(d => (
@@ -289,7 +293,7 @@ const InvitadoModal = ({ invitado, onClose, onSubmit }) => {
         <select
           value={filterNecesidad}
           onChange={(e) => setFilterNecesidad(e.target.value)}
-          className="border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+          className="border  rounded-lg px-3 py-2" className="border-default"
         >
           <option value="all">Todas las necesidades</option>
           {NECESIDADES_ESPECIALES.map(n => (
@@ -302,12 +306,12 @@ const InvitadoModal = ({ invitado, onClose, onSubmit }) => {
 
           {/* Invitados List */}
           {invitados.length === 0 ? (
-            <div className=" border-2 border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-              <Users className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-              <h3 className="text-lg font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+            <div className=" border-2 border-dashed  rounded-lg p-12 text-center" className="border-default" className="bg-surface">
+              <Users className="w-16 h-16  mx-auto mb-4" className="text-muted" />
+              <h3 className="text-lg font-semibold  mb-2" className="text-body">
                 No hay invitados registrados
               </h3>
-              <p className="text-sm  mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+              <p className="text-sm  mb-4" className="text-secondary">
                 Añade invitados con necesidades especiales, dietas o alergias
               </p>
               <button
@@ -319,8 +323,8 @@ const InvitadoModal = ({ invitado, onClose, onSubmit }) => {
               </button>
             </div>
           ) : filteredInvitados.length === 0 ? (
-            <div className=" border  rounded-lg p-8 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-              <p className="" style={{ color: 'var(--color-text-secondary)' }}>No se encontraron invitados con estos filtros</p>
+            <div className=" border  rounded-lg p-8 text-center" className="border-default" className="bg-surface">
+              <p className="" className="text-secondary">No se encontraron invitados con estos filtros</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

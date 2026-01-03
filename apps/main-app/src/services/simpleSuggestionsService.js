@@ -1,9 +1,10 @@
 /**
  * Servicio SIMPLIFICADO de sugerencias con IA
  * Usa descripción de texto libre del usuario para generar sugerencias
+ * Usa el proxy backend para centralizar llamadas a OpenAI
  */
 
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+import { apiPost } from './apiClient';
 
 /**
  * Generar sugerencias basadas en descripción libre del usuario
@@ -33,36 +34,29 @@ export async function generateSuggestionsFromDescription({
       count,
     });
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content:
-              'Eres un experto DJ de bodas. Tu especialidad es recomendar canciones perfectas basándote en las descripciones que te dan los usuarios. Eres conciso y preciso.',
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 1000,
-      }),
+    const response = await apiPost('/api/proxy/openai', {
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'Eres un experto DJ de bodas. Tu especialidad es recomendar canciones perfectas basándote en las descripciones que te dan los usuarios. Eres conciso y preciso.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 1000,
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      throw new Error(`Proxy OpenAI error: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+    const content = data.response;
 
     if (!content) {
       throw new Error('No content in response');

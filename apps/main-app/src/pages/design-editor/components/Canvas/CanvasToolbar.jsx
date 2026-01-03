@@ -31,11 +31,11 @@ export default function CanvasToolbar({ canvasRef, canvasSize, onSizeChange }) {
   };
 
   return (
-    <div className=" border-b  px-4 py-2 flex items-center gap-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+    <div className=" border-b  px-4 py-2 flex items-center gap-4" className="border-default" className="bg-surface">
       <div className="flex items-center gap-2">
         <button
           onClick={handleZoomOut}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title="Alejar (Zoom -)"
         >
           <ZoomOut className="w-4 h-4" />
@@ -43,14 +43,14 @@ export default function CanvasToolbar({ canvasRef, canvasSize, onSizeChange }) {
         <span className="text-sm font-medium min-w-[60px] text-center">{zoom}%</span>
         <button
           onClick={handleZoomIn}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title="Acercar (Zoom +)"
         >
           <ZoomIn className="w-4 h-4" />
         </button>
         <button
           onClick={handleZoomFit}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title="Ajustar"
         >
           <Maximize2 className="w-4 h-4" />
@@ -76,7 +76,7 @@ export default function CanvasToolbar({ canvasRef, canvasSize, onSizeChange }) {
         </button>
       </div>
 
-      <div className="ml-auto text-xs " style={{ color: 'var(--color-muted)' }}>
+      <div className="ml-auto text-xs " className="text-muted">
         A5 (148 × 210 mm) • 300 DPI
       </div>
     </div>

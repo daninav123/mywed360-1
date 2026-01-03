@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { ADMIN_ALLOWED_PATHS, ADMIN_NAVIGATION } from '../../config/adminNavigation';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import LanguageSelector from '../../components/ui/LanguageSelector';
 
 const normalizePath = (pathname) => {

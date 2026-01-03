@@ -82,7 +82,7 @@ const AdminDebugPayments = () => {
             />
             <CardContent>
               <Box className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Box className=" p-4 rounded" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <Box className=" p-4 rounded" className="bg-page">
                   <Typography variant="overline" color="textSecondary">
                     Pagos en colección raíz
                   </Typography>
@@ -96,7 +96,7 @@ const AdminDebugPayments = () => {
                   )}
                 </Box>
 
-                <Box className=" p-4 rounded" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <Box className=" p-4 rounded" className="bg-page">
                   <Typography variant="overline" color="textSecondary">
                     Pagos en subcolecciones
                   </Typography>
@@ -110,7 +110,7 @@ const AdminDebugPayments = () => {
                   )}
                 </Box>
 
-                <Box className=" p-4 rounded" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <Box className=" p-4 rounded" className="bg-page">
                   <Typography variant="overline" color="textSecondary">
                     Estado general
                   </Typography>
@@ -134,9 +134,9 @@ const AdminDebugPayments = () => {
                     Opciones:
                   </Typography>
                   <ol className="list-decimal list-inside text-sm space-y-1">
-                    <li>Ejecuta <code className=" px-1 rounded" style={{ backgroundColor: 'var(--color-bg)' }}>node scripts/seedPayments.js</code> para crear datos de prueba</li>
+                    <li>Ejecuta <code className=" px-1 rounded" className="bg-page">node scripts/seedPayments.js</code> para crear datos de prueba</li>
                     <li>Integra Stripe para pagos reales</li>
-                    <li>Revisa <code className=" px-1 rounded" style={{ backgroundColor: 'var(--color-bg)' }}>docs/firestore-indexes-needed.md</code> para crear índices</li>
+                    <li>Revisa <code className=" px-1 rounded" className="bg-page">docs/firestore-indexes-needed.md</code> para crear índices</li>
                   </ol>
                 </Alert>
               )}
@@ -156,7 +156,7 @@ const AdminDebugPayments = () => {
                   {data.rootCollection.sample.map((payment, idx) => (
                     <Box
                       key={idx}
-                      className="border  rounded p-3 " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                      className="border  rounded p-3 " className="border-default" className="bg-page"
                     >
                       <Box className="flex justify-between items-start mb-2">
                         <Typography variant="subtitle2" className="font-mono">
@@ -200,7 +200,7 @@ const AdminDebugPayments = () => {
                   {data.collectionGroup.sample.map((payment, idx) => (
                     <Box
                       key={idx}
-                      className="border  rounded p-3 " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                      className="border  rounded p-3 " className="border-default" className="bg-page"
                     >
                       <Typography variant="caption" color="textSecondary" className="font-mono">
                         {payment.path}
@@ -223,7 +223,7 @@ const AdminDebugPayments = () => {
       {!data && !loading && (
         <Card>
           <CardContent className="text-center py-10">
-            <Database size={48} className="mx-auto mb-4 " style={{ color: 'var(--color-muted)' }} />
+            <Database size={48} className="mx-auto mb-4 " className="text-muted" />
             <Typography variant="h6" color="textSecondary">
               Haz clic en "Consultar Pagos" para empezar
             </Typography>

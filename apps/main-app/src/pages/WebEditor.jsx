@@ -1,13 +1,13 @@
-﻿import { doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc } from 'firebase/firestore';
-import { Plus, Trash, Zap } from 'lucide-react';
+﻿import { Plus, Trash, Zap } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import useTranslations from '../hooks/useTranslations';
-import { db } from '../firebaseConfig';
 import { post as apiPost } from '../services/apiClient';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 /*
   Editor interno para la página web de la boda.
   Permite al usuario rellenar/editar la información que utilizará WeddingSite.jsx.
@@ -36,34 +36,43 @@ export default function WebEditor() {
   useEffect(() => {
     (async () => {
       try {
-        const docSnap = await getDoc(doc(db, 'users', uid));
-        if (docSnap.exists() && docSnap.data().weddingInfo)
-          setInfo({ ...info, ...docSnap.data().weddingInfo });
-        const schSnap = await getDocs(collection(db, 'users', uid, 'schedule'));
-        setSchedule(
-          schSnap.docs
-            .map((d) => ({ id: d.id, ...d.data() }))
-            .sort((a, b) => a.time.localeCompare(b.time))
-        );
-        const galSnap = await getDocs(collection(db, 'users', uid, 'gallery'));
-        setGallery(galSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        const response = await fetch(`${API_URL}/wedding-info/${uid}`, {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.weddingInfo) {
+            setInfo({ ...info, ...data.weddingInfo });
+          }
+          if (data.schedule) {
+            setSchedule(data.schedule.sort((a, b) => a.time.localeCompare(b.time)));
+          }
+          if (data.gallery) {
+            setGallery(data.gallery);
+          }
+        }
       } catch (e) {
-        // console.error(e);
+        console.error('Error loading wedding editor data:', e);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
 
   const saveInfo = async () => {
     setLoading(true);
     try {
-      await setDoc(doc(db, 'users', uid), { weddingInfo: info }, { merge: true });
+      await fetch(`${API_URL}/wedding-info/${uid}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ weddingInfo: info }),
+      });
       toast.success(t('messages.saveSuccess'));
     } catch (err) {
-      // console.error(err);
+      console.error(err);
       toast.error(t('messages.saveError'));
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // --- Schedule helpers ---
@@ -77,19 +86,19 @@ export default function WebEditor() {
   const saveSchedule = async () => {
     setLoading(true);
     try {
-      const colRef = collection(db, 'users', uid, 'schedule');
-      // Borrar docs existentes y volver a crear (simple)
-      const existing = await getDocs(colRef);
-      await Promise.all(existing.docs.map((d) => deleteDoc(d.ref)));
-      await Promise.all(
-        schedule.map((item) => addDoc(colRef, { time: item.time, title: item.title }))
-      );
-      toast.success(t('messages.saveSuccess'));
-    } catch (e) {
-      // console.error(e);
-      toast.error(t('errors.generic'));
+      await fetch(`${API_URL}/wedding-info/${uid}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ schedule }),
+      });
+      toast.success(t('messages.scheduleUpdated'));
+    } catch (err) {
+      console.error(err);
+      toast.error(t('messages.saveError'));
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // --- AI helpers ---
@@ -132,7 +141,7 @@ export default function WebEditor() {
         clearTimeout(timeoutId);
       }
     } catch (err) {
-      // console.error(err);
+      console.error(err);
       toast.error(t('errors.openaiError'));
     }
     setAiLoading(false);
@@ -172,16 +181,16 @@ export default function WebEditor() {
         }
 
         const data = await response.json();
-      let arr = [];
-      try {
-        arr = JSON.parse(data?.response);
-      } catch {}
-      if (Array.isArray(arr)) setSchedule(arr.map((item, i) => ({ ...item, temp: i })));
+        let arr = [];
+        try {
+          arr = JSON.parse(data?.response);
+        } catch {}
+        if (Array.isArray(arr)) setSchedule(arr.map((item, i) => ({ ...item, temp: i })));
       } finally {
         clearTimeout(timeoutId);
       }
     } catch (err) {
-      // console.error(err);
+      console.error(err);
       toast.error(t('errors.openaiError'));
     }
     setAiLoading(false);
@@ -198,23 +207,24 @@ export default function WebEditor() {
   const saveGallery = async () => {
     setLoading(true);
     try {
-      const colRef = collection(db, 'users', uid, 'gallery');
-      const existing = await getDocs(colRef);
-      await Promise.all(existing.docs.map((d) => deleteDoc(d.ref)));
-      await Promise.all(
-        gallery.filter((g) => g.url).map((img) => addDoc(colRef, { url: img.url }))
-      );
-      toast.success(t('messages.saveSuccess'));
-    } catch (e) {
-      // console.error(e);
-      toast.error(t('errors.generic'));
+      await fetch(`${API_URL}/wedding-info/${uid}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ gallery: gallery.filter((g) => g.url) }),
+      });
+      toast.success(t('messages.galleryUpdated'));
+    } catch (err) {
+      console.error(err);
+      toast.error(t('messages.saveError'));
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <div className="p-4 md:p-6 space-y-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>Editor de mi web</h1>
+      <h1 className="text-2xl font-bold " className="text-body">Editor de mi web</h1>
 
       {/* Información básica */}
       <section className="space-y-4">
@@ -250,7 +260,7 @@ export default function WebEditor() {
           type="button"
           onClick={suggestStory}
           disabled={aiLoading}
-          className="text-sm  underline" style={{ color: 'var(--color-primary)' }}
+          className="text-sm  underline" className="text-primary"
         >
           {aiLoading ? 'Generando...' : 'Sugerir con IA'}
         </button>
@@ -288,7 +298,7 @@ export default function WebEditor() {
         <h2 className="text-xl font-medium flex items-center justify-between">
           Programa del día
           <div className="flex gap-3">
-            <button onClick={addSchedule} className=" flex items-center gap-1" style={{ color: 'var(--color-success)' }}>
+            <button onClick={addSchedule} className=" flex items-center gap-1" className="text-success">
               <Plus size={16} /> Añadir
             </button>
             <button
@@ -314,7 +324,7 @@ export default function WebEditor() {
               value={s.title}
               onChange={(e) => updateSchedule(idx, 'title', e.target.value)}
             />
-            <button onClick={() => removeSchedule(idx)} className="" style={{ color: 'var(--color-danger)' }}>
+            <button onClick={() => removeSchedule(idx)} className="" className="text-danger">
               <Trash size={16} />
             </button>
           </div>
@@ -332,7 +342,7 @@ export default function WebEditor() {
       <section className="space-y-4">
         <h2 className="text-xl font-medium flex items-center justify-between">
           Galería{' '}
-          <button onClick={addImage} className=" flex items-center gap-1" style={{ color: 'var(--color-success)' }}>
+          <button onClick={addImage} className=" flex items-center gap-1" className="text-success">
             <Plus size={16} /> Añadir
           </button>
         </h2>
@@ -344,7 +354,7 @@ export default function WebEditor() {
               value={g.url}
               onChange={(e) => updateImage(idx, e.target.value)}
             />
-            <button onClick={() => removeImage(idx)} className="" style={{ color: 'var(--color-danger)' }}>
+            <button onClick={() => removeImage(idx)} className="" className="text-danger">
               <Trash size={16} />
             </button>
           </div>

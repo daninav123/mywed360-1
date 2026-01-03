@@ -1,8 +1,14 @@
 ﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Mail, Send, Trash2, Archive, Star, Clock, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Mail, Send, Trash2, Archive, Star, Clock, CheckCircle, User, Moon, LogOut } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { onAuthStateChanged } from 'firebase/auth';
 import useTranslations from '../hooks/useTranslations';
+import { useAuth } from '../hooks/useAuth.jsx';
+import DarkModeToggle from '../components/DarkModeToggle';
+import LanguageSelector from '../components/ui/LanguageSelector';
+import Nav from '../components/Nav';
+import NotificationCenter from '../components/NotificationCenter';
 
 import ChipToggle from '../components/email/ChipToggle';
 import { formatDate } from '../utils/formatUtils';
@@ -57,8 +63,14 @@ import { ensureContractFromEmail } from '../services/contractEmailService';
  *  - POST /sendEmail        -> env)a correo (funci)n Cloud)
  */
 const UnifiedEmail = () => {
+  console.log('🔵 [UnifiedEmail] Componente montado/renderizado');
+  
   const { t } = useTranslations();
   const { getCurrentUsername } = useEmailUsername();
+  const { userProfile } = useAuth();
+  
+  console.log('🔵 [UnifiedEmail] userProfile en render:', userProfile);
+  
   const [myEmail, setMyEmail] = useState(null);
   const [emails, setEmails] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -198,35 +210,45 @@ const UnifiedEmail = () => {
       cancelled = true;
     };
   }, [emails, activeWedding]);
-  // Obtener email del usuario
+  // Obtener email del usuario desde PostgreSQL
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) return;
 
-      const username = await getCurrentUsername();
-      let resolvedEmail;
-
-      if (username) {
-        resolvedEmail = `${username}@maloveapp.com`;
+      console.log('[UnifiedEmail] Auth state changed, userProfile:', userProfile);
+      setUserId(user.uid);
+      
+      // Usar myWed360Email del perfil de PostgreSQL
+      if (userProfile?.myWed360Email) {
+        const resolvedEmail = userProfile.myWed360Email;
+        console.log('[UnifiedEmail] ✅ Usando email del perfil:', resolvedEmail);
         await initEmailService({
           uid: user.uid,
-          emailUsername: username,
           myWed360Email: resolvedEmail,
           email: user.email,
         });
+        setMyEmail(resolvedEmail);
       } else {
-        resolvedEmail = user.email;
-        await initEmailService({
-          uid: user.uid,
-          email: user.email,
-        });
+        console.log('[UnifiedEmail] ⚠️ No hay userProfile.myWed360Email, usando fallback');
+        // Fallback si no hay perfil cargado aún
+        const username = await getCurrentUsername();
+        if (username) {
+          const resolvedEmail = `${username}@planivia.net`;
+          console.log('[UnifiedEmail] Fallback email:', resolvedEmail);
+          await initEmailService({
+            uid: user.uid,
+            emailUsername: username,
+            myWed360Email: resolvedEmail,
+            email: user.email,
+          });
+          setMyEmail(resolvedEmail);
+        } else {
+          console.log('[UnifiedEmail] ❌ No username disponible');
+        }
       }
-
-      setUserId(user.uid);
-      setMyEmail(resolvedEmail);
     });
     return () => unsub();
-  }, []);
+  }, [userProfile, getCurrentUsername]);
 
   // Carga inicial + polling
   useEffect(() => {
@@ -342,12 +364,43 @@ const UnifiedEmail = () => {
 
     return base.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
   }, [emails, search, onlyUnread, onlyWithAttachments, activeCustomFolder, activeTagId, userId]);
+  
+  const { logout: logoutUnified } = useAuth();
+  const [openUserMenu, setOpenUserMenu] = useState(false);
+  
   return (
+    <>
+    <div className="absolute top-4 right-4 flex items-center space-x-3 z-[100]">
+      <LanguageSelector variant="minimal" />
+      <div className="relative" data-user-menu>
+        <button onClick={() => setOpenUserMenu(!openUserMenu)} className={`w-11 h-11 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center ${openUserMenu ? 'bg-lavender border-2 border-primary shadow-lg' : 'bg-white/95 border-2 border-white/80 shadow-md'}`} title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })}>
+          <User className={`w-5 h-5 ${openUserMenu ? 'text-primary' : 'text-secondary'}`} />
+        </button>
+        {openUserMenu && (
+          <div className="absolute right-0 mt-3 bg-surface p-2 space-y-1 min-w-[220px] border border-soft rounded-lg shadow-xl z-[9999]">
+            <div className="px-2 py-1"><NotificationCenter /></div>
+            <Link to="/perfil" onClick={() => setOpenUserMenu(false)} className="menu-item">
+              <User className="w-4 h-4 mr-3" />{t('navigation.profile', { defaultValue: 'Perfil' })}
+            </Link>
+            <Link to="/email" onClick={() => setOpenUserMenu(false)} className="menu-item">
+              <Mail className="w-4 h-4 mr-3" />{t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
+            </Link>
+            <div className="px-3 py-2.5 rounded-xl transition-all duration-200 hover-lavender">
+              <div className="flex items-center justify-between"><span className="text-sm flex items-center text-body"><Moon className="w-4 h-4 mr-3" />{t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}</span><DarkModeToggle className="ml-2" /></div>
+            </div>
+            <div className="divider"></div>
+            <button onClick={() => { logoutUnified(); setOpenUserMenu(false); }} className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center text-danger hover-danger-bg">
+              <LogOut className="w-4 h-4 mr-3" />{t('navigation.logout', { defaultValue: 'Cerrar sesión' })}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
     <div className="flex h-full w-full flex-col">
       {/* Wizard para elegir nombre si es la primera vez */}
       <UsernameWizard />
       {/* B)squeda y filtros r)pidos */}
-      <div className="flex flex-col gap-2 border-b /50 p-3 md:flex-row md:items-center md:justify-between" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="flex flex-col gap-2 border-b /50 p-3 md:flex-row md:items-center md:justify-between bg-page">
         <div className="flex items-center gap-2">
           <ChipToggle
             active={onlyUnread}
@@ -367,7 +420,7 @@ const UnifiedEmail = () => {
             placeholder="Buscar correos"
             className="w-full rounded border px-3 py-2 text-sm pr-8"
           />
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" style={{ color: 'var(--color-muted)' }}>
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-muted">
             🔍
           </span>
         </div>
@@ -376,7 +429,7 @@ const UnifiedEmail = () => {
           <select
             value={activeTagId || ''}
             onChange={(e) => setActiveTagId(e.target.value || null)}
-            className="px-3 py-2 border  rounded-lg text-sm" style={{ borderColor: 'var(--color-border)' }}
+            className="px-3 py-2 border border-default rounded-lg text-sm"
           >
             <option value="">Todas las etiquetas</option>
             {allTags.map((t) => (
@@ -412,7 +465,7 @@ const UnifiedEmail = () => {
       {/* Contenido principal */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar de carpetas */}
-        <aside className="w-64 border-r  p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <aside className="w-64 border-r p-4 bg-page">
           <nav className="space-y-2">
             <button
               className={`block w-full rounded px-3 py-2 text-left text-sm ${
@@ -449,10 +502,10 @@ const UnifiedEmail = () => {
 
             {/* Carpetas personalizadas */}
             <div className="mt-4">
-              <div className="mb-2 flex items-center justify-between text-xs font-semibold " style={{ color: 'var(--color-text-secondary)' }}>
+              <div className="mb-2 flex items-center justify-between text-xs font-semibold text-secondary">
                 <span>Carpetas</span>
                 <button
-                  className=" hover:underline" style={{ color: 'var(--color-primary)' }}
+                  className="text-primary hover:underline"
                   onClick={() => {
                     try {
                       const name = prompt('Nombre de la carpeta');
@@ -480,7 +533,7 @@ const UnifiedEmail = () => {
                     >
                       {f.name}
                     </button>
-                    <div className="ml-2 flex items-center gap-1 text-xs " style={{ color: 'var(--color-muted)' }}>
+                    <div className="ml-2 flex items-center gap-1 text-xs text-muted">
                       <button
                         title="Renombrar"
                         onClick={() => {
@@ -518,8 +571,8 @@ const UnifiedEmail = () => {
         {/* Lista de correos */}
         <div className="w-80 border-r">
           {/* Acciones masivas */}
-          <div className="flex items-center justify-between p-2 border-b  text-xs" style={{ backgroundColor: 'var(--color-surface)' }}>
-            <div className="" style={{ color: 'var(--color-text-secondary)' }}>Seleccionados: {selectedIds.size}</div>
+          <div className="flex items-center justify-between p-2 border-b text-xs bg-surface">
+            <div className="text-secondary">Seleccionados: {selectedIds.size}</div>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -622,7 +675,7 @@ const UnifiedEmail = () => {
               userId={userId}
             />
           ) : (
-            <div className="flex h-full items-center justify-center" style={{ color: 'var(--color-muted)' }}>
+            <div className="flex h-full items-center justify-center text-muted">
               Selecciona un correo para verlo aquí
             </div>
           )}
@@ -632,13 +685,15 @@ const UnifiedEmail = () => {
       {/* Modal de redactar */}
       {showCompose && (
         <ComposeEmailModal
+          isOpen={showCompose}
           onClose={() => setShowCompose(false)}
-          from={myEmail}
-          userId={userId}
-          initial={composeInitial || {}}
+          userEmail={myEmail}
+          replyTo={composeInitial}
         />
       )}
     </div>
+    <Nav />
+    </>
   );
 };
 export default UnifiedEmail;

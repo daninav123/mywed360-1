@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, ChevronDown } from 'lucide-react';
+import PreLaunchBanner from '../PreLaunchBanner';
 
 // Theme tokens del Wedding Dashboard Soft
 export const theme = {
@@ -292,28 +293,28 @@ export function Navbar() {
         transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      <div className="max-w-7xl mx-auto px-8 py-7">
+      <div className="max-w-7xl mx-auto px-8 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <button
             onClick={() => navigate('/')}
             className="hover:scale-105"
             style={{
-              fontFamily: theme.fonts.heading,
-              fontSize: '36px',
-              fontWeight: 500,
-              background: 'linear-gradient(135deg, #2D3748 0%, #4A5568 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
               border: 'none',
               cursor: 'pointer',
               padding: 0,
-              letterSpacing: '-0.02em',
+              background: 'none',
               transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
-            Planivia
+            <img 
+              src="/logo.png?t=20260103v5" 
+              alt="Planivia" 
+              style={{
+                height: '48px',
+                width: 'auto',
+              }}
+            />
           </button>
 
           {/* Desktop Menu */}
@@ -540,6 +541,7 @@ export function Navbar() {
 export function PageWrapper({ children }) {
   return (
     <div style={{ backgroundColor: theme.colors.bgApp, minHeight: '100vh' }}>
+      <PreLaunchBanner />
       <Navbar />
       {children}
     </div>

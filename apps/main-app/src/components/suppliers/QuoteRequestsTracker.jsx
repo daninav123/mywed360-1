@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { useWedding } from '../../context/WeddingContext';
 import { useWeddingServices } from '../../hooks/useWeddingServices';
 import { db } from '../../firebaseConfig';

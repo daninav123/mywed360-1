@@ -72,13 +72,13 @@ export default function SupplierDebug() {
   if (!info) return null;
 
   return (
-    <div className="min-h-screen  p-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-screen  p-8" className="bg-page">
       <div className="max-w-4xl mx-auto">
-        <div className=" rounded-lg shadow-lg p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className=" rounded-lg shadow-lg p-6" className="bg-surface">
           <h1 className="text-2xl font-bold mb-6">🔍 Debug de Autenticación de Proveedor</h1>
 
           {/* Estado general */}
-          <div className="mb-6 p-4 rounded-lg " style={{ backgroundColor: 'var(--color-bg)' }}>
+          <div className="mb-6 p-4 rounded-lg " className="bg-page">
             <div className="flex items-center gap-3 mb-2">
               {info.isAuth ? (
                 <>
@@ -87,7 +87,7 @@ export default function SupplierDebug() {
                 </>
               ) : (
                 <>
-                  <XCircle className="" style={{ color: 'var(--color-danger)' }} size={24} />
+                  <XCircle className="" className="text-danger" size={24} />
                   <span className="font-semibold text-red-700">❌ NO AUTENTICADO</span>
                 </>
               )}
@@ -101,11 +101,11 @@ export default function SupplierDebug() {
               {info.token ? (
                 <div>
                   <div className="mb-2">
-                    <span className="" style={{ color: 'var(--color-muted)' }}>Primeros 50 chars:</span>{' '}
+                    <span className="" className="text-muted">Primeros 50 chars:</span>{' '}
                     {info.token.substring(0, 50)}...
                   </div>
                   <div>
-                    <span className="" style={{ color: 'var(--color-muted)' }}>Longitud:</span> {info.token.length} caracteres
+                    <span className="" className="text-muted">Longitud:</span> {info.token.length} caracteres
                   </div>
                 </div>
               ) : (
@@ -172,7 +172,7 @@ export default function SupplierDebug() {
           <div className="flex gap-3">
             <button
               onClick={loadInfo}
-              className="px-4 py-2 0 text-white rounded hover:bg-gray-600" style={{ backgroundColor: 'var(--color-bg)' }}
+              className="px-4 py-2 0 text-white rounded hover:bg-gray-600" className="bg-page"
             >
               Recargar Info
             </button>

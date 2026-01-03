@@ -75,7 +75,7 @@ const isConfirmedStatus = (status) => {
 
 const SEARCH_PAGE_SIZE = 6;
 const DEFAULT_PROVIDER_IMAGE =
-  'https://images.unsplash.com/photo-1530023367847-a683933f4177?auto=format&fit=crop&w=800&q=60';
+  '/assets/services/catering.webp';
 
 const ShortlistList = ({ items, loading, error, t }) => {
   if (loading) {
@@ -831,10 +831,10 @@ const Proveedores = () => {
                   <DollarSign className="w-5 h-5 text-purple-600" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+                  <h2 className="text-xl font-bold " className="text-body">
                     📋 Mis Solicitudes de Presupuesto
                   </h2>
-                  <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                  <p className="text-sm " className="text-secondary">
                     Compara y gestiona los presupuestos que has solicitado
                   </p>
                 </div>
@@ -960,7 +960,7 @@ const Proveedores = () => {
                               id="hasPortfolioFilter"
                               checked={hasPortfolioFilter}
                               onChange={(e) => setHasPortfolioFilter(e.target.checked)}
-                              className="w-4 h-4 text-purple-600  rounded focus:ring-purple-500" style={{ borderColor: 'var(--color-border)' }}
+                              className="w-4 h-4 text-purple-600  rounded focus:ring-purple-500" className="border-default"
                             />
                             <label
                               htmlFor="hasPortfolioFilter"
@@ -989,7 +989,7 @@ const Proveedores = () => {
                               id="sortBy"
                               value={sortBy}
                               onChange={(e) => setSortBy(e.target.value)}
-                              className="px-3 py-1.5 text-sm border border-blue-300 rounded-md  text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ backgroundColor: 'var(--color-surface)' }}
+                              className="px-3 py-1.5 text-sm border border-blue-300 rounded-md  text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500" className="bg-surface"
                             >
                               <option value="relevance">Relevancia</option>
                               <option value="rating">Rating ⭐</option>

@@ -1,5 +1,7 @@
 import express from 'express';
-import { randomUUID } from 'crypto';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 import { FieldValue } from 'firebase-admin/firestore';
 
 import { db } from '../db.js';

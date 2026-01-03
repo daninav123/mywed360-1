@@ -18,7 +18,7 @@ export default function CanvasRulers({ width, height, visible = false }) {
     <>
       {/* Regla horizontal superior */}
       <div 
-        className="absolute top-0 left-0  border-b " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+        className="absolute top-0 left-0  border-b " className="border-default" className="bg-page"
         style={{ 
           width: `${width}px`, 
           height: '20px',
@@ -29,7 +29,7 @@ export default function CanvasRulers({ width, height, visible = false }) {
         {horizontalMarks.map(mark => (
           <div
             key={`h-${mark}`}
-            className="absolute " style={{ color: 'var(--color-muted)' }}
+            className="absolute " className="text-muted"
             style={{
               left: `${mark}px`,
               borderLeft: mark % 500 === 0 ? '2px solid #6b7280' : '1px solid #d1d5db',
@@ -44,7 +44,7 @@ export default function CanvasRulers({ width, height, visible = false }) {
 
       {/* Regla vertical izquierda */}
       <div 
-        className="absolute top-0 left-0  border-r " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+        className="absolute top-0 left-0  border-r " className="border-default" className="bg-page"
         style={{ 
           width: '20px', 
           height: `${height}px`,
@@ -54,7 +54,7 @@ export default function CanvasRulers({ width, height, visible = false }) {
         {verticalMarks.map(mark => (
           <div
             key={`v-${mark}`}
-            className="absolute  text-center" style={{ color: 'var(--color-muted)' }}
+            className="absolute  text-center" className="text-muted"
             style={{
               top: `${mark}px`,
               borderTop: mark % 500 === 0 ? '2px solid #6b7280' : '1px solid #d1d5db',
@@ -64,7 +64,7 @@ export default function CanvasRulers({ width, height, visible = false }) {
           >
             {mark % 500 === 0 && (
               <span 
-                className="text-[9px]  px-0.5" style={{ backgroundColor: 'var(--color-bg)' }}
+                className="text-[9px]  px-0.5" className="bg-page"
                 style={{
                   transform: 'translateY(-8px)',
                   display: 'inline-block'

@@ -353,7 +353,9 @@
     "legend": "Ingreso - Gasto",
     "noHistory": "Necesitamos más historial para calcular la tendencia.",
     "income": "Ingresos",
-    "expense": "Gastos"
+    "expense": "Gastos",
+    "cashFlow": "Flujo de Caja",
+    "cashFlowHint": "Flujo de caja proyectado basado en pagos e ingresos próximos."
   },
   "contributions": {
     "confirmDelete": "¿Eliminar esta aportación?",

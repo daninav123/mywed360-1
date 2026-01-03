@@ -5,7 +5,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-atelier-vintage',
     url: 'https://www.marthastewart.com/wedding-vintage-inspired-reception',
-    image: 'https://images.unsplash.com/photo-1520854221050-0f4caff449fb?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Martha Stewart Weddings',
     published: '2024-04-12T09:00:00.000Z',
     title: {
@@ -20,7 +20,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-tuscany-destination',
     url: 'https://www.brides.com/tuscany-destination-wedding-ideas-7970213',
-    image: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Brides',
     published: '2024-05-03T14:30:00.000Z',
     title: {
@@ -35,7 +35,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-modern-minimal',
     url: 'https://www.stylemepretty.com/2024/05/29/modern-floral-wedding-ideas/',
-    image: 'https://images.unsplash.com/photo-1511288597083-5023dc0f7c9a?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Style Me Pretty',
     published: '2024-05-29T17:20:00.000Z',
     title: {
@@ -50,7 +50,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-lakeside-ceremony',
     url: 'https://greenweddingshoes.com/lakeside-wedding-ideas/',
-    image: 'https://images.unsplash.com/photo-1520031606212-1c1f1cfd6d21?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Green Wedding Shoes',
     published: '2024-03-22T16:15:00.000Z',
     title: {
@@ -65,7 +65,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-garden-editorial',
     url: 'https://www.rockmywedding.co.uk/garden-wedding-editorial',
-    image: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Rock My Wedding',
     published: '2024-02-17T11:45:00.000Z',
     title: {
@@ -80,7 +80,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-planner-insights',
     url: 'https://www.vogue.com/article/how-to-choose-a-wedding-planner',
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Vogue',
     published: '2024-07-12T08:30:00.000Z',
     title: {
@@ -95,7 +95,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-coastal-mallorca',
     url: 'https://www.oncewed.com/featured/romantic-coastal-wedding-in-mallorca/',
-    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Once Wed',
     published: '2024-06-18T15:05:00.000Z',
     title: {
@@ -110,7 +110,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-napa-valley',
     url: 'https://www.over-the-moon.com/weddings/sarah-bretts-wedding-in-napa-valley/',
-    image: 'https://images.unsplash.com/photo-1502675583301-6e1930d4b5b6?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Over The Moon',
     published: '2024-04-05T10:50:00.000Z',
     title: {
@@ -125,7 +125,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-mexico-festive',
     url: 'https://utterlyengaged.com/festive-mexico-destination-wedding-inspiration/',
-    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Utterly Engaged',
     published: '2024-01-22T13:25:00.000Z',
     title: {
@@ -140,7 +140,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-autumn-mood',
     url: 'https://junebugweddings.com/wedding-blog/moody-autumn-wedding-inspiration/',
-    image: 'https://images.unsplash.com/photo-1529634896862-08db0e0ea1cf?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Junebug Weddings',
     published: '2023-10-14T18:40:00.000Z',
     title: {
@@ -155,7 +155,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-rose-gold',
     url: 'https://www.loveandlavender.com/rose-gold-wedding-inspiration/',
-    image: 'https://images.unsplash.com/photo-1520854221050-0f4caff449fb?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Love and Lavender',
     published: '2023-09-08T12:35:00.000Z',
     title: {
@@ -170,7 +170,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-weekend-guide',
     url: 'https://www.brides.com/guide-to-wedding-weekend-itineraries-7487479',
-    image: 'https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: 'Brides',
     published: '2024-03-11T09:45:00.000Z',
     title: {
@@ -185,7 +185,7 @@ const FALLBACK_POST_TEMPLATES = [
   {
     id: 'fallback-sustainable-celebration',
     url: 'https://www.100layercake.com/blog/2024/04/02/sustainable-wedding-ideas/',
-    image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1280&q=80',
+    image: '/assets/services/default.webp',
     source: '100 Layer Cake',
     published: '2024-04-02T11:10:00.000Z',
     title: {

@@ -14,7 +14,7 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import { X, Edit3, CalendarPlus, Trash2, CheckCircle2, Circle, MessageSquare } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import * as notificationService from '../../services/notificationService';
 
 const fmtDateTimeLocal = (d) => {

@@ -1,13 +1,14 @@
 import express from 'express';
-import admin from 'firebase-admin';
+import { db, admin, USE_FIREBASE } from '../db.js';
 import logger from '../utils/logger.js';
 
-// Suponemos que firebase-admin ya está inicializado en otro punto del backend
-const db = admin.firestore();
 const router = express.Router();
 
 // Middleware de autenticación muy simple (usa UID en el header Authorization)
 function authMiddleware(req, res, next) {
+  if (!USE_FIREBASE || !db) {
+    return res.status(503).json({ error: 'Firebase not available' });
+  }
   const auth = req.headers['authorization'] || '';
   if (!auth.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'unauthenticated' });
@@ -91,5 +92,10 @@ router.get('/search', async (req, res) => {
     res.status(500).json({ error: 'events-search-failed' });
   }
 });
+
+// Si Firebase está deshabilitado, las rutas quedan vacías pero el router se exporta igual
+if (!USE_FIREBASE || !db) {
+  console.warn('[events.js] Firebase deshabilitado - rutas de eventos no disponibles');
+}
 
 export default router;

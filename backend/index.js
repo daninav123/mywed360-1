@@ -41,11 +41,11 @@ import { http, requestWithRetry } from './utils/http.js';
 import { randomUUID } from 'crypto';
 // Importar middleware de autenticación (ESM) - debe cargarse antes que las rutas para inicializar Firebase Admin correctamente
 import {
-  authMiddleware,
   requireAuth,
-  requireMailAccess,
-  optionalAuth,
   requireAdmin,
+  optionalAuth,
+  requireMailAccess,
+  requireSupplier
 } from './middleware/authMiddleware.js';
 
 import mailRouter from './routes/mail.js';
@@ -69,6 +69,7 @@ import aiWebsiteRouter from './routes/ai-website.js';
 import emailInsightsRouter from './routes/email-insights.js';
 import metricsSeatingRouter from './routes/metrics-seating.js';
 import notificationsRouter from './routes/notifications.js';
+// import guestsPostgresRouter from './routes/guests-postgres.js'; // Deshabilitado - ruta experimental
 import guestsRouter from './routes/guests.js';
 import rolesRouter from './routes/roles.js';
 import eventsRouter from './routes/events.js';
@@ -97,6 +98,7 @@ import supplierPublicRouter from './routes/supplier-public.js';
 import supplierReviewsRouter from './routes/supplier-reviews.js';
 import supplierQuoteRequestsRouter from './routes/supplier-quote-requests.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
+import userEmailAliasRouter from './routes/user-email-alias.js';
 import supplierPortfolioRouter from './routes/supplier-portfolio.js';
 import migrateSuppliersRouter from './routes/migrate-suppliers.js';
 import publicWeddingRouter from './routes/public-wedding.js';
@@ -142,6 +144,7 @@ import favoritesRouter from './routes/favorites.js';
 import projectMetricsRouter from './routes/project-metrics.js';
 import weddingsRouter from './routes/weddings.js';
 import usersRouter from './routes/users.js';
+import userWeddingsRouter from './routes/user-weddings.js';
 import taskTemplatesRouter from './routes/task-templates.js';
 import mobileRouter from './routes/mobile.js';
 import quoteRequestsRouter from './routes/quote-requests.js';
@@ -150,6 +153,9 @@ import quoteResponsesRouter from './routes/quote-responses.js';
 import quoteStatsRouter from './routes/quote-stats.js';
 import quoteValidationRouter from './routes/quote-validation.js';
 import suppliersAnalyzeWebRouter from './routes/suppliers-analyze-web.js';
+import checklistRouter from './routes/checklist.js';
+import geolocationRouter from './routes/geolocation.js';
+import suppliersRouter from './routes/suppliers.js';
 
 import ipAllowlist from './middleware/ipAllowlist.js';
 import adminAuthRouter from './routes/admin-auth.js';
@@ -164,7 +170,6 @@ import timelineRouter from './routes/timeline.js';
 import specialMomentsRouter from './routes/special-moments.js';
 import transactionsRouter from './routes/transactions.js';
 import budgetRouter from './routes/budget.js';
-import guestsPostgresRouter from './routes/guests-postgres.js';
 import weddingInfoRouter from './routes/wedding-info.js';
 import authRouter from './routes/auth.js';
 
@@ -639,15 +644,15 @@ app.use('/api/task-templates', taskTemplatesRouter); // Plantillas de tareas (en
 app.use('/api/mail', (req, res, next) => {
   console.error(`🚨 [INDEX] PRE-AUTH: ${req.method} ${req.url}`);
   next();
-}, authMiddleware(), (req, res, next) => {
+}, requireAuth, (req, res, next) => {
   console.error(`✅ [INDEX] POST-AUTH: ${req.method} ${req.url} user=${req.user?.uid}`);
   next();
 }, mailRouter);
 app.use('/api/mail', mailOpsRouter);
 app.use('/api/mail', mailStatsRouter);
 app.use('/api/mail', mailSearchRouter);
-app.use('/api/email/folders', authMiddleware(), emailFoldersRouter);
-app.use('/api/email/tags', authMiddleware(), emailTagsRouter);
+app.use('/api/email/folders', requireAuth, emailFoldersRouter);
+app.use('/api/email/tags', requireAuth, emailTagsRouter);
 app.use('/api/email/validate', requireAuth, emailValidationRouter); // Validación DKIM/SPF
 app.use('/api/email', emailDocsRouter);
 app.use('/api/email-templates', optionalAuth, emailTemplatesRouter); // Plantillas de email
@@ -664,15 +669,17 @@ app.use('/api/emails', requireMailAccess, emailsRouter);
 // Rutas que requieren autenticación general
 app.use('/api/notifications', requireAuth, notificationsRouter);
 app.use('/api/guests', requireAuth, guestsRouter);
+app.use('/api/checklist', requireAuth, checklistRouter);
+app.use('/api/wedding-suppliers', requireAuth, suppliersRouter); // PostgreSQL suppliers
 app.use('/api/events', requireAuth, eventsRouter);
 app.use('/api/roles', requireAuth, rolesRouter);
-app.use('/api/ai-image', authMiddleware(), aiImageRouter);
-app.use('/api/ai-suppliers', authMiddleware(), aiSuppliersRouter);
-app.use('/api/ai-suppliers-web', authMiddleware(), aiSuppliersWebRouter);
-app.use('/api/ai-suppliers-real', authMiddleware(), aiSuppliersRealRouter);
-app.use('/api/ai-suppliers-tavily', authMiddleware(), aiSuppliersTavilyRouter);
+app.use('/api/ai-image', requireAuth, aiImageRouter);
+app.use('/api/ai-suppliers', requireAuth, aiSuppliersRouter);
+app.use('/api/ai-suppliers-web', requireAuth, aiSuppliersWebRouter);
+app.use('/api/ai-suppliers-real', requireAuth, aiSuppliersRealRouter);
+app.use('/api/ai-suppliers-tavily', requireAuth, aiSuppliersTavilyRouter);
 app.use('/api/google-places', googlePlacesRouter); // Proxy para Google Places API
-app.use('/api/proxy', authMiddleware(), proxyRouter); // Proxy seguro para API keys (Translation, OpenAI, Tavily)
+app.use('/api/proxy', requireAuth, proxyRouter); // Proxy seguro para API keys (Translation, OpenAI, Tavily)
 app.use('/api/suppliers', suppliersHybridRouter); // Búsqueda pública, sin auth
 app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para registro
 app.use('/api/suppliers', supplierPublicRouter); // Portfolio público (sin auth)
@@ -683,10 +690,10 @@ app.use('/api/quote-requests', supplierQuoteRequestsRouter); // Rutas públicas 
 app.use('/api/suppliers', supplierRequestsRouter); // Solicitudes de presupuesto (legacy - mantener por compatibilidad)
 app.use('/api', resendQuoteEmailRouter); // Reenviar emails de solicitudes de presupuesto (debug)
 app.use('/api/suppliers', suppliersAnalyzeWebRouter); // Análisis web de proveedores (público)
-app.use('/api/favorites', authMiddleware(), favoritesRouter); // Favoritos requiere auth
-app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
+app.use('/api/favorites', requireAuth, favoritesRouter); // Favoritos requiere auth
+app.use('/api/ai/budget-estimate', requireAuth, aiBudgetRouter);
 app.use('/api/ai/search', requireAuth, aiSearchRouter); // Búsqueda inteligente con IA
-app.use('/api/ai', authMiddleware(), aiRouter);
+app.use('/api/ai', requireAuth, aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
 app.use('/api/ai-songs', requireAuth, aiSongsRouter);
 app.use('/api/ai-website', requireAuth, aiWebsiteRouter);
@@ -721,9 +728,11 @@ app.use('/api/seating-plan', requireAuth, seatingPlanRouter);
 app.use('/api/ceremony', requireAuth, ceremonyRouter);
 app.use('/api/supplier-groups', requireAuth, supplierGroupsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/geolocation', geolocationRouter);
+app.use('/api/user', requireAuth, userEmailAliasRouter);
+app.use('/api/user', requireAuth, userWeddingsRouter);
 app.use('/api/transactions', requireAuth, transactionsRouter);
 app.use('/api/budget', requireAuth, budgetRouter);
-app.use('/api/guests-pg', requireAuth, guestsPostgresRouter);
 app.use('/api/wedding-info', requireAuth, weddingInfoRouter);
 // app.use('/api/crm', crmRouter); // COMENTADO: router no importado
 // Supplier portal (public entry by token, handled inside router)
@@ -917,7 +926,7 @@ console.log('[backend] Admin tasks endpoint mounted on /api/admin/tasks/cleanup-
 // Fallback monitor (requiere autenticación, admins para stats)
 try {
   const fallbackMonitorRouter = (await import('./routes/fallback-monitor.js')).default;
-  app.use('/api/fallback-monitor', authMiddleware(), fallbackMonitorRouter);
+  app.use('/api/fallback-monitor', requireAuth, fallbackMonitorRouter);
   console.log('[backend] Fallback monitor routes mounted on /api/fallback-monitor');
 } catch (error) {
   console.error('[backend] Failed to load fallback monitor routes:', error.message);

@@ -16,3 +16,7 @@ export { default as Progress } from './Progress';
 
 // Exportar componentes de Tabs simples (implementación interna)
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
+
+// Exportar TabButton y StatusIndicator
+export { default as TabButton } from './TabButton';
+export { default as StatusIndicator } from './StatusIndicator';

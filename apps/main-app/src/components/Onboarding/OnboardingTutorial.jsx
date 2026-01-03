@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { createWedding, getWeddingIdForOwner } from '../../services/WeddingService';
 
 /**

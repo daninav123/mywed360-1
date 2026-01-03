@@ -5,8 +5,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, MapPin, Users, Clock, Edit2, Trash2, Plus, Wine, Coffee, PartyPopper, Music } from 'lucide-react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
@@ -96,22 +96,22 @@ const EventCard = ({ event, onEdit, onDelete }) => {
         <div className="flex items-center gap-3">
           <span className="text-3xl">{typeConfig.icon}</span>
           <div>
-            <h3 className="font-semibold " style={{ color: 'var(--color-text)' }}>
+            <h3 className="font-semibold " className="text-body">
               {event.customName || typeConfig.name}
             </h3>
-            <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{typeConfig.name}</p>
+            <p className="text-sm " className="text-secondary">{typeConfig.name}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(event)}
-            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-blue-50 rounded transition-colors" className="text-primary" className="text-secondary"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(event.id)}
-            className="p-2  hover: hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2  hover: hover:bg-red-50 rounded transition-colors" className="text-danger" className="text-secondary"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -120,35 +120,35 @@ const EventCard = ({ event, onEdit, onDelete }) => {
 
       <div className="space-y-3">
         {event.date && (
-          <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-text)' }}>
+          <div className="flex items-center gap-2 text-sm " className="text-body">
             <Calendar className="w-4 h-4 flex-shrink-0" />
             <span>{formatDate(event.date)}</span>
-            {event.time && <span className="" style={{ color: 'var(--color-muted)' }}>• {event.time}</span>}
+            {event.time && <span className="" className="text-muted">• {event.time}</span>}
           </div>
         )}
 
         {event.location && (
-          <div className="flex items-start gap-2 text-sm " style={{ color: 'var(--color-text)' }}>
+          <div className="flex items-start gap-2 text-sm " className="text-body">
             <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span>{event.location}</span>
           </div>
         )}
 
         {event.guestCount && (
-          <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-text)' }}>
+          <div className="flex items-center gap-2 text-sm " className="text-body">
             <Users className="w-4 h-4 flex-shrink-0" />
             <span>{event.guestCount} invitados</span>
           </div>
         )}
 
         {event.activities && event.activities.length > 0 && (
-          <div className="pt-3 border-t " style={{ borderColor: 'var(--color-border)' }}>
-            <p className="text-xs font-medium  mb-2" style={{ color: 'var(--color-text-secondary)' }}>Actividades:</p>
+          <div className="pt-3 border-t " className="border-default">
+            <p className="text-xs font-medium  mb-2" className="text-secondary">Actividades:</p>
             <div className="flex flex-wrap gap-2">
               {event.activities.map((activity, idx) => (
                 <span
                   key={idx}
-                  className="px-2 py-1  rounded-full text-xs  border " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}
+                  className="px-2 py-1  rounded-full text-xs  border " className="border-default" className="text-body" className="bg-surface"
                 >
                   {activity}
                 </span>
@@ -158,13 +158,13 @@ const EventCard = ({ event, onEdit, onDelete }) => {
         )}
 
         {event.budget && (
-          <div className="text-sm  pt-2 border-t " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }}>
+          <div className="text-sm  pt-2 border-t " className="border-default" className="text-body">
             💰 Presupuesto: {event.budget}€
           </div>
         )}
 
         {event.notes && (
-          <div className="text-xs  pt-3 border-t " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text-secondary)' }}>
+          <div className="text-xs  pt-3 border-t " className="border-default" className="text-secondary">
             {event.notes}
           </div>
         )}
@@ -229,18 +229,18 @@ const EventModal = ({ event, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               {event ? 'Editar evento' : 'Nuevo evento relacionado'}
             </h2>
-            <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className=" hover:" className="text-muted" className="text-secondary">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 Tipo de evento
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -256,7 +256,7 @@ const EventModal = ({ event, onSave, onClose }) => {
                     }`}
                   >
                     <span className="text-2xl mb-1 block">{type.icon}</span>
-                    <span className="text-xs  line-clamp-2" style={{ color: 'var(--color-text)' }}>{type.name}</span>
+                    <span className="text-xs  line-clamp-2" className="text-body">{type.name}</span>
                   </button>
                 ))}
               </div>
@@ -264,7 +264,7 @@ const EventModal = ({ event, onSave, onClose }) => {
 
             {formData.type === 'otro' && (
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   {t('relatedEvents.namePlaceholder')}
                 </label>
                 <input
@@ -272,40 +272,40 @@ const EventModal = ({ event, onSave, onClose }) => {
                   value={formData.customName}
                   onChange={(e) => setFormData({ ...formData, customName: e.target.value })}
                   placeholder={t('relatedEvents.namePlaceholder')}
-                  className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 />
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Fecha *
                 </label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full border  rounded-lg px-3 py-2" className="border-default"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Hora
                 </label>
                 <input
                   type="time"
                   value={formData.time}
                   onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Ubicación
               </label>
               <input
@@ -313,13 +313,13 @@ const EventModal = ({ event, onSave, onClose }) => {
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 placeholder="Dirección o lugar"
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Número de invitados
                 </label>
                 <input
@@ -327,12 +327,12 @@ const EventModal = ({ event, onSave, onClose }) => {
                   value={formData.guestCount}
                   onChange={(e) => setFormData({ ...formData, guestCount: e.target.value })}
                   placeholder="0"
-                  className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Presupuesto (€)
                 </label>
                 <input
@@ -340,14 +340,14 @@ const EventModal = ({ event, onSave, onClose }) => {
                   value={formData.budget}
                   onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                   placeholder="0"
-                  className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full border  rounded-lg px-3 py-2" className="border-default"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium " style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium " className="text-body">
                   Actividades
                 </label>
                 {formData.activities.length === 0 && selectedType.defaultActivities.length > 0 && (
@@ -388,7 +388,7 @@ const EventModal = ({ event, onSave, onClose }) => {
                   onChange={(e) => setNewActivity(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddActivity())}
                   placeholder="Nueva actividad..."
-                  className="flex-1 border  rounded-lg px-3 py-2 text-sm" style={{ borderColor: 'var(--color-border)' }}
+                  className="flex-1 border  rounded-lg px-3 py-2 text-sm" className="border-default"
                 />
                 <button
                   type="button"
@@ -401,7 +401,7 @@ const EventModal = ({ event, onSave, onClose }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Notas
               </label>
               <textarea
@@ -409,7 +409,7 @@ const EventModal = ({ event, onSave, onClose }) => {
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder={t('relatedEvents.notesPlaceholder')}
                 rows={3}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
@@ -417,7 +417,7 @@ const EventModal = ({ event, onSave, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
               >
                 Cancelar
               </button>
@@ -521,7 +521,7 @@ export default function EventosRelacionados() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando eventos...</p>
+            <p className="" className="text-secondary">Cargando eventos...</p>
           </div>
         </div>
       </PageWrapper>
@@ -554,12 +554,12 @@ export default function EventosRelacionados() {
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-3  rounded-lg shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="p-3  rounded-lg shadow-sm" className="bg-surface">
                   <PartyPopper className="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>Eventos Relacionados</h1>
-                  <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                  <h1 className="text-2xl font-bold " className="text-body">Eventos Relacionados</h1>
+                  <p className="text-sm " className="text-secondary">
                     Gestiona todos los eventos alrededor de tu boda
                   </p>
                 </div>
@@ -577,17 +577,17 @@ export default function EventosRelacionados() {
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{events.length}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Eventos</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{events.length}</div>
+                <div className="text-xs " className="text-secondary">Eventos</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{totalGuests}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Invitados totales</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{totalGuests}</div>
+                <div className="text-xs " className="text-secondary">Invitados totales</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{totalBudget.toFixed(0)}€</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Presupuesto total</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{totalBudget.toFixed(0)}€</div>
+                <div className="text-xs " className="text-secondary">Presupuesto total</div>
               </div>
             </div>
           </div>
@@ -623,12 +623,12 @@ export default function EventosRelacionados() {
 
           {/* Events */}
           {events.length === 0 ? (
-            <div className=" border-2 border-dashed  rounded-lg p-12 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-              <PartyPopper className="w-16 h-16  mx-auto mb-4" style={{ color: 'var(--color-muted)' }} />
-              <h3 className="text-lg font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+            <div className=" border-2 border-dashed  rounded-lg p-12 text-center" className="border-default" className="bg-surface">
+              <PartyPopper className="w-16 h-16  mx-auto mb-4" className="text-muted" />
+              <h3 className="text-lg font-semibold  mb-2" className="text-body">
                 No hay eventos relacionados
               </h3>
-              <p className="text-sm  mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+              <p className="text-sm  mb-4" className="text-secondary">
                 Añade despedidas, cenas, brunches y otros eventos alrededor de tu boda
               </p>
               <button
@@ -640,8 +640,8 @@ export default function EventosRelacionados() {
               </button>
             </div>
           ) : sortedEvents.length === 0 ? (
-            <div className=" border  rounded-lg p-8 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-              <p className="" style={{ color: 'var(--color-text-secondary)' }}>No hay eventos de este tipo</p>
+            <div className=" border  rounded-lg p-8 text-center" className="border-default" className="bg-surface">
+              <p className="" className="text-secondary">No hay eventos de este tipo</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

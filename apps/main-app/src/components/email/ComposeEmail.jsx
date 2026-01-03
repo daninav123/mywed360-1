@@ -2,7 +2,7 @@ import { AlertCircle, Paperclip } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import * as EmailService from '../../services/emailService';
 import { uploadEmailAttachments } from '../../services/storageUploadService';
 import { safeRender } from '../../utils/promiseSafeRenderer';

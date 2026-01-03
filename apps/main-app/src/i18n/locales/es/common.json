@@ -1,4 +1,13 @@
 {
+  "navbar": {
+    "features": "Funcionalidades",
+    "pricing": "Precios",
+    "suppliers": "Proveedores",
+    "planners": "Planners",
+    "partners": "Partners",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse"
+  },
   "app": {
     "name": "Planivia",
     "brandName": "Planivia",
@@ -936,6 +945,10 @@
     "registerLink": "Regístrate",
     "alreadyHaveAccount": "¿Ya tienes una cuenta?",
     "loginLink": "Iniciar sesión",
+    "fullNameLabel": "Nombre completo",
+    "fullNamePlaceholder": "Ej: María García",
+    "continueButton": "Continuar",
+    "step2Of2": "Paso 2 de 2",
     "hero": {
       "title": "Planifica tu boda sin estrés",
       "description": "Centraliza tareas, proveedores y comunicaciones en un solo lugar.",
@@ -948,7 +961,20 @@
     "roleOptions": {
       "particular": "Pareja",
       "planner": "Organizador/a de bodas",
-      "assistant": "Asistente"
+      "assistant": "Asistente",
+      "supplier": "Proveedor"
+    },
+    "step2": {
+      "particular": {
+        "title": "Información de tu boda",
+        "description": "Estos datos nos ayudarán a personalizar tu experiencia",
+        "partnerNameLabel": "Nombre de tu pareja / prometido(a)",
+        "partnerNamePlaceholder": "Ej: Carlos Martínez",
+        "weddingDateLabel": "Fecha aproximada de la boda",
+        "weddingCityLabel": "Ciudad de la boda",
+        "weddingCityPlaceholder": "Ej: Madrid",
+        "phoneLabel": "Teléfono"
+      }
     },
     "validation": {
       "missingEmail": "Ingresa tu correo electrónico.",
@@ -2361,7 +2387,18 @@
     "aria": "Imagen de inspiración",
     "ariaWithTags": "Imagen de inspiración: {{tags}}",
     "addFav": "Añadir a favoritos",
-    "removeFav": "Quitar de favoritos"
+    "removeFav": "Quitar de favoritos",
+    "pageTitle": "Inspiración",
+    "pageSubtitle": "Galería de Boda",
+    "userMenu": "Menú de usuario",
+    "profile": "Perfil",
+    "emailInbox": "Buzón de Emails",
+    "darkMode": "Modo oscuro",
+    "logout": "Cerrar sesión",
+    "userProfileSubtitle": "Perfil de Usuario",
+    "weddingManagement": "Gestión de Boda",
+    "inspirationAndNotes": "Inspiración y Notas",
+    "saving": "Guardando..."
   },
   "compose": {
     "toField": "Campo del destinatario",
@@ -2386,6 +2423,11 @@
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "save": "Guardar",
+    "date": "Fecha",
+    "time": "Hora",
+    "venue": "Lugar",
+    "address": "Dirección",
+    "select": "Seleccionar",
     "suppliers": {
       "overview": {
         "defaults": {
@@ -3988,7 +4030,7 @@
     "rfqModal": {
       "defaults": {
         "subject": "Solicitud de propuesta: {servicio}",
-        "body": "Hola {proveedor_nombre},\n\nSomos {novios} y estamos organizando nuestra boda para el {fecha_evento} en {lugar}. Nos encantaría conocer su disponibilidad y tarifas para {servicio}.\n\nDetalles del evento:\n• Invitados: {invitados}\n• Presupuesto aprox.: {presupuesto}\n• Planificador/a: {organizador}\n\n¿Podrían enviarnos una propuesta inicial o agendar una breve llamada?\n\n¡Gracias!\n\n{organizador}",
+        "body": "Hola {proveedor_nombre},\n\nSomos {novios} y estamos organizando nuestra boda para el {fecha_evento} en {lugar}. Nos encantaría conocer su disponibilidad y tarifas para {servicio}.\n\nDetalles del evento:\n• Invitados: {invitados}\n• Presupuesto aprox.: {presupuesto}\n• Planner: {organizador}\n\n¿Podrían enviarnos una propuesta inicial o agendar una breve llamada?\n\n¡Gracias!\n\n{organizador}",
         "unknownDate": "Fecha por confirmar"
       },
       "title": "Colaboradores activos ({{count}})",
@@ -4273,7 +4315,7 @@
           "sendErrorRetry": "No pudimos enviar el correo automático. Inténtalo de nuevo.",
           "sendError": "No pudimos enviar el correo automático.",
           "sending": "Enviando...",
-          "userFallback": "Planificador",
+          "userFallback": "Planner",
           "guestsFallback": "100",
           "appendedQuote": "Nos encantaría recibir una propuesta detallada con tarifas, condiciones y disponibilidad para nuestra fecha.",
           "appendedMeeting": "¿Podríamos agendar una reunión (presencial o videollamada) para revisar el servicio y confirmar disponibilidad? Cuéntanos qué horarios te vienen mejor.",
@@ -4482,7 +4524,7 @@
           "name": "Naturaleza Viva Photography",
           "service": "Photography",
           "snippet": "Estudio especializado en fotografía de bodas con un estilo natural y documental. Capturamos tus momentos más emotivos y espontáneos.",
-          "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
+          "image": "/assets/services/fotografia.webp",
           "location": "Madrid",
           "price": "€1,200 - €2,500",
           "tags": ["natural", "documentary", "outdoor", "sunlight"],
@@ -4493,7 +4535,7 @@
           "name": "Lente Azul Photography",
           "service": "Photography",
           "snippet": "Más de 10 años de experiencia en bodas en la playa y espacios naturales. Paquetes personalizados para cada pareja.",
-          "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
+          "image": "/assets/services/fotografia.webp",
           "location": "Barcelona",
           "price": "€1,500 - €3,000",
           "tags": ["beach", "outdoor", "nature"],
@@ -4504,7 +4546,7 @@
           "name": "Delicious Moments Catering",
           "service": "Catering",
           "snippet": "Catering con opciones vegetarianas, veganas y aptas para alérgicos. Especialistas en eventos de 50 a 200 invitados.",
-          "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
+          "image": "/assets/services/catering.webp",
           "location": "Madrid",
           "price": "€70 - €120 por invitado",
           "tags": ["vegetarian", "vegan", "buffet"],
@@ -4515,7 +4557,7 @@
           "name": "DJ Sonido & Luces",
           "service": "Music",
           "snippet": "DJ con sonido e iluminación profesional. Amplia experiencia en bodas y eventos corporativos.",
-          "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
+          "image": "/assets/services/musica.webp",
           "location": "Valencia",
           "price": "€800 - €1,500",
           "tags": ["dj", "music", "lighting"],
@@ -4526,7 +4568,7 @@
           "name": "Flores del Jardín",
           "service": "Flores",
           "snippet": "Floristería artesanal especializada en decoración vintage y boho. Trabajamos con producto local y de temporada.",
-          "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
+          "image": "/assets/services/flores.webp",
           "location": "Seville",
           "price": "€500 - €1,500",
           "tags": ["flores", "decoration", "boho"],
@@ -6678,6 +6720,81 @@
     "saving": "Saving",
     "save": "Save"
   },
+  "infoBoda": {
+    "vision": {
+      "title": "Visión de la Boda",
+      "subtitle": "Comparte tu sueño para el día perfecto",
+      "howWeMet": "¿Cómo os conocisteis?",
+      "howWeMetPlaceholder": "Cuéntanos vuestra historia...",
+      "mostImportant": "¿Qué es lo más importante de vuestra boda?",
+      "mostImportantPlaceholder": "Describe lo que más os importa...",
+      "mustHave": "Imprescindibles",
+      "mustHavePlaceholder": "Cosas que deben estar presentes...",
+      "mustNotHave": "A evitar",
+      "mustNotHavePlaceholder": "Cosas que queréis evitar...",
+      "remember10Years": "¿Qué queréis recordar dentro de 10 años?",
+      "remember10YearsPlaceholder": "Los momentos que durarán para siempre..."
+    },
+    "essential": {
+      "title": "Información Esencial",
+      "subtitle": "Detalles básicos sobre vuestra boda",
+      "coupleName": "Nombre de la pareja",
+      "coupleNamePlaceholder": "ej., María y Juan",
+      "coupleNameHint": "Cómo queréis aparecer en las invitaciones",
+      "weddingDate": "Fecha de la boda",
+      "numGuests": "Número de invitados",
+      "rsvpDeadline": "Fecha límite RSVP"
+    },
+    "ceremony": {
+      "ceremonyType": "Tipo de ceremonia"
+    },
+    "experience": {
+      "title": "Experiencia de la Boda",
+      "subtitle": "Ambiente y actividades",
+      "ambiancePlaceholder": "Describe el ambiente que imagináis...",
+      "activitiesPlaceholder": "Lista de actividades planificadas...",
+      "musicType": "Tipo de música",
+      "musicPlaceholder": "¿Qué estilo de música queréis?"
+    },
+    "venue": {
+      "openMaps": "Ver en Maps",
+      "gpsHint": "Las coordenadas GPS ayudan a los invitados a encontrar el lugar fácilmente"
+    },
+    "spaces": {
+      "title": "Espacios",
+      "spaceType": "Tipo de espacio",
+      "types": {
+        "farmhouse": "Masía",
+        "estate": "Finca",
+        "hotel": "Hotel",
+        "beach": "Playa",
+        "garden": "Jardín",
+        "castle": "Castillo",
+        "winery": "Bodega",
+        "other": "Otro"
+      },
+      "indoorOutdoor": "Interior/Exterior",
+      "indoor": "Interior",
+      "outdoor": "Exterior",
+      "mixed": "Mixto",
+      "tentNeeded": "¿Se necesita carpa/toldo?",
+      "planBPlaceholder": "Describe el plan B en caso de lluvia..."
+    },
+    "timing": {
+      "banquetTime": "Hora del banquete"
+    },
+    "emergency": {
+      "title": "Contactos de Emergencia",
+      "subtitle": "Personas clave para el día de la boda",
+      "coordinator": "Coordinador de boda",
+      "venueManager": "Responsable del lugar",
+      "photographer": "Fotógrafo",
+      "music": "Música/DJ",
+      "fullNamePlaceholder": "Nombre completo",
+      "phonePlaceholder": "Número de teléfono",
+      "contactPhonePlaceholder": "Teléfono de contacto"
+    }
+  },
   "authResetPassword": {
     "validation": {
       "missingEmail": "Missing Email"
@@ -7029,15 +7146,6 @@
       "subtitle": "Únete a nuestro programa de partners y empieza a ganar comisiones hoy mismo",
       "primary": "Solicitar Acceso Ahora"
     }
-  },
-  "navbar": {
-    "features": "Características",
-    "pricing": "Precios",
-    "suppliers": "Para Proveedores",
-    "planners": "Para Planners",
-    "partners": "Partners",
-    "login": "Iniciar Sesión",
-    "signup": "Comenzar Gratis"
   },
   "footer": {
     "copyright": "© 2025 Wedding Planner. Haciendo realidad bodas de ensueño.",

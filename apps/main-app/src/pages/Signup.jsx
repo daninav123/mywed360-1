@@ -26,6 +26,10 @@ export default function Signup() {
   const [busyProvider, setBusyProvider] = useState(null);
 
   const signupSource = location?.state?.signupSource || 'direct';
+  
+  // Pre-launch mode check
+  const isPreLaunchMode = import.meta.env.VITE_PRE_LAUNCH_MODE === 'true';
+  const launchDate = import.meta.env.VITE_LAUNCH_DATE || '31 de enero de 2026';
 
   useEffect(() => {
     performanceMonitor?.logEvent?.('signup_view', { source: signupSource });
@@ -79,6 +83,12 @@ export default function Signup() {
 
   const handleSubmit = async (formData) => {
     resetFeedback();
+    
+    // Block signup in pre-launch mode
+    if (isPreLaunchMode) {
+      setFormError(`La plataforma estará disponible a partir del ${launchDate}. Por ahora puedes explorar nuestras funcionalidades.`);
+      return;
+    }
 
     const context = {
       role: formData.role,

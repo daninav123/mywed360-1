@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import ExternalImage from '@/components/ExternalImage';
+import LanguageSelector from '../components/ui/LanguageSelector';
 import useTranslations from '../hooks/useTranslations';
 export default function PublicWedding() {
   const { slug } = useParams();
@@ -34,8 +35,13 @@ export default function PublicWedding() {
 
   if (state.loading) {
     return (
-      <div style={{ padding: 24, textAlign: 'center' }}>
-        {t('public.publicWedding.loading')}
+      <div className="relative min-h-screen">
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
+        <div style={{ padding: 24, textAlign: 'center' }}>
+          {t('public.publicWedding.loading')}
+        </div>
       </div>
     );
   }
@@ -45,8 +51,13 @@ export default function PublicWedding() {
         ? t('public.publicWedding.error', { reason: state.error })
         : t('public.publicWedding.error', { reason: 'error' });
     return (
-      <div style={{ padding: 24, textAlign: 'center', color: '#b91c1c' }}>
-        {message}
+      <div className="relative min-h-screen">
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
+        <div style={{ padding: 24, textAlign: 'center', color: '#b91c1c' }}>
+          {message}
+        </div>
       </div>
     );
   }
@@ -72,7 +83,7 @@ export default function PublicWedding() {
   const gallery = payload?.gallery || [];
 
   return (
-    <div className="font-sans " style={{ color: 'var(--color-text)' }}>
+    <div className="font-sans " className="text-body">
       <section className="min-h-[60vh] bg-gray-900 text-white flex items-center justify-center text-center px-6">
         <div>
           <h1 className="text-5xl font-bold mb-3">
@@ -92,7 +103,7 @@ export default function PublicWedding() {
       )}
 
       {timeline.length > 0 && (
-        <section className=" py-10" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <section className=" py-10" className="bg-page">
           <div className="max-w-2xl mx-auto px-4">
             <h2 className="text-2xl font-semibold mb-4">
               {t('public.publicWedding.defaults.timelineTitle')}
@@ -100,10 +111,10 @@ export default function PublicWedding() {
             <ul className="space-y-3">
               {timeline.map((t) => (
                 <li key={t.id} placeholder={t('publicWedding.confirmPlaceholder')} className="flex items-start gap-3">
-                  <span className="text-sm  w-24" style={{ color: 'var(--color-muted)' }}>{t.time || t.hour || ''}</span>
+                  <span className="text-sm  w-24" className="text-muted">{t.time || t.hour || ''}</span>
                   <div>
                     <div className="font-medium">{t.label || t.title || ''}</div>
-                    {t.desc && <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{t.desc}</div>}
+                    {t.desc && <div className="text-sm " className="text-secondary">{t.desc}</div>}
                   </div>
                 </li>
               ))}

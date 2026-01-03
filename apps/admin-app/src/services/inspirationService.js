@@ -33,30 +33,30 @@ const YOUTUBE_KEY = import.meta.env.VITE_YOUTUBE_KEY;
 export async function fetchInspiration(category = '', page = 1) {
   const results = [];
 
-  // Unsplash
-  if (UNSPLASH_KEY) {
-    try {
-      const res = await axios.get('https://api.unsplash.com/search/photos', {
-        params: {
-          query: `wedding ${category}`.trim(),
-          page,
-          per_page: 15,
-        },
-        headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` },
-      });
-      const mapped = res.data.results.map((img) => ({
-        id: `unsplash_image_${img.id}`,
-        type: 'image',
-        url: img.urls.regular,
-        thumb: img.urls.small,
-        categories: [category],
-        source: 'unsplash',
-      }));
-      results.push(...mapped);
-    } catch (e) {
-      // console.warn('Unsplash error', e.message);
-    }
-  }
+  // Unsplash - DESACTIVADO (migrado a imágenes propias)
+  // if (UNSPLASH_KEY) {
+  //   try {
+  //     const res = await axios.get('https://api.unsplash.com/search/photos', {
+  //       params: {
+  //         query: `wedding ${category}`.trim(),
+  //         page,
+  //         per_page: 15,
+  //       },
+  //       headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` },
+  //     });
+  //     const mapped = res.data.results.map((img) => ({
+  //       id: `unsplash_image_${img.id}`,
+  //       type: 'image',
+  //       url: img.urls.regular,
+  //       thumb: img.urls.small,
+  //       categories: [category],
+  //       source: 'unsplash',
+  //     }));
+  //     results.push(...mapped);
+  //   } catch (e) {
+  //     // console.warn('Unsplash error', e.message);
+  //   }
+  // }
 
   // Pexels
   if (PEXELS_KEY) {
@@ -140,8 +140,8 @@ export async function fetchInspiration(category = '', page = 1) {
     results.push({
       id: 'demo_1',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1529634896862-08db0e0ea1cf',
-      thumb: 'https://images.unsplash.com/photo-1529634896862-08db0e0ea1cf?w=400',
+      url: '/assets/landing/demo-decoration.webp',
+      thumb: '/assets/landing/demo-decoration.webp',
       categories: ['decoracion'],
       source: 'demo',
     });

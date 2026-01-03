@@ -35,7 +35,7 @@ export const WEB_TEMPLATES = [
           titulo: 'María & Carlos',
           subtitulo: 'Nos casamos',
           fecha: '2025-12-31',
-          imagen: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1600',
+          imagen: '/assets/services/default.webp',
         },
         displayName: 'Hero Section',
         custom: {},

@@ -11,23 +11,23 @@ import useTranslations from '../../../hooks/useTranslations';
 
 // Im�genes por tipo de servicio
 const SERVICE_IMAGES = {
-  fotografia: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=800&q=60',
-  fotografo: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=800&q=60',
-  video: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=800&q=60',
-  videografia: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=800&q=60',
-  catering: 'https://images.unsplash.com/photo-1530023367847-a683933f4177?auto=format&fit=crop&w=800&q=60',
-  flores: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800&q=60',
-  florista: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800&q=60',
-  decoracion: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=60',
-  musica: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=800&q=60',
-  dj: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=800&q=60',
-  vestido: 'https://images.unsplash.com/photo-1595751949310-d6e4b2961b28?auto=format&fit=crop&w=800&q=60',
-  peluqueria: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=60',
-  maquillaje: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=800&q=60',
-  pastel: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=800&q=60',
-  tarta: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=800&q=60',
-  invitaciones: 'https://images.unsplash.com/photo-1530103043960-ef38714abb15?auto=format&fit=crop&w=800&q=60',
-  default: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=60'
+  fotografia: '/assets/services/default.webp',
+  fotografo: '/assets/services/default.webp',
+  video: '/assets/services/default.webp',
+  videografia: '/assets/services/default.webp',
+  catering: '/assets/services/default.webp',
+  flores: '/assets/services/default.webp',
+  florista: '/assets/services/default.webp',
+  decoracion: '/assets/services/default.webp',
+  musica: '/assets/services/default.webp',
+  dj: '/assets/services/default.webp',
+  vestido: '/assets/services/default.webp',
+  peluqueria: '/assets/services/default.webp',
+  maquillaje: '/assets/services/default.webp',
+  pastel: '/assets/services/default.webp',
+  tarta: '/assets/services/default.webp',
+  invitaciones: '/assets/services/default.webp',
+  default: '/assets/services/default.webp'
 };
 
 // Funci�n para normalizar texto (quitar acentos)
@@ -130,7 +130,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
         'Estudio especializado en fotograf�a de bodas con estilo natural y documental. Capta�os los momentos m�s emotivos y espont�neos de tu boda.',
       match: 95,
       image:
-        'https://images.unsplash.com/photo-1537633552985-df8429e8048b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHdlZGRpbmclMjBwaG90b2dyYXBoeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
+        '/assets/services/default.webp',
       location: 'Madrid',
       price: '1200� - 2500�',
       aiSummary:
@@ -144,7 +144,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
         'M�s de 10 a�os de experiencia en fotograf�a de bodas en playa y espacios naturales. Ofrecem�s paquetes personaliza�os para cada pareja.',
       match: 87,
       image:
-        'https://images.unsplash.com/photo-1508435234994-67cfd7690508?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8d2VkZGluZyUyMHBob3RvZ3JhcGh5fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
+        '/assets/services/default.webp',
       location: 'Barcelona',
       price: '1500� - 3000�',
       aiSummary:
@@ -158,7 +158,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
         'Fotograf�a de autor para bodas con estilo �nico. Combina�os fotograf�a documental con retra�os art�sticos para crear un �lbum inolvidable.',
       match: 79,
       image:
-        'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fHdlZGRpbmclMjBwaG90b2dyYXBoeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
+        '/assets/services/default.webp',
       location: 'Valencia',
       price: '1000� - 2000�',
       aiSummary:

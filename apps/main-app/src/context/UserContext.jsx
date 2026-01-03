@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 
 // Contexto mínimo y estable para compatibilidad con código legacy y tests
 const UserContext = createContext({

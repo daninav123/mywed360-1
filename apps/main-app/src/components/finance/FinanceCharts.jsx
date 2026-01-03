@@ -145,57 +145,137 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
 
   return (
     <div className="space-y-6">
-      {/* Stats Cards Premium */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4 bg-[var(--color-primary-10)] border border-[color:var(--color-primary-30)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
-                {t('finance.charts.totalTransactions')}
-              </p>
-              <p className="text-2xl font-black text-body">{totalTransactions}</p>
-            </div>
-            <DollarSign className="w-8 h-8 text-[color:var(--color-primary-40)]" />
+      {/* Stats Cards con estilo del proyecto */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Total Transactions - Azul */}
+        <div style={{
+          backgroundColor: '#E8F4FD',
+          borderRadius: '20px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          border: '1px solid #EEF2F7',
+          padding: '24px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            backgroundColor: '#5EBBFF',
+            opacity: 0.6,
+          }} />
+          <div className="space-y-1">
+            <h3 style={{
+              color: '#5EBBFF',
+              fontSize: '12px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>{t('finance.charts.totalTransactions')}</h3>
+            <p className="text-3xl font-bold" style={{ color: '#5EBBFF' }}>{totalTransactions}</p>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-4 bg-[var(--color-success-10)] border border-[color:var(--color-success-30)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
-                {t('finance.charts.activeCategories')}
-              </p>
-              <p className="text-2xl font-black text-[color:var(--color-success)]">{activeCategories}</p>
-            </div>
-            <PieChartIcon className="w-8 h-8 text-[color:var(--color-success-40)]" />
+        {/* Active Categories - Verde */}
+        <div style={{
+          backgroundColor: '#E8F5E9',
+          borderRadius: '20px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          border: '1px solid #EEF2F7',
+          padding: '24px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            backgroundColor: '#4A9B5F',
+            opacity: 0.6,
+          }} />
+          <div className="space-y-1">
+            <h3 style={{
+              color: '#4A9B5F',
+              fontSize: '12px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>{t('finance.charts.activeCategories')}</h3>
+            <p className="text-3xl font-bold" style={{ color: '#4A9B5F' }}>{activeCategories}</p>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-4 bg-[var(--color-warning-10)] border border-[color:var(--color-warning-30)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
-                {t('finance.charts.budgetEfficiency')}
-              </p>
-              <p className="text-2xl font-black text-[color:var(--color-warning)]">{efficiency}%</p>
-            </div>
-            <Target className="w-8 h-8 text-[color:var(--color-warning-40)]" />
+        {/* Budget Efficiency - Naranja */}
+        <div style={{
+          backgroundColor: '#FFF3E0',
+          borderRadius: '20px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          border: '1px solid #EEF2F7',
+          padding: '24px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            backgroundColor: '#FF9800',
+            opacity: 0.6,
+          }} />
+          <div className="space-y-1">
+            <h3 style={{
+              color: '#FF9800',
+              fontSize: '12px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>{t('finance.charts.budgetEfficiency')}</h3>
+            <p className="text-3xl font-bold" style={{ color: '#FF9800' }}>{efficiency}%</p>
           </div>
-        </Card>
+        </div>
 
-        <Card className={`p-4 ${safeStats.currentBalance >= 0 ? 'bg-[var(--color-success)]' : 'bg-[var(--color-danger)]'}/10 border ${safeStats.currentBalance >= 0 ? 'border-[color:var(--color-success)]' : 'border-[color:var(--color-danger)]'}/30`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`text-xs font-bold uppercase tracking-wider ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'} mb-1`}>
-                {t('finance.charts.projectedBalance')}
-              </p>
-              <p className={`text-2xl font-black ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>
-                {formatCurrency(safeStats.currentBalance)}
-              </p>
-            </div>
-            <TrendingUp className={`w-8 h-8 ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}/40`} />
+        {/* Projected Balance - Morado */}
+        <div style={{
+          backgroundColor: '#F3E5F5',
+          borderRadius: '20px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          border: '1px solid #EEF2F7',
+          padding: '24px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            backgroundColor: safeStats.currentBalance >= 0 ? '#AB47BC' : '#E57373',
+            opacity: 0.6,
+          }} />
+          <div className="space-y-1">
+            <h3 style={{
+              color: safeStats.currentBalance >= 0 ? '#AB47BC' : '#E57373',
+              fontSize: '12px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>{t('finance.charts.projectedBalance')}</h3>
+            <p className="text-3xl font-bold" style={{ color: safeStats.currentBalance >= 0 ? '#AB47BC' : '#E57373' }}>
+              {formatCurrency(safeStats.currentBalance)}
+            </p>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Charts Grid */}

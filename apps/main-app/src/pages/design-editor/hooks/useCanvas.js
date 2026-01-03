@@ -1,8 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { useWedding } from '../../../context/WeddingContext';
-import { db, firebaseReady } from '../../../firebaseConfig';
 
-const fsImport = () => import('firebase/firestore');
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 export function useCanvas() {
   const { activeWedding } = useWedding();

@@ -8,25 +8,25 @@ import axios from 'axios';
 const DEMO_IMAGES = [
   {
     id: 'demo_1',
-    url: 'https://images.unsplash.com/photo-1529634896862-08db0e0ea1cf?auto=format&fit=crop&w=800&q=60',
+    url: '/assets/landing/demo-decoration.webp',
     thumb:
-      'https://images.unsplash.com/photo-1529634896862-08db0e0ea1cf?auto=format&fit=crop&w=400&q=60',
+      '/assets/landing/demo-decoration.webp',
     tags: ['decoración', 'flores'],
     source: 'demo',
   },
   {
     id: 'demo_2',
-    url: 'https://images.unsplash.com/photo-1499955085172-a104c9463ece?auto=format&fit=crop&w=800&q=60',
+    url: '/assets/landing/demo-ceremony.webp',
     thumb:
-      'https://images.unsplash.com/photo-1499955085172-a104c9463ece?auto=format&fit=crop&w=400&q=60',
+      '/assets/landing/demo-ceremony.webp',
     tags: ['ceremonia'],
     source: 'demo',
   },
   {
     id: 'demo_3',
-    url: 'https://images.unsplash.com/photo-1502920917128-1aa500764b1c?auto=format&fit=crop&w=800&q=60',
+    url: '/assets/landing/demo-flowers.webp',
     thumb:
-      'https://images.unsplash.com/photo-1502920917128-1aa500764b1c?auto=format&fit=crop&w=400&q=60',
+      '/assets/landing/demo-flowers.webp',
     tags: ['flores', 'vestido'],
     source: 'demo',
   },

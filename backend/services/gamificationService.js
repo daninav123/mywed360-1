@@ -1,5 +1,8 @@
 import admin from 'firebase-admin';
-import { db } from '../db.js';
+import { db, USE_FIREBASE } from '../db.js';
+
+// Verificar si Firebase está disponible
+const FIREBASE_AVAILABLE = USE_FIREBASE && db !== null;
 
 const DEFAULT_LEVELS = [
   { level: 1, min: 0, max: 100, name: 'Novato' },
@@ -89,13 +92,13 @@ const DEFAULT_STATE = {
   nextLevelTarget: DEFAULT_LEVELS[1]?.min ?? null,
 };
 
-const weddingsCollection = db.collection('weddings');
+const weddingsCollection = FIREBASE_AVAILABLE ? db.collection('weddings') : null;
 
 const userGamDoc = (weddingId, uid) =>
-  weddingsCollection.doc(String(weddingId)).collection('gamification').doc(String(uid));
+  FIREBASE_AVAILABLE ? weddingsCollection.doc(String(weddingId)).collection('gamification').doc(String(uid)) : null;
 
 const userAchievementsDoc = (weddingId, uid) =>
-  weddingsCollection.doc(String(weddingId)).collection('achievements').doc(String(uid));
+  FIREBASE_AVAILABLE ? weddingsCollection.doc(String(weddingId)).collection('achievements').doc(String(uid)) : null;
 
 const weddingEventsCollection = (weddingId) =>
   weddingsCollection.doc(String(weddingId)).collection('gamificationEvents');
@@ -177,6 +180,7 @@ function mapEventRecord(doc) {
 }
 
 export async function awardPoints(weddingId, uid, eventType, meta = {}) {
+  if (!FIREBASE_AVAILABLE) return { success: false, disabled: true };
   if (!weddingId) throw new Error('weddingId requerido');
   if (!uid) throw new Error('uid requerido');
   if (!eventType || typeof eventType !== 'string') throw new Error('eventType requerido');
@@ -294,6 +298,7 @@ export async function awardPoints(weddingId, uid, eventType, meta = {}) {
 }
 
 export async function getStats(weddingId, uid, { historyLimit = 10 } = {}) {
+  if (!FIREBASE_AVAILABLE) return null;
   if (!weddingId) throw new Error('weddingId requerido');
   if (!uid) throw new Error('uid requerido');
 
@@ -351,6 +356,7 @@ export async function getStats(weddingId, uid, { historyLimit = 10 } = {}) {
 }
 
 export async function getAchievements(weddingId, uid) {
+  if (!FIREBASE_AVAILABLE) return [];
   if (!weddingId) throw new Error('weddingId requerido');
   if (!uid) throw new Error('uid requerido');
 
@@ -364,6 +370,7 @@ export async function getAchievements(weddingId, uid) {
 }
 
 export async function getEvents(weddingId, uid, limit = 20) {
+  if (!FIREBASE_AVAILABLE) return [];
   if (!weddingId) throw new Error('weddingId requerido');
 
   const sanitizedLimit = Math.max(1, Math.min(Number(limit) || 20, 50));

@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 import { useWedding } from '../../context/WeddingContext';
-import { db, firebaseReady } from '../../firebaseConfig';
-
-const fsImport = () => import('firebase/firestore');
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 function formatDateLong(d) {
   try {
@@ -108,7 +106,7 @@ export default function Invitaciones() {
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Diseña tus invitaciones</h2>
-        <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+        <p className="" className="text-secondary">
           Genera una invitación completa con IA a partir de tus datos de Perfil. Lista para imprimir
           y exportable a PDF.
         </p>
@@ -122,7 +120,7 @@ export default function Invitaciones() {
         onImageGenerated={() => {}}
       />
 
-      {loading && <div className="text-sm  mt-3" style={{ color: 'var(--color-muted)' }}>Cargando datos de perfil…</div>}
+      {loading && <div className="text-sm  mt-3" className="text-muted">Cargando datos de perfil…</div>}
     </div>
   );
 }

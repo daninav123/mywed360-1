@@ -234,13 +234,13 @@ export default function SupplierRegistration() {
         ? successData.nextSteps
         : fallbackNextSteps;
     return (
-      <div className="min-h-screen  flex items-center justify-center p-6" style={{ backgroundColor: 'var(--color-bg)' }}>
-        <div className="max-w-2xl w-full  border rounded-xl p-8 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
-          <div className=" text-5xl mb-4" style={{ color: 'var(--color-success)' }}>✓</div>
+      <div className="min-h-screen  flex items-center justify-center p-6" className="bg-page">
+        <div className="max-w-2xl w-full  border rounded-xl p-8 text-center" className="bg-surface">
+          <div className=" text-5xl mb-4" className="text-success">✓</div>
           <h1 className="text-3xl font-bold mb-4">
             {t('suppliers.publicRegistration.success.title')}
           </h1>
-          <p className=" mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className=" mb-6" className="text-secondary">
             {t('suppliers.publicRegistration.success.description.prefix')}{' '}
             <strong>{formData.email}</strong>{' '}
             {t('suppliers.publicRegistration.success.description.suffix')}
@@ -264,7 +264,7 @@ export default function SupplierRegistration() {
               </p>
               <a
                 href={successData.setupPasswordUrl}
-                className="text-sm  hover:underline break-all" style={{ color: 'var(--color-primary)' }}
+                className="text-sm  hover:underline break-all" className="text-primary"
               >
                 {successData.setupPasswordUrl}
               </a>
@@ -280,7 +280,7 @@ export default function SupplierRegistration() {
             </button>
             <button
               onClick={() => navigate('/')}
-              className="px-6 py-3 border  rounded-lg hover:" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+              className="px-6 py-3 border  rounded-lg hover:" className="border-default" className="bg-page"
             >
               {t('suppliers.publicRegistration.success.buttons.goHome')}
             </button>
@@ -291,18 +291,18 @@ export default function SupplierRegistration() {
   }
 
   return (
-    <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8" className="bg-page">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>
+          <h1 className="text-4xl font-bold  mb-2" className="text-body">
             {t('suppliers.publicRegistration.form.header.title')}
           </h1>
-          <p className="text-lg " style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="text-lg " className="text-secondary">
             {t('suppliers.publicRegistration.form.header.subtitle')}
           </p>
         </div>
 
-        <div className=" shadow-sm rounded-lg p-8" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className=" shadow-sm rounded-lg p-8" className="bg-surface">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Información básica */}
             <div>
@@ -325,7 +325,7 @@ export default function SupplierRegistration() {
                       'common.suppliers.publicRegistration.form.basicInfo.fields.name.placeholder'
                     )}
                   />
-                  {errors.name && <p className=" text-sm mt-1" style={{ color: 'var(--color-danger)' }}>{errors.name}</p>}
+                  {errors.name && <p className=" text-sm mt-1" className="text-danger">{errors.name}</p>}
                 </div>
 
                 <div>
@@ -342,7 +342,7 @@ export default function SupplierRegistration() {
                       'common.suppliers.publicRegistration.form.basicInfo.fields.email.placeholder'
                     )}
                   />
-                  {errors.email && <p className=" text-sm mt-1" style={{ color: 'var(--color-danger)' }}>{errors.email}</p>}
+                  {errors.email && <p className=" text-sm mt-1" className="text-danger">{errors.email}</p>}
                 </div>
 
                 <div>
@@ -404,7 +404,7 @@ export default function SupplierRegistration() {
                     </option>
                   ))}
                 </select>
-                {errors.category && <p className=" text-sm mt-1" style={{ color: 'var(--color-danger)' }}>{errors.category}</p>}
+                {errors.category && <p className=" text-sm mt-1" className="text-danger">{errors.category}</p>}
               </div>
 
               <div>
@@ -423,7 +423,7 @@ export default function SupplierRegistration() {
                     </label>
                   ))}
                 </div>
-                {errors.services && <p className=" text-sm mt-1" style={{ color: 'var(--color-danger)' }}>{errors.services}</p>}
+                {errors.services && <p className=" text-sm mt-1" className="text-danger">{errors.services}</p>}
               </div>
             </div>
 
@@ -448,7 +448,7 @@ export default function SupplierRegistration() {
                       'common.suppliers.publicRegistration.form.location.fields.city.placeholder'
                     )}
                   />
-                  {errors.city && <p className=" text-sm mt-1" style={{ color: 'var(--color-danger)' }}>{errors.city}</p>}
+                  {errors.city && <p className=" text-sm mt-1" className="text-danger">{errors.city}</p>}
                 </div>
 
                 <div>
@@ -466,7 +466,7 @@ export default function SupplierRegistration() {
                     )}
                   />
                   {errors.province && (
-                    <p className=" text-sm mt-1" style={{ color: 'var(--color-danger)' }}>{errors.province}</p>
+                    <p className=" text-sm mt-1" className="text-danger">{errors.province}</p>
                   )}
                 </div>
 
@@ -500,9 +500,9 @@ export default function SupplierRegistration() {
                 placeholder={t('supplier.registration.emailPlaceholder')}
               />
               {errors.description && (
-                <p className=" text-sm mt-1" style={{ color: 'var(--color-danger)' }}>{errors.description}</p>
+                <p className=" text-sm mt-1" className="text-danger">{errors.description}</p>
               )}
-              <p className="text-sm  mt-1" style={{ color: 'var(--color-muted)' }}>
+              <p className="text-sm  mt-1" className="text-muted">
                 {t('suppliers.publicRegistration.form.description.counter', {
                   count: formData.description.length,
                 })}
@@ -580,7 +580,7 @@ export default function SupplierRegistration() {
                   onChange={handleChange}
                   className={`mt-1 ${errors.acceptedTerms ? 'border-red-500' : ''}`}
                 />
-                <span className="text-sm " style={{ color: 'var(--color-text)' }}>
+                <span className="text-sm " className="text-body">
                   {t('suppliers.publicRegistration.form.terms.prefix')}{' '}
                   <a href="/terminos" className="text-indigo-600 hover:underline">
                     {t('suppliers.publicRegistration.form.terms.termsLink')}
@@ -593,7 +593,7 @@ export default function SupplierRegistration() {
                 </span>
               </label>
               {errors.acceptedTerms && (
-                <p className=" text-sm mt-1 ml-6" style={{ color: 'var(--color-danger)' }}>{errors.acceptedTerms}</p>
+                <p className=" text-sm mt-1 ml-6" className="text-danger">{errors.acceptedTerms}</p>
               )}
             </div>
 
@@ -602,7 +602,7 @@ export default function SupplierRegistration() {
               <button
                 type="button"
                 onClick={() => navigate('/')}
-                className="px-6 py-3 border  rounded-lg hover:" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="px-6 py-3 border  rounded-lg hover:" className="border-default" className="bg-page"
               >
                 {t('suppliers.publicRegistration.form.actions.cancel')}
               </button>

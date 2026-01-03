@@ -24,7 +24,7 @@ export default function SupplierPayments() {
         <ArrowLeft size={20} /> Volver
       </button>
       <h1 className="text-3xl font-bold mb-6">Pagos y Facturación</h1>
-      <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className="p-6 rounded-lg" className="bg-surface">
         <CreditCard size={32} className="mb-4" />
         <p>Estado: {status?.paymentsEnabled ? 'Activo' : 'No configurado'}</p>
         <input type="text" placeholder={t('supplier.payments.amountPlaceholder')} />

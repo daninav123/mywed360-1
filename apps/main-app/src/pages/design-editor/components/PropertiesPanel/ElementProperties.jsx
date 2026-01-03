@@ -55,7 +55,7 @@ export default function ElementProperties({ element, canvasRef }) {
       {isText && (
         <>
           <div>
-            <label className="block text-xs font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+            <label className="block text-xs font-medium  mb-2" className="text-body">
               Tamaño de fuente
             </label>
             <input
@@ -66,15 +66,15 @@ export default function ElementProperties({ element, canvasRef }) {
               onChange={(e) => updateProperty('fontSize', parseInt(e.target.value))}
               className="w-full"
             />
-            <div className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>{props.fontSize}px</div>
+            <div className="text-xs  mt-1" className="text-muted">{props.fontSize}px</div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium  mb-2" style={{ color: 'var(--color-text)' }}>Fuente</label>
+            <label className="block text-xs font-medium  mb-2" className="text-body">Fuente</label>
             <select
               value={props.fontFamily}
               onChange={(e) => updateProperty('fontFamily', e.target.value)}
-              className="w-full px-3 py-2 border  rounded text-sm" style={{ borderColor: 'var(--color-border)' }}
+              className="w-full px-3 py-2 border  rounded text-sm" className="border-default"
               style={{ fontFamily: props.fontFamily }}
             >
               {Object.entries(WEDDING_FONTS).map(([category, fonts]) => (
@@ -96,7 +96,7 @@ export default function ElementProperties({ element, canvasRef }) {
       )}
 
       <div>
-        <label className="block text-xs font-medium  mb-2" style={{ color: 'var(--color-text)' }}>Opacidad</label>
+        <label className="block text-xs font-medium  mb-2" className="text-body">Opacidad</label>
         <input
           type="range"
           min="0"
@@ -106,13 +106,13 @@ export default function ElementProperties({ element, canvasRef }) {
           onChange={(e) => updateProperty('opacity', parseFloat(e.target.value))}
           className="w-full"
         />
-        <div className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
+        <div className="text-xs  mt-1" className="text-muted">
           {Math.round(props.opacity * 100)}%
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-medium  mb-2" style={{ color: 'var(--color-text)' }}>Rotación</label>
+        <label className="block text-xs font-medium  mb-2" className="text-body">Rotación</label>
         <input
           type="range"
           min="0"
@@ -121,7 +121,7 @@ export default function ElementProperties({ element, canvasRef }) {
           onChange={(e) => updateProperty('angle', parseInt(e.target.value))}
           className="w-full"
         />
-        <div className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>{props.angle}°</div>
+        <div className="text-xs  mt-1" className="text-muted">{props.angle}°</div>
       </div>
 
       {/* Sombra */}
@@ -142,30 +142,30 @@ export default function ElementProperties({ element, canvasRef }) {
                 updateProperty('shadow', null);
               }
             }}
-            className="w-4 h-4  rounded" style={{ color: 'var(--color-primary)' }}
+            className="w-4 h-4  rounded" className="text-primary"
           />
-          <span className="text-xs font-medium " style={{ color: 'var(--color-text)' }}>Sombra</span>
+          <span className="text-xs font-medium " className="text-body">Sombra</span>
         </label>
       </div>
 
-      <div className="pt-4 border-t " style={{ borderColor: 'var(--color-border)' }}>
+      <div className="pt-4 border-t " className="border-default">
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div>
-            <div className=" mb-1" style={{ color: 'var(--color-muted)' }}>Posición X</div>
+            <div className=" mb-1" className="text-muted">Posición X</div>
             <div className="font-mono">{Math.round(element.left || 0)}px</div>
           </div>
           <div>
-            <div className=" mb-1" style={{ color: 'var(--color-muted)' }}>Posición Y</div>
+            <div className=" mb-1" className="text-muted">Posición Y</div>
             <div className="font-mono">{Math.round(element.top || 0)}px</div>
           </div>
           <div>
-            <div className=" mb-1" style={{ color: 'var(--color-muted)' }}>Ancho</div>
+            <div className=" mb-1" className="text-muted">Ancho</div>
             <div className="font-mono">
               {Math.round((element.width || 0) * (element.scaleX || 1))}px
             </div>
           </div>
           <div>
-            <div className=" mb-1" style={{ color: 'var(--color-muted)' }}>Alto</div>
+            <div className=" mb-1" className="text-muted">Alto</div>
             <div className="font-mono">
               {Math.round((element.height || 0) * (element.scaleY || 1))}px
             </div>

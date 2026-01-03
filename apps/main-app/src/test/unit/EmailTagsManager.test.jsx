@@ -4,7 +4,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import EmailTagsManager from '../../components/email/EmailTagsManager';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { post as apiPost, get as apiGet, del as apiDel } from '../../services/apiClient';
 import * as tagService from '../../services/tagService';
 

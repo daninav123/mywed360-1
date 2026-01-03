@@ -141,14 +141,14 @@ export default function SupplierReviews() {
           <button
             onClick={() => navigate(`/supplier/dashboard/${id}`)}
             className="flex items-center gap-2 hover:opacity-70"
-            style={{ color: 'var(--color-text)' }}
+            className="text-body"
           >
             <ArrowLeft size={20} />
             <span>Volver al Dashboard</span>
           </button>
         </div>
 
-        <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--color-text)' }}>
+        <h1 className="text-3xl font-bold mb-6" className="text-body">
           Mis Reseñas
         </h1>
 
@@ -156,26 +156,26 @@ export default function SupplierReviews() {
         {stats && (
           <div
             className="shadow-md rounded-lg p-6 mb-6"
-            style={{ backgroundColor: 'var(--color-surface)' }}
+            className="bg-surface"
           >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
-                <div className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
+                <div className="text-3xl font-bold" className="text-primary">
                   {stats.averageRating}
                 </div>
                 <div className="flex items-center justify-center mt-2">
                   {renderStars(Math.round(stats.averageRating))}
                 </div>
-                <div className="text-sm mt-1" style={{ color: 'var(--color-muted)' }}>
+                <div className="text-sm mt-1" className="text-muted">
                   Valoración media
                 </div>
               </div>
 
               <div className="text-center">
-                <div className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
+                <div className="text-3xl font-bold" className="text-body">
                   {stats.totalReviews}
                 </div>
-                <div className="text-sm mt-1" style={{ color: 'var(--color-muted)' }}>
+                <div className="text-sm mt-1" className="text-muted">
                   Reseñas totales
                 </div>
               </div>
@@ -197,7 +197,7 @@ export default function SupplierReviews() {
                           }}
                         />
                       </div>
-                      <span style={{ color: 'var(--color-muted)' }}>
+                      <span className="text-muted">
                         {stats.distribution[rating]}
                       </span>
                     </div>
@@ -210,7 +210,7 @@ export default function SupplierReviews() {
 
         {/* Filtros */}
         <div className="flex items-center gap-4 mb-6">
-          <Filter size={20} style={{ color: 'var(--color-text)' }} />
+          <Filter size={20} className="text-body" />
           {['all', 'published', 'pending', 'under_review'].map((filterOption) => (
             <button
               key={filterOption}
@@ -237,14 +237,14 @@ export default function SupplierReviews() {
           {reviews.length === 0 ? (
             <div
               className="text-center py-12 rounded-lg"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
               <MessageSquare
                 size={48}
                 className="mx-auto mb-4"
-                style={{ color: 'var(--color-muted)' }}
+                className="text-muted"
               />
-              <p style={{ color: 'var(--color-muted)' }}>
+              <p className="text-muted">
                 No tienes reseñas {filter !== 'all' ? `${filter}` : ''} todavía
               </p>
             </div>
@@ -253,18 +253,18 @@ export default function SupplierReviews() {
               <div
                 key={review.id}
                 className="shadow-md rounded-lg p-6"
-                style={{ backgroundColor: 'var(--color-surface)' }}
+                className="bg-surface"
               >
                 {/* Header de la reseña */}
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-3">
-                      <h3 className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                      <h3 className="font-semibold" className="text-body">
                         {review.client.name}
                       </h3>
                       {renderStars(review.rating)}
                     </div>
-                    <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-sm" className="text-muted">
                       {review.createdAt && format.date
                         ? format.date(review.createdAt.toDate(), { dateStyle: 'medium' })
                         : ''}
@@ -286,7 +286,7 @@ export default function SupplierReviews() {
                 </div>
 
                 {/* Comentario */}
-                <p className="mb-4" style={{ color: 'var(--color-text)' }}>
+                <p className="mb-4" className="text-body">
                   {review.comment}
                 </p>
 
@@ -298,11 +298,11 @@ export default function SupplierReviews() {
                   >
                     <p
                       className="text-sm font-semibold mb-1"
-                      style={{ color: 'var(--color-primary)' }}
+                      className="text-primary"
                     >
                       Tu respuesta:
                     </p>
-                    <p className="text-sm" style={{ color: 'var(--color-text)' }}>
+                    <p className="text-sm" className="text-body">
                       {review.supplierResponse}
                     </p>
                   </div>
@@ -316,7 +316,7 @@ export default function SupplierReviews() {
                       onChange={(e) => setResponseText(e.target.value)}
                       placeholder={t('supplier.reviews.responsePlaceholder')}
                       className="w-full p-3 border rounded-lg mb-2"
-                      style={{ borderColor: 'var(--color-border)' }}
+                      className="border-default"
                       rows={3}
                     />
                     <div className="flex gap-2">
@@ -353,7 +353,7 @@ export default function SupplierReviews() {
                     <button
                       onClick={() => setRespondingTo(review.id)}
                       className="text-sm hover:opacity-70"
-                      style={{ color: 'var(--color-primary)' }}
+                      className="text-primary"
                     >
                       Responder
                     </button>

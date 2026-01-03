@@ -3,15 +3,15 @@
 
 import express from 'express';
 import { z } from 'zod';
-import { db } from '../db.js';
-import { FieldValue } from 'firebase-admin/firestore';
-import admin from 'firebase-admin';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import logger from '../utils/logger.js';
 import multer from 'multer';
 import { notifyNewQuoteRequest, notifyNewReview } from '../services/supplierNotifications.js';
 import { sendEmail } from '../services/mailgunService.js';
+
+const prisma = new PrismaClient();
 
 const router = express.Router();
 
@@ -71,15 +71,18 @@ const requireSupplierAuth = async (req, res, next) => {
     const decoded = jwt.verify(token, JWT_SECRET);
 
     // Verificar que el proveedor existe
-    const supplierDoc = await db.collection('suppliers').doc(decoded.supplierId).get();
-    if (!supplierDoc.exists) {
+    const supplier = await prisma.supplier.findUnique({
+      where: { id: decoded.supplierId },
+    });
+    
+    if (!supplier) {
       logger.warn(`[requireSupplierAuth] Supplier not found: ${decoded.supplierId}`);
       return res.status(401).json({ error: 'supplier_not_found' });
     }
 
     req.supplier = {
-      id: decoded.supplierId,
-      data: supplierDoc.data(),
+      id: supplier.id,
+      data: supplier,
     };
 
     next();
@@ -109,45 +112,39 @@ router.post('/auth/login', express.json(), async (req, res) => {
 
     // Buscar proveedor por email
     logger.info(`[supplier-login] Searching for supplier with email: ${email.toLowerCase()}`);
-    const suppliersQuery = await db
-      .collection('suppliers')
-      .where('contact.email', '==', email.toLowerCase())
-      .limit(1)
-      .get();
+    const supplier = await prisma.supplier.findFirst({
+      where: { email: email.toLowerCase() },
+    });
 
-    if (suppliersQuery.empty) {
+    if (!supplier) {
       logger.warn(`[supplier-login] Supplier not found for email: ${email.toLowerCase()}`);
       return res.status(401).json({ error: 'invalid_credentials' });
     }
 
     logger.info(`[supplier-login] Supplier found, checking password...`);
 
-    const supplierDoc = suppliersQuery.docs[0];
-    const supplierData = supplierDoc.data();
-
     // Verificar contraseña
-    // Nota: En el registro guardamos la contraseña hasheada
-    if (!supplierData.auth?.passwordHash) {
+    if (!supplier.passwordHash) {
       return res.status(401).json({
         error: 'password_not_set',
         message: 'Contraseña no configurada. Contacta soporte.',
       });
     }
 
-    const passwordValid = await bcrypt.compare(password, supplierData.auth.passwordHash);
+    const passwordValid = await bcrypt.compare(password, supplier.passwordHash);
     if (!passwordValid) {
       return res.status(401).json({ error: 'invalid_credentials' });
     }
 
     // Verificar estado de la cuenta
-    if (supplierData.profile?.status === 'suspended') {
+    if (supplier.status === 'suspended') {
       return res.status(403).json({ error: 'account_suspended' });
     }
 
     // Generar token JWT
     const token = jwt.sign(
       {
-        supplierId: supplierDoc.id,
+        supplierId: supplier.id,
         email: email.toLowerCase(),
       },
       JWT_SECRET,
@@ -155,19 +152,20 @@ router.post('/auth/login', express.json(), async (req, res) => {
     );
 
     // Actualizar última vez que inició sesión
-    await supplierDoc.ref.update({
-      lastLoginAt: FieldValue.serverTimestamp(),
+    await prisma.supplier.update({
+      where: { id: supplier.id },
+      data: { lastLoginAt: new Date() },
     });
 
     return res.json({
       success: true,
       token,
       supplier: {
-        id: supplierDoc.id,
-        name: supplierData.profile?.name,
+        id: supplier.id,
+        name: supplier.businessName,
         email: email.toLowerCase(),
-        category: supplierData.profile?.category,
-        status: supplierData.profile?.status,
+        category: supplier.category,
+        status: supplier.status,
       },
     });
   } catch (error) {
@@ -184,10 +182,10 @@ router.get('/auth/verify', requireSupplierAuth, async (req, res) => {
     success: true,
     supplier: {
       id: req.supplier.id,
-      name: req.supplier.data.profile?.name,
-      email: req.supplier.data.contact?.email,
-      category: req.supplier.data.profile?.category,
-      status: req.supplier.data.profile?.status,
+      name: req.supplier.data.businessName,
+      email: req.supplier.data.email,
+      category: req.supplier.data.category,
+      status: req.supplier.data.status,
     },
   });
 });
@@ -208,31 +206,29 @@ router.post('/auth/set-password', express.json(), async (req, res) => {
     }
 
     // Buscar proveedor
-    const suppliersQuery = await db
-      .collection('suppliers')
-      .where('contact.email', '==', email.toLowerCase())
-      .where('verification.emailVerificationToken', '==', verificationToken)
-      .limit(1)
-      .get();
+    const supplier = await prisma.supplier.findFirst({
+      where: {
+        email: email.toLowerCase(),
+        verificationToken: verificationToken,
+      },
+    });
 
-    if (suppliersQuery.empty) {
+    if (!supplier) {
       return res.status(404).json({ error: 'invalid_token' });
     }
-
-    const supplierDoc = suppliersQuery.docs[0];
 
     // Hashear contraseña
     const passwordHash = await bcrypt.hash(newPassword, 10);
 
     // Guardar contraseña
-    await supplierDoc.ref.update({
-      'auth.passwordHash': passwordHash,
-      'auth.passwordSetAt': FieldValue.serverTimestamp(),
-      'verification.emailVerified': true,
-      'verification.emailVerifiedAt': FieldValue.serverTimestamp(),
-      'verification.emailVerificationToken': null,
-      'profile.status': 'verified',
-      updatedAt: FieldValue.serverTimestamp(),
+    await prisma.supplier.update({
+      where: { id: supplier.id },
+      data: {
+        passwordHash,
+        emailVerified: true,
+        verificationToken: null,
+        status: 'verified',
+      },
     });
 
     return res.json({
@@ -250,33 +246,20 @@ router.post('/auth/set-password', express.json(), async (req, res) => {
 // ============================================
 
 // GET /portfolio - Listar todas las fotos del proveedor
+// NOTA: Portfolio usa Firebase Storage - Migrar a MinIO/S3 en futuro
 router.get('/portfolio', requireSupplierAuth, async (req, res) => {
   try {
-    logger.info(`[GET /portfolio] Handler ejecutándose para supplier: ${req.supplier?.id}`);
     const { category, featured, limit = 50 } = req.query;
 
-    let query = db
-      .collection('suppliers')
-      .doc(req.supplier.id)
-      .collection('portfolio')
-      .orderBy('uploadedAt', 'desc');
+    const where = { supplierId: req.supplier.id };
+    if (category && category !== 'all') where.category = category;
+    if (featured === 'true') where.featured = true;
 
-    // Filtros opcionales
-    if (category && category !== 'all') {
-      query = query.where('category', '==', category);
-    }
-
-    if (featured === 'true') {
-      query = query.where('featured', '==', true);
-    }
-
-    // Ejecutar query
-    const snapshot = await query.limit(Number(limit)).get();
-
-    const photos = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const photos = await prisma.supplierPortfolio.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: Number(limit),
+    });
 
     return res.json({ success: true, photos });
   } catch (error) {
@@ -728,130 +711,18 @@ router.get('/analytics/chart', requireSupplierAuth, async (req, res) => {
 });
 
 // POST /portfolio/upload - Subir nueva foto con archivo
+// NOTA: Requiere migración de Firebase Storage a MinIO/S3
+// Temporalmente deshabilitado hasta completar migración de storage
 router.post('/portfolio/upload', requireSupplierAuth, upload.single('image'), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'no_file_uploaded' });
-    }
-
-    const {
-      title = '',
-      description = '',
-      category,
-      tags = '[]',
-      featured = 'false',
-      isCover = 'false',
-    } = req.body;
-
-    // Validaciones
-    if (!category) {
-      return res.status(400).json({ error: 'category_required' });
-    }
-
-    // Generar nombre único para el archivo
-    const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(7);
-    const extension = req.file.originalname.split('.').pop();
-    const fileName = `${timestamp}_${randomString}.${extension}`;
-
-    // Subir a Firebase Storage usando Admin SDK (sin CORS)
-    // Firebase ahora usa .firebasestorage.app como bucket por defecto
-    const bucketName =
-      process.env.VITE_FIREBASE_STORAGE_BUCKET || 'planivia-98c77.firebasestorage.app';
-    logger.info(`[upload] Usando bucket: ${bucketName}`);
-    const bucket = admin.storage().bucket(bucketName);
-    const storagePath = `suppliers/${req.supplier.id}/portfolio/${fileName}`;
-    const file = bucket.file(storagePath);
-
-    await file.save(req.file.buffer, {
-      metadata: {
-        contentType: req.file.mimetype,
-      },
-    });
-
-    // Hacer el archivo público
-    await file.makePublic();
-
-    // Obtener URL pública
-    const downloadURL = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
-
-    // Si se marca como portada, desmarcar la anterior
-    const isActualCover = isCover === 'true' || isCover === true;
-    if (isActualCover) {
-      const existingCoverQuery = await db
-        .collection('suppliers')
-        .doc(req.supplier.id)
-        .collection('portfolio')
-        .where('isCover', '==', true)
-        .get();
-
-      const batch = db.batch();
-      existingCoverQuery.docs.forEach((doc) => {
-        batch.update(doc.ref, { isCover: false });
-      });
-      await batch.commit();
-    }
-
-    // Parsear tags si viene como string JSON
-    let parsedTags = [];
-    try {
-      parsedTags = typeof tags === 'string' ? JSON.parse(tags) : tags;
-    } catch (e) {
-      parsedTags =
-        typeof tags === 'string'
-          ? tags
-              .split(',')
-              .map((t) => t.trim())
-              .filter(Boolean)
-          : [];
-    }
-
-    // Crear nueva foto en Firestore
-    const photoData = {
-      title,
-      description,
-      category,
-      tags: Array.isArray(parsedTags) ? parsedTags : [],
-      featured: featured === 'true' || featured === true,
-      isCover: isActualCover,
-
-      // URLs de imágenes (por ahora sin thumbnails, se pueden generar después)
-      original: downloadURL,
-      thumbnails: {
-        small: downloadURL,
-        medium: downloadURL,
-        large: downloadURL,
-      },
-      storagePath, // Guardar para poder eliminar después
-
-      // Analytics
-      views: 0,
-      likes: 0,
-
-      // Timestamps
-      uploadedAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
-    };
-
-    const docRef = await db
-      .collection('suppliers')
-      .doc(req.supplier.id)
-      .collection('portfolio')
-      .add(photoData);
-
-    logger.info(`Photo ${docRef.id} uploaded by supplier ${req.supplier.id}`);
-
-    return res.json({
-      success: true,
-      photoId: docRef.id,
-      photo: {
-        id: docRef.id,
-        ...photoData,
-      },
+    // TODO: Migrar a MinIO o S3
+    return res.status(501).json({ 
+      error: 'storage_migration_pending',
+      message: 'Portfolio upload requiere migración a MinIO/S3. Usa endpoint legacy con URLs externas por ahora.'
     });
   } catch (error) {
-    logger.error('Error uploading portfolio photo:', error);
-    return res.status(500).json({ error: 'upload_failed', message: error.message });
+    logger.error('Error in portfolio upload:', error);
+    return res.status(500).json({ error: 'internal_error' });
   }
 });
 

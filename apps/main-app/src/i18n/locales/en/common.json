@@ -1,4 +1,13 @@
 {
+  "navbar": {
+    "features": "Features",
+    "pricing": "Pricing",
+    "suppliers": "Suppliers",
+    "planners": "Planners",
+    "partners": "Partners",
+    "login": "Log in",
+    "signup": "Sign up"
+  },
   "app": {
     "name": "Planivia",
     "brandName": "Planivia",
@@ -2360,7 +2369,18 @@
     "aria": "Inspiration image",
     "ariaWithTags": "Inspiration image: {{tags}}",
     "addFav": "Add to favorites",
-    "removeFav": "Remove from favorites"
+    "removeFav": "Remove from favorites",
+    "pageTitle": "Inspiration",
+    "pageSubtitle": "Wedding Gallery",
+    "userMenu": "User menu",
+    "profile": "Profile",
+    "emailInbox": "Email Inbox",
+    "darkMode": "Dark mode",
+    "logout": "Log out",
+    "userProfileSubtitle": "User Profile",
+    "weddingManagement": "Wedding Management",
+    "inspirationAndNotes": "Inspiration and Notes",
+    "saving": "Saving..."
   },
   "compose": {
     "toField": "Recipient field",
@@ -2385,6 +2405,11 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "save": "Save",
+    "date": "Date",
+    "time": "Time",
+    "venue": "Venue",
+    "address": "Address",
+    "select": "Select",
     "suppliers": {
       "overview": {
         "defaults": {
@@ -3182,11 +3207,11 @@
   },
   "services": {
     "catering": "Catering",
-    "photography": "Fotografía",
+    "photography": "Photography",
     "video": "Vdeo",
-    "music": "Música",
-    "musicDJ": "Música/DJ",
-    "decoration": "Decoración",
+    "music": "Music",
+    "musicDJ": "Music/DJ",
+    "decoration": "Decoration",
     "flowers": "Flores",
     "transport": "Transporte",
     "dresses": "Vestidos",
@@ -3201,7 +3226,7 @@
     "entertainment": "Animacin",
     "weddingPlanner": "Wedding Planner",
     "ceremonyVenue": "Lugar de ceremonia",
-    "receptionVenue": "Lugar de celebración",
+    "receptionVenue": "Venue",
     "accommodation": "Alojamiento",
     "honeymoon": "Viaje de novios",
     "sound": "Sonido",
@@ -3210,7 +3235,7 @@
     "weddingCake": "Tarta nupcial",
     "favors": "Detalles/Regaos",
     "security": "Seguridad",
-    "dayCoordination": "Coordinacin día B",
+    "dayCoordination": "Day-of Coordination",
     "other": "Otro"
   },
   "suppliers": {
@@ -4471,55 +4496,98 @@
           "name": "Naturaleza Viva Photography",
           "service": "Photography",
           "snippet": "Studio specialized in wedding photography with a natural, documentary style. We capture your most emotional and spontaneous moments.",
-          "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
+          "image": "/assets/services/fotografia.webp",
           "location": "Madrid",
           "price": "€1,200 - €2,500",
-          "tags": ["natural", "documentary", "outdoor", "sunlight"],
-          "keywords": ["photographer", "natural", "documentary", "wedding"]
+          "tags": [
+            "natural",
+            "documentary",
+            "outdoor",
+            "sunlight"
+          ],
+          "keywords": [
+            "photographer",
+            "natural",
+            "documentary",
+            "wedding"
+          ]
         },
         {
           "id": "2",
           "name": "Lente Azul Photography",
           "service": "Photography",
           "snippet": "More than 10 years of experience in beach weddings and natural spaces. Personalized packages for every couple.",
-          "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
+          "image": "/assets/services/fotografia.webp",
           "location": "Barcelona",
           "price": "€1,500 - €3,000",
-          "tags": ["beach", "outdoor", "nature"],
-          "keywords": ["photographer", "wedding", "beach", "experience"]
+          "tags": [
+            "beach",
+            "outdoor",
+            "nature"
+          ],
+          "keywords": [
+            "photographer",
+            "wedding",
+            "beach",
+            "experience"
+          ]
         },
         {
           "id": "3",
           "name": "Delicious Moments Catering",
           "service": "Catering",
           "snippet": "Catering with vegetarian, vegan and allergy-friendly options. Specialists in events from 50 to 200 guests.",
-          "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
+          "image": "/assets/services/catering.webp",
           "location": "Madrid",
           "price": "€70 - €120 per guest",
-          "tags": ["vegetarian", "vegan", "buffet"],
-          "keywords": ["catering", "buffet", "event"]
+          "tags": [
+            "vegetarian",
+            "vegan",
+            "buffet"
+          ],
+          "keywords": [
+            "catering",
+            "buffet",
+            "event"
+          ]
         },
         {
           "id": "4",
           "name": "DJ Sounds & Lights",
           "service": "Music",
           "snippet": "DJ with professional sound and lighting equipment. Extensive experience in weddings and corporate events.",
-          "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
+          "image": "/assets/services/musica.webp",
           "location": "Valencia",
           "price": "€800 - €1,500",
-          "tags": ["dj", "music", "lighting"],
-          "keywords": ["dj", "music", "event"]
+          "tags": [
+            "dj",
+            "music",
+            "lighting"
+          ],
+          "keywords": [
+            "dj",
+            "music",
+            "event"
+          ]
         },
         {
           "id": "5",
           "name": "Flores del Jardín",
           "service": "Flowers",
           "snippet": "Artisan florist specialized in vintage and boho decoration. We work with local, seasonal product.",
-          "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
+          "image": "/assets/services/flores.webp",
           "location": "Seville",
           "price": "€500 - €1,500",
-          "tags": ["flowers", "decoration", "boho"],
-          "keywords": ["flowers", "decoration", "wedding"]
+          "tags": [
+            "flowers",
+            "decoration",
+            "boho"
+          ],
+          "keywords": [
+            "flowers",
+            "decoration",
+            "wedding"
+          ]
         }
       ]
     },
@@ -6136,7 +6204,7 @@
         "coupleName": "{coupleName}"
       },
       "examples": {
-        "guestName": "María"
+        "guestName": "Maria"
       },
       "previewTitle": "Preview",
       "confirmAddCouple": "The message does not include {coupleName}. It will be added automatically to identify the couple.",
@@ -6666,6 +6734,75 @@
     },
     "saving": "Saving",
     "save": "Save"
+  },
+  "infoBoda": {
+    "vision": {
+      "title": "Wedding Vision",
+      "subtitle": "Share your dream for the perfect day",
+      "howWeMet": "How did you meet?",
+      "howWeMetPlaceholder": "Tell us your story...",
+      "mostImportant": "What's most important for your wedding?",
+      "mostImportantPlaceholder": "Describe what matters most to you...",
+      "mustHave": "Must-haves",
+      "mustHavePlaceholder": "Things that must be present...",
+      "mustNotHave": "Must-nots",
+      "mustNotHavePlaceholder": "Things you want to avoid...",
+      "remember10Years": "What do you want to remember in 10 years?",
+      "remember10YearsPlaceholder": "The moments that will last forever..."
+    },
+    "essential": {
+      "title": "Essential Information",
+      "subtitle": "Basic details about your wedding",
+      "coupleName": "Couple name",
+      "coupleNamePlaceholder": "e.g., Maria & John",
+      "coupleNameHint": "How you want to appear on invitations",
+      "weddingDate": "Wedding date",
+      "numGuests": "Number of guests",
+      "rsvpDeadline": "RSVP deadline"
+    },
+    "ceremony": {
+      "ceremonyType": "Ceremony type"
+    },
+    "experience": {
+      "title": "Wedding Experience",
+      "subtitle": "Atmosphere and activities",
+      "ambiancePlaceholder": "Describe the atmosphere you envision...",
+      "activitiesPlaceholder": "List planned activities...",
+      "musicType": "Music type",
+      "musicPlaceholder": "What style of music do you want?"
+    },
+    "spaces": {
+      "title": "Spaces",
+      "spaceType": "Space type",
+      "types": {
+        "farmhouse": "Farmhouse",
+        "estate": "Estate",
+        "hotel": "Hotel",
+        "beach": "Beach",
+        "garden": "Garden",
+        "castle": "Castle",
+        "winery": "Winery",
+        "other": "Other"
+      },
+      "indoorOutdoor": "Indoor/Outdoor",
+      "indoor": "Indoor",
+      "outdoor": "Outdoor",
+      "mixed": "Mixed"
+    },
+    "timing": {
+      "banquetTime": "Banquet time"
+    },
+    "emergency": {
+      "title": "Emergency Contacts",
+      "subtitle": "Key people for your wedding day",
+      "coordinator": "Wedding coordinator",
+      "venueManager": "Venue manager",
+      "photographer": "Photographer",
+      "music": "Music/DJ",
+      "fullNamePlaceholder": "Full name",
+      "phonePlaceholder": "Phone number",
+      "contactPhonePlaceholder": "Contact phone"
+    }
   },
   "authResetPassword": {
     "validation": {

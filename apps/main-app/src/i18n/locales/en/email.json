@@ -36,22 +36,22 @@
       "ariaLabel": "Insert suggested reply {{index}}"
     }
   },
-  "sent": "Enviados",
-  "drafts": "Borradores",
-  "trash": "Papelera",
-  "searchPlaceholder": "Buscar correos...",
-  "noEmails": "No hay correos",
+  "sent": "Sent",
+  "drafts": "Drafts",
+  "trash": "Trash",
+  "searchPlaceholder": "Search emails...",
+  "noEmails": "No Emails",
   "form": {
-    "to": "Para",
-    "subject": "Asunto",
-    "message": "Mensaje",
-    "attachments": "Adjuntos"
+    "to": "To",
+    "subject": "Subject",
+    "message": "Message",
+    "attachments": "Attachments"
   },
   "messages": {
-    "sent": "Correo enviado correctamente",
-    "saved": "Borrador guardado",
-    "deleted": "Correo eliminado",
-    "error": "Error al enviar el correo"
+    "sent": "Email Sent Successfully",
+    "saved": "Draft Saved",
+    "deleted": "Email Deleted",
+    "error": "Error Sending Email"
   },
   "composer": {
     "header": {

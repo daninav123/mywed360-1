@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { useWedding } from '../context/WeddingContext';
 import { toast } from 'react-toastify';
 import { generarWebAutomatica } from '../services/webBuilder/aiGeneratorService';
@@ -162,28 +162,28 @@ const WebBuilderPage = () => {
   // Mostrar loading mientras se carga el perfil
   if (profileLoading) {
     return (
-      <div className="flex items-center justify-center h-screen " style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="flex items-center justify-center h-screen " className="bg-page">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2  mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
-          <h2 className="text-xl font-semibold " style={{ color: 'var(--color-text)' }}>Cargando tu perfil...</h2>
-          <p className=" mt-2" style={{ color: 'var(--color-text-secondary)' }}>Preparando el sistema de diseño web</p>
+          <h2 className="text-xl font-semibold " className="text-body">Cargando tu perfil...</h2>
+          <p className=" mt-2" className="text-secondary">Preparando el sistema de diseño web</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="web-builder-page min-h-screen " style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="web-builder-page min-h-screen " className="bg-page">
       {/* Header */}
-      <header className=" border-b  sticky top-0 z-50" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+      <header className=" border-b  sticky top-0 z-50" className="border-default" className="bg-surface">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h1 className="text-2xl font-bold " className="text-body">
               {paso === 1 && '🎨 Crear tu Web de Boda'}
               {paso === 2 && '👀 Vista Previa'}
               {paso === 3 && '✏️ Editar tu Web'}
             </h1>
-            <p className="text-sm  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-sm  mt-1" className="text-secondary">
               {paso === 1 && 'Genera tu web automáticamente en segundos'}
               {paso === 2 && 'Revisa cómo se ve tu web'}
               {paso === 3 && 'Personaliza cada detalle a tu gusto'}
@@ -198,7 +198,7 @@ const WebBuilderPage = () => {
                     setPaso(1);
                     setWebConfig(null);
                   }}
-                  className="px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
                 >
                   ← Volver
                 </button>
@@ -227,7 +227,7 @@ const WebBuilderPage = () => {
                     setModoEdicion(false);
                     setPaso(2);
                   }}
-                  className="px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
                 >
                   👁️ Ver Preview
                 </button>
@@ -248,10 +248,10 @@ const WebBuilderPage = () => {
         {/* Paso 1: Pantalla inicial */}
         {paso === 1 && (
           <div className="max-w-2xl mx-auto text-center">
-            <div className=" rounded-2xl shadow-lg p-12" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className=" rounded-2xl shadow-lg p-12" className="bg-surface">
               <div className="text-6xl mb-6">✨</div>
-              <h2 className="text-3xl font-bold  mb-4" style={{ color: 'var(--color-text)' }}>¿Listo para crear tu web?</h2>
-              <p className=" mb-8 text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+              <h2 className="text-3xl font-bold  mb-4" className="text-body">¿Listo para crear tu web?</h2>
+              <p className=" mb-8 text-lg" className="text-secondary">
                 En solo <strong>10 segundos</strong> generaremos una web completa con todos tus
                 datos. Luego podrás editarla como quieras.
               </p>
@@ -292,9 +292,9 @@ const WebBuilderPage = () => {
                 )}
               </button>
 
-              <div className="mt-12 pt-8 border-t " style={{ borderColor: 'var(--color-border)' }}>
-                <h3 className="font-semibold  mb-3" style={{ color: 'var(--color-text)' }}>¿Qué incluye?</h3>
-                <ul className="text-left  space-y-2 inline-block" style={{ color: 'var(--color-text-secondary)' }}>
+              <div className="mt-12 pt-8 border-t " className="border-default">
+                <h3 className="font-semibold  mb-3" className="text-body">¿Qué incluye?</h3>
+                <ul className="text-left  space-y-2 inline-block" className="text-secondary">
                   <li>✓ Portada con tus nombres y fecha</li>
                   <li>✓ Tu historia de amor</li>
                   <li>✓ Información del evento</li>
@@ -309,7 +309,7 @@ const WebBuilderPage = () => {
 
         {/* Paso 2: Preview */}
         {paso === 2 && webConfig && (
-          <div className=" rounded-lg shadow-xl overflow-hidden" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className=" rounded-lg shadow-xl overflow-hidden" className="bg-surface">
             <WebRenderer
               config={webConfig}
               editable={false}

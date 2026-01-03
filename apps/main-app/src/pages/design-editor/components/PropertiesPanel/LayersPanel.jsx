@@ -90,12 +90,12 @@ export default function LayersPanel({ canvasRef }) {
   return (
     <div className="p-4 space-y-2">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Capas</h3>
-        <div className="text-xs " style={{ color: 'var(--color-muted)' }}>{layers.length} elementos</div>
+        <h3 className="text-sm font-semibold " className="text-body">Capas</h3>
+        <div className="text-xs " className="text-muted">{layers.length} elementos</div>
       </div>
 
       {layers.length === 0 ? (
-        <div className="py-8 text-center text-sm " style={{ color: 'var(--color-muted)' }}>
+        <div className="py-8 text-center text-sm " className="text-muted">
           No hay elementos en el canvas
         </div>
       ) : (
@@ -104,13 +104,13 @@ export default function LayersPanel({ canvasRef }) {
             <div
               key={layer.id}
               onClick={() => selectLayer(layer)}
-              className="flex items-center gap-2 p-2 rounded hover: cursor-pointer group" style={{ backgroundColor: 'var(--color-bg)' }}
+              className="flex items-center gap-2 p-2 rounded hover: cursor-pointer group" className="bg-page"
             >
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium  truncate" style={{ color: 'var(--color-text)' }}>
+                <div className="text-sm font-medium  truncate" className="text-body">
                   {layer.name}
                 </div>
-                <div className="text-xs " style={{ color: 'var(--color-muted)' }}>{layer.type}</div>
+                <div className="text-xs " className="text-muted">{layer.type}</div>
               </div>
 
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -125,7 +125,7 @@ export default function LayersPanel({ canvasRef }) {
                   {layer.visible ? (
                     <Eye className="w-4 h-4" />
                   ) : (
-                    <EyeOff className="w-4 h-4 " style={{ color: 'var(--color-muted)' }} />
+                    <EyeOff className="w-4 h-4 " className="text-muted" />
                   )}
                 </button>
 
@@ -138,7 +138,7 @@ export default function LayersPanel({ canvasRef }) {
                   title={layer.locked ? 'Desbloquear' : 'Bloquear'}
                 >
                   {layer.locked ? (
-                    <Lock className="w-4 h-4 " style={{ color: 'var(--color-muted)' }} />
+                    <Lock className="w-4 h-4 " className="text-muted" />
                   ) : (
                     <Unlock className="w-4 h-4" />
                   )}
@@ -149,7 +149,7 @@ export default function LayersPanel({ canvasRef }) {
                     e.stopPropagation();
                     deleteLayer(layer);
                   }}
-                  className="p-1 rounded hover:bg-red-50 " style={{ color: 'var(--color-danger)' }}
+                  className="p-1 rounded hover:bg-red-50 " className="text-danger"
                   title="Eliminar"
                 >
                   <Trash2 className="w-4 h-4" />

@@ -4,8 +4,8 @@
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FileText, Calendar, AlertCircle, CheckCircle2, Clock, Plus, Edit2, Trash2, Upload } from 'lucide-react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { useWedding } from '../context/WeddingContext';
 import PageWrapper from '../components/PageWrapper';
 import { toast } from 'react-toastify';
@@ -69,7 +69,7 @@ const TramiteCard = ({ tramite, fechaBoda, onToggle, onEdit, onDelete }) => {
               }`}>
                 {tramite.tramite.nombre}
                 {tramite.tramite.obligatorio && (
-                  <span className=" ml-1" style={{ color: 'var(--color-danger)' }}>*</span>
+                  <span className=" ml-1" className="text-danger">*</span>
                 )}
               </h3>
               {!tramite.completado && urgencia !== 'normal' && (
@@ -79,11 +79,11 @@ const TramiteCard = ({ tramite, fechaBoda, onToggle, onEdit, onDelete }) => {
               )}
             </div>
             
-            <p className="text-sm  mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-sm  mb-2" className="text-secondary">
               {tramite.tramite.descripcion}
             </p>
 
-            <div className="space-y-1 text-xs " style={{ color: 'var(--color-text-secondary)' }}>
+            <div className="space-y-1 text-xs " className="text-secondary">
               <div className="flex items-center gap-2">
                 <Clock className="w-3 h-3" />
                 <span>Plazo: {tramite.tramite.plazo} días antes</span>
@@ -125,7 +125,7 @@ const TramiteCard = ({ tramite, fechaBoda, onToggle, onEdit, onDelete }) => {
             )}
 
             {tramite.notas && (
-              <div className="mt-2 p-2  border  rounded text-xs " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+              <div className="mt-2 p-2  border  rounded text-xs " className="border-default" className="text-body" className="bg-page">
                 {tramite.notas}
               </div>
             )}
@@ -135,14 +135,14 @@ const TramiteCard = ({ tramite, fechaBoda, onToggle, onEdit, onDelete }) => {
         <div className="flex items-center gap-1 ml-2">
           <button
             onClick={() => onEdit(tramite)}
-            className="p-1.5  hover: hover:bg-blue-50 rounded transition-colors" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text-secondary)' }}
+            className="p-1.5  hover: hover:bg-blue-50 rounded transition-colors" className="text-primary" className="text-secondary"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           {!tramite.tramite.obligatorio && (
             <button
               onClick={() => onDelete(tramite.id)}
-              className="p-1.5  hover: hover:bg-red-50 rounded transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-text-secondary)' }}
+              className="p-1.5  hover: hover:bg-red-50 rounded transition-colors" className="text-danger" className="text-secondary"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -168,27 +168,27 @@ const TramiteModal = ({ tramite, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className=" rounded-lg max-w-md w-full" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className=" rounded-lg max-w-md w-full" className="bg-surface">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-xl font-bold " className="text-body">
               Editar trámite
             </h2>
-            <button onClick={onClose} className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-text-secondary)' }}>✕</button>
+            <button onClick={onClose} className=" hover:" className="text-muted" className="text-secondary">✕</button>
           </div>
 
-          <div className="mb-4 p-3  rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
-            <h3 className="font-semibold  mb-1" style={{ color: 'var(--color-text)' }}>
+          <div className="mb-4 p-3  rounded-lg" className="bg-page">
+            <h3 className="font-semibold  mb-1" className="text-body">
               {tramite.tramite.nombre}
             </h3>
-            <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-sm " className="text-secondary">
               {tramite.tramite.descripcion}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 Notas personales
               </label>
               <textarea
@@ -196,12 +196,12 @@ const TramiteModal = ({ tramite, onSave, onClose }) => {
                 onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
                 placeholder={t('legalProcedures.namePlaceholder')}
                 rows={4}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-1" className="text-body">
                 URL del documento (opcional)
               </label>
               <input
@@ -209,9 +209,9 @@ const TramiteModal = ({ tramite, onSave, onClose }) => {
                 value={formData.documentoUrl}
                 onChange={(e) => setFormData({ ...formData, documentoUrl: e.target.value })}
                 placeholder={t('legalProcedures.searchPlaceholder')}
-                className="w-full border  rounded-lg px-3 py-2" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full border  rounded-lg px-3 py-2" className="border-default"
               />
-              <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
+              <p className="text-xs  mt-1" className="text-muted">
                 Link a Drive, Dropbox, etc. donde guardas el documento
               </p>
             </div>
@@ -220,7 +220,7 @@ const TramiteModal = ({ tramite, onSave, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 px-4 py-2 border  rounded-lg hover: transition-colors" className="border-default" className="bg-page"
               >
                 Cancelar
               </button>
@@ -368,7 +368,7 @@ export default function TramitesLegales() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2  mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
-            <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando trámites...</p>
+            <p className="" className="text-secondary">Cargando trámites...</p>
           </div>
         </div>
       </PageWrapper>
@@ -391,12 +391,12 @@ export default function TramitesLegales() {
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-3  rounded-lg shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
-                  <FileText className="w-6 h-6 " style={{ color: 'var(--color-primary)' }} />
+                <div className="p-3  rounded-lg shadow-sm" className="bg-surface">
+                  <FileText className="w-6 h-6 " className="text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>Trámites Legales</h1>
-                  <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                  <h1 className="text-2xl font-bold " className="text-body">Trámites Legales</h1>
+                  <p className="text-sm " className="text-secondary">
                     Documentación necesaria para tu boda
                   </p>
                 </div>
@@ -415,33 +415,33 @@ export default function TramitesLegales() {
             )}
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>{stats.total}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Total trámites</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-body">{stats.total}</div>
+                <div className="text-xs " className="text-secondary">Total trámites</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-success)' }}>{stats.completados}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Completados</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-success">{stats.completados}</div>
+                <div className="text-xs " className="text-secondary">Completados</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <div className="text-2xl font-bold " style={{ color: 'var(--color-primary)' }}>{stats.obligatorios}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Obligatorios</div>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
+                <div className="text-2xl font-bold " className="text-primary">{stats.obligatorios}</div>
+                <div className="text-xs " className="text-secondary">Obligatorios</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
                 <div className="text-2xl font-bold text-orange-600">{stats.urgentes}</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Urgentes</div>
+                <div className="text-xs " className="text-secondary">Urgentes</div>
               </div>
-              <div className=" rounded-lg p-3 border " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className=" rounded-lg p-3 border " className="border-default" className="bg-surface">
                 <div className="text-2xl font-bold text-purple-600">{stats.porcentaje}%</div>
-                <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Progreso</div>
+                <div className="text-xs " className="text-secondary">Progreso</div>
               </div>
             </div>
 
             {stats.total > 0 && (
               <div className="mt-4">
                 <div className="flex items-center justify-between text-sm mb-2">
-                  <span className=" font-medium" style={{ color: 'var(--color-text)' }}>Progreso de categoría</span>
-                  <span className="" style={{ color: 'var(--color-text-secondary)' }}>{stats.completados}/{stats.total}</span>
+                  <span className=" font-medium" className="text-body">Progreso de categoría</span>
+                  <span className="" className="text-secondary">{stats.completados}/{stats.total}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div
@@ -470,10 +470,10 @@ export default function TramitesLegales() {
                   }`}
                 >
                   <div className="text-2xl mb-2">{cat.icono}</div>
-                  <div className="font-semibold  text-sm mb-1" style={{ color: 'var(--color-text)' }}>
+                  <div className="font-semibold  text-sm mb-1" className="text-body">
                     {cat.nombre}
                   </div>
-                  <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
+                  <div className="text-xs " className="text-secondary">
                     {catCompletados}/{catTramites.length} completados
                   </div>
                 </button>
@@ -485,19 +485,19 @@ export default function TramitesLegales() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>
+                <h2 className="text-lg font-semibold " className="text-body">
                   {CATEGORIAS_TRAMITES.find(c => c.id === activeCategory)?.nombre}
                 </h2>
-                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                <p className="text-sm " className="text-secondary">
                   {CATEGORIAS_TRAMITES.find(c => c.id === activeCategory)?.descripcion}
                 </p>
               </div>
             </div>
 
             {activeTramites.length === 0 ? (
-              <div className=" border  rounded-lg p-8 text-center" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-                <FileText className="w-12 h-12  mx-auto mb-3" style={{ color: 'var(--color-muted)' }} />
-                <p className="" style={{ color: 'var(--color-text-secondary)' }}>No hay trámites en esta categoría</p>
+              <div className=" border  rounded-lg p-8 text-center" className="border-default" className="bg-surface">
+                <FileText className="w-12 h-12  mx-auto mb-3" className="text-muted" />
+                <p className="" className="text-secondary">No hay trámites en esta categoría</p>
               </div>
             ) : (
               <div className="space-y-3">

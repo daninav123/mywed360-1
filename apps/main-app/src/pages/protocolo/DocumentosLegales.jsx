@@ -6,10 +6,7 @@ import {
   collection,
   deleteDoc,
   doc as firestoreDoc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-} from 'firebase/firestore';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 import PageWrapper from '../../components/PageWrapper';
 import Card from '../../components/ui/Card';
@@ -19,7 +16,7 @@ import useTranslations from '../../hooks/useTranslations';
 import { uploadEmailAttachments } from '../../services/storageUploadService';
 import { db } from '../../firebaseConfig';
 import { formatDate } from '../../utils/formatUtils';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 import legalCatalog from '../../data/legalRequirementsCatalog.json';
 import legalCatalogExtended from '../../data/legalRequirementsExtended.json';
@@ -644,7 +641,7 @@ export default function DocumentosLegales() {
     <PageWrapper title="Documentos">
       {!activeWedding && (
         <Card className="p-6">
-          <p className="" style={{ color: 'var(--color-text)' }}>Selecciona una boda activa para gestionar documentos.</p>
+          <p className="" className="text-body">Selecciona una boda activa para gestionar documentos.</p>
         </Card>
       )}
 
@@ -679,7 +676,7 @@ export default function DocumentosLegales() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Búsqueda de país */}
                 <div>
-                  <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                  <label className="block text-sm font-medium  mb-1" className="text-body">
                     🔍 Buscar país
                   </label>
                   <input
@@ -693,7 +690,7 @@ export default function DocumentosLegales() {
 
                 {/* Filtro por región */}
                 <div>
-                  <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                  <label className="block text-sm font-medium  mb-1" className="text-body">
                     🌍 Región
                   </label>
                   <select
@@ -712,7 +709,7 @@ export default function DocumentosLegales() {
 
                 {/* Selector de país */}
                 <div>
-                  <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                  <label className="block text-sm font-medium  mb-1" className="text-body">
                     🗺️ País {currentCountryRegion && `(${currentCountryRegion.label})`}
                   </label>
                   <select
@@ -727,14 +724,14 @@ export default function DocumentosLegales() {
                     ))}
                   </select>
                   {filteredCountries.length === 0 && (
-                    <p className="text-xs  mt-1" style={{ color: 'var(--color-danger)' }}>No hay países con ese criterio</p>
+                    <p className="text-xs  mt-1" className="text-danger">No hay países con ese criterio</p>
                   )}
                 </div>
               </div>
 
               {/* Selector de tipo de matrimonio */}
               <div>
-                <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-2" className="text-body">
                   💍 Tipo de matrimonio
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -759,13 +756,13 @@ export default function DocumentosLegales() {
 
           {/* Requisitos legales */}
           <Card className="p-6">
-            <p className="text-sm  mb-3" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-sm  mb-3" className="text-secondary">
               Esta lista es orientativa y puede variar según municipio, Registro Civil o diócesis.
               Confirma siempre con tu oficina/parroquia.
             </p>
             <div className="space-y-2">
               {requirementsList.length === 0 && (
-                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                <p className="text-sm " className="text-secondary">
                   No hay requisitos configurados para este tipo en{' '}
                   {activeCountry?.name || form.region}.
                 </p>
@@ -808,7 +805,7 @@ export default function DocumentosLegales() {
                       />
                       <span>{label}</span>
                     </label>
-                    <div className="pl-6 flex flex-wrap items-center gap-2 text-xs " style={{ color: 'var(--color-text-secondary)' }}>
+                    <div className="pl-6 flex flex-wrap items-center gap-2 text-xs " className="text-secondary">
                       <input
                         id={inputId}
                         type="file"
@@ -916,7 +913,7 @@ export default function DocumentosLegales() {
                       />
                       <label
                         htmlFor={inputId}
-                        className="px-2 py-1 border rounded cursor-pointer hover:" style={{ backgroundColor: 'var(--color-bg)' }}
+                        className="px-2 py-1 border rounded cursor-pointer hover:" className="bg-page"
                       >
                         {uploadingReq[progressKey]
                           ? 'Subiendo...'
@@ -939,7 +936,7 @@ export default function DocumentosLegales() {
                             <span>{fileMeta.filename || 'Archivo'}</span>
                           )}
                           <button
-                            className="" style={{ color: 'var(--color-danger)' }}
+                            className="" className="text-danger"
                             onClick={async () => {
                               let storageDeletedOk = true;
                               let firestoreDeletedOk = true;
@@ -1069,7 +1066,7 @@ export default function DocumentosLegales() {
                         href={link.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1  hover:underline" style={{ color: 'var(--color-primary)' }}
+                        className="inline-flex items-center gap-1  hover:underline" className="text-primary"
                       >
                         {link.label || link.url}
                         <span aria-hidden="true">↗</span>
@@ -1137,27 +1134,27 @@ export default function DocumentosLegales() {
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Descargables</h2>
-              <div className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+              <div className="text-sm " className="text-secondary">
                 {form.region === 'ES' ? 'España' : form.region}
               </div>
             </div>
             {templatesForSelection.length === 0 && (
-              <p className=" text-sm" style={{ color: 'var(--color-text-secondary)' }}>No hay descargables para la selección actual.</p>
+              <p className=" text-sm" className="text-secondary">No hay descargables para la selección actual.</p>
             )}
             {templatesForSelection.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {templatesForSelection.map((tpl) => (
                   <div
                     key={tpl.id}
-                    placeholder={t('protocol.documents.searchCountryPlaceholder')} className="border rounded-lg p-3 flex items-center justify-between " style={{ backgroundColor: 'var(--color-surface)' }}
+                    placeholder={t('protocol.documents.searchCountryPlaceholder')} className="border rounded-lg p-3 flex items-center justify-between " className="bg-surface"
                   >
                     <div>
                       <div className="font-medium">{tpl.title}</div>
-                      {tpl.desc && <div className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{tpl.desc}</div>}
+                      {tpl.desc && <div className="text-xs " className="text-secondary">{tpl.desc}</div>}
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:" style={{ backgroundColor: 'var(--color-bg)' }}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:" className="bg-page"
                         onClick={() => {
                           try {
                             const data = buildTemplatePrefill(weddingInfo);
@@ -1179,7 +1176,7 @@ export default function DocumentosLegales() {
                         <Download size={16} /> .DOC
                       </button>
                       <button
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:" style={{ backgroundColor: 'var(--color-bg)' }}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border hover:" className="bg-page"
                         onClick={async () => {
                           try {
                             const data = buildTemplatePrefill(weddingInfo);

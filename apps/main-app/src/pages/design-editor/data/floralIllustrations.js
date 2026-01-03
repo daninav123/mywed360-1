@@ -43,7 +43,7 @@ export const FLORAL_ILLUSTRATIONS = {
     {
       id: 'rose-corner-bl',
       name: 'Rosa Esquina Inferior Izquierda',
-      url: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=500&auto=format&fit=crop',
+      url: '/assets/services/flores.webp',
       category: 'roses',
       position: 'corner-bottom-left',
       style: 'watercolor',
@@ -51,7 +51,7 @@ export const FLORAL_ILLUSTRATIONS = {
     {
       id: 'rose-spray',
       name: 'Spray de Rosas',
-      url: 'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=600&auto=format&fit=crop',
+      url: '/assets/florals/rose-spray.webp',
       category: 'roses',
       position: 'accent',
       style: 'vector',
@@ -74,7 +74,7 @@ export const FLORAL_ILLUSTRATIONS = {
     {
       id: 'peony-cluster',
       name: 'Grupo de Peonías',
-      url: 'https://images.unsplash.com/photo-1452827073306-6e6e661baf57?w=600&auto=format&fit=crop',
+      url: '/assets/florals/peony-cluster.webp',
       category: 'peonies',
       position: 'corner',
       style: 'watercolor',
@@ -86,7 +86,7 @@ export const FLORAL_ILLUSTRATIONS = {
     {
       id: 'olive-branch-1',
       name: 'Rama de Olivo',
-      url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=700&auto=format&fit=crop',
+      url: '/assets/florals/olive-branch-watercolor.webp',
       category: 'olive',
       position: 'horizontal',
       style: 'watercolor',
@@ -130,7 +130,7 @@ export const FLORAL_ILLUSTRATIONS = {
     {
       id: 'wreath-mixed-1',
       name: 'Corona Floral Mixta',
-      url: 'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=700&auto=format&fit=crop',
+      url: '/assets/florals/rose-spray.webp',
       category: 'wreaths',
       position: 'frame',
       style: 'watercolor',
@@ -138,7 +138,7 @@ export const FLORAL_ILLUSTRATIONS = {
     {
       id: 'wreath-greenery',
       name: 'Corona de Verdor',
-      url: 'https://images.unsplash.com/photo-1478145046317-39f10e56b5e9?w=700&auto=format&fit=crop',
+      url: '/assets/florals/wreath-greenery.webp',
       category: 'wreaths',
       position: 'frame',
       style: 'watercolor',
@@ -146,7 +146,7 @@ export const FLORAL_ILLUSTRATIONS = {
     {
       id: 'wreath-botanical',
       name: 'Corona Botánica',
-      url: 'https://images.unsplash.com/photo-1452827073306-6e6e661baf57?w=700&auto=format&fit=crop',
+      url: '/assets/florals/peony-cluster.webp',
       category: 'wreaths',
       position: 'frame',
       style: 'watercolor',
@@ -159,10 +159,10 @@ export const FLORAL_ILLUSTRATIONS = {
       id: 'corner-set-botanical-1',
       name: 'Set Esquinas Botánicas',
       corners: {
-        topLeft: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&auto=format&fit=crop',
-        topRight: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400&auto=format&fit=crop',
-        bottomLeft: 'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=400&auto=format&fit=crop',
-        bottomRight: 'https://images.unsplash.com/photo-1478145046317-39f10e56b5e9?w=400&auto=format&fit=crop',
+        topLeft: '/assets/florals/olive-branch-watercolor.webp',
+        topRight: '/assets/services/flores.webp',
+        bottomLeft: '/assets/florals/rose-spray.webp',
+        bottomRight: '/assets/florals/wreath-greenery.webp',
       },
       category: 'corner-set',
       style: 'watercolor',
@@ -171,10 +171,10 @@ export const FLORAL_ILLUSTRATIONS = {
       id: 'corner-set-floral-2',
       name: 'Set Esquinas Florales Doradas',
       corners: {
-        topLeft: 'https://images.unsplash.com/photo-1452827073306-6e6e661baf57?w=400&auto=format&fit=crop',
-        topRight: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&auto=format&fit=crop',
-        bottomLeft: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400&auto=format&fit=crop',
-        bottomRight: 'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=400&auto=format&fit=crop',
+        topLeft: '/assets/florals/peony-cluster.webp',
+        topRight: '/assets/florals/olive-branch-watercolor.webp',
+        bottomLeft: '/assets/services/flores.webp',
+        bottomRight: '/assets/florals/rose-spray.webp',
       },
       category: 'corner-set',
       style: 'gold-accent',
@@ -186,7 +186,7 @@ export const FLORAL_ILLUSTRATIONS = {
     {
       id: 'accent-small-flowers',
       name: 'Pequeñas Flores Esparcidas',
-      url: 'https://images.unsplash.com/photo-1478145046317-39f10e56b5e9?w=400&auto=format&fit=crop',
+      url: '/assets/florals/wreath-greenery.webp',
       category: 'accents',
       position: 'scattered',
       style: 'watercolor',
@@ -194,7 +194,7 @@ export const FLORAL_ILLUSTRATIONS = {
     {
       id: 'accent-leaves',
       name: 'Hojas Decorativas',
-      url: 'https://images.unsplash.com/photo-1452827073306-6e6e661baf57?w=400&auto=format&fit=crop',
+      url: '/assets/florals/peony-cluster.webp',
       category: 'accents',
       position: 'accent',
       style: 'watercolor',

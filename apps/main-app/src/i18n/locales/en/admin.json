@@ -1,25 +1,25 @@
 {
   "admin": {
-    "title": "Administración",
-    "dashboard": "Panel de control",
+    "title": "Administration",
+    "dashboard": "Control Panel",
     "users": {
-      "title": "Gestión de usuarios",
-      "newUser": "Nuevo usuario",
-      "editUser": "Editar usuario",
-      "deleteUser": "Eliminar usuario",
+      "title": "User Management",
+      "newUser": "New User",
+      "editUser": "Edit User",
+      "deleteUser": "Delete User",
       "roles": {
-        "admin": "Administrador",
-        "owner": "Propietario",
+        "admin": "Administrator",
+        "owner": "Owner",
         "planner": "Wedding Planner",
-        "assistant": "Asistente"
+        "assistant": "Assistant"
       }
     },
-    "settings": "Configuración",
-    "analytics": "Analíticas",
-    "logs": "Registros",
+    "settings": "Settings",
+    "analytics": "Analytics",
+    "logs": "Logs",
     "messages": {
-      "updated": "Configuración actualizada",
-      "error": "Error en la operación"
+      "updated": "Settings Updated",
+      "error": "Operation Error"
     }
   },
   "_note": "Translate from es/admin.json",

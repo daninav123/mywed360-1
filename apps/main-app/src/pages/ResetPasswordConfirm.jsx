@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
+import LanguageSelector from '../components/ui/LanguageSelector';
 import useTranslations from '../hooks/useTranslations';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4004';
@@ -101,7 +102,12 @@ export default function ResetPasswordConfirm() {
 
   if (tokenValid === false) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12">
+      <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12 relative">
+        {/* Selector de idioma */}
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
+
             <div className="w-full max-w-md space-y-5 rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 shadow-sm text-center">
               <div className="text-6xl mb-4">⚠️</div>
               <h2 className="text-2xl font-semibold text-[color:var(--color-text)]">
@@ -122,7 +128,12 @@ export default function ResetPasswordConfirm() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12">
+    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12 relative">
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+
           <form
             onSubmit={handleSubmit}
             className="w-full max-w-md space-y-5 rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 shadow-sm"

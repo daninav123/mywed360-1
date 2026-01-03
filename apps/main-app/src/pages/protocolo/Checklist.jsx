@@ -27,7 +27,6 @@ import { toast } from 'react-toastify';
 
 import CeremonyChecklist from '../../components/protocolo/CeremonyChecklist';
 import Modal from '../../components/Modal';
-import PageWrapper from '../../components/PageWrapper';
 import { Button } from '../../components/ui';
 import { Card } from '../../components/ui';
 import Badge from '../../components/ui/Badge';
@@ -404,7 +403,7 @@ export default function Checklist() {
                     : ITEM_STATUS.PENDING;
                 handleStatusChange(item.id, nextStatus);
               }}
-              className="mt-1 flex-shrink-0 rounded-full p-1 transition hover:" style={{ backgroundColor: 'var(--color-bg)' }}
+              className="mt-1 flex-shrink-0 rounded-full p-1 transition hover:bg-page"
             >
               {renderStatusBadge(item.status)}
             </button>
@@ -438,7 +437,7 @@ export default function Checklist() {
               </div>
 
               {item.dueDate && (
-                <div className="mt-1 flex items-center gap-2 text-xs " style={{ color: 'var(--color-text-secondary)' }}>
+                <div className="mt-1 flex items-center gap-2 text-xs text-secondary">
                   <Calendar size={13} />
                   <span>
                     {t('protocol.checklist.labels.due')} {formatDate(item.dueDate, 'short')}
@@ -461,7 +460,7 @@ export default function Checklist() {
                     rows={3}
                   />
                   <div className="flex flex-wrap items-center gap-2">
-                    <label className="text-xs font-medium " style={{ color: 'var(--color-text-secondary)' }}>
+                    <label className="text-xs font-medium  text-secondary">
                       {t('protocol.checklist.labels.due')}
                     </label>
                     <input
@@ -475,7 +474,7 @@ export default function Checklist() {
                         variant="ghost"
                         size="xs"
                         onClick={() => setItemDueDate(item.id, null)}
-                        className="text-xs  hover:text-rose-500" style={{ color: 'var(--color-muted)' }}
+                        className="text-xs  hover:text-rose-500 text-muted"
                       >
                         {translate('common.protocol.checklist.labels.clearDue', 'Limpiar fecha')}
                       </Button>
@@ -484,7 +483,7 @@ export default function Checklist() {
                 </div>
               ) : (
                 item.notes && (
-                  <p className="mt-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                  <p className="mt-2 text-sm  text-secondary">
                     {item.notes}
                   </p>
                 )
@@ -492,12 +491,12 @@ export default function Checklist() {
 
               {itemDocs.length > 0 && (
                 <div className="mt-3">
-                  <div className="text-xs font-medium " style={{ color: 'var(--color-muted)' }}>
+                  <div className="text-xs font-medium  text-muted">
                     {t('protocol.checklist.labels.documents')}
                   </div>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {itemDocs.map((doc) => (
-                      <span key={doc.id} className="rounded-full  px-2 py-0.5 text-xs" style={{ backgroundColor: 'var(--color-bg)' }}>
+                      <span key={doc.id} className="rounded-full  px-2 py-0.5 text-xs bg-page">
                         {doc.name || doc.type}
                       </span>
                     ))}
@@ -518,7 +517,7 @@ export default function Checklist() {
               </button>
               <button
                 onClick={() => setEditingItem(isEditing ? null : item.id)}
-                className="rounded p-1  transition hover:" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-muted)' }}
+                className="rounded p-1 transition hover:text-primary text-muted"
                 title={
                   isEditing
                     ? t('protocol.checklist.tooltips.save')
@@ -530,7 +529,7 @@ export default function Checklist() {
               {item.custom && (
                 <button
                   onClick={() => handleRemoveCustomItem(item.id)}
-                  className="rounded p-1  transition hover:text-rose-600" style={{ color: 'var(--color-muted)' }}
+                  className="rounded p-1  transition hover:text-rose-600 text-muted"
                   title={t('protocol.checklist.tooltips.delete')}
                 >
                   <Trash2 size={16} />
@@ -575,7 +574,7 @@ export default function Checklist() {
     >
       <div className="space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium " style={{ color: 'var(--color-text)' }}>
+          <label className="mb-1 block text-sm font-medium  text-body">
             {t('protocol.checklist.addModal.nameLabel')}
           </label>
           <input
@@ -587,7 +586,7 @@ export default function Checklist() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium " style={{ color: 'var(--color-text)' }}>
+          <label className="mb-1 block text-sm font-medium  text-body">
             {t('protocol.checklist.addModal.notesLabel')}
           </label>
           <textarea
@@ -680,7 +679,67 @@ export default function Checklist() {
   );
 
   return (
-    <PageWrapper title={t('protocol.checklist.title')}>
+    <>
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        <div className="mx-auto my-8" style={{
+          maxWidth: '1024px',
+          width: '100%',
+          backgroundColor: '#FFFBF7',
+          borderRadius: '32px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          overflow: 'hidden'
+        }}>
+          
+          {/* Hero con degradado beige-dorado */}
+          <header className="relative overflow-hidden" style={{
+            background: 'linear-gradient(135deg, #FFF4E6 0%, #F8EFE3 50%, #E8D5C4 100%)',
+            padding: '48px 32px 32px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          }}>
+            <div className="max-w-4xl" style={{ textAlign: 'center' }}>
+              {/* Título con líneas decorativas */}
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '16px',
+                marginBottom: '12px'
+              }}>
+                <div style={{
+                  width: '60px',
+                  height: '1px',
+                  background: 'linear-gradient(to right, transparent, #D4A574)',
+                }} />
+                <h1 style={{
+                  fontFamily: "'Playfair Display', 'Cormorant Garamond', serif",
+                  fontSize: '40px',
+                  fontWeight: 400,
+                  color: '#1F2937',
+                  letterSpacing: '-0.01em',
+                  margin: 0,
+                }}>Checklist de protocolo</h1>
+                <div style={{
+                  width: '60px',
+                  height: '1px',
+                  background: 'linear-gradient(to left, transparent, #D4A574)',
+                }} />
+              </div>
+              
+              {/* Subtítulo como tag uppercase */}
+              <p style={{
+                fontFamily: "'DM Sans', 'Inter', sans-serif",
+                fontSize: '11px',
+                fontWeight: 600,
+                color: '#9CA3AF',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '32px',
+              }}>Controla documentos, ensayos y entregables críticos para el flujo 11.</p>
+            </div>
+          </header>
+
+          {/* Contenido */}
+          <section className="px-6 py-6">
       <input
         ref={fileInputRef}
         type="file"
@@ -692,7 +751,7 @@ export default function Checklist() {
       <AddCheckpointModal />
 
       <div className="space-y-6">
-        <header className="rounded-2xl border   p-6 shadow-sm" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+        <header className="rounded-2xl border p-6 shadow-sm border-default bg-surface">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-center gap-3">
@@ -712,23 +771,23 @@ export default function Checklist() {
                       : translate('common.protocol.checklist.countdown.future', 'Cuenta atrás al gran día') + ` · ${countdown.days}d ${countdown.hours}h`}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 rounded-full  px-4 py-2 text-sm " style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <div className="flex items-center gap-2 rounded-full px-4 py-2 text-sm text-secondary bg-page">
                     <Clock size={16} />
                     {translate('common.protocol.checklist.countdown.missing', 'Añade la fecha del evento para ver la cuenta atrás.')}
                   </div>
                 )}
-                <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-muted)' }}>
+                <div className="flex items-center gap-2 text-sm text-muted">
                   <Calendar size={16} />
                   {eventDate ? formatDate(eventDate, 'long') : translate('common.protocol.checklist.labels.noDate', 'Sin fecha definida')}
                 </div>
               </div>
               <div>
-                <p className="text-base font-semibold " style={{ color: 'var(--color-text)' }}>
+                <p className="text-base font-semibold  text-body">
                   {readiness.isReady
                     ? translate('common.protocol.checklist.readiness.ready', 'Checklist completa y lista para el evento.')
                     : translate('common.protocol.checklist.readiness.pending', 'Revisa los puntos críticos antes de la boda.')}
                 </p>
-                <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                <p className="text-sm  text-secondary">
                   {t('protocol.checklist.description')}
                 </p>
               </div>
@@ -770,15 +829,15 @@ export default function Checklist() {
             </div>
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+            <div className="flex items-center gap-2 text-sm  text-secondary">
               <CheckCircle className="text-emerald-500" size={18} />
               {translate('common.protocol.checklist.stats.completion', 'Completado:')} {summary.completionPercentage || 0}%
             </div>
-            <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+            <div className="flex items-center gap-2 text-sm  text-secondary">
               <AlertTriangle className="text-amber-500" size={18} />
               {translate('common.protocol.checklist.stats.critical', 'Críticos abiertos:')} {summary.criticalPending.length}
             </div>
-            <div className="flex items-center gap-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+            <div className="flex items-center gap-2 text-sm  text-secondary">
               <AlertCircle className="text-rose-500" size={18} />
               {translate('common.protocol.checklist.stats.overdue', 'Atrasados:')} {summary.overdueItems.length}
             </div>
@@ -787,7 +846,7 @@ export default function Checklist() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={translate('common.protocol.checklist.labels.search', 'Buscar en el checklist')}
-                className="w-64 rounded-md border  px-3 py-2 text-sm focus:border-[color:var(--color-primary)] focus:outline-none" style={{ borderColor: 'var(--color-border)' }}
+                className="w-64 rounded-md border  px-3 py-2 text-sm focus:border-[color:var(--color-primary)] focus:outline-none border-default"
               />
             </div>
           </div>
@@ -795,13 +854,13 @@ export default function Checklist() {
 
         <div className="grid gap-6 lg:grid-cols-[320px,1fr]">
           <aside className="space-y-6 lg:sticky lg:top-24">
-            <Card className="space-y-4 border   p-4 shadow-sm" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+            <Card className="space-y-4 border p-4 shadow-sm border-default bg-surface">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
+                  <p className="text-sm font-semibold  text-body">
                     {translate('common.protocol.checklist.readiness.title', 'Estado del evento')}
                   </p>
-                  <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
+                  <p className="text-xs  text-muted">
                     {readiness.isReady
                       ? translate(
                           'common.protocol.checklist.readiness.subtitleReady',
@@ -858,9 +917,9 @@ export default function Checklist() {
               )}
             </Card>
 
-            <Card className="space-y-4 border   p-4 shadow-sm" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+            <Card className="space-y-4 border p-4 shadow-sm border-default bg-surface">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
+                <p className="text-sm font-semibold  text-body">
                   {translate('common.protocol.checklist.manual.title', 'Extras personales')}
                 </p>
                 <Button
@@ -873,7 +932,7 @@ export default function Checklist() {
                 </Button>
               </div>
               {manualChecks.length === 0 ? (
-                <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
+                <p className="text-xs  text-muted">
                   {t('protocol.checklist.manual.empty', {
                     button: t('protocol.checklist.buttons.addCheckpoint'),
                   })}
@@ -904,7 +963,7 @@ export default function Checklist() {
                           {item.title}
                         </p>
                         {item.notes && (
-                          <p className="mt-0.5 text-[11px] " style={{ color: 'var(--color-muted)' }}>{item.notes}</p>
+                          <p className="mt-0.5 text-[11px]  text-muted">{item.notes}</p>
                         )}
                       </div>
                       <button
@@ -913,7 +972,7 @@ export default function Checklist() {
                             prev.filter((checkpoint) => checkpoint.id !== item.id)
                           )
                         }
-                        className=" transition hover:text-rose-500" style={{ color: 'var(--color-muted)' }}
+                        className=" transition hover:text-rose-500 text-muted"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -940,15 +999,15 @@ export default function Checklist() {
                 >
                   <button
                     onClick={() => toggleSection(section.key)}
-                    className="flex w-full items-center justify-between gap-3 border-b border-gray-100  px-5 py-4 text-left" style={{ backgroundColor: 'var(--color-bg)' }}
+                    className="flex w-full items-center justify-between gap-3 border-b border-gray-100  px-5 py-4 text-left bg-page"
                   >
                     <div className="flex flex-1 items-center gap-3">
-                      <div className="rounded-full bg-gray-200 p-2 " style={{ color: 'var(--color-text)' }}>
+                      <div className="rounded-full bg-gray-200 p-2  text-body">
                         <section.icon size={18} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{section.title}</p>
-                        <p className="text-xs " style={{ color: 'var(--color-muted)' }}>{section.summary}</p>
+                        <p className="text-sm font-semibold  text-body">{section.title}</p>
+                        <p className="text-xs  text-muted">{section.summary}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -961,15 +1020,15 @@ export default function Checklist() {
                   {isExpanded && (
                     <div className="space-y-4 px-5 py-4">
                       {visibleItems.length === 0 ? (
-                        <div className="rounded-lg border border-dashed  p-6 text-center text-sm " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-muted)' }}>
+                        <div className="rounded-lg border border-dashed p-6 text-center text-sm border-default text-muted">
                           {searchTerm
                             ? translate(
                                 'common.protocol.checklist.labels.searchEmpty',
-                                'Sin resultados para esta búsqueda.'
+                                'No se encontraron ítems que coincidan con tu búsqueda.'
                               )
                             : translate(
-                                'common.protocol.checklist.labels.emptySection',
-                                'Nada pendiente en esta sección.'
+                                'common.protocol.checklist.labels.noCritical',
+                                'No tienes puntos críticos en esta categoría. ¡Todo bien!'
                               )}
                         </div>
                       ) : (
@@ -989,18 +1048,18 @@ export default function Checklist() {
               const isExpanded = expandedSections.has(section.key);
 
               return (
-                <Card key={section.key} className="border  shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <Card key={section.key} className="border  shadow-sm bg-surface">
                   <button
                     onClick={() => toggleSection(section.key)}
-                    className="flex w-full items-center justify-between gap-2 border-b border-gray-100  px-5 py-4 text-left" style={{ backgroundColor: 'var(--color-bg)' }}
+                    className="flex w-full items-center justify-between gap-2 border-b border-gray-100  px-5 py-4 text-left bg-page"
                   >
-                    <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{section.title}</p>
+                    <p className="text-sm font-semibold  text-body">{section.title}</p>
                     {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
                   {isExpanded && (
                     <div className="space-y-4 px-5 py-4">
                       {visibleItems.length === 0 ? (
-                        <div className="rounded-lg border border-dashed  p-6 text-center text-sm " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-muted)' }}>
+                        <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted">
                           {searchTerm
                             ? translate(
                                 'common.protocol.checklist.labels.searchEmpty',
@@ -1008,7 +1067,7 @@ export default function Checklist() {
                               )
                             : translate(
                                 'common.protocol.checklist.labels.emptySection',
-                                'Añade aquí notas personales o tareas técnicas.'
+                                'Esta sección está vacía.'
                               )}
                         </div>
                       ) : (
@@ -1022,7 +1081,7 @@ export default function Checklist() {
               );
             })}
 
-            <Card className="flex flex-col gap-3 border border-dashed   p-5 text-sm " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+            <Card className="flex flex-col gap-3 border border-dashed p-5 text-sm border-default text-body bg-page">
               <div className="flex items-center gap-2">
                 <Plus size={18} />
                 <p className="font-semibold">
@@ -1032,7 +1091,7 @@ export default function Checklist() {
                   )}
                 </p>
               </div>
-              <p className="text-xs " style={{ color: 'var(--color-muted)' }}>
+              <p className="text-xs  text-muted">
                 {translate(
                   'common.protocol.checklist.customItems.subtitle',
                   `Personaliza el checklist con recordatorios propios (máximo ${MAX_CUSTOM_ITEMS} ítems).`
@@ -1092,6 +1151,12 @@ export default function Checklist() {
           </div>
         ) : null}
       </div>
-    </PageWrapper>
+      
+      </section>
+        </div>
+        {/* Fin contenedor blanco */}
+      </div>
+      {/* Fin contenedor beige */}
+    </>
   );
 }

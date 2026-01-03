@@ -1,55 +1,28 @@
 import express from 'express';
-import { db } from '../../db.js';
+import { PrismaClient } from '@prisma/client';
 import { requireMailAccess } from '../../middleware/authMiddleware.js';
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 async function setReadFlag(id, flag, req) {
-  // Intentar primero en la colección global
-  const docRef = db.collection('mails').doc(id);
-  const doc = await docRef.get();
-  if (doc.exists) {
-    const data = doc.data();
-    await docRef.update({ read: flag });
-    return { data, scope: 'global' };
+  // Buscar mail en PostgreSQL
+  const mail = await prisma.mail.findUnique({ where: { id } });
+  
+  if (mail) {
+    await prisma.mail.update({
+      where: { id },
+      data: { read: flag },
+    });
+    return { data: mail, scope: 'global' };
   }
-
-  // Fallback: algunos mensajes existen sólo en la subcolección del usuario
-  try {
-    const uid = req?.user?.uid || null;
-    if (uid) {
-      const userDocRef = db.collection('users').doc(uid).collection('mails').doc(id);
-      const userDoc = await userDocRef.get();
-      if (userDoc.exists) {
-        await userDocRef.set({ read: flag }, { merge: true });
-        const data = userDoc.data() || {};
-        return { data, scope: 'user', uid };
-      }
-    }
-  } catch (_) {}
 
   return { notFound: true };
 }
 
 async function propagateToUserSubcollection(data, id, flag) {
-  try {
-    const targetEmail = data.folder === 'sent' ? data.from : data.to;
-    if (targetEmail) {
-      let uid = null;
-      const byAlias = await db.collection('users').where('myWed360Email', '==', targetEmail).limit(1).get();
-      if (!byAlias.empty) {
-        uid = byAlias.docs[0].id;
-      } else {
-        const byLogin = await db.collection('users').where('email', '==', targetEmail).limit(1).get();
-        if (!byLogin.empty) uid = byLogin.docs[0].id;
-      }
-      if (uid) {
-        await db.collection('users').doc(uid).collection('mails').doc(id).set({ read: flag }, { merge: true });
-      }
-    }
-  } catch (e) {
-    console.warn('No se pudo propagar read/unread a subcolección de usuario:', e?.message || e);
-  }
+  // Ya no necesario - Mail tiene relación directa con userId
+  // PostgreSQL maneja esto automáticamente
 }
 
 // PATCH /api/mail/:id/read
@@ -112,31 +85,13 @@ router.post('/:id/unread', requireMailAccess, async (req, res) => {
 router.delete('/:id', requireMailAccess, async (req, res) => {
   try {
     const { id } = req.params;
-    const docRef = db.collection('mails').doc(id);
-    const snap = await docRef.get();
-    const data = snap.exists ? snap.data() : null;
-    await docRef.delete();
-
-    try {
-      if (data) {
-        const targetEmail = data.folder === 'sent' ? data.from : data.to;
-        if (targetEmail) {
-          let uid = null;
-          const byAlias = await db.collection('users').where('myWed360Email', '==', targetEmail).limit(1).get();
-          if (!byAlias.empty) {
-            uid = byAlias.docs[0].id;
-          } else {
-            const byLogin = await db.collection('users').where('email', '==', targetEmail).limit(1).get();
-            if (!byLogin.empty) uid = byLogin.docs[0].id;
-          }
-          if (uid) {
-            await db.collection('users').doc(uid).collection('mails').doc(id).delete();
-          }
-        }
-      }
-    } catch (e) {
-      console.warn('No se pudo eliminar de subcolección de usuario:', e?.message || e);
+    const mail = await prisma.mail.findUnique({ where: { id } });
+    if (!mail) {
+      return res.status(404).json({ error: 'Mail no encontrado' });
     }
+    await prisma.mail.delete({ where: { id } });
+
+    // Cleanup de subcollections ya no necesario - PostgreSQL maneja esto con relaciones
     res.status(204).end();
   } catch (err) {
     console.error('Error en DELETE /api/mail/:id:', err);

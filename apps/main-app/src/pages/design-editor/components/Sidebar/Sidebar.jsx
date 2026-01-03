@@ -64,8 +64,8 @@ export default function Sidebar({ onAddElement, assets, loading }) {
   };
 
   return (
-    <aside className="w-64  border-r  flex flex-col" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-      <div className="flex border-b " style={{ borderColor: 'var(--color-border)' }}>
+    <aside className="w-64  border-r  flex flex-col" className="border-default" className="bg-surface">
+      <div className="flex border-b " className="border-default">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (

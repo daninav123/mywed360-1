@@ -4,6 +4,13 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import { sendPasswordResetEmail } from '../services/emailResetService.js';
+import {
+  sendSuccess,
+  sendValidationError,
+  sendInternalError,
+} from '../utils/apiResponse.js';
+import { generateUserEmailAliases } from '../utils/emailAliasGenerator.js';
+import { requireAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -25,15 +32,17 @@ function generateRefreshToken() {
 // POST /api/auth/register - Registro de nuevo usuario
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, role = 'particular', fullName, weddingInfo, plannerInfo, assistantInfo } = req.body;
+    
+    console.log('[Auth] Register attempt:', { email, hasPassword: !!password, passwordLength: password?.length });
 
     // Validación
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email y password requeridos' });
+      return sendValidationError(req, res, [{ message: 'Email y password requeridos' }]);
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'Password debe tener al menos 6 caracteres' });
+    if (password.length < 8) {
+      return sendValidationError(req, res, [{ message: 'Password debe tener al menos 8 caracteres' }]);
     }
 
     // Verificar si el email ya existe
@@ -42,26 +51,48 @@ router.post('/register', async (req, res) => {
     });
 
     if (existingUser) {
-      return res.status(400).json({ error: 'Email ya registrado' });
+      return sendValidationError(req, res, [{ message: 'Email ya registrado' }]);
     }
 
+    console.log('[Auth] Hasheando password...');
     // Hash del password
     const passwordHash = await bcrypt.hash(password, 10);
+    console.log('[Auth] Password hasheado correctamente');
 
     // Generar verification token
     const verificationToken = crypto.randomBytes(32).toString('hex');
+
+    // Mapear rol del formulario a UserRole de Prisma
+    const roleMap = {
+      'particular': 'OWNER',
+      'planner': 'PLANNER',
+      'assistant': 'ASSISTANT',
+      'supplier': 'SUPPLIER'
+    };
+    const prismaRole = roleMap[role] || 'OWNER';
+
+    // Generar alias de email único @planivia.net
+    const emailAliases = await generateUserEmailAliases(fullName || email, prisma);
+    console.log('[Auth] Email aliases generados:', emailAliases);
 
     // Crear usuario con perfil
     const user = await prisma.user.create({
       data: {
         email: email.toLowerCase(),
         passwordHash,
-        name: name || null,
         verificationToken,
+        role: prismaRole,
         profile: {
           create: {
-            role: 'user',
+            role: role,
+            phone: weddingInfo?.phone || plannerInfo?.professionalPhone || assistantInfo?.phone || null,
+            planiviaEmail: emailAliases.planiviaEmail,
             settings: {},
+            metadata: {
+              fullName: fullName || null,
+              ...(plannerInfo && { plannerInfo }),
+              ...(assistantInfo && { assistantInfo })
+            },
           },
         },
       },
@@ -88,18 +119,66 @@ router.post('/register', async (req, res) => {
       },
     });
 
+    // Si es particular, crear boda inicial con weddingInfo
+    if (role === 'particular') {
+      try {
+        const weddingDate = weddingInfo?.weddingDate ? new Date(weddingInfo.weddingDate) : null;
+        
+        const wedding = await prisma.wedding.create({
+          data: {
+            userId: user.id,
+            coupleName: weddingInfo?.coupleName || `Boda de ${fullName}`,
+            weddingDate: weddingDate,
+            celebrationCity: weddingInfo?.celebrationCity || null,
+            celebrationPlace: null,
+            celebrationAddress: null,
+            banquetPlace: null,
+            receptionAddress: null,
+            schedule: null,
+            numGuests: 0,
+            status: 'planning',
+            access: {
+              create: {
+                userId: user.id,
+                role: 'OWNER',
+                permissions: {},
+                status: 'active'
+              }
+            }
+          },
+        });
+        console.log('[Auth] Boda inicial creada para particular:', wedding.id);
+      } catch (weddingError) {
+        console.error('[Auth] Error creando boda inicial:', weddingError);
+        console.error('[Auth] Error details:', weddingError.message);
+        // No fallar el registro si falla la creación de la boda
+      }
+    }
+
     // Respuesta (sin password hash)
     const { passwordHash: _, verificationToken: __, ...userData } = user;
 
-    res.status(201).json({
-      user: userData,
-      token,
-      refreshToken,
-      message: 'Usuario creado exitosamente',
-    });
+    console.log('[Auth] Usuario creado exitosamente:', user.id);
+    return sendSuccess(
+      req,
+      res,
+      {
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          fullName: user.fullName,
+        },
+        token,
+        refreshToken,
+      },
+      201
+    );
   } catch (error) {
-    console.error('[Auth] Error en register:', error);
-    res.status(500).json({ error: 'Error al crear usuario' });
+    console.error('[Auth] Error en registro:', error);
+    console.error('[Auth] Error stack:', error.stack);
+    console.error('[Auth] Error message:', error.message);
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -109,7 +188,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email y password requeridos' });
+      return sendValidationError(req, res, [{ message: 'Email y password requeridos' }]);
     }
 
     console.log('[Auth] Login attempt:', email.toLowerCase());
@@ -122,15 +201,14 @@ router.post('/login', async (req, res) => {
 
     if (!user) {
       console.log('[Auth] Usuario no encontrado:', email.toLowerCase());
-      return res.status(401).json({ error: 'Credenciales inválidas' });
+      return sendValidationError(req, res, [{ message: 'Credenciales inválidas' }]);
     }
 
-    console.log('[Auth] Usuario encontrado. passwordHash existe:', !!user.passwordHash);
-    console.log('[Auth] passwordHash length:', user.passwordHash?.length || 0);
+    // Validación de passwordHash (logs sensibles removidos por seguridad)
 
     if (!user.passwordHash) {
       console.log('[Auth] Usuario sin passwordHash - requiere migración de Firebase');
-      return res.status(401).json({ error: 'Credenciales inválidas' });
+      return sendValidationError(req, res, [{ message: 'Credenciales inválidas' }]);
     }
 
     // Verificar password
@@ -138,7 +216,7 @@ router.post('/login', async (req, res) => {
     console.log('[Auth] Password válida:', validPassword);
     
     if (!validPassword) {
-      return res.status(401).json({ error: 'Credenciales inválidas' });
+      return sendValidationError(req, res, [{ message: 'Credenciales inválidas' }]);
     }
 
     console.log('[Auth] Generando tokens...');
@@ -167,16 +245,18 @@ router.post('/login', async (req, res) => {
     const { passwordHash: _, verificationToken: __, resetToken: ___, ...userData } = user;
 
     console.log('[Auth] Enviando respuesta exitosa');
-    res.json({
-      user: userData,
-      token,
-      refreshToken,
-      message: 'Login exitoso',
-    });
-    console.log('[Auth] Login completado exitosamente');
+    return sendSuccess(
+      req,
+      res,
+      {
+        user: userData,
+        token,
+        refreshToken,
+      }
+    );
   } catch (error) {
     console.error('[Auth] Error en login:', error);
-    res.status(500).json({ error: 'Error al iniciar sesión' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -216,16 +296,16 @@ router.get('/me', async (req, res) => {
     // Respuesta sin datos sensibles
     const { passwordHash: _, verificationToken: __, resetToken: ___, ...userData } = user;
 
-    res.json({ user: userData });
+    return sendSuccess(req, res, { user: userData });
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Token inválido' });
     }
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expirado' });
+      return sendInternalError(req, res, new Error('Error en el login'));
     }
     console.error('[Auth] Error en /me:', error);
-    res.status(500).json({ error: 'Error al obtener usuario' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -241,10 +321,10 @@ router.post('/logout', async (req, res) => {
       });
     }
 
-    res.json({ message: 'Sesión cerrada' });
+    return sendSuccess(req, res, { message: 'Sesión cerrada' });
   } catch (error) {
     console.error('[Auth] Error en logout:', error);
-    res.status(500).json({ error: 'Error al cerrar sesión' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -254,7 +334,7 @@ router.post('/refresh', async (req, res) => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-      return res.status(400).json({ error: 'Refresh token requerido' });
+      return sendValidationError(req, res, [{ message: 'Refresh token requerido' }]);
     }
 
     // Buscar sesión
@@ -264,22 +344,22 @@ router.post('/refresh', async (req, res) => {
     });
 
     if (!session) {
-      return res.status(401).json({ error: 'Sesión inválida' });
+      return sendValidationError(req, res, [{ message: 'Sesión inválida' }]);
     }
 
     // Verificar expiración
     if (new Date() > session.expiresAt) {
       await prisma.session.delete({ where: { id: session.id } });
-      return res.status(401).json({ error: 'Sesión expirada' });
+      return sendValidationError(req, res, [{ message: 'Sesión expirada' }]);
     }
 
     // Generar nuevo token JWT
     const token = generateToken(session.userId);
 
-    res.json({ token });
+    return sendSuccess(req, res, { token });
   } catch (error) {
     console.error('[Auth] Error en refresh:', error);
-    res.status(500).json({ error: 'Error al refrescar token' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -289,7 +369,7 @@ router.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-      return res.status(400).json({ error: 'Email requerido' });
+      return sendValidationError(req, res, [{ message: 'Email requerido' }]);
     }
 
     const user = await prisma.user.findUnique({
@@ -298,7 +378,7 @@ router.post('/forgot-password', async (req, res) => {
 
     // No revelar si el email existe o no (seguridad)
     if (!user) {
-      return res.json({ message: 'Si el email existe, recibirás instrucciones' });
+      return sendSuccess(req, res, { message: 'Si el email existe, recibirás instrucciones' });
     }
 
     // Generar token de reset
@@ -322,14 +402,14 @@ router.post('/forgot-password', async (req, res) => {
       // No revelamos el error al usuario por seguridad
     }
     
-    res.json({
+    return sendSuccess(req, res, {
       message: 'Si el email existe, recibirás instrucciones',
       // Solo en desarrollo, devolver token para testing
       resetToken: process.env.NODE_ENV === 'development' ? resetToken : undefined,
     });
   } catch (error) {
     console.error('[Auth] Error en forgot-password:', error);
-    res.status(500).json({ error: 'Error al procesar solicitud' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -339,11 +419,11 @@ router.post('/reset-password', async (req, res) => {
     const { resetToken, newPassword } = req.body;
 
     if (!resetToken || !newPassword) {
-      return res.status(400).json({ error: 'Token y nueva password requeridos' });
+      return sendValidationError(req, res, [{ message: 'Token y nueva password requeridos' }]);
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ error: 'Password debe tener al menos 6 caracteres' });
+      return sendValidationError(req, res, [{ message: 'Password debe tener al menos 6 caracteres' }]);
     }
 
     // Buscar usuario con token válido
@@ -357,7 +437,7 @@ router.post('/reset-password', async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ error: 'Token inválido o expirado' });
+      return sendValidationError(req, res, [{ message: 'Token inválido o expirado' }]);
     }
 
     // Hash nueva password
@@ -378,10 +458,10 @@ router.post('/reset-password', async (req, res) => {
       where: { userId: user.id },
     });
 
-    res.json({ message: 'Password actualizada exitosamente' });
+    return sendSuccess(req, res, { message: 'Password actualizada exitosamente' });
   } catch (error) {
     console.error('[Auth] Error en reset-password:', error);
-    res.status(500).json({ error: 'Error al resetear password' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -399,11 +479,11 @@ router.patch('/change-password', async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ error: 'Passwords requeridas' });
+      return sendValidationError(req, res, [{ message: 'Passwords requeridas' }]);
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ error: 'Nueva password debe tener al menos 6 caracteres' });
+      return sendValidationError(req, res, [{ message: 'Nueva password debe tener al menos 6 caracteres' }]);
     }
 
     // Buscar usuario
@@ -434,6 +514,38 @@ router.patch('/change-password', async (req, res) => {
   } catch (error) {
     console.error('[Auth] Error en change-password:', error);
     res.status(500).json({ error: 'Error al cambiar password' });
+  }
+});
+
+// GET /api/auth/verify - Verificar token JWT actual
+router.get('/verify', requireAuth, async (req, res) => {
+  try {
+    // Si llegamos aquí, el middleware requireAuth ya validó el token
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.uid },
+      select: {
+        id: true,
+        email: true,
+        emailVerified: true,
+        role: true,
+        createdAt: true,
+        lastLogin: true,
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'Usuario no encontrado'
+      });
+    }
+
+    return sendSuccess(req, res, {
+      user: user
+    });
+  } catch (error) {
+    console.error('[Auth] Error en verify:', error);
+    return sendInternalError(req, res, error);
   }
 });
 

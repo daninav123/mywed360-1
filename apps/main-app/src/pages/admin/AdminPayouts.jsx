@@ -182,7 +182,7 @@ const AdminPayouts = () => {
       )}
 
       {loading && (
-        <div className="rounded-md border border-slate-200  px-4 py-3 text-sm text-slate-600 shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className="rounded-md border border-slate-200  px-4 py-3 text-sm text-slate-600 shadow-sm" className="bg-surface">
           Calculando comisiones y pagos...
         </div>
       )}
@@ -190,7 +190,7 @@ const AdminPayouts = () => {
       {!loading && data && (
         <div className="space-y-6">
           {totals.length > 0 && (
-            <div className="rounded-xl border border-slate-200  shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="rounded-xl border border-slate-200  shadow-sm" className="bg-surface">
               <div className="border-b border-slate-100 px-6 py-4">
                 <h2 className="text-lg font-semibold text-slate-800">Resumen por moneda</h2>
                 <p className="text-xs text-slate-500">Importes agregados de comisiones y ventas.</p>
@@ -220,7 +220,7 @@ const AdminPayouts = () => {
             </div>
           )}
 
-          <div className="rounded-xl border border-slate-200  shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className="rounded-xl border border-slate-200  shadow-sm" className="bg-surface">
             <div className="border-b border-slate-100 px-6 py-4">
               <h2 className="text-lg font-semibold text-slate-800">Comerciales</h2>
               <p className="text-xs text-slate-500">Detalle de comisiones por comercial y codigos asociados.</p>
@@ -285,7 +285,7 @@ NaN
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200  shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className="rounded-xl border border-slate-200  shadow-sm" className="bg-surface">
             <div className="border-b border-slate-100 px-6 py-4">
               <h2 className="text-lg font-semibold text-slate-800">Jefes de comerciales</h2>
               <p className="text-xs text-slate-500">Comisiones calculadas a partir de los pagos asignados a sus equipos.</p>

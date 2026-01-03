@@ -86,13 +86,13 @@ export default function FlipTools({ canvasRef }) {
   };
 
   return (
-    <div className=" border-b  px-4 py-2" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+    <div className=" border-b  px-4 py-2" className="border-default" className="bg-surface">
       <div className="flex items-center gap-1">
-        <span className="text-xs font-medium  mr-2" style={{ color: 'var(--color-text-secondary)' }}>Transformar:</span>
+        <span className="text-xs font-medium  mr-2" className="text-secondary">Transformar:</span>
         
         <button
           onClick={flipHorizontal}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title="Voltear horizontalmente"
         >
           <FlipHorizontal className="w-4 h-4" />
@@ -100,7 +100,7 @@ export default function FlipTools({ canvasRef }) {
         
         <button
           onClick={flipVertical}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title="Voltear verticalmente"
         >
           <FlipVertical className="w-4 h-4" />
@@ -108,7 +108,7 @@ export default function FlipTools({ canvasRef }) {
         
         <button
           onClick={rotate90}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title="Rotar 90°"
         >
           <RotateCw className="w-4 h-4" />
@@ -118,7 +118,7 @@ export default function FlipTools({ canvasRef }) {
         
         <button
           onClick={toggleLockMovement}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title="Bloquear/Desbloquear posición"
         >
           <Lock className="w-4 h-4" />
@@ -126,7 +126,7 @@ export default function FlipTools({ canvasRef }) {
         
         <button
           onClick={toggleAspectRatio}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title="Bloquear/Desbloquear proporción"
         >
           <Unlock className="w-4 h-4" />

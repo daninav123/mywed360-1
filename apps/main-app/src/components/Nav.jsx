@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import useTranslations from '../hooks/useTranslations';
 import { prefetchModule } from '../utils/prefetch';
 

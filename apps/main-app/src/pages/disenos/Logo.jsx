@@ -1,4 +1,4 @@
-﻿import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+﻿const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -82,12 +82,12 @@ export default function Logo() {
           className="w-16 h-10 p-0 border-0 cursor-pointer"
           aria-label={t('design.logo.selectColor')}
         />
-        <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{t('design.logo.colorCode')}: {hex}</p>
+        <p className="text-sm " className="text-secondary">{t('design.logo.colorCode')}: {hex}</p>
       </Card>
 
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">{t('design.logo.designLogo')}</h2>
-        <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+        <p className="" className="text-secondary">
           {t('design.logo.createCustomLogo')}
         </p>
       </div>

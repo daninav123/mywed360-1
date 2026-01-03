@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
-import { useAuth } from '../../hooks/useAuth';
+import LanguageSelector from '../../components/ui/LanguageSelector';
+import { useAuth } from '../../hooks/useAuth.jsx';
 
 const MFA_CODE_LENGTH = 6;
 
@@ -213,7 +214,12 @@ const AdminLogin = () => {
   const buttonLabel = isSubmitting ? 'Accediendo...' : 'Acceder';
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-4 relative">
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md rounded-xl bg-surface shadow-lg border border-soft p-8 space-y-6"
@@ -281,7 +287,7 @@ const AdminLogin = () => {
         </button>
 
         {isBlocked && (
-          <p className="text-xs " style={{ color: 'var(--color-danger)' }}>
+          <p className="text-xs " className="text-danger">
             Bloqueo temporal activo ({Math.ceil(blockRemainingSeconds / 60)} min restantes). Si necesitas ayuda,
             escríbenos a <a href={`mailto:${supportEmail}`} className="underline">{supportEmail}</a>.
           </p>

@@ -312,7 +312,7 @@ export default function SupplierPortfolio() {
                 event.stopPropagation();
                 handlePhotoDeleted(photo.id);
               }}
-              className=" hover: transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-danger)' }}
+              className=" hover: transition-colors" className="text-danger" className="text-danger"
               title={t('suppliers.portfolio.dashboard.photoCard.delete')}
             >
               <Trash2 className="h-5 w-5" />

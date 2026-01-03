@@ -1,5 +1,7 @@
 import express from 'express';
-import { db } from '../../db.js';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 const router = express.Router();
 const DEFAULT_LIST_LIMIT = 200;
@@ -185,38 +187,38 @@ async function resolveUidByEmail(email) {
   const normalized = sanitizeEmail(email);
   if (!normalized) return null;
   if (userLookupCache.has(normalized)) return userLookupCache.get(normalized);
+  
   try {
-    let snap = await db.collection('users').where('maLoveEmail', '==', normalized).limit(1).get();
-    if (!snap.empty) {
-      const uid = snap.docs[0].id;
-      userLookupCache.set(normalized, uid);
-      return uid;
+    // Buscar en PostgreSQL
+    const profile = await prisma.userProfile.findFirst({
+      where: {
+        OR: [
+          { maLoveEmail: normalized },
+          { myWed360Email: normalized },
+        ]
+      },
+      select: { userId: true }
+    });
+    
+    if (profile) {
+      userLookupCache.set(normalized, profile.userId);
+      return profile.userId;
     }
-
-    snap = await db.collection('users').where('myWed360Email', '==', normalized).limit(1).get();
-    if (!snap.empty) {
-      const uid = snap.docs[0].id;
-      userLookupCache.set(normalized, uid);
-      return uid;
-    }
-    const legacy = legacyAlias(normalized);
-    if (legacy && legacy !== normalized) {
-      snap = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
-      if (!snap.empty) {
-        const uid = snap.docs[0].id;
-        userLookupCache.set(normalized, uid);
-        return uid;
-      }
-    }
-    const loginSnap = await db.collection('users').where('email', '==', normalized).limit(1).get();
-    if (!loginSnap.empty) {
-      const uid = loginSnap.docs[0].id;
-      userLookupCache.set(normalized, uid);
-      return uid;
+    
+    // Fallback: buscar por email de login
+    const user = await prisma.user.findUnique({
+      where: { email: normalized },
+      select: { id: true }
+    });
+    
+    if (user) {
+      userLookupCache.set(normalized, user.id);
+      return user.id;
     }
   } catch (err) {
     console.warn('[mail][resolveUidByEmail] failed', normalized, err?.message || err);
   }
+  
   userLookupCache.set(normalized, null);
   return null;
 }
@@ -249,117 +251,65 @@ async function fetchFolderMails({ req, folder, userNorm, limit = DEFAULT_LIST_LI
   const addresses = new Set([sanitizeEmail(userNorm)].filter(Boolean));
   const profileAddresses = collectProfileAddresses(req.userProfile);
   for (const addr of profileAddresses) addresses.add(addr);
-  const afterIso =
-    after instanceof Date
-      ? after.toISOString()
-      : typeof after === 'string' && after.trim()
-        ? new Date(after).toISOString()
-        : null;
-
-  // 0) Preferir siempre el UID autenticado (evita depender de to==alias y de búsquedas por email)
-  if (authUid) {
-    try {
-      let userQuery = db.collection('users').doc(authUid).collection('mails').where('folder', '==', folder);
-      let docs = [];
-      try {
-        let q = userQuery.orderBy('date', 'desc');
-        if (afterIso) q = q.startAfter(afterIso);
-        const snap = await q.limit(limit).get();
-        docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      } catch (err) {
-        const snap = await userQuery.get();
-        docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        docs.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-        if (limit && Number.isFinite(limit)) docs = docs.slice(0, limit);
-      }
-      if (docs.length) return docs;
-    } catch (_) {}
-  }
-
-  // 1) Fallback: resolver UID por direcciones conocidas
-  if (userNorm) {
-    try {
-      const uid = await resolveUidForAddresses(addresses);
-      if (uid) {
-        let userQuery = db.collection('users').doc(uid).collection('mails').where('folder', '==', folder);
-        let docs = [];
-        try {
-          let q = userQuery.orderBy('date', 'desc');
-          if (afterIso) q = q.startAfter(afterIso);
-          const snap = await q.limit(limit).get();
-          docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        } catch (err) {
-          const snap = await userQuery.get();
-          docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-          docs.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-          if (limit && Number.isFinite(limit)) docs = docs.slice(0, limit);
-        }
-        if (docs.length) return docs;
-      }
-    } catch (_) {}
-  }
-
-  // 2) Si existe ownerUid (mails a buzones compartidos), intentar traerlos directamente
-  if (authUid) {
-    try {
-      let q = db.collection('mails').where('ownerUid', '==', authUid).where('folder', '==', folder);
-      try {
-        let q2 = q.orderBy('date', 'desc');
-        if (afterIso) q2 = q2.startAfter(afterIso);
-        const snap = await q2.limit(limit).get();
-        const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        if (items.length) return items;
-      } catch (_) {
-        const snap = await q.limit(limit * 4).get();
-        let items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        items.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-        if (limit && Number.isFinite(limit)) items = items.slice(0, limit);
-        if (items.length) return items;
-      }
-    } catch (_) {}
-  }
+  
+  const afterDate = after instanceof Date ? after : 
+    (typeof after === 'string' && after.trim() ? new Date(after) : null);
 
   try {
-    let query = db.collection('mails').where('folder', '==', folder);
-    if (userNorm) {
-      if (normalizedFolder === 'sent') query = query.where('from', '==', userNorm);
-      else query = query.where('to', '==', userNorm);
+    // Prisma query simplificada - buscar por userId y folder
+    const where = {
+      folder: folder,
+    };
+    
+    // Si hay usuario autenticado, filtrar por userId
+    if (authUid) {
+      where.userId = authUid;
     }
-    let q = query.orderBy('date', 'desc');
-    if (afterIso) q = q.startAfter(afterIso);
-    const snapshot = await q.limit(limit).get();
-    const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-    if (items.length) return items;
-  } catch (fireErr) {
-    if (fireErr?.code !== 9 && !(fireErr?.message || '').toLowerCase().includes('index')) {
-      throw fireErr;
+    
+    // Si hay cursor de paginación
+    if (afterDate && !isNaN(afterDate.getTime())) {
+      where.date = { lt: afterDate };
     }
-    try {
-      const snapshot = await db.collection('mails').where('folder', '==', folder).limit(limit * 4).get();
-      let items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      items.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-      if (limit && Number.isFinite(limit)) items = items.slice(0, limit);
-      if (!userNorm) return items;
-      const filtered = filterMailsByAddresses(items, normalizedFolder, addresses);
-      if (filtered.length) {
-        filtered.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-        return filtered.slice(0, limit);
-      }
-    } catch (fallbackErr) {
-      console.error('[mail][fallback] query without index failed', fallbackErr?.message || fallbackErr);
+    
+    const mails = await prisma.mail.findMany({
+      where,
+      orderBy: { date: 'desc' },
+      take: limit,
+    });
+    
+    if (mails.length) {
+      return mails;
     }
+  } catch (err) {
+    console.warn('[fetchFolderMails] Prisma query failed:', err?.message || err);
   }
 
-  if (userNorm) {
-    try {
-      const snapshot = await db.collection('mails').where('folder', '==', folder).limit(limit * 4).get();
-      const arr = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      const filtered = filterMailsByAddresses(arr, normalizedFolder, addresses);
-      if (filtered.length) {
-        filtered.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-        return filtered.slice(0, limit);
+  // Fallback: buscar sin userId (para mails antiguos o compartidos)
+  try {
+    const where = { folder: folder };
+    
+    // Filtrar por email si se especificó
+    if (userNorm) {
+      if (normalizedFolder === 'sent') {
+        where.from = userNorm;
+      } else {
+        where.to = { contains: userNorm }; // 'to' puede ser una lista
       }
-    } catch (_) {}
+    }
+    
+    if (afterDate && !isNaN(afterDate.getTime())) {
+      where.date = { lt: afterDate };
+    }
+    
+    const mails = await prisma.mail.findMany({
+      where,
+      orderBy: { date: 'desc' },
+      take: limit,
+    });
+    
+    if (mails.length) return mails;
+  } catch (err) {
+    console.warn('[fetchFolderMails] Fallback query failed:', err?.message || err);
   }
 
   return [];
@@ -449,10 +399,14 @@ export async function getMailDetail(req, res) {
     const { id } = req.params;
     if (!id) return res.status(400).json({ error: 'id-required' });
 
-    const ref = db.collection('mails').doc(id);
-    const snap = await ref.get();
-    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
-    const data = snap.data() || {};
+    const mail = await prisma.mail.findUnique({ 
+      where: { id },
+      include: {
+        // Si tienes relación con attachments en Prisma, incluirla aquí
+      }
+    });
+    if (!mail) return res.status(404).json({ error: 'not-found' });
+    const data = mail;
 
     try {
       const profile = req.userProfile || {};
@@ -470,9 +424,10 @@ export async function getMailDetail(req, res) {
     } catch (_) {}
 
     let attachments = Array.isArray(data.attachments) ? data.attachments : [];
+    // Attachments desde Prisma (si existe relación)
     try {
-      const attSnap = await ref.collection('attachments').get();
-      const list = attSnap.docs.map((d) => ({ id: d.id, ...(d.data() || {}) }));
+      // TODO: Si hay modelo MailAttachment en Prisma, usar eso
+      const list = []; // Por ahora vacío hasta migrar attachments
       attachments = list.map((a) => ({
         id: a.id,
         filename: a.filename || a.name || 'attachment',

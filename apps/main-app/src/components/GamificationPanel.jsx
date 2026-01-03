@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { getSummary } from '../services/GamificationService';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { useWedding } from '../context/WeddingContext';
 import { Card } from './ui/Card';
 

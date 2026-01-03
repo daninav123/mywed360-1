@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 
 import { db } from '../firebaseConfig';
-import { useAuth } from '../hooks/useAuth'; // Nuevo sistema
+import { useAuth } from '../hooks/useAuth.jsx'; // Nuevo sistema
 import useTranslations from '../hooks/useTranslations';
 import { useWedding } from '../context/WeddingContext';
 import { fetchBlogPosts } from '../services/blogContentService';
@@ -921,9 +921,9 @@ export default function HomePage() {
           </div>
           <div className="flex items-center">
             <img
-              src={`${import.meta.env.BASE_URL}maloveapp-logo.png`}
+              src="/logo.png"
               alt={headerLogoAlt}
-              className="w-32 h-32 object-contain"
+              className="h-16 w-auto object-contain"
             />
           </div>
         </header>

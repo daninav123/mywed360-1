@@ -249,69 +249,6 @@ export default function TransactionManager({
   return (
     <>
       <div className="space-y-6">
-        {/* Stats Cards Premium */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-4 border-[color:var(--color-primary-30)]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
-                  {t('finance.transactions.totalTransactions', { defaultValue: 'Total' })}
-                </p>
-                <p className="text-2xl font-black text-body">{stats.count}</p>
-              </div>
-              <DollarSign className="w-8 h-8 text-[color:var(--color-primary-40)]" />
-            </div>
-          </Card>
-
-          <Card className="p-4 border-[color:var(--color-success-30)]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
-                  {t('finance.transactions.totalIncome', { defaultValue: 'Ingresos' })}
-                </p>
-                <p className="text-2xl font-black text-[color:var(--color-success)]">
-                  {formatCurrency(stats.totalIncome)}
-                </p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-[color:var(--color-success-40)]" />
-            </div>
-          </Card>
-
-          <Card className="p-4 border-[color:var(--color-danger-30)]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-danger)] mb-1">
-                  {t('finance.transactions.totalExpense', { defaultValue: 'Gastos' })}
-                </p>
-                <p className="text-2xl font-black text-[color:var(--color-danger)]">
-                  {formatCurrency(stats.totalExpense)}
-                </p>
-              </div>
-              <TrendingDown className="w-8 h-8 text-[color:var(--color-danger-40)]" />
-            </div>
-          </Card>
-
-          <Card className="p-4 border-[color:var(--color-warning-30)]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
-                  {t('finance.transactions.pending', { defaultValue: 'Pendiente' })}
-                </p>
-                <p className="text-2xl font-black text-[color:var(--color-warning)]">
-                  {formatCurrency(stats.pendingExpenses)}
-                </p>
-                {stats.overdueExpenses > 0 && (
-                  <p className="text-xs text-[color:var(--color-danger)] mt-1 flex items-center gap-1">
-                    <AlertCircle size={12} />
-                    {formatCurrency(stats.overdueExpenses)} {t('finance.transactions.overdue', { defaultValue: 'vencido' })}
-                  </p>
-                )}
-              </div>
-              <AlertCircle className="w-8 h-8 text-[color:var(--color-warning-40)]" />
-            </div>
-          </Card>
-        </div>
-
         {/* Actions Bar */}
         <Card className="p-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

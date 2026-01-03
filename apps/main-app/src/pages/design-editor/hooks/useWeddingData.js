@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../../firebaseConfig';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { useWedding } from '../../../context/WeddingContext';
-import { useAuth } from '../../../hooks/useAuth';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 
 /**
  * Hook para obtener datos reales de la boda para templates

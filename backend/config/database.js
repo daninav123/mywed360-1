@@ -207,4 +207,5 @@ export function getDatabase() {
   return dbAdapter;
 }
 
-export default getDatabase();
+// Export prisma client directamente para uso en routes
+export default getPrisma();

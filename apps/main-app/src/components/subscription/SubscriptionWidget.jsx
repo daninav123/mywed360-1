@@ -18,12 +18,16 @@ const SubscriptionWidget = () => {
 
   const fetchSubscription = async () => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
       const response = await fetch(`${API_BASE_URL}/api/stripe/subscription`, {
         headers: {
           'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
+          'Authorization': `Bearer ${token}`,
         },
       });
 

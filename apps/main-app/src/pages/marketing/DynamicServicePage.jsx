@@ -91,6 +91,15 @@ export default function DynamicServicePage() {
         {/* Canonical */}
         <link rel="canonical" href={`https://planivia.net/${country}/${city}/${service}`} />
         
+        {/* Hreflang para multi-país/idioma */}
+        <link rel="alternate" hreflang="es-ES" href={`https://planivia.net/es/${city}/${service}`} />
+        <link rel="alternate" hreflang="es-MX" href={`https://planivia.net/mx/${city}/${service}`} />
+        <link rel="alternate" hreflang="es-AR" href={`https://planivia.net/ar/${city}/${service}`} />
+        <link rel="alternate" hreflang="es-CO" href={`https://planivia.net/co/${city}/${service}`} />
+        <link rel="alternate" hreflang="es-CL" href={`https://planivia.net/cl/${service}`} />
+        <link rel="alternate" hreflang="es-PE" href={`https://planivia.net/pe/${city}/${service}`} />
+        <link rel="alternate" hreflang="x-default" href={`https://planivia.net/${country}/${city}/${service}`} />
+        
         {/* Hreflang */}
         <link rel="alternate" hreflang={cityData.locale} href={`https://planivia.net/${country}/${city}/${service}`} />
         

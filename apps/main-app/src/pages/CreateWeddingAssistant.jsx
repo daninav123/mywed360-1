@@ -1,11 +1,16 @@
 ﻿import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { User, Mail, Moon, LogOut } from 'lucide-react';
 
+import DarkModeToggle from '../components/DarkModeToggle';
+import LanguageSelector from '../components/ui/LanguageSelector';
+import Nav from '../components/Nav';
+import NotificationCenter from '../components/NotificationCenter';
 import PageWrapper from '../components/PageWrapper';
 import Button from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { createWedding } from '../services/WeddingService';
 import {
   getEventStyleOptions,
@@ -272,7 +277,8 @@ const initialStepIndex = firstActiveStepIndex(INITIAL_FORM);
 export default function CreateWeddingAssistant() {
   const { t } = useTranslation();
   OPTION_SETS = getOptionSets(t);
-  const { currentUser, userProfile, hasRole, isLoading } = useAuth();
+  const { currentUser, userProfile, hasRole, isLoading, logout: logoutUnified } = useAuth();
+  const [openUserMenu, setOpenUserMenu] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState(INITIAL_FORM);
   const [messages, setMessages] = useState(() => [
@@ -517,6 +523,33 @@ export default function CreateWeddingAssistant() {
   }
 
   return (
+    <>
+    <div className="absolute top-4 right-4 flex items-center space-x-3" style={{ zIndex: 100 }}>
+      <LanguageSelector variant="minimal" />
+      <div className="relative" data-user-menu>
+        <button onClick={() => setOpenUserMenu(!openUserMenu)} className="w-11 h-11 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center" title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })} style={{ backgroundColor: openUserMenu ? 'var(--color-lavender)' : 'rgba(255, 255, 255, 0.95)', border: `2px solid ${openUserMenu ? 'var(--color-primary)' : 'rgba(255,255,255,0.8)'}`, boxShadow: openUserMenu ? '0 4px 12px rgba(94, 187, 255, 0.3)' : '0 2px 8px rgba(0,0,0,0.15)' }}>
+          <User className="w-5 h-5" style={{ color: openUserMenu ? 'var(--color-primary)' : 'var(--color-text-secondary)' }} />
+        </button>
+        {openUserMenu && (
+          <div className="absolute right-0 mt-3 bg-[var(--color-surface)] p-2 space-y-1" style={{ minWidth: '220px', border: '1px solid var(--color-border-soft)', borderRadius: 'var(--radius-lg)', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 9999 }}>
+            <div className="px-2 py-1"><NotificationCenter /></div>
+            <Link to="/perfil" onClick={() => setOpenUserMenu(false)} className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200" className="text-body" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <User className="w-4 h-4 mr-3" />{t('navigation.profile', { defaultValue: 'Perfil' })}
+            </Link>
+            <Link to="/email" onClick={() => setOpenUserMenu(false)} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'} className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200" className="text-body">
+              <Mail className="w-4 h-4 mr-3" />{t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
+            </Link>
+            <div className="px-3 py-2.5 rounded-xl transition-all duration-200" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <div className="flex items-center justify-between"><span className="text-sm flex items-center" className="text-body"><Moon className="w-4 h-4 mr-3" />{t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}</span><DarkModeToggle className="ml-2" /></div>
+            </div>
+            <div style={{ height: '1px', backgroundColor: 'var(--color-border-soft)', margin: '8px 0' }}></div>
+            <button onClick={() => { logoutUnified(); setOpenUserMenu(false); }} className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center" className="text-danger" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <LogOut className="w-4 h-4 mr-3" />{t('navigation.logout', { defaultValue: 'Cerrar sesión' })}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
     <div className="p-6 max-w-3xl mx-auto">
       <Card className="flex h-[70vh] flex-col gap-4 p-6 md:h-[75vh]">
       <header className="space-y-2">
@@ -637,5 +670,7 @@ export default function CreateWeddingAssistant() {
       )}
       </Card>
     </div>
+    <Nav />
+    </>
   );
 }

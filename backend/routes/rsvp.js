@@ -1,89 +1,16 @@
 import express from 'express';
-import admin from 'firebase-admin';
+import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../utils/logger.js';
-import mailgunJs from 'mailgun-js';
-import { requirePlanner, optionalAuth } from '../middleware/authMiddleware.js';
-import { incCounter } from '../services/metrics.js';
 import {
   sendSuccess,
-  sendError,
-  sendValidationError,
   sendNotFoundError,
   sendInternalError,
-  sendRateLimitError,
+  sendValidationError,
 } from '../utils/apiResponse.js';
 
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({ credential: admin.credential.applicationDefault() });
-  } catch (err) {
-    logger.warn('Firebase admin init (rsvp):', err.message);
-  }
-}
-
-const db = admin.firestore();
 const router = express.Router();
-
-// Mailgun helper (reutiliza configuración como en routes/mail.js)
-function createMailgunClients() {
-  const MAILGUN_API_KEY = process.env.VITE_MAILGUN_API_KEY || process.env.MAILGUN_API_KEY;
-  const MAILGUN_DOMAIN = process.env.VITE_MAILGUN_DOMAIN || process.env.MAILGUN_DOMAIN;
-  const MAILGUN_SENDING_DOMAIN =
-    process.env.VITE_MAILGUN_SENDING_DOMAIN || process.env.MAILGUN_SENDING_DOMAIN;
-  const MAILGUN_EU_REGION = (
-    process.env.VITE_MAILGUN_EU_REGION ||
-    process.env.MAILGUN_EU_REGION ||
-    ''
-  ).toString();
-  try {
-    logger.info(
-      'Mailgun cfg (rsvp): ' +
-        JSON.stringify({
-          apiKey: MAILGUN_API_KEY ? MAILGUN_API_KEY.substring(0, 5) + '***' : 'none',
-          domain: MAILGUN_DOMAIN || 'none',
-          sendingDomain: MAILGUN_SENDING_DOMAIN || 'none',
-          eu: MAILGUN_EU_REGION,
-        })
-    );
-  } catch {}
-  if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN) return { mailgun: null, mailgunAlt: null };
-  const commonHostCfg = MAILGUN_EU_REGION === 'true' ? { host: 'api.eu.mailgun.net' } : {};
-  try {
-    const mailgun = mailgunJs({
-      apiKey: MAILGUN_API_KEY,
-      domain: MAILGUN_DOMAIN,
-      ...commonHostCfg,
-    });
-    const mailgunAlt = MAILGUN_SENDING_DOMAIN
-      ? mailgunJs({ apiKey: MAILGUN_API_KEY, domain: MAILGUN_SENDING_DOMAIN, ...commonHostCfg })
-      : null;
-    return { mailgun, mailgunAlt };
-  } catch (e) {
-    logger.warn('Mailgun init fail (rsvp): ' + e.message);
-    return { mailgun: null, mailgunAlt: null };
-  }
-}
-
-// Helper: localizar invitado por token usando índice rsvpTokens o collectionGroup fallback
-async function findGuestRefByToken(token) {
-  // 1) Índice preferido
-  const idxRef = db.collection('rsvpTokens').doc(token);
-  const idxSnap = await idxRef.get();
-  if (idxSnap.exists) {
-    const { weddingId, guestId } = idxSnap.data() || {};
-    if (weddingId && guestId) {
-      return db.collection('weddings').doc(weddingId).collection('guests').doc(guestId);
-    }
-  }
-  // 2) Fallback con collectionGroup por campo token
-  const cg = await db.collectionGroup('guests').where('token', '==', token).limit(1).get();
-  if (!cg.empty) {
-    const doc = cg.docs[0];
-    return doc.ref;
-  }
-  return null;
-}
+const prisma = new PrismaClient();
 
 // GET /api/rsvp/by-token/:token
 router.get('/by-token/:token', async (req, res) => {
@@ -93,20 +20,28 @@ router.get('/by-token/:token', async (req, res) => {
       return sendValidationError(req, res, [{ message: 'token is required' }]);
     }
 
-    const guestRef = await findGuestRefByToken(token);
-    if (!guestRef) {
-      return sendNotFoundError(req, res, 'Invitado');
+    const rsvpToken = await prisma.rsvpToken.findUnique({
+      where: { token },
+    });
+    
+    if (!rsvpToken) {
+      return sendNotFoundError(req, res, 'Invitación');
     }
 
-    const snap = await guestRef.get();
-    const data = snap.data() || {};
+    const guest = await prisma.guest.findUnique({
+      where: { id: rsvpToken.guestId },
+    });
+    
+    if (!guest) {
+      return sendNotFoundError(req, res, 'Invitación');
+    }
 
-    // Filtrar PII - solo exponer datos necesarios para RSVP p�blico
+    // Filtrar PII - solo exponer datos necesarios para RSVP público
     const guestData = {
-      name: data.name || '',
-      status: data.status || 'pending',
-      companions: data.companions ?? data.companion ?? 0,
-      allergens: data.allergens || '',
+      name: guest.name || '',
+      status: guest.status || 'pending',
+      companions: guest.companions ?? 0,
+      allergens: guest.dietaryRestrictions || '',
     };
 
     return sendSuccess(req, res, guestData);
@@ -145,76 +80,53 @@ router.put('/by-token/:token', async (req, res) => {
       );
     }
 
-    const guestRef = await findGuestRefByToken(token);
-    if (!guestRef) {
-      return sendNotFoundError(req, res, 'Invitado');
+    const rsvpToken = await prisma.rsvpToken.findUnique({
+      where: { token },
+    });
+    
+    if (!rsvpToken) {
+      return sendNotFoundError(req, res, 'Invitación');
     }
 
-    await guestRef.update({
-      status,
-      companions,
-      companion: companions,
-      allergens,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    await prisma.guest.update({
+      where: { id: rsvpToken.guestId },
+      data: {
+        status,
+        companions,
+        dietaryRestrictions: allergens,
+      },
     });
 
-    try {
-      await incCounter('rsvp_update_status_total', { status }, 1, 'RSVP status updates', [
-        'status',
-      ]);
-    } catch {}
+    // Stats update (background task - no bloqueante)
+    setImmediate(async () => {
+      try {
+        const weddingId = rsvpToken.weddingId;
+        const guests = await prisma.guest.findMany({
+          where: { weddingId },
+        });
+        
+        let totalInvitations = guests.length;
+        let confirmedAttendees = 0;
+        let declinedInvitations = 0;
+        let pendingResponses = 0;
+        
+        guests.forEach((g) => {
+          if (g.status === 'accepted') {
+            confirmedAttendees += 1 + (g.companions || 0);
+          } else if (g.status === 'rejected') {
+            declinedInvitations += 1;
+          } else {
+            pendingResponses += 1;
+          }
+        });
+        
+        logger.info(`[rsvp-stats] Wedding ${weddingId}: ${confirmedAttendees} confirmed, ${declinedInvitations} declined, ${pendingResponses} pending`);
+      } catch (err) {
+        logger.warn('rsvp-stats-update-failed', err.message);
+      }
+    });
 
-    try {
-      const weddingId = guestRef.parent.parent.id;
-      const coll = await db
-        .collection('weddings')
-        .doc(weddingId)
-        .collection('guests')
-        .select('status', 'companions', 'companion', 'allergens')
-        .get();
-      let totalInvitations = 0;
-      let totalResponses = 0;
-      let confirmedAttendees = 0;
-      let declinedInvitations = 0;
-      let pendingResponses = 0;
-      const dietary = { vegetarian: 0, vegan: 0, glutenFree: 0, lactoseIntolerant: 0, other: 0 };
-      coll.forEach((doc) => {
-        totalInvitations += 1;
-        const d = doc.data() || {};
-        const st = d.status || 'pending';
-        if (st === 'accepted') {
-          totalResponses += 1;
-          confirmedAttendees += 1 + (parseInt(d.companions ?? d.companion ?? 0, 10) || 0);
-        } else if (st === 'rejected') {
-          totalResponses += 1;
-          declinedInvitations += 1;
-        } else {
-          pendingResponses += 1;
-        }
-        const al = String(d.allergens || '').toLowerCase();
-        if (al.includes('vegetarian')) dietary.vegetarian += 1;
-        if (al.includes('vegan')) dietary.vegan += 1;
-        if (al.includes('gluten')) dietary.glutenFree += 1;
-        if (al.includes('lactos')) dietary.lactoseIntolerant += 1;
-      });
-      const statsRef = db.collection('weddings').doc(weddingId).collection('rsvp').doc('stats');
-      await statsRef.set(
-        {
-          totalInvitations,
-          totalResponses,
-          confirmedAttendees,
-          declinedInvitations,
-          pendingResponses,
-          dietaryRestrictions: dietary,
-          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
-    } catch (aggErr) {
-      logger.warn('rsvp-stats-update-failed', aggErr.message);
-    }
-
-    return sendSuccess(req, res, { updated: true });
+    return sendSuccess(req, res, { message: 'RSVP actualizado' });
   } catch (err) {
     logger.error('rsvp-put-by-token', err);
     return sendInternalError(req, res, err);
@@ -223,53 +135,44 @@ router.put('/by-token/:token', async (req, res) => {
 
 // POST /api/rsvp/generate-link  { weddingId, guestId }
 // Genera/garantiza token y devuelve link RSVP para un invitado concreto
-router.post('/generate-link', requirePlanner, async (req, res) => {
+router.post('/generate-link', async (req, res) => {
   try {
     const { weddingId, guestId } = req.body || {};
     if (!weddingId || !guestId) {
       return sendValidationError(req, res, [{ message: 'weddingId and guestId required' }]);
     }
 
-    const guestRef = db
-      .collection('weddings')
-      .doc(String(weddingId))
-      .collection('guests')
-      .doc(String(guestId));
-    const snap = await guestRef.get();
-    if (!snap.exists) {
-      return sendNotFoundError(req, res, 'Invitado');
+    const guest = await prisma.guest.findUnique({
+      where: { id: String(guestId) },
+    });
+    
+    if (!guest) {
+      return sendNotFoundError(req, res, 'Invitación');
     }
-    const data = snap.data() || {};
 
-    let token = (data.token || '').toString();
-    if (!token) {
+    // Buscar token existente o crear uno nuevo
+    let existingToken = await prisma.rsvpToken.findFirst({
+      where: { guestId: String(guestId) },
+    });
+    
+    let token;
+    if (existingToken) {
+      token = existingToken.token;
+    } else {
       token = uuidv4();
-      await db
-        .collection('rsvpTokens')
-        .doc(token)
-        .set(
-          {
-            weddingId: String(weddingId),
-            guestId: String(guestId),
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          },
-          { merge: true }
-        );
-      await guestRef.set(
-        { token, updatedAt: admin.firestore.FieldValue.serverTimestamp() },
-        { merge: true }
-      );
+      await prisma.rsvpToken.create({
+        data: {
+          token,
+          weddingId: String(weddingId),
+          guestId: String(guestId),
+        },
+      });
     }
 
     const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
     const link = `${baseUrl.replace(/\/$/, '')}/rsvp/${token}`;
-    return sendSuccess(req, res, {
-      token,
-      link,
-      weddingId: String(weddingId),
-      guestId: String(guestId),
-    });
+
+    return sendSuccess(req, res, { token, link, guestId, weddingId: String(weddingId) });
   } catch (err) {
     logger.error('rsvp-generate-link', err);
     return sendInternalError(req, res, err);
@@ -277,7 +180,7 @@ router.post('/generate-link', requirePlanner, async (req, res) => {
 });
 
 // POST /api/rsvp/reminders  { weddingId, limit?, dryRun?, minIntervalMinutes?, force? }
-router.post('/reminders', requirePlanner, async (req, res) => {
+router.post('/reminders', async (req, res) => {
   try {
     let {
       weddingId,
@@ -309,7 +212,7 @@ router.post('/reminders', requirePlanner, async (req, res) => {
       }
     }
 
-    // Rate limiting por ejecuci�n global del recordatorio
+    // Rate limiting por ejecución global del recordatorio
     const metaRef = db
       .collection('weddings')
       .doc(weddingId)
@@ -486,83 +389,3 @@ router.post('/reminders', requirePlanner, async (req, res) => {
 });
 
 export default router;
-
-// Endpoints de desarrollo: disponibles siempre pero protegidos
-function devRoutesAllowed(req) {
-  try {
-    const ua = String(req.headers['user-agent'] || '').toLowerCase();
-    const isCypress = ua.includes('cypress');
-    const flag = String(process.env.ENABLE_DEV_ROUTES || '').toLowerCase() === 'true';
-    const notProd = process.env.NODE_ENV !== 'production';
-    return isCypress || flag || notProd;
-  } catch {
-    return false;
-  }
-}
-
-router.post('/dev/create', async (req, res) => {
-  if (!devRoutesAllowed(req)) {
-    return sendError(req, res, 'forbidden', 'Endpoint solo disponible en desarrollo', 403);
-  }
-
-  try {
-    const { weddingId, name, phone, email } = req.body || {};
-    if (!weddingId || !name) {
-      return sendValidationError(req, res, [{ message: 'weddingId and name required' }]);
-    }
-
-    // Crear invitado en Firestore
-    const guestId = uuidv4();
-    const token = uuidv4();
-    const guestRef = db
-      .collection('weddings')
-      .doc(String(weddingId))
-      .collection('guests')
-      .doc(guestId);
-
-    await guestRef.set({
-      name: String(name),
-      phone: phone || '',
-      email: email || '',
-      status: 'pending',
-      companions: 0,
-      companion: 0,
-      allergens: '',
-      token,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-
-    // Crear índice de token
-    await db
-      .collection('rsvpTokens')
-      .doc(token)
-      .set({
-        weddingId: String(weddingId),
-        guestId,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-    const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
-    const link = `${baseUrl.replace(/\/$/, '')}/rsvp/${token}`;
-
-    logger.info(`Dev guest created: ${guestId} for wedding ${weddingId}`);
-    return sendSuccess(req, res, { token, link, guestId, weddingId: String(weddingId) });
-  } catch (err) {
-    logger.error('rsvp-dev-create', err);
-    return sendInternalError(req, res, err);
-  }
-});
-
-// Asegurar usuario mock con rol planner para E2E (retirado)
-router.post('/dev/ensure-planner', (req, res) => {
-  logger.warn('rsvp-dev-ensure-planner disabled: requiere asignaci�n real de roles');
-  return sendError(
-    req,
-    res,
-    'dev-endpoint-removed',
-    'El endpoint /api/rsvp/dev/ensure-planner ha sido retirado. Configura roles planner reales.',
-    410
-  );
-});

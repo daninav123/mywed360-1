@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import { useWedding } from '../context/WeddingContext';
-import { useAuth } from './useAuth';
+import { useAuth } from './useAuth.jsx';
 
 /**
  * Hook personalizado para gestionar el estado del onboarding del usuario.

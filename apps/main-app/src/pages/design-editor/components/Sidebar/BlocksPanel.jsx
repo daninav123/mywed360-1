@@ -32,15 +32,15 @@ export default function BlocksPanel({ onAddElement, designType = 'invitation' })
   return (
     <div className="p-4 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Bloques Dinámicos</h3>
-        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
+        <h3 className="text-sm font-semibold " className="text-body">Bloques Dinámicos</h3>
+        <p className="text-xs " className="text-secondary">
           Elementos que se llenan automáticamente con datos de InfoBoda
         </p>
       </div>
 
       {/* Categorías */}
       <div className="space-y-1">
-        <p className="text-xs font-medium " style={{ color: 'var(--color-text)' }}>Categoría</p>
+        <p className="text-xs font-medium " className="text-body">Categoría</p>
         <div className="grid grid-cols-2 gap-1">
           {BLOCK_CATEGORIES.map((cat) => (
             <button
@@ -61,12 +61,12 @@ export default function BlocksPanel({ onAddElement, designType = 'invitation' })
 
       {/* Lista de Bloques */}
       <div className="space-y-2">
-        <p className="text-xs font-medium " style={{ color: 'var(--color-text)' }}>
+        <p className="text-xs font-medium " className="text-body">
           {filteredBlocks.length} bloques disponibles
         </p>
         
         {loading ? (
-          <div className="text-center py-8  text-sm" style={{ color: 'var(--color-muted)' }}>
+          <div className="text-center py-8  text-sm" className="text-muted">
             Cargando datos...
           </div>
         ) : (
@@ -75,20 +75,20 @@ export default function BlocksPanel({ onAddElement, designType = 'invitation' })
               <button
                 key={block.id}
                 onClick={() => handleAddBlock(block)}
-                className="w-full p-3  border  rounded-lg hover:border-blue-400 hover:shadow-md transition-all group text-left" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}
+                className="w-full p-3  border  rounded-lg hover:border-blue-400 hover:shadow-md transition-all group text-left" className="border-default" className="bg-surface"
               >
                 <div className="flex items-start gap-2">
                   <span className="text-2xl flex-shrink-0">{block.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium  group-hover:" style={{ color: 'var(--color-primary)' }} style={{ color: 'var(--color-text)' }}>
+                    <div className="text-sm font-medium  group-hover:" className="text-primary" className="text-body">
                       {block.name}
                     </div>
-                    <div className="text-xs  mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                    <div className="text-xs  mt-0.5" className="text-muted">
                       {block.description}
                     </div>
                     
                     {/* Preview del contenido */}
-                    <div className="mt-2 p-2  rounded text-xs font-mono  truncate" style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+                    <div className="mt-2 p-2  rounded text-xs font-mono  truncate" className="text-body" className="bg-page">
                       {(() => {
                         const generated = block.generator(weddingData);
                         if (Array.isArray(generated)) {

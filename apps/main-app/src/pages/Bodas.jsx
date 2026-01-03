@@ -1,12 +1,4 @@
-﻿import {
-  deleteField,
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-} from 'firebase/firestore';
-import React, { useCallback, useEffect, useState } from 'react';
+﻿import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -23,8 +15,9 @@ import PageTabs from '../components/ui/PageTabs';
 import { Progress } from '../components/ui/Progress';
 import WeddingFormModal from '../components/WeddingFormModal';
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import { createWedding } from '../services/WeddingService';
 import { bulkSyncWeddings, syncWeddingWithCRM } from '../services/crmSyncService';
@@ -359,22 +352,15 @@ export default function Bodas() {
       : '¿Archivar esta boda? Podrás restaurarla más adelante.';
     if (!window.confirm(confirmMessage)) return;
     try {
-      const wedRef = doc(db, 'weddings', wedding.id);
-      await updateDoc(wedRef, {
-        active: nextActive,
-        archivedAt: nextActive ? deleteField() : serverTimestamp(),
+      await fetch(`${API_URL}/wedding-info/${wedding.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          active: nextActive,
+          archivedAt: nextActive ? null : new Date().toISOString(),
+        }),
       });
-      if (currentUser?.uid) {
-        const subRef = doc(db, 'users', currentUser.uid, 'weddings', wedding.id);
-        await setDoc(
-          subRef,
-          {
-            active: nextActive,
-            lastUpdatedAt: serverTimestamp(),
-          },
-          { merge: true }
-        );
-      }
       performanceMonitor.logEvent(nextActive ? 'wedding_restored' : 'wedding_archived', {
         weddingId: wedding.id,
         role: userProfile?.role || 'planner',

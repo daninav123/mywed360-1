@@ -1,33 +1,34 @@
 /**
  * Configuración de Firebase Admin para el backend
- * Exporta instancias de Firestore y utilidades
+ * Firebase está DESHABILITADO - Se usa solo PostgreSQL
  */
 
-import admin from 'firebase-admin';
+// Firebase está deshabilitado cuando USE_FIREBASE=false
+const USE_FIREBASE = process.env.USE_FIREBASE !== 'false';
 
-// Firebase Admin ya está inicializado en authMiddleware.js
-// Aquí solo exportamos las utilidades necesarias
+let admin = null;
+let db = null;
+let FieldValue = null;
+let Timestamp = null;
+let auth = null;
 
-/**
- * Instancia de Firestore
- */
-export const db = admin.firestore();
+if (USE_FIREBASE) {
+  console.log('⚠️ Firebase habilitado en config/firebase.js');
+  const firebaseAdmin = await import('firebase-admin');
+  const { getFirestore } = await import('firebase-admin/firestore');
+  admin = firebaseAdmin.default;
+  
+  if (admin && admin.apps && admin.apps.length > 0) {
+    db = getFirestore();
+    FieldValue = admin.firestore.FieldValue;
+    Timestamp = admin.firestore.Timestamp;
+    auth = admin.auth();
+  }
+} else {
+  console.log('✅ Firebase deshabilitado en config/firebase.js - usando PostgreSQL');
+}
 
-/**
- * FieldValue para operaciones de Firestore
- * (serverTimestamp, increment, delete, arrayUnion, etc.)
- */
-export const FieldValue = admin?.firestore?.FieldValue || admin?.firestore?.().FieldValue;
-
-/**
- * Timestamp para fechas de Firestore
- */
-export const Timestamp = admin?.firestore?.Timestamp || admin?.firestore?.().Timestamp;
-
-/**
- * Auth para gestión de usuarios
- */
-export const auth = typeof admin?.auth === 'function' ? admin.auth() : null;
+export { admin, db, FieldValue, Timestamp, auth };
 
 export default {
   db,

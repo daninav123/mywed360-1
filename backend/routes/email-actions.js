@@ -1,6 +1,7 @@
 import express from 'express';
-import { db } from '../db.js';
-import { FieldValue } from 'firebase-admin/firestore';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 const router = express.Router();
 

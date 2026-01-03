@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Moon, LogOut } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { useWedding } from '../context/WeddingContext';
 import useTranslations from '../hooks/useTranslations';
 import useFinance from '../hooks/useFinance';
@@ -149,12 +149,14 @@ export default function HomePage2() {
       }
     }
     
-    const userName = userProfile?.name || userProfile?.displayName || currentUser?.displayName || '';
+    // Intentar obtener nombre del perfil del usuario
+    const userName = userProfile?.account?.name || userProfile?.name || userProfile?.displayName || currentUser?.displayName || '';
     if (userName) {
       return { name1: userName, name2: null };
     }
     
-    return { name1: currentUser?.email?.split('@')[0] || t('home2.header.guest'), name2: null };
+    // Si no hay nombre, retornar vacío (se mostrará solo "Hola!")
+    return { name1: '', name2: null };
   }, [userProfile, currentUser, activeWeddingData, t]);
 
   const displayName = coupleNames.name1;
@@ -361,12 +363,19 @@ export default function HomePage2() {
           </div>
         </div>
 
-        <header className="relative" style={{
-          height: '240px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-          overflow: 'hidden',
-          borderRadius: '32px 32px 0 0',
+        <div className="mx-auto my-8" style={{
+          maxWidth: '1024px',
+          width: '100%',
+          backgroundColor: '#FFFBF7',
+          borderRadius: '32px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          overflow: 'hidden'
         }}>
+          <header className="relative" style={{
+            height: '240px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            overflow: 'hidden',
+          }}>
           {/* Imagen de fondo completa */}
           <div className="absolute inset-0">
             <img 
@@ -375,7 +384,7 @@ export default function HomePage2() {
               className="w-full h-full object-cover"
               style={{ objectPosition: 'center 30%', transition: 'opacity 1s ease-in-out' }}
               onError={(e) => {
-                e.target.src = "https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=1400&auto=format&fit=crop&q=80";
+                e.target.src = "/assets/services/default.webp";
               }}
             />
             {/* Overlay sutil para legibilidad del texto */}
@@ -411,8 +420,13 @@ export default function HomePage2() {
         </header>
 
         <section className="px-6 py-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <CountdownCard weddingDate={activeWeddingData?.weddingDate || activeWeddingData?.date} />
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <CountdownCard
+              weddingDate={activeWeddingData?.weddingInfo?.weddingDate}
+              venueName={activeWeddingData?.weddingInfo?.venueName}
+              t={t}
+              format={format}
+            />
             <BudgetCard spent={budgetMetrics.spent} total={budgetMetrics.total} />
             <GuestListCard confirmed={guestsMetrics.confirmed} pending={guestsMetrics.pending} />
           </div>
@@ -432,7 +446,6 @@ export default function HomePage2() {
         <section className="px-6 py-6">
           <LatestBlogPosts />
         </section>
-
         </div>
       </div>
       <Nav active="home" />

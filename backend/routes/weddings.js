@@ -1,9 +1,78 @@
 import express from 'express';
 import admin from 'firebase-admin';
+import pkg from 'pg';
 import logger from '../utils/logger.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
 
+const { Pool } = pkg;
 const router = express.Router();
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
+});
+
+// POST /api/weddings - Crear nueva boda en PostgreSQL
+router.post('/', requireAuth, async (req, res) => {
+  try {
+    console.log('[weddings] POST - Creating wedding');
+    const userId = req.user?.uid;
+    
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'No autenticado' 
+      });
+    }
+
+    const { 
+      coupleName, 
+      weddingDate, 
+      celebrationPlace, 
+      status, 
+      numGuests,
+      eventType 
+    } = req.body;
+
+    console.log('[weddings] Creating wedding for user:', userId);
+    console.log('[weddings] Data:', { coupleName, weddingDate });
+
+    const result = await pool.query(`
+      INSERT INTO weddings (
+        "userId",
+        "coupleName",
+        "weddingDate",
+        "celebrationPlace",
+        status,
+        "numGuests",
+        "createdAt",
+        "updatedAt"
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+      RETURNING *
+    `, [
+      userId,
+      coupleName || 'Mi Boda',
+      weddingDate || null,
+      celebrationPlace || null,
+      status || 'planning',
+      numGuests || null
+    ]);
+
+    const wedding = result.rows[0];
+    console.log('[weddings] Wedding created:', wedding.id);
+
+    res.json({
+      success: true,
+      data: wedding
+    });
+  } catch (error) {
+    console.error('[weddings] Error creating wedding:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
 
 // POST /api/weddings/:weddingId/permissions/autofix
 // Añade al usuario autenticado a plannerIds de la boda si tiene relación válida

@@ -133,7 +133,7 @@ export default function PresupuestoBoda() {
         <HeroSection
           title="Controla el Presupuesto de tu Boda sin Estrés"
           subtitle="Sabe exactamente cuánto gastas, cuánto te queda y dónde puedes optimizar. Todo en tiempo real."
-          image="https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?w=800&auto=format&fit=crop&q=80"
+          image="/assets/services/default.webp"
         >
           <div className="flex gap-4">
             <PrimaryButton onClick={() => navigate('/signup')}>

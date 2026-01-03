@@ -165,19 +165,19 @@ const MarkdownRenderer = ({ markdown }) => {
   const blocks = useMemo(() => parseMarkdown(markdown), [markdown]);
   if (!blocks.length) return null;
   return (
-    <div className="space-y-5 leading-relaxed " style={{ color: 'var(--color-text)' }}>
+    <div className="space-y-5 leading-relaxed " className="text-body">
       {blocks.map((block, index) => {
         const key = `${block.type}-${index}`;
         switch (block.type) {
           case 'h2':
             return (
-              <h2 key={key} className="text-2xl font-semibold " style={{ color: 'var(--color-text)' }}>
+              <h2 key={key} className="text-2xl font-semibold " className="text-body">
                 <InlineText text={block.text} />
               </h2>
             );
           case 'h3':
             return (
-              <h3 key={key} className="text-xl font-semibold " style={{ color: 'var(--color-text)' }}>
+              <h3 key={key} className="text-xl font-semibold " className="text-body">
                 <InlineText text={block.text} />
               </h3>
             );
@@ -185,7 +185,7 @@ const MarkdownRenderer = ({ markdown }) => {
             return (
               <ul key={key} className="list-disc space-y-2 pl-5">
                 {block.items.map((item, idx) => (
-                  <li key={`${key}-item-${idx}`} className="" style={{ color: 'var(--color-text)' }}>
+                  <li key={`${key}-item-${idx}`} className="" className="text-body">
                     <InlineText text={item} />
                   </li>
                 ))}
@@ -195,14 +195,14 @@ const MarkdownRenderer = ({ markdown }) => {
             return (
               <blockquote
                 key={key}
-                className="border-l-4 border-indigo-200 bg-indigo-50/60 px-4 py-2 italic " style={{ color: 'var(--color-text)' }}
+                className="border-l-4 border-indigo-200 bg-indigo-50/60 px-4 py-2 italic " className="text-body"
               >
                 <InlineText text={block.text} />
               </blockquote>
             );
           default:
             return (
-              <p key={key} className="" style={{ color: 'var(--color-text)' }}>
+              <p key={key} className="" className="text-body">
                 <InlineText text={block.text} />
               </p>
             );
@@ -434,10 +434,10 @@ const BlogPost = () => {
       author: authorData,
       publisher: {
         '@type': 'Organization',
-        name: 'Lovenda',
+        name: 'Planivia',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://malove.app/maloveapp-logo.png',
+          url: 'https://planivia.net/logo.png',
         },
       },
       mainEntityOfPage: canonicalHref,
@@ -513,27 +513,27 @@ const BlogPost = () => {
         {!loading && post ? (
           <article className="space-y-6">
             <header className="space-y-3">
-              <h1 className="text-3xl font-semibold " style={{ color: 'var(--color-text)' }}>{post.title}</h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+              <h1 className="text-3xl font-semibold " className="text-body">{post.title}</h1>
+              <div className="flex flex-wrap items-center gap-4 text-sm " className="text-secondary">
                 {post?.byline?.name ? (
                   <Link
                     to={`/blog/autor/${post.byline.slug || post.byline.id}`}
                     className="text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)]"
                   >
-                    Por <span className="font-semibold " style={{ color: 'var(--color-text)' }}>{post.byline.name}</span>
+                    Por <span className="font-semibold " className="text-body">{post.byline.name}</span>
                     {post.byline.title ? ` · ${post.byline.title}` : ''}
                   </Link>
                 ) : null}
                 {publishedAt ? (
-                  <span className="" style={{ color: 'var(--color-muted)' }}>
+                  <span className="" className="text-muted">
                     Publicado el {formatDate(publishedAt, 'long')}
                   </span>
                 ) : null}
-                <div className="flex flex-wrap gap-2 " style={{ color: 'var(--color-muted)' }}>
+                <div className="flex flex-wrap gap-2 " className="text-muted">
                   {(post.tags || []).map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center rounded-full  px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide " style={{ color: 'var(--color-text-secondary)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                      className="inline-flex items-center rounded-full  px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide " className="text-secondary" className="bg-page"
                     >
                       {tag}
                     </span>
@@ -551,14 +551,14 @@ const BlogPost = () => {
             ) : null}
 
             {post.excerpt ? (
-              <p className="text-lg  font-medium" style={{ color: 'var(--color-text)' }}>{post.excerpt}</p>
+              <p className="text-lg  font-medium" className="text-body">{post.excerpt}</p>
             ) : null}
             {post?.byline?.signature ? (
-              <p className="text-sm italic " style={{ color: 'var(--color-muted)' }}>{post.byline.signature}</p>
+              <p className="text-sm italic " className="text-muted">{post.byline.signature}</p>
             ) : null}
 
-            <div className="flex flex-wrap items-center gap-3 py-4 border-y " style={{ borderColor: 'var(--color-border)' }}>
-              <span className="text-sm font-medium " style={{ color: 'var(--color-text)' }}>Compartir:</span>
+            <div className="flex flex-wrap items-center gap-3 py-4 border-y " className="border-default">
+              <span className="text-sm font-medium " className="text-body">Compartir:</span>
               <a
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(canonicalHref)}`}
                 target="_blank"
@@ -613,13 +613,13 @@ const BlogPost = () => {
 
             <section className="my-8 rounded-xl bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50 p-8 shadow-sm">
               <div className="max-w-3xl mx-auto text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full  shadow-md mb-4" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full  shadow-md mb-4" className="bg-surface">
                   <span className="text-2xl">💍</span>
                 </div>
-                <h2 className="text-2xl font-bold  mb-3" style={{ color: 'var(--color-text)' }}>
+                <h2 className="text-2xl font-bold  mb-3" className="text-body">
                   ¿Te ha gustado este artículo?
                 </h2>
-                <p className=" mb-6" style={{ color: 'var(--color-text)' }}>
+                <p className=" mb-6" className="text-body">
                   Descubre cómo Lovenda te ayuda a planificar cada detalle de tu boda de forma sencilla. Miles de parejas ya confían en nosotros.
                 </p>
                 <div className="flex flex-wrap justify-center gap-3 mb-6">
@@ -631,7 +631,7 @@ const BlogPost = () => {
                   </Link>
                   <Link
                     to="/precios"
-                    className="inline-flex items-center justify-center rounded-lg border-2   px-6 py-3 text-sm font-semibold  transition hover:border-rose-300 hover:bg-rose-50" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}
+                    className="inline-flex items-center justify-center rounded-lg border-2   px-6 py-3 text-sm font-semibold  transition hover:border-rose-300 hover:bg-rose-50" className="border-default" className="text-body" className="bg-surface"
                   >
                     Ver Planes y Precios
                   </Link>
@@ -640,11 +640,11 @@ const BlogPost = () => {
                   <Link to="/para-planners" className="text-rose-600 hover:text-rose-700 font-medium hover:underline">
                     Para Wedding Planners
                   </Link>
-                  <span className="" style={{ color: 'var(--color-muted)' }}>•</span>
+                  <span className="" className="text-muted">•</span>
                   <Link to="/para-proveedores" className="text-rose-600 hover:text-rose-700 font-medium hover:underline">
                     Para Proveedores
                   </Link>
-                  <span className="" style={{ color: 'var(--color-muted)' }}>•</span>
+                  <span className="" className="text-muted">•</span>
                   <Link to="/blog" className="text-rose-600 hover:text-rose-700 font-medium hover:underline">
                     Más Artículos
                   </Link>
@@ -654,8 +654,8 @@ const BlogPost = () => {
 
             {references.length ? (
               <section className="space-y-3">
-                <h2 className="text-lg font-semibold " style={{ color: 'var(--color-text)' }}>{referencesTitle}</h2>
-                <ul className="space-y-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+                <h2 className="text-lg font-semibold " className="text-body">{referencesTitle}</h2>
+                <ul className="space-y-2 text-sm " className="text-secondary">
                   {references.map((ref, index) => (
                     <li key={`${ref.url || ref.title}-${index}`} className="flex items-start gap-2">
                       <span className="mt-1 h-2 w-2 rounded-full bg-[var(--color-primary)]" />
@@ -697,13 +697,13 @@ const BlogPost = () => {
                   </span>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{authorProfile.name}</p>
+                  <p className="text-sm font-semibold " className="text-body">{authorProfile.name}</p>
                   {authorProfile.title ? (
-                    <p className="text-xs font-medium uppercase tracking-widest " style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-xs font-medium uppercase tracking-widest " className="text-muted">
                       {authorProfile.title}
                     </p>
                   ) : null}
-                  <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>{authorProfile.bio}</p>
+                  <p className="text-sm " className="text-secondary">{authorProfile.bio}</p>
                   <Link
                     to={`/blog/autor/${authorProfile.slug}`}
                     className="inline-flex text-sm font-medium text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-dark)]"
@@ -721,17 +721,17 @@ const BlogPost = () => {
           </div>
         ) : relatedPosts.length ? (
           <section className="mt-12 space-y-4">
-            <h2 className="text-xl font-semibold " style={{ color: 'var(--color-text)' }}>{relatedTitle}</h2>
+            <h2 className="text-xl font-semibold " className="text-body">{relatedTitle}</h2>
             <div className="grid gap-4 md:grid-cols-3">
               {relatedPosts.map((item) => (
                 <Link
                   key={item.slug}
                   to={`/blog/${item.slug}`}
-                  className="rounded-lg border border-soft  p-4 shadow-sm transition hover:border-[color:var(--color-primary)] hover:shadow" style={{ backgroundColor: 'var(--color-surface)' }}
+                  className="rounded-lg border border-soft  p-4 shadow-sm transition hover:border-[color:var(--color-primary)] hover:shadow" className="bg-surface"
                 >
-                  <p className="text-sm font-semibold  line-clamp-2" style={{ color: 'var(--color-text)' }}>{item.title}</p>
+                  <p className="text-sm font-semibold  line-clamp-2" className="text-body">{item.title}</p>
                   {item.publishedAt ? (
-                    <p className="mt-2 text-xs " style={{ color: 'var(--color-muted)' }}>
+                    <p className="mt-2 text-xs " className="text-muted">
                       {formatDate(new Date(item.publishedAt), 'short')}
                     </p>
                   ) : null}

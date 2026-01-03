@@ -81,13 +81,13 @@ export default function MenuCatering() {
     <div className="space-y-6">
       <Card className="p-6 space-y-4">
         <h1 className="text-2xl font-semibold">{t('design.menuCatering.title')}</h1>
-        <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+        <p className="" className="text-secondary">
           {t('design.menuCatering.description')}{' '}
           <span className="font-medium">{t('design.menuCatering.descriptionPlaceholder')}</span>
         </p>
 
         <div className="mt-2">
-          <p className="text-sm " style={{ color: 'var(--color-primary)' }}>
+          <p className="text-sm " className="text-primary">
             <span className="font-medium">{t('design.menuCatering.consejo')}:</span>{' '}
             {t('design.menuCatering.searchPlaceholder')} de cada menú especial en la sección de Menú principal.
           </p>

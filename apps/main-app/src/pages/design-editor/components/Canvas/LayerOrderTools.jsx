@@ -69,11 +69,11 @@ export default function LayerOrderTools({ canvasRef }) {
 
   return (
     <div className="flex items-center gap-1">
-      <span className="text-xs font-medium  mr-2" style={{ color: 'var(--color-text-secondary)' }}>Orden:</span>
+      <span className="text-xs font-medium  mr-2" className="text-secondary">Orden:</span>
       
       <button
         onClick={bringToFront}
-        className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+        className="p-1.5 hover: rounded" className="bg-page"
         title="Traer al frente (Ctrl+])"
       >
         <BringToFront className="w-4 h-4" />
@@ -81,7 +81,7 @@ export default function LayerOrderTools({ canvasRef }) {
       
       <button
         onClick={bringForward}
-        className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+        className="p-1.5 hover: rounded" className="bg-page"
         title="Subir una capa"
       >
         <ArrowUp className="w-4 h-4" />
@@ -89,7 +89,7 @@ export default function LayerOrderTools({ canvasRef }) {
       
       <button
         onClick={sendBackwards}
-        className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+        className="p-1.5 hover: rounded" className="bg-page"
         title="Bajar una capa"
       >
         <ArrowDown className="w-4 h-4" />
@@ -97,7 +97,7 @@ export default function LayerOrderTools({ canvasRef }) {
       
       <button
         onClick={sendToBack}
-        className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+        className="p-1.5 hover: rounded" className="bg-page"
         title="Enviar al fondo (Ctrl+[)"
       >
         <SendToBack className="w-4 h-4" />

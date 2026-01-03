@@ -102,13 +102,13 @@ export default function AlignmentTools({ canvasRef }) {
   };
 
   return (
-    <div className=" border-b  px-4 py-2" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+    <div className=" border-b  px-4 py-2" className="border-default" className="bg-surface">
       <div className="flex items-center gap-1">
-        <span className="text-xs font-medium  mr-2" style={{ color: 'var(--color-text-secondary)' }}>{t('designs:editor.alignment.label')}</span>
+        <span className="text-xs font-medium  mr-2" className="text-secondary">{t('designs:editor.alignment.label')}</span>
         
         <button
           onClick={() => align('left')}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title={t('designs:editor.alignment.alignLeft')}
         >
           <AlignLeft className="w-4 h-4" />
@@ -116,7 +116,7 @@ export default function AlignmentTools({ canvasRef }) {
         
         <button
           onClick={() => align('center-h')}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title={t('designs:editor.alignment.alignCenterH')}
         >
           <AlignHorizontalJustifyCenter className="w-4 h-4" />
@@ -124,7 +124,7 @@ export default function AlignmentTools({ canvasRef }) {
         
         <button
           onClick={() => align('right')}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title={t('designs:editor.alignment.alignRight')}
         >
           <AlignRight className="w-4 h-4" />
@@ -134,7 +134,7 @@ export default function AlignmentTools({ canvasRef }) {
         
         <button
           onClick={() => align('top')}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title={t('designs:editor.alignment.alignTop')}
         >
           <AlignLeft className="w-4 h-4 rotate-90" />
@@ -142,7 +142,7 @@ export default function AlignmentTools({ canvasRef }) {
         
         <button
           onClick={() => align('center-v')}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title={t('designs:editor.alignment.alignCenterV')}
         >
           <AlignVerticalJustifyCenter className="w-4 h-4" />
@@ -150,7 +150,7 @@ export default function AlignmentTools({ canvasRef }) {
         
         <button
           onClick={() => align('bottom')}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title={t('designs:editor.alignment.alignBottom')}
         >
           <AlignRight className="w-4 h-4 rotate-90" />
@@ -160,7 +160,7 @@ export default function AlignmentTools({ canvasRef }) {
         
         <button
           onClick={() => align('center')}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title={t('designs:editor.alignment.alignCenter')}
         >
           <AlignCenter className="w-4 h-4" />
@@ -168,11 +168,11 @@ export default function AlignmentTools({ canvasRef }) {
 
         <div className="h-5 w-px bg-gray-300 mx-2" />
         
-        <span className="text-xs font-medium  mr-2" style={{ color: 'var(--color-text-secondary)' }}>{t('designs:editor.alignment.distribute')}</span>
+        <span className="text-xs font-medium  mr-2" className="text-secondary">{t('designs:editor.alignment.distribute')}</span>
         
         <button
           onClick={() => distribute('horizontal')}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title={t('designs:editor.alignment.distributeH')}
         >
           <AlignHorizontalSpaceAround className="w-4 h-4" />
@@ -180,7 +180,7 @@ export default function AlignmentTools({ canvasRef }) {
         
         <button
           onClick={() => distribute('vertical')}
-          className="p-1.5 hover: rounded" style={{ backgroundColor: 'var(--color-bg)' }}
+          className="p-1.5 hover: rounded" className="bg-page"
           title={t('designs:editor.alignment.distributeV')}
         >
           <AlignVerticalSpaceAround className="w-4 h-4" />

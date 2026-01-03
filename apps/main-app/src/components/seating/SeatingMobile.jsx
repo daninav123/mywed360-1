@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, Search, Users, Plus, Grid, List } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Menu, Search, Users, Plus, Grid, List, Map, Filter, Presentation } from 'lucide-react';
 import useTranslations from '../../hooks/useTranslations';
 import useSeatingGestures from '../../hooks/useSeatingGestures';
 import SeatingRadialFAB from './SeatingRadialFAB';
 import SeatingMobileBottomPanel from './SeatingMobileBottomPanel';
 import SeatingCollaborationBadge from './SeatingCollaborationBadge';
+import SeatingMobileCanvas from './SeatingMobileCanvas';
+import SeatingMobileTableDetails from './SeatingMobileTableDetails';
+import SeatingMobileSearch from './SeatingMobileSearch';
+import SeatingMobileFilters from './SeatingMobileFilters';
+import SeatingPresentationMode from './SeatingPresentationMode';
 
 /**
  * Interfaz móvil optimizada para Seating Plan
@@ -22,14 +27,23 @@ const SeatingMobile = ({
   onRedo,
   canUndo = false,
   canRedo = false,
-  collaborativeEditors = {}, // { tableId: [{ userId, userName, userColor, action }] }
+  collaborativeEditors = {},
   currentUser,
+  onDeleteTable,
+  onDuplicateTable,
+  onToggleLock,
+  onEditTable,
+  hallSize = { width: 800, height: 600 },
 }) => {
-  const [viewMode, setViewMode] = useState('grid'); // grid, list
+  const [viewMode, setViewMode] = useState('grid'); // grid, list, canvas
   const [searchQuery, setSearchQuery] = useState('');
   const [showMenu, setShowMenu] = useState(false);
   const [selectedTable, setSelectedTable] = useState(null);
   const [showBottomPanel, setShowBottomPanel] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showFiltersModal, setShowFiltersModal] = useState(false);
+  const [showPresentationMode, setShowPresentationMode] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({ occupancy: [], locked: null, shape: [] });
   const { t } = useTranslations();
 
   // Gestos táctiles para el canvas
@@ -68,10 +82,45 @@ const SeatingMobile = ({
   // Filtrar invitados no asignados
   const unassignedGuests = guests.filter((g) => !g.tableId);
 
-  // Buscar
-  const filteredTables = tables.filter((t) =>
-    t.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Aplicar filtros y búsqueda
+  const filteredTables = useMemo(() => {
+    let result = tables;
+
+    // Filtro de búsqueda
+    if (searchQuery.trim()) {
+      result = result.filter((t) =>
+        t.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Filtro de ocupación
+    if (activeFilters.occupancy.length > 0) {
+      result = result.filter((table) => {
+        const occupancy = (table.guests?.length || 0) / (table.capacity || 1);
+        return activeFilters.occupancy.some((filter) => {
+          if (filter === 'empty') return occupancy === 0;
+          if (filter === 'partial') return occupancy > 0 && occupancy < 1;
+          if (filter === 'full') return occupancy === 1;
+          if (filter === 'over') return occupancy > 1;
+          return true;
+        });
+      });
+    }
+
+    // Filtro de estado bloqueado
+    if (activeFilters.locked !== null) {
+      result = result.filter((table) => table.locked === activeFilters.locked);
+    }
+
+    // Filtro de forma (si las mesas tienen propiedad shape)
+    if (activeFilters.shape.length > 0) {
+      result = result.filter((table) =>
+        activeFilters.shape.includes(table.shape || 'round')
+      );
+    }
+
+    return result;
+  }, [tables, searchQuery, activeFilters]);
 
   // Handlers
   const handleSelectTable = (table) => {
@@ -88,39 +137,74 @@ const SeatingMobile = ({
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header Mobile */}
       <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-        <button onClick={() => setShowMenu(!showMenu)} className="p-2 hover:bg-gray-100 rounded-lg">
-          <Menu className="w-6 h-6" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setShowMenu(!showMenu)} className="p-2 hover:bg-gray-100 rounded-lg">
+            <Menu className="w-6 h-6" />
+          </button>
+          <button
+            onClick={() => setShowPresentationMode(true)}
+            className="p-2 hover:bg-gray-100 rounded-lg"
+            title={t('seatingMobile.header.presentation', { defaultValue: 'Modo presentación' })}
+          >
+            <Presentation className="w-5 h-5" />
+          </button>
+        </div>
 
-        <h1 className="text-lg font-semibold">
+        <h1 className="text-lg font-semibold truncate flex-1 text-center">
           {t('seatingMobile.header.title', { defaultValue: 'Seating plan' })}
         </h1>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {/* Búsqueda */}
           <button
-            onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+            onClick={() => setShowSearchModal(true)}
             className="p-2 hover:bg-gray-100 rounded-lg"
+            title={t('seatingMobile.header.search', { defaultValue: 'Buscar' })}
           >
-            {viewMode === 'grid' ? <List className="w-5 h-5" /> : <Grid className="w-5 h-5" />}
+            <Search className="w-5 h-5" />
+          </button>
+
+          {/* Filtros */}
+          <button
+            onClick={() => setShowFiltersModal(true)}
+            className="p-2 hover:bg-gray-100 rounded-lg relative"
+            title={t('seatingMobile.header.filters', { defaultValue: 'Filtros' })}
+          >
+            <Filter className="w-5 h-5" />
+            {(activeFilters.occupancy.length > 0 || activeFilters.locked !== null || activeFilters.shape.length > 0) && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full" />
+            )}
+          </button>
+
+          {/* Toggle vista */}
+          <button
+            onClick={() => {
+              if (viewMode === 'grid') setViewMode('list');
+              else if (viewMode === 'list') setViewMode('canvas');
+              else setViewMode('grid');
+            }}
+            className="p-2 hover:bg-gray-100 rounded-lg"
+            title={t('seatingMobile.viewMode.toggle', { defaultValue: 'Cambiar vista' })}
+          >
+            {viewMode === 'canvas' ? <Map className="w-5 h-5" /> : viewMode === 'grid' ? <List className="w-5 h-5" /> : <Grid className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="bg-white px-4 py-2 border-b border-gray-200">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t('seatingMobile.search.placeholder', {
-              defaultValue: 'Buscar mesas o invitados...',
-            })}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm"
-          />
+      {/* Quick Search Bar (opcional - mostrar solo si hay búsqueda activa) */}
+      {searchQuery && (
+        <div className="bg-blue-50 px-4 py-2 border-b border-blue-200 flex items-center justify-between">
+          <span className="text-sm text-blue-900">
+            {filteredTables.length} {t('seatingMobile.search.results', { defaultValue: 'resultado(s)' })}
+          </span>
+          <button
+            onClick={() => setSearchQuery('')}
+            className="text-sm text-blue-600 font-medium"
+          >
+            {t('common.clear', { defaultValue: 'Limpiar' })}
+          </button>
         </div>
-      </div>
+      )}
 
       {/* Stats Bar */}
       <div className="bg-white px-4 py-3 border-b border-gray-200">
@@ -147,7 +231,16 @@ const SeatingMobile = ({
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-hidden">
+        {viewMode === 'canvas' ? (
+          <SeatingMobileCanvas
+            tables={filteredTables}
+            selectedTableId={selectedTable?.id}
+            onSelectTable={handleSelectTable}
+            hallSize={hallSize}
+          />
+        ) : (
+        <div className="h-full overflow-y-auto">
         {viewMode === 'grid' ? (
           <div className={`grid gap-3 p-4 ${isLandscape ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {filteredTables.map((table) => (
@@ -231,9 +324,11 @@ const SeatingMobile = ({
             ))}
           </div>
         )}
+        </div>
+        )}
 
-        {/* Unassigned Guests Section */}
-        {unassignedGuests.length > 0 && (
+        {/* Unassigned Guests Section (solo en vistas lista/grid) */}
+        {viewMode !== 'canvas' && unassignedGuests.length > 0 && (
           <div className="bg-orange-50 border-t border-orange-200 p-4 mt-4">
             <div className="flex items-center gap-2 mb-3">
               <Users className="w-5 h-5 text-orange-600" />
@@ -288,65 +383,57 @@ const SeatingMobile = ({
         title={selectedTable?.name || ''}
         defaultHeight="medium"
       >
-        {selectedTable && (
-          <div className="p-6">
-            <div className="flex items-center gap-4 text-sm text-gray-600 mb-6">
-              <span>
-                {t('seatingMobile.tableDetail.capacity', { defaultValue: 'Capacidad' })}:{' '}
-                {selectedTable.capacity}
-              </span>
-              <span>•</span>
-              <span>Ocupación: {selectedTable.guests?.length || 0}</span>
-            </div>
-
-            {/* Badge de quién está editando */}
-            {collaborativeEditors[selectedTable.id] && (
-              <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm text-blue-900">
-                    {collaborativeEditors[selectedTable.id].length === 1
-                      ? `${collaborativeEditors[selectedTable.id][0].userName} está viendo esta mesa`
-                      : `${collaborativeEditors[selectedTable.id].length} usuarios viendo esta mesa`}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {selectedTable.guests?.length > 0 ? (
-              <div className="space-y-2 mb-6">
-                <h3 className="font-semibold text-gray-900 mb-3">
-                  {t('seatingMobile.tableDetail.guestsHeading', { defaultValue: 'Invitados' })}
-                </h3>
-                {selectedTable.guests.map((guest) => (
-                  <div
-                    key={guest.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <span className="text-gray-900">{guest.name}</span>
-                    <button className="text-red-600 text-sm hover:text-red-700">
-                      {t('seatingMobile.actions.remove', { defaultValue: 'Quitar' })}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-center py-8">
-                {t('seatingMobile.tableDetail.noGuests', {
-                  defaultValue: 'No hay invitados asignados',
-                })}
-              </p>
-            )}
-
-            <button
-              onClick={handleClosePanel}
-              className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              {t('seatingMobile.actions.close', { defaultValue: 'Cerrar' })}
-            </button>
-          </div>
-        )}
+        <SeatingMobileTableDetails
+          table={selectedTable}
+          guests={guests}
+          onAssignGuest={(guestId, tableId) => onAssignGuest?.(guestId, tableId)}
+          onRemoveGuest={(guestId) => onAssignGuest?.(guestId, null)}
+          onEditTable={onEditTable}
+          onDeleteTable={onDeleteTable}
+          onDuplicateTable={onDuplicateTable}
+          onToggleLock={onToggleLock}
+        />
       </SeatingMobileBottomPanel>
+
+      {/* Search Modal */}
+      <SeatingMobileSearch
+        isOpen={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        tables={tables}
+        guests={guests}
+        onSelectTable={(table) => {
+          handleSelectTable(table);
+          setShowSearchModal(false);
+        }}
+        onSelectGuest={(guest) => {
+          // Si el invitado tiene mesa, ir a esa mesa
+          if (guest.tableId) {
+            const table = tables.find((t) => t.id === guest.tableId);
+            if (table) handleSelectTable(table);
+          }
+          setShowSearchModal(false);
+        }}
+      />
+
+      {/* Filters Modal */}
+      <SeatingMobileFilters
+        isOpen={showFiltersModal}
+        onClose={() => setShowFiltersModal(false)}
+        currentFilters={activeFilters}
+        onApply={(filters) => {
+          setActiveFilters(filters);
+          setShowFiltersModal(false);
+        }}
+      />
+
+      {/* Presentation Mode */}
+      <SeatingPresentationMode
+        isOpen={showPresentationMode}
+        onClose={() => setShowPresentationMode(false)}
+        tables={filteredTables}
+        guests={guests}
+        autoPlayInterval={5000}
+      />
     </div>
   );
 };

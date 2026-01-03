@@ -47,11 +47,11 @@ const SupplierCompare = () => {
     return (
       <PageWrapper title={pageTitle}>
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-          <MessageCircle className="h-16 w-16  mb-4" style={{ color: 'var(--color-muted)' }} />
-          <h2 className="text-2xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>
+          <MessageCircle className="h-16 w-16  mb-4" className="text-muted" />
+          <h2 className="text-2xl font-bold  mb-2" className="text-body">
             {t('suppliers.compare.empty.title', { placeholder: t('supplierCompare.searchPlaceholder') })}
           </h2>
-          <p className=" mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className=" mb-6" className="text-secondary">
             {t('suppliers.compare.empty.description', { placeholder: t('supplierCompare.notesPlaceholder') })}
           </p>
           <Button onClick={handleBack}>
@@ -84,24 +84,24 @@ const SupplierCompare = () => {
           <div>
             <button
               onClick={handleBack}
-              className="flex items-center gap-2  hover:text-blue-700 mb-2" style={{ color: 'var(--color-primary)' }}
+              className="flex items-center gap-2  hover:text-blue-700 mb-2" className="text-primary"
             >
               <ArrowLeft size={16} />
               {backLabel}
             </button>
-            <h1 className="text-3xl font-bold " style={{ color: 'var(--color-text)' }}>{pageTitle}</h1>
-            <p className=" mt-1" style={{ color: 'var(--color-text-secondary)' }}>{comparingLabel}</p>
+            <h1 className="text-3xl font-bold " className="text-body">{pageTitle}</h1>
+            <p className=" mt-1" className="text-secondary">{comparingLabel}</p>
           </div>
           <Button variant="outline" onClick={clearCompareList}>
             {clearAllLabel}
           </Button>
         </div>
 
-        <div className="overflow-x-auto border  rounded-lg" style={{ borderColor: 'var(--color-border)' }}>
+        <div className="overflow-x-auto border  rounded-lg" className="border-default">
           <table className="w-full">
             <thead>
-              <tr className="" style={{ backgroundColor: 'var(--color-bg)' }}>
-                <th className="px-4 py-3 text-left text-sm font-semibold  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+              <tr className="" className="bg-page">
+                <th className="px-4 py-3 text-left text-sm font-semibold  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', backgroundColor: 'var(--color-bg)' }}>
                   {t('suppliers.compare.table.feature', 'Característica')}
                 </th>
                 {compareList.map((supplier) => (
@@ -111,8 +111,8 @@ const SupplierCompare = () => {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
-                        <p className="font-semibold " style={{ color: 'var(--color-text)' }}>{supplier.name}</p>
-                        <p className="text-xs  font-normal" style={{ color: 'var(--color-text-secondary)' }}>
+                        <p className="font-semibold " className="text-body">{supplier.name}</p>
+                        <p className="text-xs  font-normal" className="text-secondary">
                           {supplier.category ||
                             supplier.service ||
                             t('suppliers.compare.table.categoryFallback', 'Sin categoría')}
@@ -120,7 +120,7 @@ const SupplierCompare = () => {
                       </div>
                       <button
                         onClick={() => removeFromCompare(supplier.id || supplier.slug)}
-                        className=" hover: transition-colors" style={{ color: 'var(--color-danger)' }} style={{ color: 'var(--color-muted)' }}
+                        className=" hover: transition-colors" className="text-muted"
                         title={removeLabel}
                       >
                         <X size={16} />
@@ -132,7 +132,7 @@ const SupplierCompare = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               <tr>
-                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', backgroundColor: 'var(--color-surface)' }}>
                   {t('suppliers.compare.table.image', 'Imagen')}
                 </td>
                 {compareList.map((supplier) => (
@@ -144,16 +144,16 @@ const SupplierCompare = () => {
                         className="w-full h-32 object-cover rounded-lg"
                       />
                     ) : (
-                      <div className="w-full h-32  rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
-                        <Camera className="h-8 w-8 " style={{ color: 'var(--color-muted)' }} />
+                      <div className="w-full h-32  rounded-lg flex items-center justify-center" className="bg-page">
+                        <Camera className="h-8 w-8 " className="text-muted" />
                       </div>
                     )}
                   </td>
                 ))}
               </tr>
 
-              <tr className="" style={{ backgroundColor: 'var(--color-bg)' }}>
-                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+              <tr className="" className="bg-page">
+                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', backgroundColor: 'var(--color-bg)' }}>
                   <div className="flex items-center gap-2">
                     <Star className="h-4 w-4 text-yellow-500" />
                     {t('suppliers.compare.features.rating', 'Valoración')}
@@ -171,13 +171,13 @@ const SupplierCompare = () => {
                             <span className="font-semibold">{rating.toFixed(1)}</span>
                           </div>
                           {reviewCount > 0 && (
-                            <p className="text-xs  mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                            <p className="text-xs  mt-1" className="text-secondary">
                               {formatReviewsCount(reviewCount)}
                             </p>
                           )}
                         </div>
                       ) : (
-                        <span className=" text-sm" style={{ color: 'var(--color-muted)' }}>{noRatingsLabel}</span>
+                        <span className=" text-sm" className="text-muted">{noRatingsLabel}</span>
                       )}
                     </td>
                   );
@@ -185,7 +185,7 @@ const SupplierCompare = () => {
               </tr>
 
               <tr>
-                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', backgroundColor: 'var(--color-surface)' }}>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-blue-500" />
                     {t('suppliers.compare.features.location', 'Ubicación')}
@@ -199,14 +199,14 @@ const SupplierCompare = () => {
                         {supplier.location.province && `, ${supplier.location.province}`}
                       </span>
                     ) : (
-                      <span className="" style={{ color: 'var(--color-muted)' }}>{noLocationLabel}</span>
+                      <span className="" className="text-muted">{noLocationLabel}</span>
                     )}
                   </td>
                 ))}
               </tr>
 
-              <tr className="" style={{ backgroundColor: 'var(--color-bg)' }}>
-                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+              <tr className="" className="bg-page">
+                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', backgroundColor: 'var(--color-bg)' }}>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-green-500" />
                     {t('suppliers.compare.features.price', 'Precio')}
@@ -220,7 +220,7 @@ const SupplierCompare = () => {
                       {priceRange ? (
                         <span className="font-medium">{priceRange}</span>
                       ) : (
-                        <span className="" style={{ color: 'var(--color-muted)' }}>{notSpecifiedLabel}</span>
+                        <span className="" className="text-muted">{notSpecifiedLabel}</span>
                       )}
                     </td>
                   );
@@ -228,7 +228,7 @@ const SupplierCompare = () => {
               </tr>
 
               <tr>
-                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', backgroundColor: 'var(--color-surface)' }}>
                   <div className="flex items-center gap-2">
                     <Camera className="h-4 w-4 text-purple-500" />
                     {t('suppliers.compare.features.portfolio', 'Portfolio')}
@@ -246,21 +246,21 @@ const SupplierCompare = () => {
                         {t('suppliers.compare.table.seePortfolio', 'Ver portfolio →')}
                       </a>
                     ) : (
-                      <span className="" style={{ color: 'var(--color-muted)' }}>{notAvailableLabel}</span>
+                      <span className="" className="text-muted">{notAvailableLabel}</span>
                     )}
                   </td>
                 ))}
               </tr>
 
-              <tr className="" style={{ backgroundColor: 'var(--color-bg)' }}>
-                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+              <tr className="" className="bg-page">
+                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', backgroundColor: 'var(--color-bg)' }}>
                   {t('suppliers.compare.table.description', 'Descripción')}
                 </td>
                 {compareList.map((supplier) => (
                   <td key={supplier.id || supplier.slug} className="px-4 py-3 text-sm">
-                    <p className=" line-clamp-3" style={{ color: 'var(--color-text)' }}>
+                    <p className=" line-clamp-3" className="text-body">
                       {supplier.business?.description || supplier.description || (
-                        <span className="" style={{ color: 'var(--color-muted)' }}>{notAvailableLabel}</span>
+                        <span className="" className="text-muted">{notAvailableLabel}</span>
                       )}
                     </p>
                   </td>
@@ -268,28 +268,28 @@ const SupplierCompare = () => {
               </tr>
 
               <tr>
-                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', backgroundColor: 'var(--color-surface)' }}>
                   {t('suppliers.compare.table.contact', 'Contacto')}
                 </td>
                 {compareList.map((supplier) => (
                   <td key={supplier.id || supplier.slug} className="px-4 py-3">
                     <div className="space-y-1 text-sm">
                       {supplier.contact?.email && (
-                        <p className="" style={{ color: 'var(--color-text)' }}>{supplier.contact.email}</p>
+                        <p className="" className="text-body">{supplier.contact.email}</p>
                       )}
                       {supplier.contact?.phone && (
-                        <p className="" style={{ color: 'var(--color-text)' }}>{supplier.contact.phone}</p>
+                        <p className="" className="text-body">{supplier.contact.phone}</p>
                       )}
                       {!supplier.contact?.email && !supplier.contact?.phone && (
-                        <span className="" style={{ color: 'var(--color-muted)' }}>{notAvailableLabel}</span>
+                        <span className="" className="text-muted">{notAvailableLabel}</span>
                       )}
                     </div>
                   </td>
                 ))}
               </tr>
 
-              <tr className="" style={{ backgroundColor: 'var(--color-bg)' }}>
-                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+              <tr className="" className="bg-page">
+                <td className="px-4 py-3 text-sm font-medium  sticky left-0  z-10 border-r " style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', backgroundColor: 'var(--color-bg)' }}>
                   {t('suppliers.compare.table.type', 'Tipo')}
                 </td>
                 {compareList.map((supplier) => (
@@ -306,7 +306,7 @@ const SupplierCompare = () => {
                       </span>
                     )}
                     {supplier.priority === 'internet' && (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium  " style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium  " style={{ color: 'var(--color-text)', backgroundColor: 'var(--color-bg)' }}>
                         {typeLabels.internet}
                       </span>
                     )}

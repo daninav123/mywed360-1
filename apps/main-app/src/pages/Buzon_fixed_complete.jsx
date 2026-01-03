@@ -360,7 +360,7 @@ export default function Buzon() {
 
         {/* Contenido */}
         <div className="px-6 py-6">
-          <p className="" style={{ color: 'var(--color-text-secondary)' }}>Esta vista está deshabilitada en producción.</p>
+          <p className="" className="text-secondary">Esta vista está deshabilitada en producción.</p>
         </div>
       </div>
     </div>

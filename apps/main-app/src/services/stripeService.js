@@ -6,6 +6,14 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
 /**
+ * Helper para obtener el token de autenticación
+ * TODO: Migrar a usar auth context cuando los componentes lo pasen como parámetro
+ */
+function getAuthToken() {
+  return localStorage.getItem('authToken');
+}
+
+/**
  * Crea una sesión de checkout para un producto
  * @param {string} productId - ID del producto (ej: 'wedding_pass', 'planner_pack5_monthly')
  * @param {string} weddingId - ID de la boda (opcional)
@@ -13,7 +21,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
  */
 export async function createCheckoutSession({ productId, weddingId = null }) {
   try {
-    const token = localStorage.getItem('authToken'); // TODO: Ajustar según tu sistema de auth
+    const token = getAuthToken();
 
     const response = await fetch(`${API_BASE_URL}/api/stripe/create-checkout-session`, {
       method: 'POST',
@@ -68,7 +76,7 @@ export const PRODUCT_IDS = {
  */
 export async function getCheckoutSession(sessionId) {
   try {
-    const token = localStorage.getItem('authToken');
+    const token = getAuthToken();
 
     const response = await fetch(`${API_BASE_URL}/api/stripe/session/${sessionId}`, {
       method: 'GET',
@@ -96,7 +104,7 @@ export async function getCheckoutSession(sessionId) {
  */
 export async function createCustomerPortalSession() {
   try {
-    const token = localStorage.getItem('authToken');
+    const token = getAuthToken();
 
     const response = await fetch(`${API_BASE_URL}/api/stripe/create-portal-session`, {
       method: 'POST',

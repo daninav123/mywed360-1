@@ -188,7 +188,7 @@ const PublicRSVP = () => {
       <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-          <p className=" text-lg" style={{ color: 'var(--color-text-secondary)' }}>Cargando...</p>
+          <p className=" text-lg" className="text-secondary">Cargando...</p>
         </div>
       </div>
     );
@@ -199,8 +199,8 @@ const PublicRSVP = () => {
       <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">😕</div>
-          <h1 className="text-3xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>Web no encontrada</h1>
-          <p className="" style={{ color: 'var(--color-text-secondary)' }}>La web que buscas no está disponible</p>
+          <h1 className="text-3xl font-bold  mb-2" className="text-body">Web no encontrada</h1>
+          <p className="" className="text-secondary">La web que buscas no está disponible</p>
         </div>
       </div>
     );
@@ -215,9 +215,9 @@ const PublicRSVP = () => {
 
       {/* PASO 1: Buscar por nombre */}
         {step === 1 && (
-          <div className=" rounded-xl shadow-md p-8" style={{ backgroundColor: 'var(--color-surface)' }}>
-            <h2 className="text-2xl font-bold  mb-4" style={{ color: 'var(--color-text)' }}>¿Cuál es tu nombre?</h2>
-            <p className=" mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+          <div className=" rounded-xl shadow-md p-8" className="bg-surface">
+            <h2 className="text-2xl font-bold  mb-4" className="text-body">¿Cuál es tu nombre?</h2>
+            <p className=" mb-6" className="text-secondary">
               Introduce tu nombre completo tal como aparece en la invitación
             </p>
 
@@ -240,7 +240,7 @@ const PublicRSVP = () => {
               </button>
             </form>
 
-            <p className="text-sm  mt-4 text-center" style={{ color: 'var(--color-muted)' }}>
+            <p className="text-sm  mt-4 text-center" className="text-muted">
               💡 Escribe tu nombre tal como aparece en la invitación
             </p>
           </div>
@@ -248,32 +248,32 @@ const PublicRSVP = () => {
 
         {/* PASO 2: Formulario de confirmación */}
         {step === 2 && guestData && (
-          <div className=" rounded-xl shadow-md p-8" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className=" rounded-xl shadow-md p-8" className="bg-surface">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold " style={{ color: 'var(--color-text)' }}>¡Hola, {guestData.nombre}!</h2>
-              <p className="" style={{ color: 'var(--color-text-secondary)' }}>Por favor, confirma tu asistencia</p>
+              <h2 className="text-2xl font-bold " className="text-body">¡Hola, {guestData.nombre}!</h2>
+              <p className="" className="text-secondary">Por favor, confirma tu asistencia</p>
             </div>
 
             <form onSubmit={handleSubmitRSVP} className="space-y-6">
               {/* Email de confirmación */}
               <div>
-                <label className="block  font-semibold mb-3" style={{ color: 'var(--color-text)' }}>Tu email *</label>
+                <label className="block  font-semibold mb-3" className="text-body">Tu email *</label>
                 <input
                   type="email"
                   value={formData.emailConfirmacion}
                   onChange={(e) => setFormData({ ...formData, emailConfirmacion: e.target.value })}
                   placeholder={t('rsvp.emailPlaceholder')}
                   required
-                  className="w-full px-4 py-3 border-2  rounded-lg focus:border-purple-500 focus:outline-none" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-4 py-3 border-2  rounded-lg focus:border-purple-500 focus:outline-none" className="border-default"
                 />
-                <p className="text-xs  mt-2" style={{ color: 'var(--color-text-secondary)' }}>
+                <p className="text-xs  mt-2" className="text-secondary">
                   📧 Tu email quedará registrado con la confirmación
                 </p>
               </div>
 
               {/* Asistencia */}
               <div>
-                <label className="block  font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+                <label className="block  font-semibold mb-3" className="text-body">
                   ¿Asistirás al evento? *
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -308,7 +308,7 @@ const PublicRSVP = () => {
               {formData.asistira && (
                 <>
                   <div>
-                    <label className="block  font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+                    <label className="block  font-semibold mb-3" className="text-body">
                       ¿Cuántos acompañantes traerás?
                     </label>
                     <select
@@ -320,7 +320,7 @@ const PublicRSVP = () => {
                           nombresAcompañantes: [],
                         })
                       }
-                      className="w-full px-4 py-3 border-2  rounded-lg focus:border-purple-500 focus:outline-none" style={{ borderColor: 'var(--color-border)' }}
+                      className="w-full px-4 py-3 border-2  rounded-lg focus:border-purple-500 focus:outline-none" className="border-default"
                     >
                       <option value="0">Solo yo</option>
                       <option value="1">1 acompañante</option>
@@ -333,7 +333,7 @@ const PublicRSVP = () => {
                   {/* Nombres de acompañantes */}
                   {formData.numAcompañantes > 0 && (
                     <div>
-                      <label className="block  font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+                      <label className="block  font-semibold mb-3" className="text-body">
                         Nombres de tus acompañantes
                       </label>
                       {[...Array(formData.numAcompañantes)].map((_, index) => (
@@ -343,7 +343,7 @@ const PublicRSVP = () => {
                           value={formData.nombresAcompañantes[index] || ''}
                           onChange={(e) => handleAcompañantesChange(index, e.target.value)}
                           placeholder={t('rsvp.companionPlaceholder', { number: index + 1 })}
-                          className="w-full px-4 py-3 border-2  rounded-lg mb-2 focus:border-purple-500 focus:outline-none" style={{ borderColor: 'var(--color-border)' }}
+                          className="w-full px-4 py-3 border-2  rounded-lg mb-2 focus:border-purple-500 focus:outline-none" className="border-default"
                         />
                       ))}
                     </div>
@@ -351,7 +351,7 @@ const PublicRSVP = () => {
 
                   {/* Restricciones alimentarias */}
                   <div>
-                    <label className="block  font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+                    <label className="block  font-semibold mb-3" className="text-body">
                       Restricciones alimentarias o alergias
                     </label>
 
@@ -484,9 +484,9 @@ const PublicRSVP = () => {
                         setFormData({ ...formData, restriccionesAlimentarias: e.target.value })
                       }
                       placeholder={t('rsvp.allergiesPlaceholder')}
-                      className="w-full px-4 py-3 border-2  rounded-lg focus:border-purple-500 focus:outline-none" style={{ borderColor: 'var(--color-border)' }}
+                      className="w-full px-4 py-3 border-2  rounded-lg focus:border-purple-500 focus:outline-none" className="border-default"
                     />
-                    <p className="text-xs  mt-2" style={{ color: 'var(--color-text-secondary)' }}>
+                    <p className="text-xs  mt-2" className="text-secondary">
                       💡 Marca las opciones que apliquen y especifica otras alergias en el campo de
                       texto
                     </p>
@@ -496,7 +496,7 @@ const PublicRSVP = () => {
 
               {/* Comentarios */}
               <div>
-                <label className="block  font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+                <label className="block  font-semibold mb-3" className="text-body">
                   Comentarios adicionales
                 </label>
                 <textarea
@@ -504,7 +504,7 @@ const PublicRSVP = () => {
                   onChange={(e) => setFormData({ ...formData, comentarios: e.target.value })}
                   placeholder={t('rsvp.commentsPlaceholder')}
                   rows="3"
-                  className="w-full px-4 py-3 border-2  rounded-lg focus:border-purple-500 focus:outline-none" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-4 py-3 border-2  rounded-lg focus:border-purple-500 focus:outline-none" className="border-default"
                 ></textarea>
               </div>
 
@@ -513,7 +513,7 @@ const PublicRSVP = () => {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="px-6 py-3 bg-gray-200  rounded-lg font-semibold hover:bg-gray-300 transition-all" style={{ color: 'var(--color-text)' }}
+                  className="px-6 py-3 bg-gray-200  rounded-lg font-semibold hover:bg-gray-300 transition-all" className="text-body"
                 >
                   ← Volver
                 </button>
@@ -531,23 +531,23 @@ const PublicRSVP = () => {
 
         {/* PASO 3: Confirmación */}
         {step === 3 && (
-          <div className=" rounded-xl shadow-md p-8 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className=" rounded-xl shadow-md p-8 text-center" className="bg-surface">
             <div className="text-6xl mb-4">{formData.asistira ? '🎉' : '😔'}</div>
-            <h2 className="text-3xl font-bold  mb-4" style={{ color: 'var(--color-text)' }}>
+            <h2 className="text-3xl font-bold  mb-4" className="text-body">
               {formData.asistira ? '¡Confirmación Recibida!' : 'Gracias por Informarnos'}
             </h2>
-            <p className="text-lg  mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-lg  mb-6" className="text-secondary">
               {formData.asistira
                 ? `¡Nos vemos en la boda${formData.numAcompañantes > 0 ? ` con tus ${formData.numAcompañantes} acompañante${formData.numAcompañantes > 1 ? 's' : ''}` : ''}!`
                 : 'Lamentamos que no puedas asistir'}
             </p>
 
             <div className="bg-purple-50 rounded-lg p-4 mb-6 space-y-2">
-              <p className="text-sm " style={{ color: 'var(--color-text)' }}>
+              <p className="text-sm " className="text-body">
                 ✅ Hemos guardado tu respuesta. Los novios la verán en su panel de gestión.
               </p>
               {formData.emailConfirmacion && (
-                <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
+                <p className="text-xs " className="text-secondary">
                   📧 Email registrado: {formData.emailConfirmacion}
                 </p>
               )}

@@ -2,7 +2,13 @@ import express from 'express';
 import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import logger from '../utils/logger.js';
-import { requireSupplierAuth } from './supplier-dashboard.js';
+import { requireSupplierAuth } from '../middleware/supplierAuth.js';
+import {
+  sendSuccess,
+  sendError,
+  sendInternalError,
+  sendValidationError,
+} from '../utils/apiResponse.js';
 
 const router = express.Router();
 
@@ -34,10 +40,10 @@ router.get('/availability', requireSupplierAuth, async (req, res) => {
       ...doc.data(),
     }));
 
-    return res.json({ success: true, blockedDates });
+    return sendSuccess(req, res, { blockedDates });
   } catch (error) {
     logger.error('Error getting availability:', error);
-    return res.status(500).json({ error: 'internal_error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -83,10 +89,10 @@ router.post('/availability/block', requireSupplierAuth, express.json(), async (r
 
     logger.info(`Supplier ${req.supplier.id} blocked ${dates.length} dates`);
 
-    return res.json({ success: true, blockedIds });
+    return sendSuccess(req, res, { blockedIds });
   } catch (error) {
     logger.error('Error blocking dates:', error);
-    return res.status(500).json({ error: 'internal_error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -104,10 +110,10 @@ router.delete('/availability/:dateId', requireSupplierAuth, async (req, res) => 
 
     logger.info(`Supplier ${req.supplier.id} unblocked date ${dateId}`);
 
-    return res.json({ success: true });
+    return sendSuccess(req, res, { unblocked: true });
   } catch (error) {
     logger.error('Error unblocking date:', error);
-    return res.status(500).json({ error: 'internal_error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -129,14 +135,13 @@ router.get('/availability/check', requireSupplierAuth, async (req, res) => {
       .doc(dateId)
       .get();
 
-    return res.json({
-      success: true,
+    return sendSuccess(req, res, {
       available: !doc.exists,
       blockInfo: doc.exists ? doc.data() : null,
     });
   } catch (error) {
     logger.error('Error checking availability:', error);
-    return res.status(500).json({ error: 'internal_error' });
+    return sendInternalError(req, res, error);
   }
 });
 
@@ -165,13 +170,12 @@ router.post('/availability/sync-google', requireSupplierAuth, express.json(), as
 
     logger.info(`Supplier ${req.supplier.id} connected Google Calendar`);
 
-    return res.json({
-      success: true,
+    return sendSuccess(req, res, {
       message: 'Google Calendar connected. Sync will happen automatically.',
     });
   } catch (error) {
     logger.error('Error syncing Google Calendar:', error);
-    return res.status(500).json({ error: 'internal_error' });
+    return sendInternalError(req, res, error);
   }
 });
 

@@ -6,7 +6,7 @@ import { ArrowLeft, CheckCircle2, LogOut } from 'lucide-react';
 import MarketingLayout from '../../components/marketing/MarketingLayout';
 import RegisterForm from '../../components/auth/RegisterForm';
 import SocialLoginButtons from '../../components/auth/SocialLoginButtons';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import useTranslations from '../../hooks/useTranslations';
 
 const DEFAULT_PROVIDERS = ['google', 'facebook', 'apple'];
@@ -312,13 +312,13 @@ const Access = ({ defaultMode = 'login' }) => {
       <div className="layout-container space-y-6">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 rounded-full border border-soft /95 px-3 py-1 text-xs font-medium text-muted transition hover:text-body" style={{ backgroundColor: 'var(--color-surface)' }}
+          className="inline-flex items-center gap-2 rounded-full border border-soft /95 px-3 py-1 text-xs font-medium text-muted transition hover:text-body" className="bg-surface"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           {t('marketingAccess.backLink', { defaultValue: 'Back to home' })}
         </Link>
 
-        <section className="overflow-hidden rounded-3xl border border-soft /95 shadow-lg" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <section className="overflow-hidden rounded-3xl border border-soft /95 shadow-lg" className="bg-surface">
           <div className="grid gap-10 p-8 lg:grid-cols-[1fr,0.85fr] lg:items-start lg:p-12">
             <div className="space-y-5">
               <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[color:var(--color-primary)]">
@@ -329,7 +329,7 @@ const Access = ({ defaultMode = 'login' }) => {
               {heroFeatures.length > 0 ? (
                 <div className="flex flex-wrap gap-2 text-xs text-muted">
                   {heroFeatures.map((feature) => (
-                    <span key={feature} className="rounded-full border border-soft /95 px-3 py-1" style={{ backgroundColor: 'var(--color-surface)' }}>
+                    <span key={feature} className="rounded-full border border-soft /95 px-3 py-1" className="bg-surface">
                       {feature}
                     </span>
                   ))}
@@ -337,7 +337,7 @@ const Access = ({ defaultMode = 'login' }) => {
               ) : null}
             </div>
 
-            <div className="rounded-3xl border border-soft  p-6 shadow-lg" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="rounded-3xl border border-soft  p-6 shadow-lg" className="bg-surface">
               {alreadyLoggedIn ? (
                 <div className="space-y-6 text-center">
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-[color:var(--color-primary)]">

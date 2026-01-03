@@ -53,11 +53,11 @@ export default function GroupingTools({ canvasRef }) {
 
   return (
     <div className="flex items-center gap-1">
-      <span className="text-xs font-medium  mr-2" style={{ color: 'var(--color-text-secondary)' }}>Agrupar:</span>
+      <span className="text-xs font-medium  mr-2" className="text-secondary">Agrupar:</span>
       
       <button
         onClick={handleGroup}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 hover: rounded text-xs font-medium" style={{ backgroundColor: 'var(--color-bg)' }}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 hover: rounded text-xs font-medium" className="bg-page"
         title="Agrupar elementos (Ctrl+G)"
       >
         <Group className="w-4 h-4" />
@@ -66,7 +66,7 @@ export default function GroupingTools({ canvasRef }) {
       
       <button
         onClick={handleUngroup}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 hover: rounded text-xs font-medium" style={{ backgroundColor: 'var(--color-bg)' }}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 hover: rounded text-xs font-medium" className="bg-page"
         title="Desagrupar (Ctrl+Shift+G)"
       >
         <Ungroup className="w-4 h-4" />

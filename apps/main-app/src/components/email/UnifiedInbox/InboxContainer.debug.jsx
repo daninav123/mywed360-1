@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { useAuth } from '../../../hooks/useAuth';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 
 /**
  * InboxContainer de debug para aislar el error

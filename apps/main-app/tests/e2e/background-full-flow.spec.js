@@ -229,7 +229,7 @@ test.describe('Sistema de Fondos - Flujo Completo con Login', () => {
 
     console.log('\n📍 Ingresando URL de imagen...');
     const urlInput = page.locator('input[placeholder*="ejemplo.com/fondo"]');
-    await urlInput.fill('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600');
+    await urlInput.fill('/assets/services/default.webp');
     await page.waitForTimeout(2000);
 
     const fondoInfo = await page.evaluate(() => {

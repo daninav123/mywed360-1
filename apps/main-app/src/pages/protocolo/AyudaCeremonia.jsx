@@ -115,7 +115,7 @@ const AyudaCeremonia = () => {
 
   const renderLoadingState = () => (
     <div className="p-8">
-      <Card className="p-6 text-center " style={{ color: 'var(--color-muted)' }}>Cargando contenido…</Card>
+      <Card className="p-6 text-center " className="text-muted">Cargando contenido…</Card>
     </div>
   );
 
@@ -133,22 +133,22 @@ const AyudaCeremonia = () => {
           </div>
           <div className="overflow-y-auto max-h-96">
             {readings.length === 0 ? (
-              <p className="p-4 text-sm " style={{ color: 'var(--color-muted)' }}>No hay lecturas guardadas.</p>
+              <p className="p-4 text-sm " className="text-muted">No hay lecturas guardadas.</p>
             ) : (
               <ul className="divide-y divide-gray-200">
                 {readings.map((reading) => (
                   <li
                     key={reading.id}
-                    className="p-4 hover: cursor-pointer" style={{ backgroundColor: 'var(--color-bg)' }}
+                    className="p-4 hover: cursor-pointer" className="bg-page"
                     onClick={() => handleSelectReading(reading)}
                   >
                     <div className="flex justify-between gap-3">
                       <div>
-                        <h4 className="font-medium " style={{ color: 'var(--color-text)' }}>{reading.title}</h4>
-                        <p className="text-sm  mt-1 line-clamp-2" style={{ color: 'var(--color-text-secondary)' }}>
+                        <h4 className="font-medium " className="text-body">{reading.title}</h4>
+                        <p className="text-sm  mt-1 line-clamp-2" className="text-secondary">
                           {reading.content}
                         </p>
-                        <div className="mt-2 flex items-center text-xs  gap-2" style={{ color: 'var(--color-muted)' }}>
+                        <div className="mt-2 flex items-center text-xs  gap-2" className="text-muted">
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
                             {reading.duration || calculateReadingTime(reading.content)}
                           </span>
@@ -218,7 +218,7 @@ const AyudaCeremonia = () => {
                             <Button
                               size="xs"
                               variant="ghost"
-                              className=" hover:text-red-700" style={{ color: 'var(--color-danger)' }}
+                              className=" hover:text-red-700" className="text-danger"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (
@@ -270,33 +270,33 @@ const AyudaCeremonia = () => {
             </div>
             <div className="p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Título de la lectura
                 </label>
                 <input
                   type="text"
                   value={readingForm.title}
                   onChange={(e) => setReadingForm((prev) => ({ ...prev, title: e.target.value }))}
-                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" className="border-default"
                   placeholder={t('protocol.ceremony.searchPlaceholder')}
                   required
                   disabled={!canEdit}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Contenido
                 </label>
                 <textarea
                   rows={12}
                   value={readingForm.content}
                   onChange={(e) => handleReadingContentChange(e.target.value)}
-                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 font-serif" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 font-serif" className="border-default"
                   placeholder={t('protocol.ceremony.customTitlePlaceholder')}
                   required
                   disabled={!canEdit}
                 />
-                <p className="mt-1 text-sm " style={{ color: 'var(--color-muted)' }}>
+                <p className="mt-1 text-sm " className="text-muted">
                   Duración estimada: {readingForm.duration || '0 min'}
                 </p>
               </div>
@@ -322,10 +322,10 @@ const AyudaCeremonia = () => {
           <form onSubmit={handleAddSurprise} className="p-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>Tipo</label>
+                <label className="block text-sm font-medium  mb-1" className="text-body">Tipo</label>
                 <select
                   name="type"
-                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" className="border-default"
                   required
                 >
                   <option value="">Seleccionar tipo</option>
@@ -335,47 +335,47 @@ const AyudaCeremonia = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Destinatario
                 </label>
                 <input
                   type="text"
                   name="recipient"
-                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" className="border-default"
                   placeholder={t('protocol.ceremony.presentationNotesPlaceholder')}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>Mesa</label>
+                <label className="block text-sm font-medium  mb-1" className="text-body">Mesa</label>
                 <input
                   type="text"
                   name="table"
-                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" className="border-default"
                   placeholder="Ej. Mesa 1"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Descripción
                 </label>
                 <input
                   type="text"
                   name="description"
-                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" className="border-default"
                   placeholder="Ej. Ramo de rosas blancas"
                   required
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-medium  mb-1" className="text-body">
                   Notas adicionales
                 </label>
                 <textarea
                   name="notes"
                   rows={2}
-                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" style={{ borderColor: 'var(--color-border)' }}
+                  className="w-full px-3 py-2 border  rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" className="border-default"
                   placeholder="Instrucciones especiales o detalles importantes…"
                 />
               </div>
@@ -392,47 +392,47 @@ const AyudaCeremonia = () => {
           <h3 className="text-lg font-medium">Lista de Ramos y Sorpresas</h3>
         </div>
         {surprises.length === 0 ? (
-          <div className="p-6 text-center " style={{ color: 'var(--color-muted)' }}>
+          <div className="p-6 text-center " className="text-muted">
             <p>No hay ramos o sorpresas programados todavía.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="" style={{ backgroundColor: 'var(--color-bg)' }}>
+              <thead className="" className="bg-page">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+                  <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" className="text-muted">
                     Tipo
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+                  <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" className="text-muted">
                     Destinatario
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+                  <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" className="text-muted">
                     Mesa
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+                  <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" className="text-muted">
                     Descripción
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+                  <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider" className="text-muted">
                     Estado
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium  uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+                  <th className="px-6 py-3 text-right text-xs font-medium  uppercase tracking-wider" className="text-muted">
                     Acciones
                   </th>
                 </tr>
               </thead>
-              <tbody className=" divide-y divide-gray-200" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <tbody className=" divide-y divide-gray-200" className="bg-surface">
                 {surprises.map((item) => (
                   <tr key={item.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm " style={{ color: 'var(--color-text)' }}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm " className="text-body">
                       {item.type}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm " style={{ color: 'var(--color-text)' }}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm " className="text-body">
                       {item.recipient}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm " style={{ color: 'var(--color-text)' }}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm " className="text-body">
                       {item.table}
                     </td>
-                    <td className="px-6 py-4 text-sm " style={{ color: 'var(--color-text)' }}>{item.description}</td>
+                    <td className="px-6 py-4 text-sm " className="text-body">{item.description}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 py-1 text-xs rounded-full ${
@@ -449,14 +449,14 @@ const AyudaCeremonia = () => {
                         <>
                           <button
                             type="button"
-                            className=" hover:text-blue-800" style={{ color: 'var(--color-primary)' }}
+                            className=" hover:text-blue-800" className="text-primary"
                             onClick={() => toggleSurpriseStatus(item.id)}
                           >
                             {item.status === 'pending' ? 'Marcar entregado' : 'Marcar pendiente'}
                           </button>
                           <button
                             type="button"
-                            className=" hover:text-red-800" style={{ color: 'var(--color-danger)' }}
+                            className=" hover:text-red-800" className="text-danger"
                             onClick={() => {
                               if (
                                 window.confirm('¿Seguro que quieres eliminar este elemento?')
@@ -483,11 +483,11 @@ const AyudaCeremonia = () => {
   return (
     <PageWrapper title="Ayuda Ceremonia">
       <div className="space-y-6">
-        <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+        <p className="" className="text-secondary">
           Redacta lecturas, organiza sorpresas y comparte textos importantes de la ceremonia.
         </p>
 
-        <div className="border-b " style={{ borderColor: 'var(--color-border)' }}>
+        <div className="border-b " className="border-default">
           <nav className="-mb-px flex space-x-8">
             {TABS.map((tab) => (
               <button
@@ -515,7 +515,7 @@ const AyudaCeremonia = () => {
               <h3 className="text-lg font-medium">{readingForm.title || 'Vista previa'}</h3>
               <button
                 onClick={() => setShowReadingPreview(false)}
-                className=" hover:" style={{ color: 'var(--color-muted)' }} style={{ color: 'var(--color-muted)' }}
+                className=" hover:" className="text-muted" className="text-muted"
               >
                 <span className="sr-only">Cerrar</span>
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -526,7 +526,7 @@ const AyudaCeremonia = () => {
             <div className="p-6 overflow-y-auto flex-1">
               <div className="prose max-w-none whitespace-pre-line">{readingForm.content}</div>
             </div>
-            <div className="px-6 py-3  text-right" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <div className="px-6 py-3  text-right" className="bg-page">
               <Button onClick={() => setShowReadingPreview(false)}>Cerrar</Button>
             </div>
           </Card>

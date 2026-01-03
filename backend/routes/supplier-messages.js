@@ -1,10 +1,12 @@
 import express from 'express';
-import { db } from '../db.js';
-import { FieldValue } from 'firebase-admin/firestore';
+import { PrismaClient } from '@prisma/client';
 import logger from '../utils/logger.js';
 import { requireSupplierAuth } from './supplier-dashboard.js';
 
 const router = express.Router();
+const prisma = new PrismaClient();
+
+// NOTA: Sistema de mensajería simplificado - usar tabla messages en futuro
 
 // ============================================
 // MENSAJERÍA DIRECTA

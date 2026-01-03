@@ -1,8 +1,6 @@
-import admin from 'firebase-admin';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,6 +18,18 @@ for (const candidate of envCandidates) {
     dotenv.config({ path: candidate, override: false });
     loadedEnvFiles.add(candidate);
   }
+}
+
+// Verificar si Firebase está habilitado
+const USE_FIREBASE = process.env.USE_FIREBASE !== 'false';
+
+// Solo importar Firebase si está habilitado
+let admin, getFirestore;
+if (USE_FIREBASE) {
+  const firebaseAdmin = await import('firebase-admin');
+  const firestoreModule = await import('firebase-admin/firestore');
+  admin = firebaseAdmin.default;
+  getFirestore = firestoreModule.getFirestore;
 }
 
 // Deshabilitar el uso del emulador salvo que se indique explícitamente
@@ -61,7 +71,7 @@ if (RAW_SERVICE_ACCOUNT) {
   }
 }
 
-if (!admin.apps.length) {
+if (USE_FIREBASE && admin && !admin.apps.length) {
   console.log('🔍 [db.js] Initializing Firebase Admin...');
   console.log('  - parsedServiceAccount exists:', !!parsedServiceAccount);
   console.log('  - GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
@@ -139,7 +149,10 @@ if (!admin.apps.length) {
       '⚠️  GOOGLE_APPLICATION_CREDENTIALS not set. Firestore access will fail unless the emulator is running or Application Default Credentials are configured.'
     );
   }
+} else {
+  console.log('📊 [db.js] Firebase deshabilitado (USE_FIREBASE=false) - Usando solo PostgreSQL');
 }
 
-export const db = getFirestore();
-export { admin };
+export const db = USE_FIREBASE && getFirestore ? getFirestore() : null;
+export const FieldValue = USE_FIREBASE && admin ? admin.firestore.FieldValue : null;
+export { admin, USE_FIREBASE };

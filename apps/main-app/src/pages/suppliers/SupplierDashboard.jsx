@@ -245,7 +245,7 @@ export default function SupplierDashboard() {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: 'var(--color-bg)' }}
+        className="bg-page"
       >
         <Spinner />
       </div>
@@ -256,16 +256,16 @@ export default function SupplierDashboard() {
     return (
       <div
         className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: 'var(--color-bg)' }}
+        className="bg-page"
       >
         <div
           className="max-w-md w-full shadow-lg rounded-lg p-6"
-          style={{ backgroundColor: 'var(--color-surface)' }}
+          className="bg-surface"
         >
-          <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-danger)' }}>
+          <h2 className="text-lg font-semibold mb-2" className="text-danger">
             {t('suppliers.dashboard.login.title')}
           </h2>
-          <p style={{ color: 'var(--color-muted)' }}>
+          <p className="text-muted">
             {errorMessage || t('suppliers.dashboard.login.message')}
           </p>
           <button
@@ -282,18 +282,18 @@ export default function SupplierDashboard() {
   }
 
   return (
-    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-screen py-8" className="bg-page">
       <div className="layout-container max-w-6xl">
         <div
           className="shadow-md rounded-lg p-6 mb-6"
-          style={{ backgroundColor: 'var(--color-surface)' }}
+          className="bg-surface"
         >
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
+              <h1 className="text-2xl font-bold" className="text-body">
                 {supplier.name}
               </h1>
-              <p className="mt-1" style={{ color: 'var(--color-muted)' }}>
+              <p className="mt-1" className="text-muted">
                 {locationLabel}
               </p>
               {supplier.registered && (
@@ -377,10 +377,10 @@ export default function SupplierDashboard() {
               <div className="flex items-center gap-3">
                 <Zap size={24} style={{ color: 'var(--color-warning)' }} />
                 <div>
-                  <div className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                  <div className="font-semibold" className="text-body">
                     Plan FREE - Funcionalidad Limitada
                   </div>
-                  <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                  <p className="text-sm" className="text-muted">
                     Mejora a BASIC para solicitudes ilimitadas, badge verificado y más visibilidad
                   </p>
                 </div>
@@ -409,12 +409,12 @@ export default function SupplierDashboard() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Crown size={24} style={{ color: 'var(--color-primary)' }} />
+                <Crown size={24} className="text-primary" />
                 <div>
-                  <div className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                  <div className="font-semibold" className="text-body">
                     Plan BASIC Activo ✓
                   </div>
-                  <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                  <p className="text-sm" className="text-muted">
                     ¿Quieres analíticas avanzadas y API? Descubre el plan PRO
                   </p>
                 </div>
@@ -442,12 +442,12 @@ export default function SupplierDashboard() {
             }}
           >
             <div className="flex items-center gap-3">
-              <Crown size={24} style={{ color: 'var(--color-success)' }} />
+              <Crown size={24} className="text-success" />
               <div>
-                <div className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                <div className="font-semibold" className="text-body">
                   Plan PRO Activo 🎉
                 </div>
-                <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-sm" className="text-muted">
                   Tienes acceso completo a todas las funcionalidades premium
                 </p>
               </div>
@@ -470,11 +470,11 @@ export default function SupplierDashboard() {
                 className="p-3 rounded-lg"
                 style={{ backgroundColor: 'rgba(109, 40, 217, 0.1)' }}
               >
-                <Inbox size={24} style={{ color: 'var(--color-primary)' }} />
+                <Inbox size={24} className="text-primary" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+                  <h3 className="text-lg font-semibold" className="text-body">
                     Mis Solicitudes
                   </h3>
                   {newRequestsCount > 0 && (
@@ -490,12 +490,12 @@ export default function SupplierDashboard() {
                     </span>
                   )}
                 </div>
-                <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-sm" className="text-muted">
                   Gestiona las solicitudes de presupuesto de tus clientes potenciales
                 </p>
               </div>
             </div>
-            <ArrowRight size={20} style={{ color: 'var(--color-primary)' }} />
+            <ArrowRight size={20} className="text-primary" />
           </div>
         </Link>
 
@@ -514,18 +514,18 @@ export default function SupplierDashboard() {
                 className="p-3 rounded-lg"
                 style={{ backgroundColor: 'rgba(109, 40, 217, 0.1)' }}
               >
-                <Camera size={24} style={{ color: 'var(--color-primary)' }} />
+                <Camera size={24} className="text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+                <h3 className="text-lg font-semibold" className="text-body">
                   Mi Portfolio
                 </h3>
-                <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-sm" className="text-muted">
                   Gestiona las fotos de tu trabajo y muestra tu mejor portfolio
                 </p>
               </div>
             </div>
-            <ArrowRight size={20} style={{ color: 'var(--color-primary)' }} />
+            <ArrowRight size={20} className="text-primary" />
           </div>
         </Link>
 
@@ -541,18 +541,18 @@ export default function SupplierDashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)' }}>
-                <FileText size={24} style={{ color: 'var(--color-success)' }} />
+                <FileText size={24} className="text-success" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+                <h3 className="text-lg font-semibold" className="text-body">
                   Mis Servicios/Productos
                 </h3>
-                <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-sm" className="text-muted">
                   Gestiona tu catálogo para crear cotizaciones rápidamente
                 </p>
               </div>
             </div>
-            <ArrowRight size={20} style={{ color: 'var(--color-success)' }} />
+            <ArrowRight size={20} className="text-success" />
           </div>
         </Link>
 
@@ -575,10 +575,10 @@ export default function SupplierDashboard() {
                 <MessageSquare size={20} style={{ color: '#fbbf24' }} />
               </div>
               <div>
-                <h3 className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>
+                <h3 className="font-semibold text-sm" className="text-body">
                   Mis Reseñas
                 </h3>
-                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-xs" className="text-muted">
                   Ver y responder reseñas
                 </p>
               </div>
@@ -603,10 +603,10 @@ export default function SupplierDashboard() {
                 <TrendingUp size={20} style={{ color: 'var(--color-info)' }} />
               </div>
               <div>
-                <h3 className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>
+                <h3 className="font-semibold text-sm" className="text-body">
                   Analíticas Avanzadas
                 </h3>
-                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-xs" className="text-muted">
                   Gráficos y estadísticas
                 </p>
               </div>
@@ -634,10 +634,10 @@ export default function SupplierDashboard() {
                 <Mail size={20} style={{ color: '#8b5cf6' }} />
               </div>
               <div>
-                <h3 className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>
+                <h3 className="font-semibold text-sm" className="text-body">
                   Mensajes
                 </h3>
-                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-xs" className="text-muted">
                   Chat con clientes
                 </p>
               </div>
@@ -662,10 +662,10 @@ export default function SupplierDashboard() {
                 <Calendar size={20} style={{ color: '#10b981' }} />
               </div>
               <div>
-                <h3 className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>
+                <h3 className="font-semibold text-sm" className="text-body">
                   Calendario
                 </h3>
-                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-xs" className="text-muted">
                   Gestionar disponibilidad
                 </p>
               </div>
@@ -690,10 +690,10 @@ export default function SupplierDashboard() {
                 <CreditCard size={20} style={{ color: '#f59e0b' }} />
               </div>
               <div>
-                <h3 className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>
+                <h3 className="font-semibold text-sm" className="text-body">
                   Pagos
                 </h3>
-                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                <p className="text-xs" className="text-muted">
                   Facturas y cobros
                 </p>
               </div>
@@ -706,11 +706,11 @@ export default function SupplierDashboard() {
           <div className="lg:col-span-3">
             <div
               className="shadow-md rounded-lg p-6"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
               <h2
                 className="text-lg font-semibold mb-4 flex items-center gap-2"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
               >
                 <BarChart3 size={20} />
                 {t('suppliers.dashboard.analytics.title')}
@@ -729,7 +729,7 @@ export default function SupplierDashboard() {
                       {t('suppliers.dashboard.analytics.views.title')}
                     </span>
                   </div>
-                  <p className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
+                  <p className="text-3xl font-bold" className="text-body">
                     {views}
                   </p>
                   <p className="text-sm mt-1" style={{ color: 'var(--color-info)' }}>
@@ -747,7 +747,7 @@ export default function SupplierDashboard() {
                       {t('suppliers.dashboard.analytics.clicks.title')}
                     </span>
                   </div>
-                  <p className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
+                  <p className="text-3xl font-bold" className="text-body">
                     {clicks}
                   </p>
                   <p className="text-sm mt-1" style={{ color: '#a855f7' }}>
@@ -761,17 +761,17 @@ export default function SupplierDashboard() {
                 >
                   <div
                     className="flex items-center gap-2 mb-2"
-                    style={{ color: 'var(--color-success)' }}
+                    className="text-success"
                   >
                     <Mail size={20} />
                     <span className="font-medium">
                       {t('suppliers.dashboard.analytics.contacts.title')}
                     </span>
                   </div>
-                  <p className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
+                  <p className="text-3xl font-bold" className="text-body">
                     {conversions}
                   </p>
-                  <p className="text-sm mt-1" style={{ color: 'var(--color-success)' }}>
+                  <p className="text-sm mt-1" className="text-success">
                     {t('suppliers.dashboard.analytics.contacts.subtitle')}
                   </p>
                 </div>
@@ -782,9 +782,9 @@ export default function SupplierDashboard() {
           <div className="lg:col-span-2">
             <div
               className="shadow-md rounded-lg p-6"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
-              <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+              <h2 className="text-lg font-semibold mb-4" className="text-body">
                 {t('suppliers.dashboard.profile.title')}
               </h2>
 
@@ -793,7 +793,7 @@ export default function SupplierDashboard() {
                   <div>
                     <label
                       className="block text-sm font-medium mb-1"
-                      style={{ color: 'var(--color-text)' }}
+                      className="text-body"
                     >
                       {t('suppliers.dashboard.profile.fields.name')}
                     </label>
@@ -802,14 +802,14 @@ export default function SupplierDashboard() {
                       value={formData.name}
                       onChange={(event) => setFormData({ ...formData, name: event.target.value })}
                       className="w-full px-3 py-2 border rounded-md"
-                      style={{ borderColor: 'var(--color-border)' }}
+                      className="border-default"
                     />
                   </div>
 
                   <div>
                     <label
                       className="block text-sm font-medium mb-1"
-                      style={{ color: 'var(--color-text)' }}
+                      className="text-body"
                     >
                       {t('suppliers.dashboard.profile.fields.description')}
                     </label>
@@ -820,14 +820,14 @@ export default function SupplierDashboard() {
                       }
                       rows={4}
                       className="w-full px-3 py-2 border rounded-md"
-                      style={{ borderColor: 'var(--color-border)' }}
+                      className="border-default"
                     />
                   </div>
 
                   <div>
                     <label
                       className="block text-sm font-medium mb-1"
-                      style={{ color: 'var(--color-text)' }}
+                      className="text-body"
                     >
                       {t('suppliers.dashboard.profile.fields.priceRange')}
                     </label>
@@ -837,7 +837,7 @@ export default function SupplierDashboard() {
                         setFormData({ ...formData, priceRange: event.target.value })
                       }
                       className="w-full px-3 py-2 border rounded-md"
-                      style={{ borderColor: 'var(--color-border)' }}
+                      className="border-default"
                     >
                       {PRICE_RANGE_OPTIONS.map((option) => (
                         <option key={option.value || 'empty'} value={option.value}>
@@ -850,7 +850,7 @@ export default function SupplierDashboard() {
                   <div>
                     <label
                       className="block text-sm font-medium mb-1"
-                      style={{ color: 'var(--color-text)' }}
+                      className="text-body"
                     >
                       {t('suppliers.dashboard.profile.fields.phone')}
                     </label>
@@ -859,14 +859,14 @@ export default function SupplierDashboard() {
                       value={formData.phone}
                       onChange={(event) => setFormData({ ...formData, phone: event.target.value })}
                       className="w-full px-3 py-2 border rounded-md"
-                      style={{ borderColor: 'var(--color-border)' }}
+                      className="border-default"
                     />
                   </div>
 
                   <div>
                     <label
                       className="block text-sm font-medium mb-1"
-                      style={{ color: 'var(--color-text)' }}
+                      className="text-body"
                     >
                       {t('suppliers.dashboard.profile.fields.website')}
                     </label>
@@ -877,14 +877,14 @@ export default function SupplierDashboard() {
                         setFormData({ ...formData, website: event.target.value })
                       }
                       className="w-full px-3 py-2 border rounded-md"
-                      style={{ borderColor: 'var(--color-border)' }}
+                      className="border-default"
                     />
                   </div>
 
                   <div>
                     <label
                       className="block text-sm font-medium mb-1"
-                      style={{ color: 'var(--color-text)' }}
+                      className="text-body"
                     >
                       {t('suppliers.dashboard.profile.fields.instagram')}
                     </label>
@@ -896,54 +896,54 @@ export default function SupplierDashboard() {
                       }
                       placeholder={t('supplier.dashboard.searchPlaceholder')}
                       className="w-full px-3 py-2 border rounded-md"
-                      style={{ borderColor: 'var(--color-border)' }}
+                      className="border-default"
                     />
                   </div>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-sm font-medium" className="text-muted">
                       {t('suppliers.dashboard.profile.fields.description')}
                     </p>
-                    <p className="mt-1" style={{ color: 'var(--color-text)' }}>
+                    <p className="mt-1" className="text-body">
                       {supplier.business?.description ||
                         t('suppliers.dashboard.profileDisplay.descriptionEmpty')}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-sm font-medium" className="text-muted">
                       {t('suppliers.dashboard.profile.fields.priceRange')}
                     </p>
-                    <p className="mt-1" style={{ color: 'var(--color-text)' }}>
+                    <p className="mt-1" className="text-body">
                       {supplier.business?.priceRange ||
                         t('suppliers.dashboard.profileDisplay.priceRangeEmpty')}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-sm font-medium" className="text-muted">
                       {t('suppliers.dashboard.profile.fields.phone')}
                     </p>
-                    <p className="mt-1" style={{ color: 'var(--color-text)' }}>
+                    <p className="mt-1" className="text-body">
                       {supplier.contact?.phone ||
                         t('suppliers.dashboard.profileDisplay.phoneEmpty')}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-sm font-medium" className="text-muted">
                       {t('suppliers.dashboard.profile.fields.website')}
                     </p>
-                    <p className="mt-1" style={{ color: 'var(--color-text)' }}>
+                    <p className="mt-1" className="text-body">
                       {supplier.contact?.website ? (
                         <a
                           href={supplier.contact.website}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="hover:underline"
-                          style={{ color: 'var(--color-primary)' }}
+                          className="text-primary"
                         >
                           {supplier.contact.website}
                         </a>
@@ -954,10 +954,10 @@ export default function SupplierDashboard() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
+                    <p className="text-sm font-medium" className="text-muted">
                       {t('suppliers.dashboard.profile.fields.instagram')}
                     </p>
-                    <p className="mt-1" style={{ color: 'var(--color-text)' }}>
+                    <p className="mt-1" className="text-body">
                       {supplier.contact?.instagram ||
                         t('suppliers.dashboard.profileDisplay.instagramEmpty')}
                     </p>
@@ -970,14 +970,14 @@ export default function SupplierDashboard() {
           <div className="space-y-6">
             <div
               className="shadow-md rounded-lg p-6"
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              className="bg-surface"
             >
-              <h3 className="font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+              <h3 className="font-semibold mb-3" className="text-body">
                 {t('suppliers.dashboard.profileState.title')}
               </h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span style={{ color: 'var(--color-muted)' }}>
+                  <span className="text-muted">
                     {t('suppliers.dashboard.profileState.registeredLabel')}
                   </span>
                   <span
@@ -992,7 +992,7 @@ export default function SupplierDashboard() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span style={{ color: 'var(--color-muted)' }}>
+                  <span className="text-muted">
                     {t('suppliers.dashboard.profileState.statusLabel')}
                   </span>
                   <span
@@ -1010,10 +1010,10 @@ export default function SupplierDashboard() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span style={{ color: 'var(--color-muted)' }}>
+                  <span className="text-muted">
                     {t('suppliers.dashboard.profileState.matchScore')}
                   </span>
-                  <span className="font-medium" style={{ color: 'var(--color-primary)' }}>
+                  <span className="font-medium" className="text-primary">
                     {matchScore}/100
                   </span>
                 </div>
@@ -1027,10 +1027,10 @@ export default function SupplierDashboard() {
                 borderColor: 'var(--color-primary)',
               }}
             >
-              <h4 className="font-medium mb-2" style={{ color: 'var(--color-text)' }}>
+              <h4 className="font-medium mb-2" className="text-body">
                 {t('suppliers.dashboard.insight.title')}
               </h4>
-              <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+              <p className="text-sm" className="text-muted">
                 {t('suppliers.dashboard.insight.description')}
               </p>
             </div>

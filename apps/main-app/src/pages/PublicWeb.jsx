@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Editor, Frame, Element } from '@craftjs/core';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { CraftHeroSection } from '../components/web/craft/CraftHeroSection';
 import { CraftStorySection } from '../components/web/craft/CraftStorySection';
 import { CraftEventInfoSection } from '../components/web/craft/CraftEventInfoSection';
@@ -160,10 +160,10 @@ const PublicWeb = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center " style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="min-h-screen flex items-center justify-center " className="bg-page">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-          <p className=" text-lg" style={{ color: 'var(--color-text-secondary)' }}>Cargando web...</p>
+          <p className=" text-lg" className="text-secondary">Cargando web...</p>
         </div>
       </div>
     );
@@ -171,11 +171,11 @@ const PublicWeb = () => {
 
   if (error || !webData) {
     return (
-      <div className="min-h-screen flex items-center justify-center " style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="min-h-screen flex items-center justify-center " className="bg-page">
         <div className="text-center max-w-md mx-auto p-8">
           <div className="text-6xl mb-4">😕</div>
-          <h1 className="text-3xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>{error || 'Web no encontrada'}</h1>
-          <p className=" mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+          <h1 className="text-3xl font-bold  mb-2" className="text-body">{error || 'Web no encontrada'}</h1>
+          <p className=" mb-6" className="text-secondary">
             La web que buscas no existe o no está disponible públicamente.
           </p>
           <a
@@ -241,9 +241,9 @@ const PublicWeb = () => {
         </WeddingDataProvider>
 
         {/* Footer discreto */}
-        <footer className=" border-t  py-4" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
+        <footer className=" border-t  py-4" className="border-default" className="bg-page">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-sm " className="text-secondary">
               Creado con{' '}
               <a href="/" className="text-purple-600 hover:text-purple-700 font-semibold">
                 MaLoveApp

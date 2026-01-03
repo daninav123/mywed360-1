@@ -5,7 +5,7 @@ import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { useWeddingBasicInfo, formatWeddingBasicInfo } from '../../hooks/useWeddingBasicInfo';
 import useFinance from '../../hooks/useFinance';
 import { normalizeBudgetCategoryKey } from '../../utils/budgetCategories';

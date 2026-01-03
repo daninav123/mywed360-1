@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import useDebounce from '../hooks/useDebounce';
 
 import { Card, Button, Input } from '../components/ui';
+import EmailAliasEditor from '../components/settings/EmailAliasEditor';
 import LanguageSelector from '../components/ui/LanguageSelector';
 import NotificationCenter from '../components/NotificationCenter';
 import DarkModeToggle from '../components/DarkModeToggle';
@@ -15,7 +16,7 @@ import Nav from '../components/Nav';
 import SubscriptionWidget from '../components/subscription/SubscriptionWidget';
 import { useWedding } from '../context/WeddingContext';
 import { auth } from '../firebaseConfig';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import useRoles from '../hooks/useRoles';
 import { changeLanguage, getCurrentLanguage } from '../i18n';
 import { loadData } from '../services/SyncService';
@@ -51,8 +52,8 @@ function Perfil() {
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  const { userProfile, user: authUser } = useAuth();
-  const fallbackUid = authUser?.uid || auth.currentUser?.uid || null;
+  const { userProfile, authUser, refreshProfile } = useAuth();
+  const fallbackUid = authUser?.uid || null;
   const { activeWedding } = useWedding();
   const weddingId = activeWedding || userProfile?.weddingId || '';
   const {
@@ -63,7 +64,10 @@ function Perfil() {
   } = useRoles(weddingId);
 
   const handleAccountChange = (e) => {
-    setAccount((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const newValue = { ...account, [e.target.name]: e.target.value };
+    console.log('[Perfil] Account changed:', e.target.name, '=', e.target.value);
+    console.log('[Perfil] Setting hasUnsavedChanges to true');
+    setAccount(newValue);
     setHasUnsavedChanges(true);
   };
   const handleBillingChange = (e) => {
@@ -73,6 +77,11 @@ function Perfil() {
 
   const debouncedAccount = useDebounce(account, 2000);
   const debouncedBilling = useDebounce(billing, 2000);
+
+  // Log cuando debouncedAccount cambia
+  useEffect(() => {
+    console.log('[Perfil] debouncedAccount updated:', debouncedAccount);
+  }, [debouncedAccount]);
 
   const accountFields = [
     { name: 'name', labelKey: 'profile.account.name', defaultValue: 'Nombre' },
@@ -185,10 +194,10 @@ function Perfil() {
       }
     } catch {}
     try {
-      await setDoc(
-        doc(db, 'users', uid),
-        { account, subscription, billing, updatedAt: serverTimestamp() },
-        { merge: true }
+      const token = await authUser.getIdToken();
+      await axios.patch('http://localhost:4004/api/users/profile', 
+        { account, subscription, billing },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success(t('profile.success.saved'));
       try {
@@ -206,7 +215,8 @@ function Perfil() {
     const loadProfileData = async () => {
       if (!authUser) return;
       try {
-        const token = await authUser.getIdToken();
+        const token = localStorage.getItem('authToken');
+        if (!token) return;
         const response = await axios.get('http://localhost:4004/api/users/profile', {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -229,46 +239,78 @@ function Perfil() {
   }, [authUser]);
 
   useEffect(() => {
-    if (!hasUnsavedChanges) return;
-
+    console.log('[Perfil] useEffect autoguardado disparado');
+    console.log('[Perfil] hasUnsavedChanges:', hasUnsavedChanges);
+    console.log('[Perfil] debouncedAccount.name:', debouncedAccount.name);
+    
     const autoSave = async () => {
       const uid = fallbackUid;
-      if (!uid) return;
+      if (!uid) {
+        console.log('[Perfil] No uid, abortando');
+        return;
+      }
+
+      // Solo guardar si hay cambios reales
+      if (!hasUnsavedChanges) {
+        console.log('[Perfil] No hay cambios sin guardar, abortando');
+        return;
+      }
+      
+      console.log('[Perfil] Iniciando autoguardado...');
 
       try {
         if (debouncedAccount.email && !/^\S+@\S+\.\S+$/.test(debouncedAccount.email)) {
+          console.warn('[Perfil] Email inválido, cancelando autoguardado');
           return;
         }
         if (debouncedAccount.whatsNumber && !/^\+?[0-9]{8,15}$/.test(debouncedAccount.whatsNumber.trim())) {
+          console.warn('[Perfil] WhatsApp inválido, cancelando autoguardado');
           return;
         }
       } catch {}
 
       try {
         setIsSaving(true);
-        await setDoc(
-          doc(db, 'users', uid),
-          { 
-            account: debouncedAccount, 
-            subscription, 
-            billing: debouncedBilling, 
-            updatedAt: serverTimestamp() 
-          },
-          { merge: true }
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          console.error('[Perfil] No hay token, cancelando autoguardado');
+          return;
+        }
+        
+        const payload = { 
+          account: debouncedAccount, 
+          subscription, 
+          billing: debouncedBilling
+        };
+        console.log('[Perfil] Guardando perfil:', payload);
+        
+        const response = await axios.patch('http://localhost:4004/api/users/profile',
+          payload,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
+        
+        console.log('[Perfil] Perfil guardado exitosamente:', response.data);
         setLastSavedAt(new Date());
         setHasUnsavedChanges(false);
+        
+        // Actualizar userProfile en el contexto para que HomePage2 se actualice automáticamente
+        if (refreshProfile) {
+          refreshProfile();
+        }
       } catch (e) {
-        console.error('Error auto-guardando perfil:', e);
+        console.error('[Perfil] Error auto-guardando perfil:', e);
+        console.error('[Perfil] Error response:', e.response?.data);
       } finally {
         setIsSaving(false);
       }
     };
 
     autoSave();
-  }, [debouncedAccount, debouncedBilling, subscription, hasUnsavedChanges, fallbackUid]);
+  }, [debouncedAccount, debouncedBilling, subscription, fallbackUid, refreshProfile]);
 
-   return (<div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+   return (
+    <>
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
         {/* Botones superiores derechos */}
         <div className="absolute top-4 right-4 flex items-center space-x-3" style={{ zIndex: 100 }}>
           <LanguageSelector variant="minimal" />
@@ -305,8 +347,7 @@ function Perfil() {
                 <Link
                   to="/perfil"
                   onClick={() => setOpenMenu(false)}
-                  className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
-                  style={{ color: 'var(--color-text)' }}
+                  className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200 text-body"
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
@@ -319,8 +360,7 @@ function Perfil() {
                   onClick={() => setOpenMenu(false)}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                  className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
-                  style={{ color: 'var(--color-text)' }}
+                  className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200 text-body"
                 >
                   <Mail className="w-4 h-4 mr-3" />
                   {t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
@@ -332,7 +372,7 @@ function Perfil() {
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm flex items-center" style={{ color: 'var(--color-text)' }}>
+                    <span className="text-sm flex items-center text-body">
                       <Moon className="w-4 h-4 mr-3" />
                       {t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}
                     </span>
@@ -347,8 +387,7 @@ function Perfil() {
                     auth.signOut();
                     setOpenMenu(false);
                   }}
-                  className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center"
-                  style={{ color: 'var(--color-danger)' }}
+                  className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center text-danger"
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
@@ -409,18 +448,18 @@ function Perfil() {
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               marginBottom: 0,
-            }}>Perfil de Usuario</p>
+            }}>{t('common:inspiration.userProfileSubtitle')}</p>
           </div>
           <div className="flex items-center gap-2 text-sm">
             {isSaving ? (
               <>
-                <Loader className="w-4 h-4 animate-spin" style={{ color: 'var(--color-primary)' }} />
-                <span style={{ color: 'var(--color-text-secondary)' }}>Guardando...</span>
+                <Loader className="w-4 h-4 animate-spin text-primary" />
+                <span className="text-secondary">{t('common:inspiration.saving')}</span>
               </>
             ) : lastSavedAt ? (
               <>
                 <Check className="w-4 h-4" style={{ color: '#10B981' }} />
-                <span style={{ color: 'var(--color-text-secondary)' }}>
+                <span className="text-secondary">
                   {t('profile.synced', { defaultValue: 'Sincronizado' })}
                 </span>
               </>
@@ -438,6 +477,9 @@ function Perfil() {
             </h2>
             <SubscriptionWidget />
           </div>
+
+          {/* Email de la plataforma */}
+          <EmailAliasEditor />
 
           <Card className="space-y-4">
             <h2 className="text-lg font-medium">
@@ -533,7 +575,7 @@ function Perfil() {
                     {c.role !== 'owner' && (
                       <button
                         onClick={() => removeRole(c.userId || c.uid)}
-                        className=" hover:text-red-700" style={{ color: 'var(--color-danger)' }}
+                        className="hover:text-red-700 text-danger"
                       >
                         <X size={16} />
                       </button>
@@ -564,8 +606,10 @@ function Perfil() {
       </Card>
         </div>
       </div>
+      </div>
+      {/* Bottom Navigation */}
       <Nav />
-    </div>
+    </>
   );
 }
 

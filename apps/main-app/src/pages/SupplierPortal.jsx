@@ -106,11 +106,11 @@ export default function SupplierPortal() {
     }
     
     return (
-      <div className="min-h-screen  flex items-center justify-center p-6" style={{ backgroundColor: 'var(--color-bg)' }}>
-        <div className="max-w-lg w-full  border border-red-200 rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className="min-h-screen  flex items-center justify-center p-6" className="bg-page">
+        <div className="max-w-lg w-full  border border-red-200 rounded-xl p-6" className="bg-surface">
           <div className="text-center mb-4">
-            <div className=" text-4xl mb-2" style={{ color: 'var(--color-danger)' }}>⚠️</div>
-            <h2 className="text-xl font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+            <div className=" text-4xl mb-2" className="text-danger">⚠️</div>
+            <h2 className="text-xl font-semibold  mb-2" className="text-body">
               {isTokenError ? 'Enlace no válido' : 'Error'}
             </h2>
             <p className="text-red-700">{message}</p>
@@ -138,14 +138,14 @@ export default function SupplierPortal() {
             {isTokenError && (
               <button
                 onClick={() => window.history.back()}
-                className="flex-1 px-4 py-2 border   rounded-md hover:" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 px-4 py-2 border   rounded-md hover:" className="border-default" className="text-body" className="bg-page"
               >
                 Volver
               </button>
             )}
           </div>
           
-          <div className="mt-4 pt-4 border-t  text-center text-sm " style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text-secondary)' }}>
+          <div className="mt-4 pt-4 border-t  text-center text-sm " className="border-default" className="text-secondary">
             <p>
               Si crees que esto es un error, contacta con la pareja que te envió este enlace.
             </p>
@@ -157,12 +157,12 @@ export default function SupplierPortal() {
 
   if (sent) {
     return (
-      <div className="min-h-screen  flex items-center justify-center p-6" style={{ backgroundColor: 'var(--color-bg)' }}>
-        <div className="max-w-lg w-full  border rounded-xl p-6 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className="min-h-screen  flex items-center justify-center p-6" className="bg-page">
+        <div className="max-w-lg w-full  border rounded-xl p-6 text-center" className="bg-surface">
           <h1 className="text-2xl font-semibold mb-2">
             {t('public.supplierPortal.thanksTitle')}
           </h1>
-          <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="" className="text-secondary">
             {t('public.supplierPortal.thanksDescription')}
           </p>
         </div>
@@ -171,18 +171,18 @@ export default function SupplierPortal() {
   }
 
   return (
-    <div className="min-h-screen  flex items-center justify-center p-6" style={{ backgroundColor: 'var(--color-bg)' }}>
-      <div className="max-w-2xl w-full  border rounded-xl p-6 shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
+    <div className="min-h-screen  flex items-center justify-center p-6" className="bg-page">
+      <div className="max-w-2xl w-full  border rounded-xl p-6 shadow-sm" className="bg-surface">
         <header className="mb-6">
           <h1 className="text-2xl font-semibold">
             {t('public.supplierPortal.title')}
           </h1>
-          <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="" className="text-secondary">
             {t('public.supplierPortal.labels.wedding')}:{' '}
             <strong>{w.name}</strong> {w.date ? `· ${String(w.date).slice(0, 10)}` : ''}{' '}
             {w.location ? `· ${w.location}` : ''}
           </p>
-          <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="" className="text-secondary">
             {t('public.supplierPortal.labels.supplier')}:{' '}
             <strong>{s.name}</strong> {s.service ? `· ${s.service}` : ''}
           </p>

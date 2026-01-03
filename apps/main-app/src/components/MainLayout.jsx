@@ -15,7 +15,7 @@ import DarkModeToggle from './DarkModeToggle';
 import Nav from './Nav';
 import NotificationCenter from './NotificationCenter';
 import WeddingSelector from './WeddingSelector';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { useWedding } from '../context/WeddingContext';
 import { prefetchModule } from '../utils/prefetch';
 import NotificationWatcher from './notifications/NotificationWatcher';

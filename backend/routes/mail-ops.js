@@ -1,9 +1,9 @@
 import express from 'express';
-import { FieldValue } from 'firebase-admin/firestore';
-import { db } from '../db.js';
+import { PrismaClient } from '@prisma/client';
 import { requireMailAccess } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 function hasPrivilegedRole(profile) {
   const role = String((profile && profile.role) || '').toLowerCase();
@@ -54,20 +54,26 @@ async function findUserIdByEmail(email, cache) {
   if (cache && cache.has(normalized)) return cache.get(normalized);
   let uid = null;
   try {
-    let snap = await db.collection('users').where('myWed360Email', '==', normalized).limit(1).get();
-    if (!snap.empty) {
-      uid = snap.docs[0].id;
-    } else {
+    // Buscar por myWed360Email o email en UserProfile
+    let user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: normalized },
+          { profile: { myWed360Email: normalized } },
+        ],
+      },
+    });
+    
+    if (!user) {
       const legacyValue = legacyAlias(normalized);
       if (legacyValue && legacyValue !== normalized) {
-        snap = await db.collection('users').where('myWed360Email', '==', legacyValue).limit(1).get();
-        if (!snap.empty) uid = snap.docs[0].id;
-      }
-      if (!uid) {
-        const loginSnap = await db.collection('users').where('email', '==', normalized).limit(1).get();
-        if (!loginSnap.empty) uid = loginSnap.docs[0].id;
+        user = await prisma.user.findFirst({
+          where: { profile: { myWed360Email: legacyValue } },
+        });
       }
     }
+    
+    if (user) uid = user.id;
   } catch (error) {
     console.warn('findUserIdByEmail failed', normalized, error?.message || error);
   }
@@ -81,18 +87,23 @@ async function updateUserMailDoc(email, mailId, payload, options = {}) {
   const cache = options.cache || new Map();
   const uid = await findUserIdByEmail(normalized, cache);
   if (!uid) return false;
-  const docRef = db.collection('users').doc(uid).collection('mails').doc(mailId);
+  
+  // Mail ya tiene userId, solo actualizar directamente
   if (options.delete) {
     try {
-      await docRef.delete();
+      await prisma.mail.deleteMany({
+        where: { id: mailId, userId: uid },
+      });
     } catch (error) {
-      if (error?.code !== 5) {
-        console.warn('user mail delete failed', normalized, mailId, error?.message || error);
-      }
+      console.warn('user mail delete failed', normalized, mailId, error?.message || error);
     }
     return true;
   }
-  await docRef.set(payload, { merge: true });
+  
+  await prisma.mail.updateMany({
+    where: { id: mailId, userId: uid },
+    data: payload,
+  });
   return true;
 }
 
@@ -103,10 +114,9 @@ router.put('/:id/folder', requireMailAccess, async (req, res) => {
     const { folder: folderRaw = 'inbox', restore = false, fallbackFolder = '' } = req.body || {};
     if (!id) return res.status(400).json({ error: 'id-required' });
 
-    const ref = db.collection('mails').doc(id);
-    const snap = await ref.get();
-    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
-    const data = snap.data() || {};
+    const mail = await prisma.mail.findUnique({ where: { id } });
+    if (!mail) return res.status(404).json({ error: 'not-found' });
+    const data = mail;
     const profile = req.userProfile || {};
     if (!hasPrivilegedRole(profile) && !isOwner(profile, data)) {
       return res.status(403).json({ error: 'forbidden' });
@@ -182,23 +192,26 @@ router.put('/:id/folder', requireMailAccess, async (req, res) => {
 
     const updatePayload = {
       folder: resolvedFolder,
-      updatedAt: nowIso,
+      updatedAt: new Date(nowIso),
     };
     const hasTrashMeta = Object.keys(nextTrashMeta).length > 0;
     if (deleteTrashMeta) {
-      updatePayload.trashMeta = FieldValue.delete();
+      updatePayload.trashMeta = null;
     } else if (hasTrashMeta) {
       updatePayload.trashMeta = nextTrashMeta;
     }
 
-    await ref.set(updatePayload, { merge: true });
+    await prisma.mail.update({
+      where: { id },
+      data: updatePayload,
+    });
 
     const userUpdate = {
       folder: resolvedFolder,
-      updatedAt: nowIso,
+      updatedAt: new Date(nowIso),
     };
     if (deleteTrashMeta) {
-      userUpdate.trashMeta = FieldValue.delete();
+      userUpdate.trashMeta = null;
     } else if (hasTrashMeta) {
       userUpdate.trashMeta = nextTrashMeta;
     }
@@ -212,13 +225,7 @@ router.put('/:id/folder', requireMailAccess, async (req, res) => {
       }
     }
 
-    if (!ownerCandidates.size && req.user?.uid) {
-      try {
-        await db.collection('users').doc(req.user.uid).collection('mails').doc(id).set(userUpdate, { merge: true });
-      } catch (error) {
-        console.warn('fallback folder sync failed', error?.message || error);
-      }
-    }
+    // Fallback ya no necesario - Mail tiene relación directa con userId
 
     res.json({
       ok: true,
@@ -237,10 +244,9 @@ router.post('/:id/tags', requireMailAccess, async (req, res) => {
     const { id } = req.params;
     const { add = [], remove = [] } = req.body || {};
     if (!id) return res.status(400).json({ error: 'id-required' });
-    const ref = db.collection('mails').doc(id);
-    const snap = await ref.get();
-    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
-    const data = snap.data() || {};
+    const mail = await prisma.mail.findUnique({ where: { id } });
+    if (!mail) return res.status(404).json({ error: 'not-found' });
+    const data = mail;
     const profile = req.userProfile || {};
     if (!hasPrivilegedRole(profile) && !isOwner(profile, data)) {
       return res.status(403).json({ error: 'forbidden' });
@@ -254,7 +260,10 @@ router.post('/:id/tags', requireMailAccess, async (req, res) => {
       const setRemove = new Set(remove.map((value) => String(value || '').trim()));
       tags = tags.filter((t) => !setRemove.has(String(t || '').trim()));
     }
-    await ref.set({ tags }, { merge: true });
+    await prisma.mail.update({
+      where: { id },
+      data: { tags },
+    });
     res.json({ ok: true, tags });
   } catch (e) {
     console.error('POST /api/mail/:id/tags', e);
@@ -266,21 +275,23 @@ router.post('/:id/tags', requireMailAccess, async (req, res) => {
 router.post('/:id/important', requireMailAccess, async (req, res) => {
   try {
     const { id } = req.params;
-    const { value = true } = req.body || {};
+    const { value } = req.body || {};
     if (!id) return res.status(400).json({ error: 'id-required' });
 
     const important = Boolean(value);
-    const ref = db.collection('mails').doc(id);
-    const snap = await ref.get();
-    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
+    const mail = await prisma.mail.findUnique({ where: { id } });
+    if (!mail) return res.status(404).json({ error: 'not-found' });
 
-    const data = snap.data() || {};
+    const data = mail;
     const profile = req.userProfile || {};
     if (!hasPrivilegedRole(profile) && !isOwner(profile, data)) {
       return res.status(403).json({ error: 'forbidden' });
     }
 
-    await ref.set({ important }, { merge: true });
+    await prisma.mail.update({
+      where: { id },
+      data: { important },
+    });
 
     const ownerCache = new Map();
     const ownerEmails = new Set();
@@ -343,28 +354,24 @@ router.delete('/trash/empty', requireMailAccess, async (req, res) => {
     const deletedIds = new Set();
     let deletedCount = 0;
 
+    // Buscar y eliminar todos los mails en trash de los usuarios
     for (const uid of userIds) {
-      const subRef = db.collection('users').doc(uid).collection('mails');
-      const trashSnap = await subRef.where('folder', '==', 'trash').get();
-      if (trashSnap.empty) continue;
-      for (const doc of trashSnap.docs) {
-        deletedIds.add(doc.id);
-        await doc.ref.delete();
-        deletedCount += 1;
-      }
-    }
-
-    for (const id of deletedIds) {
-      try {
-        const mailRef = db.collection('mails').doc(id);
-        const mailSnap = await mailRef.get();
-        if (!mailSnap.exists) continue;
-        const mailData = mailSnap.data() || {};
-        if (!isPrivileged && !isOwner(profile, mailData)) continue;
-        if (!isPrivileged && (mailData.folder || '') !== 'trash') continue;
-        await mailRef.delete();
-      } catch (error) {
-        console.warn('main mail delete failed', id, error?.message || error);
+      const trashMails = await prisma.mail.findMany({
+        where: {
+          userId: uid,
+          folder: 'trash',
+        },
+      });
+      
+      for (const mail of trashMails) {
+        deletedIds.add(mail.id);
+        if (!isPrivileged && !isOwner(profile, mail)) continue;
+        try {
+          await prisma.mail.delete({ where: { id: mail.id } });
+          deletedCount += 1;
+        } catch (error) {
+          console.warn('mail delete failed', mail.id, error?.message || error);
+        }
       }
     }
 
@@ -381,16 +388,15 @@ router.delete('/:id', requireMailAccess, async (req, res) => {
     const { id } = req.params;
     if (!id) return res.status(400).json({ error: 'id-required' });
 
-    const ref = db.collection('mails').doc(id);
-    const snap = await ref.get();
-    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
-    const data = snap.data() || {};
+    const mail = await prisma.mail.findUnique({ where: { id } });
+    if (!mail) return res.status(404).json({ error: 'not-found' });
+    const data = mail;
     const profile = req.userProfile || {};
     if (!hasPrivilegedRole(profile) && !isOwner(profile, data)) {
       return res.status(403).json({ error: 'forbidden' });
     }
 
-    await ref.delete();
+    await prisma.mail.delete({ where: { id } });
 
     const ownerCache = new Map();
     const ownerEmails = new Set();
@@ -407,13 +413,7 @@ router.delete('/:id', requireMailAccess, async (req, res) => {
       }
     }
 
-    if (!ownerEmails.size && req.user?.uid) {
-      try {
-        await db.collection('users').doc(req.user.uid).collection('mails').doc(id).delete();
-      } catch (_) {
-        // best effort
-      }
-    }
+    // Cleanup ya no necesario - Mail tiene userId directo
 
     res.json({ ok: true });
   } catch (e) {

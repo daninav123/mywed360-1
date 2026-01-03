@@ -14,10 +14,12 @@ import {
   Settings
 } from 'lucide-react';
 import { createCustomerPortalSession } from '../services/stripeService';
+import { useAuth } from '../hooks/useAuth.jsx';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
 const SubscriptionDashboard = () => {
+  const { getAuthToken } = useAuth();
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,7 +32,7 @@ const SubscriptionDashboard = () => {
   const fetchSubscription = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('authToken'); // TODO: Ajustar según tu auth
+      const token = getAuthToken();
 
       const response = await fetch(`${API_BASE_URL}/api/stripe/subscription`, {
         headers: {
@@ -121,10 +123,10 @@ const SubscriptionDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center " style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="min-h-screen flex items-center justify-center " className="bg-page">
         <div className="text-center">
           <Loader2 className="h-12 w-12 text-[color:var(--color-primary)] animate-spin mx-auto" />
-          <p className="mt-4 " style={{ color: 'var(--color-text-secondary)' }}>Cargando suscripción...</p>
+          <p className="mt-4 " className="text-secondary">Cargando suscripción...</p>
         </div>
       </div>
     );
@@ -132,15 +134,15 @@ const SubscriptionDashboard = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center  px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
-        <div className="max-w-md w-full  rounded-2xl shadow-lg p-8 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className="min-h-screen flex items-center justify-center  px-4" className="bg-page">
+        <div className="max-w-md w-full  rounded-2xl shadow-lg p-8 text-center" className="bg-surface">
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100">
-            <AlertCircle className="h-8 w-8 " style={{ color: 'var(--color-danger)' }} />
+            <AlertCircle className="h-8 w-8 " className="text-danger" />
           </div>
-          <h2 className="mt-6 text-2xl font-semibold " style={{ color: 'var(--color-text)' }}>
+          <h2 className="mt-6 text-2xl font-semibold " className="text-body">
             Error al cargar suscripción
           </h2>
-          <p className="mt-2 " style={{ color: 'var(--color-text-secondary)' }}>{error}</p>
+          <p className="mt-2 " className="text-secondary">{error}</p>
           <button
             onClick={fetchSubscription}
             className="mt-6 w-full rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white hover:brightness-95"
@@ -154,16 +156,16 @@ const SubscriptionDashboard = () => {
 
   if (!subscription) {
     return (
-      <div className="min-h-screen  px-4 py-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="min-h-screen  px-4 py-8" className="bg-page">
         <div className="max-w-4xl mx-auto">
-          <div className=" rounded-2xl shadow-lg p-8 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className=" rounded-2xl shadow-lg p-8 text-center" className="bg-surface">
             <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-purple-100">
               <Crown className="h-10 w-10 text-purple-600" />
             </div>
-            <h2 className="mt-6 text-2xl font-semibold " style={{ color: 'var(--color-text)' }}>
+            <h2 className="mt-6 text-2xl font-semibold " className="text-body">
               No tienes una suscripción activa
             </h2>
-            <p className="mt-2 " style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="mt-2 " className="text-secondary">
               Explora nuestros planes y encuentra el perfecto para ti
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
@@ -175,7 +177,7 @@ const SubscriptionDashboard = () => {
               </Link>
               <Link
                 to="/dashboard"
-                className="inline-flex items-center justify-center rounded-md border  px-6 py-3 text-sm font-semibold  hover:" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="inline-flex items-center justify-center rounded-md border  px-6 py-3 text-sm font-semibold  hover:" className="border-default" className="text-body" className="bg-page"
               >
                 Volver al Dashboard
               </Link>
@@ -187,16 +189,16 @@ const SubscriptionDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen  px-4 py-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-screen  px-4 py-8" className="bg-page">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold " style={{ color: 'var(--color-text)' }}>Mi Suscripción</h1>
-          <p className="mt-2 " style={{ color: 'var(--color-text-secondary)' }}>Gestiona tu plan y métodos de pago</p>
+          <h1 className="text-3xl font-bold " className="text-body">Mi Suscripción</h1>
+          <p className="mt-2 " className="text-secondary">Gestiona tu plan y métodos de pago</p>
         </div>
 
         {/* Plan Actual */}
-        <div className=" rounded-2xl shadow-lg overflow-hidden" style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className=" rounded-2xl shadow-lg overflow-hidden" className="bg-surface">
           <div className="bg-[var(--color-primary)] p-6">
             <div className="flex items-start justify-between">
               <div>
@@ -218,23 +220,23 @@ const SubscriptionDashboard = () => {
             {/* Detalles del Plan */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-sm font-semibold  uppercase tracking-wide" style={{ color: 'var(--color-muted)' }}>
+                <h3 className="text-sm font-semibold  uppercase tracking-wide" className="text-muted">
                   Precio
                 </h3>
-                <p className="mt-2 text-2xl font-bold " style={{ color: 'var(--color-text)' }}>
+                <p className="mt-2 text-2xl font-bold " className="text-body">
                   {formatPrice(subscription.amount, subscription.currency)}
-                  <span className="text-base font-normal " style={{ color: 'var(--color-text-secondary)' }}>
+                  <span className="text-base font-normal " className="text-secondary">
                     {subscription.interval === 'month' ? '/mes' : '/año'}
                   </span>
                 </p>
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold  uppercase tracking-wide" style={{ color: 'var(--color-muted)' }}>
+                <h3 className="text-sm font-semibold  uppercase tracking-wide" className="text-muted">
                   Próxima renovación
                 </h3>
-                <p className="mt-2 text-lg font-semibold  flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
-                  <Calendar className="h-5 w-5 " style={{ color: 'var(--color-muted)' }} />
+                <p className="mt-2 text-lg font-semibold  flex items-center gap-2" className="text-body">
+                  <Calendar className="h-5 w-5 " className="text-muted" />
                   {formatDate(subscription.currentPeriodEnd)}
                 </p>
               </div>
@@ -262,7 +264,7 @@ const SubscriptionDashboard = () => {
                 <div className="md:col-span-2">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5  flex-shrink-0 mt-0.5" style={{ color: 'var(--color-primary)' }} />
+                      <CheckCircle2 className="h-5 w-5  flex-shrink-0 mt-0.5" className="text-primary" />
                       <div>
                         <h4 className="text-sm font-semibold text-blue-800">
                           Período de prueba activo
@@ -281,14 +283,14 @@ const SubscriptionDashboard = () => {
             {/* Características del Plan */}
             {subscription.features && subscription.features.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold  uppercase tracking-wide mb-3" style={{ color: 'var(--color-muted)' }}>
+                <h3 className="text-sm font-semibold  uppercase tracking-wide mb-3" className="text-muted">
                   Características incluidas
                 </h3>
                 <ul className="space-y-2">
                   {subscription.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5  flex-shrink-0 mt-0.5" style={{ color: 'var(--color-success)' }} />
-                      <span className="" style={{ color: 'var(--color-text)' }}>{feature}</span>
+                      <CheckCircle2 className="h-5 w-5  flex-shrink-0 mt-0.5" className="text-success" />
+                      <span className="" className="text-body">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -296,7 +298,7 @@ const SubscriptionDashboard = () => {
             )}
 
             {/* Botones de Acción */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t " style={{ borderColor: 'var(--color-border)' }}>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t " className="border-default">
               <button
                 onClick={handleManageSubscription}
                 disabled={managingSubscription}
@@ -317,7 +319,7 @@ const SubscriptionDashboard = () => {
               
               <Link
                 to="/pricing"
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border  px-6 py-3 text-sm font-semibold  hover: focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border  px-6 py-3 text-sm font-semibold  hover: focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2" className="border-default" className="text-body" className="bg-page"
               >
                 <ExternalLink className="h-4 w-4" />
                 Cambiar Plan
@@ -327,25 +329,25 @@ const SubscriptionDashboard = () => {
         </div>
 
         {/* Información Adicional */}
-        <div className=" rounded-xl shadow p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
-          <h3 className="text-lg font-semibold  mb-4" style={{ color: 'var(--color-text)' }}>
+        <div className=" rounded-xl shadow p-6" className="bg-surface">
+          <h3 className="text-lg font-semibold  mb-4" className="text-body">
             Portal del Cliente
           </h3>
-          <p className=" mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className=" mb-4" className="text-secondary">
             En el portal del cliente puedes:
           </p>
           <ul className="space-y-2 mb-6">
             <li className="flex items-start gap-3">
-              <CreditCard className="h-5 w-5  flex-shrink-0 mt-0.5" style={{ color: 'var(--color-muted)' }} />
-              <span className="" style={{ color: 'var(--color-text)' }}>Actualizar métodos de pago</span>
+              <CreditCard className="h-5 w-5  flex-shrink-0 mt-0.5" className="text-muted" />
+              <span className="" className="text-body">Actualizar métodos de pago</span>
             </li>
             <li className="flex items-start gap-3">
-              <Calendar className="h-5 w-5  flex-shrink-0 mt-0.5" style={{ color: 'var(--color-muted)' }} />
-              <span className="" style={{ color: 'var(--color-text)' }}>Ver historial de facturación</span>
+              <Calendar className="h-5 w-5  flex-shrink-0 mt-0.5" className="text-muted" />
+              <span className="" className="text-body">Ver historial de facturación</span>
             </li>
             <li className="flex items-start gap-3">
-              <Settings className="h-5 w-5  flex-shrink-0 mt-0.5" style={{ color: 'var(--color-muted)' }} />
-              <span className="" style={{ color: 'var(--color-text)' }}>Cancelar o modificar tu suscripción</span>
+              <Settings className="h-5 w-5  flex-shrink-0 mt-0.5" className="text-muted" />
+              <span className="" className="text-body">Cancelar o modificar tu suscripción</span>
             </li>
           </ul>
           <button

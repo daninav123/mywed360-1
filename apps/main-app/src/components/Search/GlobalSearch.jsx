@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useWedding } from '../../context/WeddingContext';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { universalSearch } from '../../services/aiSearchOrchestrator';
 import WebSearchResults from './WebSearchResults';
 import ImportSupplierModal from './ImportSupplierModal';

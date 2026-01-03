@@ -111,7 +111,7 @@ export default function AppOverviewNew() {
         <HeroSection
         title={t('marketing:appOverview.hero.title')}
         subtitle={t('marketing:appOverview.hero.subtitle')}
-        image="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&auto=format&fit=crop&q=80"
+        image="/assets/services/default.webp"
       >
         <div className="flex gap-4">
           <PrimaryButton onClick={() => navigate('/signup')}>
@@ -199,7 +199,7 @@ export default function AppOverviewNew() {
             style={{ boxShadow: theme.shadow.lg }}
           >
             <img 
-              src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800&auto=format&fit=crop&q=80"
+              src="/assets/services/default.webp"
               alt="Planning collaboration"
               className="w-full h-auto"
             />

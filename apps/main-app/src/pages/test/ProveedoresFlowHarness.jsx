@@ -378,17 +378,17 @@ export default function ProveedoresFlowHarness() {
         data-cy="proveedores-header"
       >
         <div>
-          <h1 className="text-2xl font-semibold " style={{ color: 'var(--color-text)' }} data-cy="header-title">
+          <h1 className="text-2xl font-semibold " className="text-body" data-cy="header-title">
             Gestión de Proveedores · Harness
           </h1>
-          <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="text-sm " className="text-secondary">
             Replica la vista con pestañas (Vistos, Pipeline, Contratos), matriz de necesidades y búsqueda IA.
           </p>
         </div>
         <div className="flex flex-wrap gap-2" data-cy="header-actions">
           <button
             type="button"
-            className="inline-flex items-center px-4 py-2 border  rounded-md text-sm font-medium   hover:" style={{ borderColor: 'var(--color-border)' }} style={{ color: 'var(--color-text)' }} style={{ backgroundColor: 'var(--color-bg)' }} style={{ backgroundColor: 'var(--color-surface)' }}
+            className="inline-flex items-center px-4 py-2 border  rounded-md text-sm font-medium   hover:" className="border-default" className="text-body" className="bg-page" className="bg-surface"
             data-cy="action-matriz"
             onClick={() => setNeedsOpen(true)}
           >
@@ -420,7 +420,7 @@ export default function ProveedoresFlowHarness() {
       </header>
 
       <nav
-        className="border-b  -mb-px flex space-x-6" style={{ borderColor: 'var(--color-border)' }}
+        className="border-b  -mb-px flex space-x-6" className="border-default"
         aria-label="Secciones del flujo"
       >
         {SECTION_TABS.map((tab) => (
@@ -447,7 +447,7 @@ export default function ProveedoresFlowHarness() {
               <div
                 key={prov.id}
                 data-cy={`vistos-item-${prov.id}`}
-                className="flex items-center gap-3 border  rounded-md px-3 py-2 " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}
+                className="flex items-center gap-3 border  rounded-md px-3 py-2 " className="border-default" className="bg-surface"
               >
                 <button
                   type="button"
@@ -459,7 +459,7 @@ export default function ProveedoresFlowHarness() {
                 </button>
                 <div className="flex-1">
                   <div className="font-medium text-sm">{prov.nombre}</div>
-                  <div className="text-xs " style={{ color: 'var(--color-muted)' }}>{prov.servicio}</div>
+                  <div className="text-xs " className="text-muted">{prov.servicio}</div>
                 </div>
                 {unreadMap[prov.id] ? (
                   <span
@@ -471,7 +471,7 @@ export default function ProveedoresFlowHarness() {
                 <button
                   type="button"
                   data-cy="vistos-open"
-                  className="text-sm  hover:underline" style={{ color: 'var(--color-primary)' }}
+                  className="text-sm  hover:underline" className="text-primary"
                   onClick={() => handleOpenDetail(prov.id)}
                 >
                   Ver detalle
@@ -479,7 +479,7 @@ export default function ProveedoresFlowHarness() {
               </div>
             ))
           ) : (
-            <div className="text-sm " style={{ color: 'var(--color-muted)' }} data-cy="vistos-empty">
+            <div className="text-sm " className="text-muted" data-cy="vistos-empty">
               No hay proveedores en shortlist.
             </div>
           )}
@@ -492,19 +492,19 @@ export default function ProveedoresFlowHarness() {
           data-cy="pipeline-section"
         >
           <div className="space-y-6">
-            <div className="rounded-lg border border-dashed  /70 p-4 flex flex-wrap items-center gap-3" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="rounded-lg border border-dashed  /70 p-4 flex flex-wrap items-center gap-3" className="border-default" className="bg-surface">
               <div>
-                <div className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>
+                <div className="text-sm font-semibold " className="text-body">
                   Organiza necesidades y servicios
                 </div>
-                <p className="text-xs  max-w-md" style={{ color: 'var(--color-text-secondary)' }}>
+                <p className="text-xs  max-w-md" className="text-secondary">
                   Usa la matriz para mapear qué servicios están cubiertos y lanza búsquedas IA o altas manuales.
                 </p>
               </div>
               <div className="ml-auto">
                 <button
                   type="button"
-                  className="inline-flex items-center px-3 py-2 border   text-xs font-medium rounded-md hover:bg-blue-50" style={{ borderColor: 'var(--color-primary)' }} style={{ color: 'var(--color-primary)' }}
+                  className="inline-flex items-center px-3 py-2 border   text-xs font-medium rounded-md hover:bg-blue-50" style={{ borderColor: 'var(--color-primary)' }} className="text-primary"
                   data-cy="pipeline-open-matrix"
                   onClick={() => setNeedsOpen(true)}
                 >
@@ -522,10 +522,10 @@ export default function ProveedoresFlowHarness() {
             />
           </div>
 
-          <aside className=" border rounded-lg p-4 h-min sticky top-4 space-y-4" style={{ backgroundColor: 'var(--color-surface)' }} data-cy="pipeline-aside">
+          <aside className=" border rounded-lg p-4 h-min sticky top-4 space-y-4" className="bg-surface" data-cy="pipeline-aside">
             <div>
               <div className="text-sm font-semibold mb-2">Resumen financiero</div>
-              <div className="text-xs  space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
+              <div className="text-xs  space-y-1" className="text-secondary">
                 <div className="flex justify-between">
                   <span>Asignado</span>
                   <span>{formatCurrency(pipelineSummary.asignado)}</span>
@@ -554,7 +554,7 @@ export default function ProveedoresFlowHarness() {
             </div>
 
             {searches.length ? (
-              <div className="border-t pt-3 text-xs " style={{ color: 'var(--color-muted)' }} data-cy="search-history">
+              <div className="border-t pt-3 text-xs " className="text-muted" data-cy="search-history">
                 Últimas búsquedas IA: {searches.slice(-3).join(', ')}
               </div>
             ) : null}
@@ -567,20 +567,20 @@ export default function ProveedoresFlowHarness() {
           className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
           data-cy="contratos-section"
         >
-          <div className="border  rounded-md p-4 " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-            <div className="text-sm " style={{ color: 'var(--color-muted)' }}>Proveedores contratados</div>
+          <div className="border  rounded-md p-4 " className="border-default" className="bg-surface">
+            <div className="text-sm " className="text-muted">Proveedores contratados</div>
             <div className="text-2xl font-semibold" data-cy="contratos-total">
               {contractedProviders.length}
             </div>
           </div>
-          <div className="border  rounded-md p-4 " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-            <div className="text-sm " style={{ color: 'var(--color-muted)' }}>Presupuestos en negociación</div>
+          <div className="border  rounded-md p-4 " className="border-default" className="bg-surface">
+            <div className="text-sm " className="text-muted">Presupuestos en negociación</div>
             <div className="text-2xl font-semibold" data-cy="contratos-presupuestos">
               {budgetStageProviders.length}
             </div>
           </div>
-          <div className="border  rounded-md p-4 " style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-            <div className="text-sm " style={{ color: 'var(--color-muted)' }}>Servicios cubiertos</div>
+          <div className="border  rounded-md p-4 " className="border-default" className="bg-surface">
+            <div className="text-sm " className="text-muted">Servicios cubiertos</div>
             <div className="text-2xl font-semibold" data-cy="contratos-servicios">
               {new Set(providers.map((prov) => prov.servicio)).size}
             </div>
@@ -596,7 +596,7 @@ export default function ProveedoresFlowHarness() {
         className="max-w-4xl"
       >
         <div className="space-y-4" data-cy="needs-modal">
-          <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="text-sm " className="text-secondary">
             Ajusta los servicios prioritarios y lanza búsquedas inteligentes sin salir del módulo.
           </p>
           <ServicesBoard
@@ -640,7 +640,7 @@ export default function ProveedoresFlowHarness() {
             <button
               type="button"
               data-cy="detalle-cerrar"
-              className="text-sm  hover:underline" style={{ color: 'var(--color-primary)' }}
+              className="text-sm  hover:underline" className="text-primary"
               onClick={handleCloseDetail}
             >
               Cerrar

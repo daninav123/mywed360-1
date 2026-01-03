@@ -1,12 +1,9 @@
 import axios from 'axios';
-import { auth } from '../firebaseConfig';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4004';
 
-const getAuthToken = async () => {
-  const user = auth.currentUser;
-  if (!user) return null;
-  return await user.getIdToken();
+const getAuthToken = () => {
+  return localStorage.getItem('authToken');
 };
 
 const apiClient = axios.create({
@@ -14,8 +11,8 @@ const apiClient = axios.create({
   timeout: 15000,
 });
 
-apiClient.interceptors.request.use(async (config) => {
-  const token = await getAuthToken();
+apiClient.interceptors.request.use((config) => {
+  const token = getAuthToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

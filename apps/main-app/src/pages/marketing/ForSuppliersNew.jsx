@@ -64,7 +64,7 @@ export default function ForSuppliersNew() {
       <HeroSection
         title={t('forSuppliers.hero.title', { defaultValue: 'Grow Your Wedding Business' })}
         subtitle={t('forSuppliers.hero.subtitle', { defaultValue: 'Connect with couples who are actively looking for talented vendors like you. Join our trusted network of wedding professionals.' })}
-        image="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&auto=format&fit=crop&q=80"
+        image="/assets/services/suppliers.png"
       >
         <div className="flex gap-4">
           <PrimaryButton onClick={() => navigate('/suppliers/register')}>
@@ -146,7 +146,7 @@ export default function ForSuppliersNew() {
             style={{ boxShadow: theme.shadow.lg }}
           >
             <img 
-              src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=800&auto=format&fit=crop&q=80"
+              src="/assets/services/suppliers.png"
               alt="Vendor workspace"
               className="w-full h-auto"
             />

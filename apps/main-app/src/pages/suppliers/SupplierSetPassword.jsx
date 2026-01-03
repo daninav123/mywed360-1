@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock, CheckCircle, AlertCircle } from 'lucide-react';
+import LanguageSelector from '../../components/ui/LanguageSelector';
 import useTranslations from '../../hooks/useTranslations';
 
 /**
@@ -89,9 +90,14 @@ export default function SupplierSetPassword() {
   if (success) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: 'var(--color-bg)' }}
+        className="min-h-screen flex items-center justify-center p-4 relative"
+        className="bg-page"
       >
+        {/* Selector de idioma */}
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
+
         <div className="max-w-md w-full text-center">
           <div
             className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
@@ -99,10 +105,10 @@ export default function SupplierSetPassword() {
           >
             <CheckCircle size={48} />
           </div>
-          <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
+          <h1 className="text-3xl font-bold mb-4" className="text-body">
             {t('suppliers.setPassword.success.title')}
           </h1>
-          <p className="mb-8" style={{ color: 'var(--color-muted)' }}>
+          <p className="mb-8" className="text-muted">
             {t('suppliers.setPassword.success.description')}
           </p>
           <div className="animate-pulse">
@@ -118,9 +124,14 @@ export default function SupplierSetPassword() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: 'var(--color-bg)' }}
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      className="bg-page"
     >
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
@@ -130,10 +141,10 @@ export default function SupplierSetPassword() {
           >
             <Lock size={32} />
           </div>
-          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+          <h1 className="text-3xl font-bold mb-2" className="text-body">
             {t('suppliers.setPassword.title')}
           </h1>
-          <p style={{ color: 'var(--color-muted)' }}>
+          <p className="text-muted">
             {t('suppliers.setPassword.subtitle')}
           </p>
         </div>
@@ -141,12 +152,12 @@ export default function SupplierSetPassword() {
         {/* Card */}
         <div
           className="rounded-xl shadow-lg p-8"
-          style={{ backgroundColor: 'var(--color-surface)' }}
+          className="bg-surface"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email (readonly) */}
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 {t('suppliers.setPassword.fields.email')}
               </label>
               <input
@@ -164,33 +175,33 @@ export default function SupplierSetPassword() {
 
             {/* Nueva contraseña */}
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 {t('suppliers.setPassword.fields.password.label')}
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border  rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full px-4 py-3 border  rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" className="border-default"
                 placeholder={t('supplier.setPassword.newPasswordPlaceholder')}
                 required
                 minLength={8}
               />
-              <p className="mt-1 text-xs" style={{ color: 'var(--color-muted)' }}>
+              <p className="mt-1 text-xs" className="text-muted">
                 {t('suppliers.setPassword.fields.password.hint')}
               </p>
             </div>
 
             {/* Confirmar contraseña */}
             <div>
-              <label className="block text-sm font-medium  mb-2" style={{ color: 'var(--color-text)' }}>
+              <label className="block text-sm font-medium  mb-2" className="text-body">
                 {t('suppliers.setPassword.fields.confirm.label')}
               </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 border  rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+                className="w-full px-4 py-3 border  rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" className="border-default"
                 placeholder={t('suppliers.setPassword.fields.confirm.placeholder')}
                 required
               />
@@ -229,7 +240,7 @@ export default function SupplierSetPassword() {
             <button
               onClick={() => navigate('/supplier/login')}
               className="text-sm hover:underline"
-              style={{ color: 'var(--color-primary)' }}
+              className="text-primary"
             >
               {t('suppliers.setPassword.links.login')}
             </button>

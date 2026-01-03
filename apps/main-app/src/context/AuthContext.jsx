@@ -3,6 +3,6 @@
 // componentes heredados. Reexporta las implementaciones reales definidas en
 // hooks/useAuth.jsx sin duplicar lógica.
 
-export { AuthProvider, useAuth } from '../hooks/useAuth';
+export { AuthProvider, useAuth } from '../hooks/useAuth.jsx';
 // Exportación por defecto para facilitar mocks: { default: { useAuth } }
-export { useAuth as default } from '../hooks/useAuth';
+export { useAuth as default } from '../hooks/useAuth.jsx';

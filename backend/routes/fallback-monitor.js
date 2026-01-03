@@ -81,11 +81,11 @@ router.post('/log', async (req, res) => {
  */
 router.get('/stats', async (req, res) => {
   try {
-    // TODO: Verificar que usuario es admin
-    // const isAdmin = req.user?.role === 'admin';
-    // if (!isAdmin) {
-    //   return res.status(403).json({ error: 'Forbidden: Admin access required' });
-    // }
+    // Verificar que usuario es admin
+    const isAdmin = req.user?.role === 'admin' || req.user?.role === 'ADMIN';
+    if (!isAdmin) {
+      return res.status(403).json({ error: 'Forbidden: Admin access required' });
+    }
 
     const hours = parseInt(req.query.hours) || 24;
 
@@ -123,7 +123,11 @@ router.get('/stats', async (req, res) => {
  */
 router.post('/resolve/:alertId', async (req, res) => {
   try {
-    // TODO: Verificar que usuario es admin
+    // Verificar que usuario es admin
+    const isAdmin = req.user?.role === 'admin' || req.user?.role === 'ADMIN';
+    if (!isAdmin) {
+      return res.status(403).json({ error: 'Forbidden: Admin access required' });
+    }
 
     const { alertId } = req.params;
     const { notes } = req.body;

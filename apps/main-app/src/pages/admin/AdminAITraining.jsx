@@ -279,7 +279,7 @@ const AdminAITraining = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <Sparkles className="w-12 h-12 mx-auto mb-4 text-blue-500 animate-pulse" />
-          <p className="" style={{ color: 'var(--color-text-secondary)' }}>Cargando estadísticas de IA...</p>
+          <p className="" className="text-secondary">Cargando estadísticas de IA...</p>
         </div>
       </div>
     );
@@ -295,8 +295,8 @@ const AdminAITraining = () => {
               <Brain className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold " style={{ color: 'var(--color-text)' }}>Entrenamiento de IA</h1>
-              <p className=" mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+              <h1 className="text-3xl font-bold " className="text-body">Entrenamiento de IA</h1>
+              <p className=" mt-1" className="text-secondary">
                 Mejora continua del análisis de presupuestos
               </p>
             </div>
@@ -326,16 +326,16 @@ const AdminAITraining = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm  mb-1" style={{ color: 'var(--color-text-secondary)' }}>Precisión General</p>
-              <p className="text-3xl font-bold " style={{ color: 'var(--color-success)' }}>
+              <p className="text-sm  mb-1" className="text-secondary">Precisión General</p>
+              <p className="text-3xl font-bold " className="text-success">
                 {stats?.overallAccuracy || 0}%
               </p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
-              <TrendingUp className="w-6 h-6 " style={{ color: 'var(--color-success)' }} />
+              <TrendingUp className="w-6 h-6 " className="text-success" />
             </div>
           </div>
-          <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
+          <p className="text-xs  mt-2" className="text-muted">
             {stats?.perfect || 0} presupuestos perfectos
           </p>
         </Card>
@@ -343,16 +343,16 @@ const AdminAITraining = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm  mb-1" style={{ color: 'var(--color-text-secondary)' }}>Total Validados</p>
-              <p className="text-3xl font-bold " style={{ color: 'var(--color-primary)' }}>
+              <p className="text-sm  mb-1" className="text-secondary">Total Validados</p>
+              <p className="text-3xl font-bold " className="text-primary">
                 {stats?.total || 0}
               </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
-              <CheckCircle className="w-6 h-6 " style={{ color: 'var(--color-primary)' }} />
+              <CheckCircle className="w-6 h-6 " className="text-primary" />
             </div>
           </div>
-          <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
+          <p className="text-xs  mt-2" className="text-muted">
             Presupuestos revisados por usuarios
           </p>
         </Card>
@@ -360,7 +360,7 @@ const AdminAITraining = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm  mb-1" style={{ color: 'var(--color-text-secondary)' }}>Con Correcciones</p>
+              <p className="text-sm  mb-1" className="text-secondary">Con Correcciones</p>
               <p className="text-3xl font-bold text-amber-600">
                 {stats?.withCorrections || 0}
               </p>
@@ -369,7 +369,7 @@ const AdminAITraining = () => {
               <AlertCircle className="w-6 h-6 text-amber-600" />
             </div>
           </div>
-          <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
+          <p className="text-xs  mt-2" className="text-muted">
             La IA está aprendiendo de estos
           </p>
         </Card>
@@ -377,14 +377,14 @@ const AdminAITraining = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm  mb-1" style={{ color: 'var(--color-text-secondary)' }}>Objetivo</p>
+              <p className="text-sm  mb-1" className="text-secondary">Objetivo</p>
               <p className="text-3xl font-bold text-purple-600">95%</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-lg">
               <Sparkles className="w-6 h-6 text-purple-600" />
             </div>
           </div>
-          <p className="text-xs  mt-2" style={{ color: 'var(--color-muted)' }}>
+          <p className="text-xs  mt-2" className="text-muted">
             Meta de precisión automática
           </p>
         </Card>
@@ -394,9 +394,9 @@ const AdminAITraining = () => {
       {uploading && (
         <Card className="p-8 mb-8 border-2 border-blue-200">
           <div className="text-center">
-            <Loader2 className="w-12 h-12 mx-auto mb-4  animate-spin" style={{ color: 'var(--color-primary)' }} />
-            <h3 className="text-xl font-bold  mb-2" style={{ color: 'var(--color-text)' }}>Procesando PDF con IA...</h3>
-            <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+            <Loader2 className="w-12 h-12 mx-auto mb-4  animate-spin" className="text-primary" />
+            <h3 className="text-xl font-bold  mb-2" className="text-body">Procesando PDF con IA...</h3>
+            <p className="" className="text-secondary">
               La IA está extrayendo todos los datos del presupuesto
             </p>
           </div>
@@ -406,55 +406,55 @@ const AdminAITraining = () => {
       {/* Datos extraídos del PDF */}
       {extractedData && (
         <Card className="p-6 mb-8 border-2 border-green-200 bg-green-50">
-          <h3 className="text-xl font-bold  mb-4 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
-            <CheckCircle className="w-5 h-5 " style={{ color: 'var(--color-success)' }} />
+          <h3 className="text-xl font-bold  mb-4 flex items-center gap-2" className="text-body">
+            <CheckCircle className="w-5 h-5 " className="text-success" />
             Datos Extraídos del PDF
           </h3>
           
-          <div className=" rounded-lg p-6 space-y-4" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className=" rounded-lg p-6 space-y-4" className="bg-surface">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-semibold  mb-1" className="text-body">
                   Categoría
                 </label>
-                <p className=" font-medium" style={{ color: 'var(--color-text)' }}>{extractedData.categoryName || 'No detectada'}</p>
+                <p className=" font-medium" className="text-body">{extractedData.categoryName || 'No detectada'}</p>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-semibold  mb-1" className="text-body">
                   Proveedor
                 </label>
-                <p className=" font-medium" style={{ color: 'var(--color-text)' }}>{extractedData.supplierName || 'No detectado'}</p>
+                <p className=" font-medium" className="text-body">{extractedData.supplierName || 'No detectado'}</p>
                 {extractedData.supplierLegalName && (
-                  <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
+                  <p className="text-xs  mt-1" className="text-muted">
                     Nombre legal: {extractedData.supplierLegalName}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-semibold  mb-1" className="text-body">
                   Precio Total
                 </label>
-                <p className=" font-medium text-lg " style={{ color: 'var(--color-success)' }} style={{ color: 'var(--color-text)' }}>
+                <p className=" font-medium text-lg " className="text-success" className="text-body">
                   {extractedData.totalPrice ? `${extractedData.totalPrice}€` : 'No detectado'}
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-semibold  mb-1" className="text-body">
                   Tiempo de Entrega
                 </label>
-                <p className=" font-medium" style={{ color: 'var(--color-text)' }}>{extractedData.deliveryTime || 'No detectado'}</p>
+                <p className=" font-medium" className="text-body">{extractedData.deliveryTime || 'No detectado'}</p>
               </div>
             </div>
 
             {extractedData.servicesIncluded && extractedData.servicesIncluded.length > 0 && (
               <div>
-                <label className="block text-sm font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-semibold  mb-2" className="text-body">
                   Servicios Incluidos
                 </label>
-                <ul className="list-disc list-inside space-y-1 " style={{ color: 'var(--color-text)' }}>
+                <ul className="list-disc list-inside space-y-1 " className="text-body">
                   {extractedData.servicesIncluded.map((service, idx) => (
                     <li key={idx}>{service}</li>
                   ))}
@@ -464,20 +464,20 @@ const AdminAITraining = () => {
 
             {extractedData.paymentTerms && (
               <div>
-                <label className="block text-sm font-semibold  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-semibold  mb-1" className="text-body">
                   Condiciones de Pago
                 </label>
-                <p className="" style={{ color: 'var(--color-text)' }}>{extractedData.paymentTerms}</p>
+                <p className="" className="text-body">{extractedData.paymentTerms}</p>
               </div>
             )}
 
             {extractedData.emailBody && (
               <div>
-                <label className="block text-sm font-semibold  mb-1" style={{ color: 'var(--color-text)' }}>
+                <label className="block text-sm font-semibold  mb-1" className="text-body">
                   Contenido del Presupuesto
                 </label>
-                <div className=" p-4 rounded border  max-h-48 overflow-y-auto" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-bg)' }}>
-                  <pre className="text-sm  whitespace-pre-wrap font-mono" style={{ color: 'var(--color-text)' }}>
+                <div className=" p-4 rounded border  max-h-48 overflow-y-auto" className="border-default" className="bg-page">
+                  <pre className="text-sm  whitespace-pre-wrap font-mono" className="text-body">
                     {extractedData.emailBody}
                   </pre>
                 </div>
@@ -509,12 +509,12 @@ const AdminAITraining = () => {
       {/* Modo Comparación */}
       {comparisonMode && quoteA && quoteB && (
         <Card className="p-6 mb-8 border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
-          <h3 className="text-2xl font-bold  mb-6 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+          <h3 className="text-2xl font-bold  mb-6 flex items-center gap-2" className="text-body">
             <TrendingUp className="w-6 h-6 text-purple-600" />
             Comparación de Presupuestos - Entrenamiento IA
           </h3>
           
-          <p className="text-sm  mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="text-sm  mb-6" className="text-secondary">
             Compara estos dos presupuestos y selecciona cuál consideras mejor. La IA aprenderá de tu decisión.
           </p>
 
@@ -525,7 +525,7 @@ const AdminAITraining = () => {
               selectedWinner === 'A' ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white'
             }`}>
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-bold " style={{ color: 'var(--color-text)' }}>Presupuesto A</h4>
+                <h4 className="text-lg font-bold " className="text-body">Presupuesto A</h4>
                 <button
                   onClick={() => setSelectedWinner('A')}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
@@ -540,34 +540,34 @@ const AdminAITraining = () => {
 
               <div className="space-y-3">
                 <div>
-                  <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Proveedor</p>
-                  <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{quoteA.supplierName}</p>
+                  <p className="text-xs " className="text-secondary">Proveedor</p>
+                  <p className="text-sm font-semibold " className="text-body">{quoteA.supplierName}</p>
                 </div>
                 <div>
-                  <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Categoría</p>
-                  <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{quoteA.categoryName}</p>
+                  <p className="text-xs " className="text-secondary">Categoría</p>
+                  <p className="text-sm font-semibold " className="text-body">{quoteA.categoryName}</p>
                 </div>
                 <div>
-                  <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Precio</p>
-                  <p className="text-2xl font-bold " style={{ color: 'var(--color-success)' }}>{quoteA.totalPrice}€</p>
+                  <p className="text-xs " className="text-secondary">Precio</p>
+                  <p className="text-2xl font-bold " className="text-success">{quoteA.totalPrice}€</p>
                 </div>
                 {quoteA.servicesIncluded?.length > 0 && (
                   <div>
-                    <p className="text-xs  mb-1" style={{ color: 'var(--color-text-secondary)' }}>Servicios ({quoteA.servicesIncluded.length})</p>
-                    <ul className="text-sm  space-y-1" style={{ color: 'var(--color-text)' }}>
+                    <p className="text-xs  mb-1" className="text-secondary">Servicios ({quoteA.servicesIncluded.length})</p>
+                    <ul className="text-sm  space-y-1" className="text-body">
                       {quoteA.servicesIncluded.slice(0, 3).map((service, idx) => (
                         <li key={idx}>• {service}</li>
                       ))}
                       {quoteA.servicesIncluded.length > 3 && (
-                        <li className="" style={{ color: 'var(--color-muted)' }}>+{quoteA.servicesIncluded.length - 3} más</li>
+                        <li className="" className="text-muted">+{quoteA.servicesIncluded.length - 3} más</li>
                       )}
                     </ul>
                   </div>
                 )}
                 {quoteA.paymentTerms && (
                   <div>
-                    <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Condiciones de pago</p>
-                    <p className="text-sm " style={{ color: 'var(--color-text)' }}>{quoteA.paymentTerms}</p>
+                    <p className="text-xs " className="text-secondary">Condiciones de pago</p>
+                    <p className="text-sm " className="text-body">{quoteA.paymentTerms}</p>
                   </div>
                 )}
               </div>
@@ -578,7 +578,7 @@ const AdminAITraining = () => {
               selectedWinner === 'B' ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white'
             }`}>
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-bold " style={{ color: 'var(--color-text)' }}>Presupuesto B</h4>
+                <h4 className="text-lg font-bold " className="text-body">Presupuesto B</h4>
                 <button
                   onClick={() => setSelectedWinner('B')}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
@@ -593,34 +593,34 @@ const AdminAITraining = () => {
 
               <div className="space-y-3">
                 <div>
-                  <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Proveedor</p>
-                  <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{quoteB.supplierName}</p>
+                  <p className="text-xs " className="text-secondary">Proveedor</p>
+                  <p className="text-sm font-semibold " className="text-body">{quoteB.supplierName}</p>
                 </div>
                 <div>
-                  <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Categoría</p>
-                  <p className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>{quoteB.categoryName}</p>
+                  <p className="text-xs " className="text-secondary">Categoría</p>
+                  <p className="text-sm font-semibold " className="text-body">{quoteB.categoryName}</p>
                 </div>
                 <div>
-                  <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Precio</p>
-                  <p className="text-2xl font-bold " style={{ color: 'var(--color-success)' }}>{quoteB.totalPrice}€</p>
+                  <p className="text-xs " className="text-secondary">Precio</p>
+                  <p className="text-2xl font-bold " className="text-success">{quoteB.totalPrice}€</p>
                 </div>
                 {quoteB.servicesIncluded?.length > 0 && (
                   <div>
-                    <p className="text-xs  mb-1" style={{ color: 'var(--color-text-secondary)' }}>Servicios ({quoteB.servicesIncluded.length})</p>
-                    <ul className="text-sm  space-y-1" style={{ color: 'var(--color-text)' }}>
+                    <p className="text-xs  mb-1" className="text-secondary">Servicios ({quoteB.servicesIncluded.length})</p>
+                    <ul className="text-sm  space-y-1" className="text-body">
                       {quoteB.servicesIncluded.slice(0, 3).map((service, idx) => (
                         <li key={idx}>• {service}</li>
                       ))}
                       {quoteB.servicesIncluded.length > 3 && (
-                        <li className="" style={{ color: 'var(--color-muted)' }}>+{quoteB.servicesIncluded.length - 3} más</li>
+                        <li className="" className="text-muted">+{quoteB.servicesIncluded.length - 3} más</li>
                       )}
                     </ul>
                   </div>
                 )}
                 {quoteB.paymentTerms && (
                   <div>
-                    <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>Condiciones de pago</p>
-                    <p className="text-sm " style={{ color: 'var(--color-text)' }}>{quoteB.paymentTerms}</p>
+                    <p className="text-xs " className="text-secondary">Condiciones de pago</p>
+                    <p className="text-sm " className="text-body">{quoteB.paymentTerms}</p>
                   </div>
                 )}
               </div>
@@ -628,8 +628,8 @@ const AdminAITraining = () => {
           </div>
 
           {/* Factores de decisión */}
-          <div className=" rounded-lg p-4 mb-4" style={{ backgroundColor: 'var(--color-surface)' }}>
-            <h4 className="text-sm font-bold  mb-3" style={{ color: 'var(--color-text)' }}>
+          <div className=" rounded-lg p-4 mb-4" className="bg-surface">
+            <h4 className="text-sm font-bold  mb-3" className="text-body">
               🎯 ¿Qué factores influyeron en tu decisión? (Selecciona todos los relevantes)
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -663,15 +663,15 @@ const AdminAITraining = () => {
           </div>
 
           {/* Notas adicionales */}
-          <div className=" rounded-lg p-4 mb-4" style={{ backgroundColor: 'var(--color-surface)' }}>
-            <label className="block text-sm font-bold  mb-2" style={{ color: 'var(--color-text)' }}>
+          <div className=" rounded-lg p-4 mb-4" className="bg-surface">
+            <label className="block text-sm font-bold  mb-2" className="text-body">
               📝 Notas adicionales (opcional)
             </label>
             <textarea
               value={comparisonNotes}
               onChange={(e) => setComparisonNotes(e.target.value)}
               placeholder="Explica por qué elegiste este presupuesto..."
-              className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style={{ borderColor: 'var(--color-border)' }}
+              className="w-full px-3 py-2 border  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" className="border-default"
               rows={3}
             />
           </div>
@@ -721,8 +721,8 @@ const AdminAITraining = () => {
 
       {/* Precisión por Campo */}
       <Card className="p-6">
-        <h3 className="text-xl font-bold  mb-6 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
-          <BarChart3 className="w-5 h-5 " style={{ color: 'var(--color-primary)' }} />
+        <h3 className="text-xl font-bold  mb-6 flex items-center gap-2" className="text-body">
+          <BarChart3 className="w-5 h-5 " className="text-primary" />
           Precisión por Campo
         </h3>
 
@@ -735,7 +735,7 @@ const AdminAITraining = () => {
               return (
                 <div key={field}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold  capitalize" style={{ color: 'var(--color-text)' }}>
+                    <span className="text-sm font-semibold  capitalize" className="text-body">
                       {field.replace(/([A-Z])/g, ' $1').trim()}
                     </span>
                     <span className={`text-sm font-bold ${
@@ -758,7 +758,7 @@ const AdminAITraining = () => {
                       style={{ width: `${accuracy}%` }}
                     />
                   </div>
-                  <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>
+                  <p className="text-xs  mt-1" className="text-muted">
                     {count} correcciones de {stats.total} presupuestos
                   </p>
                 </div>
@@ -766,7 +766,7 @@ const AdminAITraining = () => {
             })}
           </div>
         ) : (
-          <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
+          <div className="text-center py-8 " className="text-muted">
             <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p>Aún no hay suficientes datos para mostrar estadísticas por campo.</p>
             <p className="text-sm mt-1">Los usuarios deben validar más presupuestos.</p>

@@ -43,28 +43,48 @@ export default function InspirationBoardCompact({ categories = [] }) {
           {t('home2.inspiration.title')}
         </h3>
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-4">
         {displayCategories.map((category, index) => (
           <Link
             key={index}
             to={`/inspiracion?tag=${encodeURIComponent(category.slug || '')}`}
-            className="relative aspect-square rounded-xl overflow-hidden group"
-            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+            className="relative aspect-square rounded-xl overflow-hidden group cursor-pointer"
+            style={{ 
+              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+              transition: 'all 0.3s ease'
+            }}
           >
             <ExternalImage
               src={category.url}
               alt={category.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
-            <div className="absolute inset-0" style={{ backgroundColor: 'rgba(252, 228, 236, 0.15)' }} />
-            <div className="absolute bottom-0 left-0 right-0 p-3">
-              <div className="flex items-center gap-1.5">
-                <Heart className="w-3.5 h-3.5" style={{ color: '#F8A5B7', fill: '#F8A5B7' }} />
+            {/* Overlay gradiente para mejor legibilidad */}
+            <div 
+              className="absolute inset-0 opacity-60 group-hover:opacity-40 transition-opacity duration-300"
+              style={{ 
+                background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)'
+              }} 
+            />
+            {/* Overlay rosa sutil */}
+            <div 
+              className="absolute inset-0 opacity-20 group-hover:opacity-10 transition-opacity duration-300" 
+              style={{ backgroundColor: '#FCE4EC' }} 
+            />
+            {/* Contenido del texto */}
+            <div className="absolute inset-0 flex flex-col justify-end p-4">
+              <div className="flex items-center gap-2">
+                <Heart 
+                  className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" 
+                  style={{ color: '#F8A5B7', fill: '#F8A5B7' }} 
+                />
                 <p style={{
                   fontFamily: "'DM Sans', 'Inter', sans-serif",
-                  fontSize: '12px',
-                  fontWeight: 500,
-                  color: '#2D3748',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: '#FFFFFF',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                  letterSpacing: '0.01em'
                 }} className="truncate">{category.name}</p>
               </div>
             </div>

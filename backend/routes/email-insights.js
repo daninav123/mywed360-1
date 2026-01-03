@@ -1,6 +1,7 @@
 ﻿import express from 'express';
-import { db } from '../db.js';
-import OpenAI from 'openai';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 import logger from '../utils/logger.js';
 import { extractTextForMail } from '../services/attachmentText.js';
 import { classifyEmailContent } from '../services/emailClassification.js';

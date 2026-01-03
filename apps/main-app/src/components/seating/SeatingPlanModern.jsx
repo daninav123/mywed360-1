@@ -57,12 +57,13 @@ import AchievementsModal from './AchievementsModal';
 import { useAchievements } from '../../hooks/useAchievements';
 
 // Hooks
-import { useSeatingPlan } from '../../hooks/useSeatingPlan';
+import useSeatingPlan from '../../hooks/useSeatingPlan';
 import { useWedding } from '../../context/WeddingContext';
 import useTheme from '../../hooks/useTheme';
 import { post as apiPost } from '../../services/apiClient';
 import useTranslations from '../../hooks/useTranslations';
 import { useMobileViewport } from '../../hooks/useMobileViewport';
+import Nav from '../Nav';
 
 // Modo móvil
 import SeatingMobile from './SeatingMobile';
@@ -856,6 +857,7 @@ export default function SeatingPlanModern() {
           />
         )} */}
       </SeatingLayoutFloating>
+      <Nav />
     </DndProvider>
   );
 }

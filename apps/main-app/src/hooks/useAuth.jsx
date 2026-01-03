@@ -25,17 +25,21 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
+      if (!data || !data.user) {
+        throw new Error('Invalid response structure');
+      }
+      
       setCurrentUser({
         uid: data.user.id,
         email: data.user.email,
-        displayName: data.user.name,
-        emailVerified: data.user.emailVerified,
+        displayName: data.user.name || data.user.email,
+        emailVerified: data.user.emailVerified || false,
       });
       
       setUserProfile({
-        ...data.user.profile,
+        ...(data.user.profile || {}),
         email: data.user.email,
-        name: data.user.name,
+        name: data.user.name || data.user.email,
         role: data.user.profile?.role || data.user.role,
         weddingId: data.user.weddings?.[0]?.id,
       });
@@ -64,34 +68,41 @@ export const AuthProvider = ({ children }) => {
       });
       
       console.log('[Auth Frontend] Login response:', data);
-      console.log('[Auth Frontend] User data:', data.user);
-      console.log('[Auth Frontend] Profile data:', data.user?.profile);
       
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      // El backend devuelve: {success: true, data: {token, user, refreshToken}}
+      const responseData = data.data || data;
+      const user = responseData.user;
+      const token = responseData.token;
+      const refreshToken = responseData.refreshToken;
+      
+      console.log('[Auth Frontend] User data:', user);
+      console.log('[Auth Frontend] Profile data:', user?.profile);
+      
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('refreshToken', refreshToken);
       console.log('[Auth Frontend] Tokens guardados en localStorage');
       
       const userData = {
-        uid: data.user.id,
-        email: data.user.email,
-        displayName: data.user.name || data.user.email,
-        emailVerified: data.user.emailVerified || false,
+        uid: user.id,
+        email: user.email,
+        displayName: user.name || user.email,
+        emailVerified: user.emailVerified || false,
       };
       console.log('[Auth Frontend] Setting currentUser:', userData);
       setCurrentUser(userData);
       
       const profileData = {
-        ...(data.user.profile || {}),
-        email: data.user.email,
-        name: data.user.name || data.user.email,
-        role: data.user.profile?.role || data.user.role || 'OWNER',
-        weddingId: data.user.weddings?.[0]?.id || null,
+        ...(user.profile || {}),
+        email: user.email,
+        name: user.name || user.email,
+        role: user.profile?.role || user.role || 'OWNER',
+        weddingId: user.weddings?.[0]?.id || null,
       };
       console.log('[Auth Frontend] Setting userProfile:', profileData);
       setUserProfile(profileData);
       
       console.log('[Auth Frontend] Login completado, retornando success');
-      return { success: true, user: data.user };
+      return { success: true, user };
     } catch (error) {
       console.error('[Auth] Login error:', error);
       throw new Error(error.response?.data?.error || 'Error al iniciar sesión');
@@ -99,37 +110,59 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Register
-  const register = useCallback(async (email, password, name) => {
+  const register = useCallback(async (email, password, additionalData = {}) => {
     try {
+      console.log('[Auth Frontend] Register attempt:', { email, additionalData });
+      
       const { data } = await axios.post(`${API_BASE_URL}/api/auth/register`, {
         email,
         password,
-        name
+        fullName: additionalData.fullName || additionalData.name,
+        role: additionalData.role || 'particular',
+        weddingInfo: additionalData.weddingInfo || null,
+        plannerInfo: additionalData.plannerInfo || null,
+        assistantInfo: additionalData.assistantInfo || null
       });
       
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      console.log('[Auth Frontend] Register response:', data);
+      
+      const responseData = data.data || data;
+      const user = responseData.user;
+      const token = responseData.token;
+      const refreshToken = responseData.refreshToken;
+      
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('refreshToken', refreshToken);
       
       setCurrentUser({
-        uid: data.user.id,
-        email: data.user.email,
-        displayName: data.user.name,
-        emailVerified: data.user.emailVerified,
+        uid: user.id,
+        email: user.email,
+        displayName: user.name || email,
+        emailVerified: user.emailVerified || false,
       });
       
       setUserProfile({
-        ...data.user.profile,
-        email: data.user.email,
-        name: data.user.name,
-        role: data.user.profile?.role || data.user.role,
+        ...(user.profile || {}),
+        email: user.email,
+        name: user.name || email,
+        role: user.profile?.role || user.role,
       });
       
-      return data.user;
+      console.log('[Auth Frontend] Register successful');
+      return { success: true, user };
     } catch (error) {
-      console.error('[Auth] Register error:', error);
-      throw new Error(error.response?.data?.error || 'Error al registrar usuario');
+      console.error('[Auth Frontend] Register error:', error);
+      console.error('[Auth Frontend] Error details:', error.response?.data);
+      return { 
+        success: false, 
+        code: error.response?.data?.code || 'unknown',
+        message: error.response?.data?.error || 'Error al registrar usuario' 
+      };
     }
   }, []);
+
+  // Alias para compatibilidad con Signup.jsx
+  const registerWithEmail = register;
 
   // Logout
   const logout = useCallback(async () => {
@@ -201,13 +234,16 @@ export const AuthProvider = ({ children }) => {
   const value = {
     currentUser,
     user: currentUser,
+    authUser: currentUser,  // Alias para compatibilidad
     userProfile,
     profile: userProfile,
     loading,
     isLoading,
     isAuthenticated,
     login,
+    loginWithEmail: login,  // Alias para compatibilidad con Login.jsx
     register,
+    registerWithEmail,  // Alias para compatibilidad con Signup.jsx
     logout,
     resetPassword,
     updatePassword,

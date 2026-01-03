@@ -1,15 +1,22 @@
 import express from 'express';
 import { z } from 'zod';
 import { requireAuth } from '../middleware/authMiddleware.js';
+import {
+  sendSuccess,
+  sendError,
+  sendInternalError,
+  sendValidationError,
+} from '../utils/apiResponse.js';
 import { listTemplates, generateContract, saveDocumentMeta, listDocuments } from '../services/legalDocsService.js';
 
 const router = express.Router();
 
 router.get('/templates', requireAuth, async (_req, res) => {
   try {
-    res.json({ success: true, templates: listTemplates() });
+    return sendSuccess(res, { templates: listTemplates() });
+    return sendSuccess(req, res, { templates: listTemplates() });
   } catch (e) {
-    res.status(500).json({ success: false, error: e?.message || 'templates error' });
+    return sendInternalError(req, res, e);
   }
 });
 
@@ -30,10 +37,10 @@ router.post('/generate', requireAuth, async (req, res) => {
     if (saveMeta) {
       await saveDocumentMeta(weddingId, result.meta);
     }
-    res.json({ success: true, document: result });
+    return sendSuccess(req, res, { document: result });
   } catch (e) {
     const msg = e?.issues ? e.issues.map(i => i.message).join(', ') : (e?.message || 'generate error');
-    res.status(400).json({ success: false, error: msg });
+    return sendValidationError(req, res, e?.issues || [{ message: msg }]);
   }
 });
 

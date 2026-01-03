@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { db, firebaseReady } from '../../../firebaseConfig';
 import { ALL_DESIGN_ASSETS, loadExpandedAssets } from '../data/mockAssets';
 
-const fsImport = () => import('firebase/firestore');
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 export function useDesignAssets() {
   const [assets, setAssets] = useState([]);

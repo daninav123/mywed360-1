@@ -344,7 +344,7 @@ export default function SupplierRequestsNew() {
             <div className="grid grid-cols-2 gap-3">
               {request.weddingDate && (
                 <div className="flex items-center gap-2 text-sm">
-                  <Calendar size={16} style={{ color: 'var(--color-primary)' }} />
+                  <Calendar size={16} className="text-primary" />
                   <span className="text-muted">
                     {new Date(request.weddingDate).toLocaleDateString('es-ES')}
                   </span>
@@ -352,7 +352,7 @@ export default function SupplierRequestsNew() {
               )}
               {request.location && (
                 <div className="flex items-center gap-2 text-sm">
-                  <MapPin size={16} style={{ color: 'var(--color-success)' }} />
+                  <MapPin size={16} className="text-success" />
                   <span className="text-muted">{request.location}</span>
                 </div>
               )}
@@ -379,7 +379,7 @@ export default function SupplierRequestsNew() {
                 <div className="space-y-1">
                   {request.categoryRequirements.customOptions?.map((option, idx) => (
                     <div key={idx} className="flex items-start gap-2 text-sm">
-                      <span className=" dark:text-green-400 mt-0.5" style={{ color: 'var(--color-success)' }}>✓</span>
+                      <span className=" dark:text-green-400 mt-0.5" className="text-success">✓</span>
                       <span className="text-yellow-900 dark:text-yellow-200 font-medium">
                         {option}
                       </span>
@@ -390,7 +390,7 @@ export default function SupplierRequestsNew() {
                       .filter(([_, value]) => value === true)
                       .map(([key, _]) => (
                         <div key={key} className="flex items-start gap-2 text-sm">
-                          <span className=" dark:text-green-400 mt-0.5" style={{ color: 'var(--color-success)' }}>✓</span>
+                          <span className=" dark:text-green-400 mt-0.5" className="text-success">✓</span>
                           <span className="text-yellow-900 dark:text-yellow-200 font-medium">
                             {key
                               .replace(/([A-Z])/g, ' $1')
@@ -511,7 +511,7 @@ export default function SupplierRequestsNew() {
                           <p className="text-sm font-semibold text-green-700 dark:text-green-400">
                             ✅ Cotización Enviada
                           </p>
-                          <p className="text-xs  dark:text-green-500 mt-1" style={{ color: 'var(--color-success)' }}>
+                          <p className="text-xs  dark:text-green-500 mt-1" className="text-success">
                             Total: {request.quotation.total?.toFixed(2)}€ | Estado:{' '}
                             {request.quotation.status === 'accepted' ? 'Aceptada' : 'Pendiente'}
                           </p>
@@ -608,7 +608,7 @@ export default function SupplierRequestsNew() {
               <div className="flex items-center justify-center gap-2">
                 <Circle size={16} />
                 <span>Activas</span>
-                <span className="px-2 py-0.5 rounded-full text-xs /20" style={{ backgroundColor: 'var(--color-surface)' }}>{stats.active}</span>
+                <span className="px-2 py-0.5 rounded-full text-xs /20" className="bg-surface">{stats.active}</span>
               </div>
             </button>
             <button
@@ -622,7 +622,7 @@ export default function SupplierRequestsNew() {
               <div className="flex items-center justify-center gap-2">
                 <CheckCircle size={16} />
                 <span>Archivadas</span>
-                <span className="px-2 py-0.5 rounded-full text-xs /20" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <span className="px-2 py-0.5 rounded-full text-xs /20" className="bg-surface">
                   {stats.archived}
                 </span>
               </div>
@@ -642,7 +642,7 @@ export default function SupplierRequestsNew() {
             <div className="p-4 rounded-lg bg-app">
               <p className="text-xs text-muted mb-1">Conversión</p>
               <div className="flex items-center gap-2">
-                <TrendingUp size={18} style={{ color: 'var(--color-success)' }} />
+                <TrendingUp size={18} className="text-success" />
                 <p className="text-2xl font-bold text-success">{stats.conversionRate}%</p>
               </div>
             </div>

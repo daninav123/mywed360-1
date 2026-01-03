@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { Camera, Sparkles, ChevronRight, UploadCloud, X } from 'lucide-react';
 
 import UploadWidget from '@/components/momentos/UploadWidget';
+import LanguageSelector from '@/components/ui/LanguageSelector';
 import { formatDate } from '../utils/formatUtils';
 import {
   getAlbumScenes,
@@ -208,7 +209,10 @@ export default function MomentosPublic() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white relative">
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
         <div className="text-center space-y-3">
           <div className="animate-spin h-10 w-10 border-2 border-slate-600 border-t-transparent rounded-full mx-auto" />
           <p className="text-sm text-slate-400">{t('public.moments.public.loading')}</p>
@@ -219,8 +223,11 @@ export default function MomentosPublic() {
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white px-6">
-        <div className="/5  border border-white/10 rounded-3xl px-6 py-8 max-w-md text-center space-y-3" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white px-6 relative">
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
+        <div className="/5  border border-white/10 rounded-3xl px-6 py-8 max-w-md text-center space-y-3" className="bg-surface">
           <h1 className="text-xl font-semibold text-white">
             {t('public.moments.public.errorTitle')}
           </h1>
@@ -250,7 +257,12 @@ export default function MomentosPublic() {
         : t('public.moments.public.status.cleanupDays', { count: cleanupDays });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col relative">
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-50">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+      
       <header className="px-6 pt-10 pb-6 bg-[var(--color-primary)]">
         <p className="text-xs uppercase tracking-[0.2em] text-blue-300 font-semibold">
           {t('public.moments.public.hero.badge')}
@@ -277,7 +289,7 @@ export default function MomentosPublic() {
         )}
       </header>
 
-      <main className="flex-1  text-slate-900 rounded-t-[32px] -mt-4 relative z-10" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <main className="flex-1  text-slate-900 rounded-t-[32px] -mt-4 relative z-10" className="bg-surface">
         <div className="px-5 py-6 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-800">
@@ -294,10 +306,10 @@ export default function MomentosPublic() {
                 key={scene.id}
                 type="button"
                 onClick={() => handleSceneSelect(scene)}
-                className="flex items-center justify-between rounded-2xl border border-slate-200  px-4 py-4 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-[0.99]" style={{ backgroundColor: 'var(--color-surface)' }}
+                className="flex items-center justify-between rounded-2xl border border-slate-200  px-4 py-4 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-[0.99]" className="bg-surface"
               >
                 <div className="flex items-center gap-3 text-left">
-                  <div className="h-12 w-12 rounded-full bg-blue-50  flex items-center justify-center" style={{ color: 'var(--color-primary)' }}>
+                  <div className="h-12 w-12 rounded-full bg-blue-50  flex items-center justify-center" className="text-primary">
                     {scene.emoji ? (
                       <span className="text-xl" aria-hidden="true">{scene.emoji}</span>
                     ) : (
@@ -332,7 +344,7 @@ export default function MomentosPublic() {
                 {recentUploads.map((item, index) => (
                   <div
                     key={`${item.name}-${index}`}
-                    className="flex items-center justify-between text-xs text-slate-200 border border-white/10 rounded-xl px-3 py-2 /5" style={{ backgroundColor: 'var(--color-surface)' }}
+                    className="flex items-center justify-between text-xs text-slate-200 border border-white/10 rounded-xl px-3 py-2 /5" className="bg-surface"
                   >
                     <div className="min-w-0">
                       <p className="truncate font-medium">{item.name}</p>
@@ -364,7 +376,7 @@ export default function MomentosPublic() {
 
       {selectedScene && (
         <div className="fixed inset-0 z-40 flex flex-col bg-black/60">
-          <div className="mt-auto  rounded-t-3xl px-5 py-6 shadow-md" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className="mt-auto  rounded-t-3xl px-5 py-6 shadow-md" className="bg-surface">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-400">

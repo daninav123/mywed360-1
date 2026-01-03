@@ -212,7 +212,7 @@ export default function PartnersNew() {
         <HeroSection
         title={t('marketing:partners.hero.title')}
         subtitle={t('marketing:partners.hero.description.0') + ' ' + t('marketing:partners.hero.description.1')}
-        image="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&auto=format&fit=crop&q=80"
+        image="/assets/services/partners.png"
       >
         <div className="flex gap-4">
           <PrimaryButton onClick={() => document.getElementById('partners-form')?.scrollIntoView({ behavior: 'smooth' })}>

@@ -14,10 +14,13 @@ let testEnv;
 /** @type {RulesTestEnvironment} */
 
 const PROJECT_ID = 'maloveapp-test';
+const RUN_FIRESTORE_RULES = process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
+const describeIf = RUN_FIRESTORE_RULES ? describe : describe.skip;
 
 beforeAll(async () => {
-  // Carga las reglas del archivo real del proyecto
-  const rules = readFileSync(new URL('../../firestore.rules', import.meta.url), 'utf8');
+  if (!RUN_FIRESTORE_RULES) return;
+  // Carga las reglas del archivo real del proyecto (raíz del monorepo)
+  const rules = readFileSync(new URL('../../../../firestore.rules', import.meta.url), 'utf8');
 
   testEnv = await initializeTestEnvironment({
     projectId: PROJECT_ID,
@@ -45,7 +48,7 @@ beforeAll(async () => {
 }, 60000);
 
 afterAll(async () => {
-  if (testEnv) {
+  if (testEnv && testEnv.cleanup) {
     await testEnv.cleanup();
   }
 });
@@ -55,7 +58,7 @@ const getContext = (uid) => {
   return testEnv.authenticatedContext(uid);
 };
 
-describe('Reglas de Firestore - bodas', () => {
+describeIf('Reglas de Firestore - bodas', () => {
   test('Owner puede leer y escribir su boda', async () => {
     const ctx = getContext('owner1');
     const db = ctx.firestore();
@@ -106,7 +109,7 @@ describe('Reglas de Firestore - bodas', () => {
   });
 });
 
-describe('Colecciones de diagnóstico', () => {
+describeIf('Colecciones de diagnóstico', () => {
   test('_conexion_prueba lectura/escritura sin auth', async () => {
     const ctx = getContext(null); // no autenticado
     const db = ctx.firestore();

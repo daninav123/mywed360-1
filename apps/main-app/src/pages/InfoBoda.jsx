@@ -1,16 +1,13 @@
-import { doc, getDoc, updateDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import { Card, Button, Input } from '../components/ui';
 import ImageUploader from '../components/ImageUploader';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 import { useWedding } from '../context/WeddingContext';
 import useGuests from '../hooks/useGuests';
 import useWeddingData from '../hooks/useWeddingData';
-import { propagateAllChanges } from '../utils/weddingPropagation';
-import { auth, db } from '../firebaseConfig';
 import WeddingVisionSection from '../components/wedding/WeddingVisionSection';
 import SupplierRequirementsSection from '../components/wedding/SupplierRequirementsSection';
 import WeddingDesignChat from '../components/wedding/WeddingDesignChat';
@@ -138,74 +135,8 @@ function InfoBoda() {
   const [ibanCountry, setIbanCountry] = useState('');
 
   const { userProfile, user: authUser } = useAuth();
-  const fallbackUid = authUser?.uid || auth.currentUser?.uid || null;
   const { activeWedding } = useWedding();
   const weddingId = activeWedding || userProfile?.weddingId || '';
-  
-  // Hook de sincronización bidireccional
-  const { syncedData, stats: syncStats, isLoading: isSyncLoading } = useWeddingInfoSync();
-
-  // Actualizar campos sincronizados automáticamente
-  useEffect(() => {
-    if (syncedData && Object.keys(syncedData).length > 0) {
-      setWeddingInfo((prev) => ({
-        ...prev,
-        numGuests: syncedData.numGuests || prev.numGuests,
-        totalBudget: syncedData.totalBudget || prev.totalBudget,
-        _lastSync: syncedData._syncTimestamp
-      }));
-    }
-  }, [syncedData]);
-
-  // Listener de actualizaciones desde proveedores confirmados
-  useEffect(() => {
-    if (!weddingId) return;
-
-    const unsubscribe = onSnapshot(doc(db, 'weddings', weddingId), (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        
-        // Detectar si fue una actualización desde proveedor
-        if (data._lastUpdateSource === 'supplier-acceptance') {
-          const categoryName = data._lastUpdateCategory || 'proveedor';
-          const supplierName = data._lastUpdateSupplierName || '';
-          
-          // Actualizar estado local con los nuevos datos
-          setWeddingInfo((prev) => ({
-            ...prev,
-            ...data,
-          }));
-          
-          // Mostrar notificación de actualización
-          toast.success(
-            t('weddingInfo.toasts.supplierContracted', { supplierName }),
-            { duration: 5000 }
-          );
-          
-          // Notificación adicional con detalles
-          const updatedFields = [];
-          if (data.celebrationPlace) updatedFields.push(t('weddingInfo.toasts.fields.place'));
-          if (data.celebrationAddress) updatedFields.push(t('weddingInfo.toasts.fields.address'));
-          if (data.venueManagerPhone) updatedFields.push(t('weddingInfo.toasts.fields.contact'));
-          if (data.cateringContact) updatedFields.push(t('weddingInfo.toasts.fields.catering'));
-          if (data.photographerContact) updatedFields.push(t('weddingInfo.toasts.fields.photographer'));
-          if (data.musicContact) updatedFields.push(t('weddingInfo.toasts.fields.music'));
-          if (data.coordinatorName) updatedFields.push(t('weddingInfo.toasts.fields.coordinator'));
-          
-          if (updatedFields.length > 0) {
-            toast.info(
-              t('weddingInfo.toasts.fieldsUpdated', { fields: updatedFields.join(', ') }),
-              { duration: 4000 }
-            );
-          }
-        }
-      }
-    }, (error) => {
-      console.error('[InfoBoda] Error en listener:', error);
-    });
-
-    return () => unsubscribe();
-  }, [weddingId]);
 
   const handleWeddingChange = (e) => {
     const { name, value } = e.target;
@@ -215,18 +146,6 @@ function InfoBoda() {
     // Validar IBAN en tiempo real
     if (name === 'giftAccount') {
       handleIBANChange(value);
-    }
-
-    // Propagar cambios críticos inmediatamente
-    const criticalFields = ['weddingDate', 'celebrationPlace', 'celebrationAddress', 'celebrationCity'];
-    if (criticalFields.includes(name)) {
-      const changedFields = [name];
-      const updatedInfo = { ...weddingInfo, [name]: value };
-      setTimeout(() => {
-        propagateAllChanges(weddingId, updatedInfo, changedFields).catch(err => 
-          console.error('[InfoBoda] Error propagating:', err)
-        );
-      }, 500);
     }
   };
 
@@ -425,42 +344,46 @@ function InfoBoda() {
   ];
 
   const saveWeddingInfo = async (showToast = true) => {
-    const uid = fallbackUid;
-    if (!uid) {
+    if (!weddingId) {
       if (showToast) {
-        toast.error(
-          t('profile.errors.userNotFound', { defaultValue: 'No se pudo determinar tu usuario' })
-        );
+        toast.error(t('weddingInfo.toasts.loginRequired'));
       }
       return;
     }
-    // Validaciones rápidas
+
     try {
-      if (weddingId) {
-        await updateDoc(doc(db, 'weddings', weddingId), {
+      const response = await fetch(`${API_URL}/wedding-info/${weddingId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
           weddingInfo,
           webImages: {
             heroImage,
             gallery: galleryImages,
           },
           webSlug,
+          isPublished,
           weddingDesign,
           supplierRequirements,
-          updatedAt: serverTimestamp(),
-        });
-        setLastSavedAt(new Date());
-        setHasUnsavedChanges(false);
-        if (showToast) {
-          toast.success(t('app.savedSuccessfully', { defaultValue: 'Guardado exitosamente' }));
-        }
-      } else {
-        toast.error(
-          t('profile.errors.weddingNotFound', { defaultValue: 'No se encontró tu boda' })
-        );
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al guardar');
+      }
+
+      setLastSavedAt(new Date());
+      if (showToast) {
+        toast.success(t('weddingInfo.toasts.saved'));
       }
     } catch (error) {
-      console.error('Error guardando información:', error);
-      toast.error(t('profile.errors.savingProfile', { defaultValue: 'Error al guardar' }));
+      console.error('Error guardando:', error);
+      if (showToast) {
+        toast.error(t('weddingInfo.toasts.errorSaving'));
+      }
     }
   };
 
@@ -484,13 +407,19 @@ function InfoBoda() {
 
   useEffect(() => {
     const loadWeddingInfo = async () => {
-      const uid = fallbackUid;
-      if (!uid) return;
+      if (!weddingId) return;
       try {
-        if (weddingId) {
-          const wedSnap = await getDoc(doc(db, 'weddings', weddingId));
-          if (wedSnap.exists() && wedSnap.data().weddingInfo) {
-            const wi = wedSnap.data().weddingInfo;
+        const response = await fetch(`${API_URL}/wedding-info/${weddingId}`, {
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar información');
+        }
+        
+        const wedding = await response.json();
+        if (wedding && wedding.weddingInfo) {
+          const wi = wedding.weddingInfo;
             setWeddingInfo({
               coupleName: wi.coupleName || '',
               celebrationPlace: wi.celebrationPlace || '',
@@ -557,23 +486,24 @@ function InfoBoda() {
             if (wi.importantInfo) setImportantInfo(wi.importantInfo);
 
             // Cargar imágenes
-            const webImages = wedSnap.data().webImages || {};
+            const webImages = wedding.webImages || {};
             setHeroImage(webImages.heroImage || '');
             setGalleryImages(webImages.gallery || []);
 
             // Cargar slug
-            setWebSlug(wedSnap.data().webSlug || '');
+            setWebSlug(wedding.webSlug || '');
 
             // Cargar weddingDesign y supplierRequirements
-            if (wedSnap.data().weddingDesign) {
-              setWeddingDesign(wedSnap.data().weddingDesign);
+            if (wedding.weddingDesign) {
+              setWeddingDesign(wedding.weddingDesign);
             }
-            if (wedSnap.data().supplierRequirements) {
-              setSupplierRequirements(wedSnap.data().supplierRequirements);
+            if (wedding.supplierRequirements) {
+              setSupplierRequirements(wedding.supplierRequirements);
             }
           }
         }
       } catch (e) {
+        console.error('[InfoBoda] Error cargando:', e);
         toast.error(
           t('profile.errors.loadingProfile', { defaultValue: 'Error al cargar información' })
         );
@@ -583,7 +513,17 @@ function InfoBoda() {
   }, [weddingId]);
 
   return (
-    <div className="p-4 max-w-6xl mx-auto space-y-6">
+    <>
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+        <div className="mx-auto my-8" style={{
+          maxWidth: '1024px',
+          width: '100%',
+          backgroundColor: '#FFFBF7',
+          borderRadius: '32px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          overflow: 'hidden'
+        }}>
+          <div className="p-6 space-y-6">
       <div className="page-header">
         <div className="flex justify-between items-center">
           <div>
@@ -2094,6 +2034,9 @@ function InfoBoda() {
           )}
         </>
       )}
+          </div>
+        </div>
+      </div>
 
       {/* Modal de chat IA */}
       <WeddingDesignChat
@@ -2109,7 +2052,7 @@ function InfoBoda() {
         onUpdateDesign={setWeddingDesign}
         onUpdateRequirements={setSupplierRequirements}
       />
-    </div>
+    </>
   );
 }
 

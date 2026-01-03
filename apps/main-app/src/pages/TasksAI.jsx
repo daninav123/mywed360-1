@@ -1,7 +1,6 @@
 ﻿import React, { useState, useEffect, useMemo } from 'react';
 import { useWedding } from '../context/WeddingContext';
-import { collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import { toast } from 'react-toastify';
 import { Sparkles, LayoutGrid, Calendar as CalendarIcon, BarChart3, Zap, Filter, Search, AlertCircle, CheckCircle } from 'lucide-react';
 import AIAnalysisPanel from '../components/tasks/AIAnalysisPanel';
@@ -398,7 +397,7 @@ export default function TasksAI() {
             border: '1px solid var(--color-border-soft)',
           }}
         >
-          <p style={{ color: 'var(--color-text)' }}>
+          <p className="text-body">
             No hay boda activa. Por favor selecciona o crea una boda.
           </p>
         </div>
@@ -408,7 +407,7 @@ export default function TasksAI() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="min-h-screen" className="bg-page">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -420,10 +419,10 @@ export default function TasksAI() {
                 fontFamily: "'Playfair Display', serif",
               }}
             >
-              <Sparkles className="w-8 h-8" style={{ color: 'var(--color-primary)' }} />
+              <Sparkles className="w-8 h-8" className="text-primary" />
               Tareas con IA
             </h1>
-            <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="mt-1" className="text-secondary">
               Plan personalizado para tu {weddingContext?.ceremonyType || 'boda'}
             </p>
           </div>
@@ -431,7 +430,7 @@ export default function TasksAI() {
           {/* View mode selector */}
           <div 
             className="flex items-center gap-2 rounded-lg p-1"
-            style={{ backgroundColor: 'var(--color-surface)' }}
+            className="bg-surface"
           >
             <button
               onClick={() => setViewMode('roadmap')}
@@ -582,8 +581,8 @@ export default function TasksAI() {
                         <CalendarIcon className="w-6 h-6" style={{ color: 'var(--color-on-primary)' }} />
                       </div>
                       <div>
-                        <h3 className="font-bold" style={{ color: 'var(--color-text)' }}>⚪ PENDIENTES</h3>
-                        <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                        <h3 className="font-bold" className="text-body">⚪ PENDIENTES</h3>
+                        <span className="text-xs" className="text-secondary">
                           {organizedTasks.pending.length} tareas
                         </span>
                       </div>
@@ -600,7 +599,7 @@ export default function TasksAI() {
                       />
                     ))}
                     {organizedTasks.pending.length === 0 && (
-                      <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
+                      <div className="text-center py-8 " className="text-muted">
                         <p className="text-sm">No hay tareas pendientes</p>
                       </div>
                     )}
@@ -651,7 +650,7 @@ export default function TasksAI() {
                       />
                     ))}
                     {organizedTasks.inProgress.length === 0 && (
-                      <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
+                      <div className="text-center py-8 " className="text-muted">
                         <p className="text-sm">No hay tareas en progreso</p>
                       </div>
                     )}
@@ -684,8 +683,8 @@ export default function TasksAI() {
                         <AlertCircle className="w-6 h-6" style={{ color: 'var(--color-on-primary)' }} />
                       </div>
                       <div>
-                        <h3 className="font-bold" style={{ color: 'var(--color-text)' }}>🟠 BLOQUEADAS</h3>
-                        <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                        <h3 className="font-bold" className="text-body">🟠 BLOQUEADAS</h3>
+                        <span className="text-xs" className="text-secondary">
                           {organizedTasks.blocked.length} tareas
                         </span>
                       </div>
@@ -702,7 +701,7 @@ export default function TasksAI() {
                       />
                     ))}
                     {organizedTasks.blocked.length === 0 && (
-                      <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
+                      <div className="text-center py-8 " className="text-muted">
                         <p className="text-sm">No hay tareas bloqueadas</p>
                       </div>
                     )}
@@ -735,8 +734,8 @@ export default function TasksAI() {
                         <Sparkles className="w-6 h-6" style={{ color: 'var(--color-on-primary)' }} />
                       </div>
                       <div>
-                        <h3 className="font-bold" style={{ color: 'var(--color-text)' }}>✅ COMPLETADAS</h3>
-                        <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                        <h3 className="font-bold" className="text-body">✅ COMPLETADAS</h3>
+                        <span className="text-xs" className="text-secondary">
                           {organizedTasks.completed.length} tareas
                         </span>
                       </div>
@@ -752,7 +751,7 @@ export default function TasksAI() {
                       />
                     ))}
                     {organizedTasks.completed.length === 0 && (
-                      <div className="text-center py-8 " style={{ color: 'var(--color-muted)' }}>
+                      <div className="text-center py-8 " className="text-muted">
                         <p className="text-sm">¡Aún no has completado ninguna tarea!</p>
                       </div>
                     )}
@@ -770,12 +769,12 @@ export default function TasksAI() {
 
           {/* Vista Estadísticas (placeholder) */}
           {viewMode === 'stats' && (
-            <div className=" rounded-xl p-8 text-center border  shadow-sm" style={{ borderColor: 'var(--color-border)' }} style={{ backgroundColor: 'var(--color-surface)' }}>
-              <BarChart3 className="w-16 h-16 mx-auto mb-4 " style={{ color: 'var(--color-muted)' }} />
-              <h3 className="text-xl font-semibold  mb-2" style={{ color: 'var(--color-text)' }}>
+            <div className=" rounded-xl p-8 text-center border  shadow-sm" className="border-default" className="bg-surface">
+              <BarChart3 className="w-16 h-16 mx-auto mb-4 " className="text-muted" />
+              <h3 className="text-xl font-semibold  mb-2" className="text-body">
                 Estadísticas Avanzadas
               </h3>
-              <p className="" style={{ color: 'var(--color-text-secondary)' }}>
+              <p className="" className="text-secondary">
                 Próximamente: Dashboard con análisis profundo y predicciones IA
               </p>
             </div>

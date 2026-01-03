@@ -2,7 +2,7 @@
 
 import EmailDetail from './EmailDetail';
 import useTranslations from '../../hooks/useTranslations';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { processIncomingEmails } from '../../services/emailAutomationService';
 import {
   getMails,

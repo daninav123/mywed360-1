@@ -26,8 +26,8 @@ export default function ShapesPanel({ onAdd }) {
   return (
     <div className="p-4 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold " style={{ color: 'var(--color-text)' }}>Formas</h3>
-        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>
+        <h3 className="text-sm font-semibold " className="text-body">Formas</h3>
+        <p className="text-xs " className="text-secondary">
           Añade formas geométricas a tu diseño
         </p>
       </div>
@@ -39,17 +39,17 @@ export default function ShapesPanel({ onAdd }) {
             <button
               key={shape.id}
               onClick={() => onAdd({ type: 'shape', shape: shape.shape, fill: selectedColor })}
-              className="aspect-square  rounded-lg flex flex-col items-center justify-center gap-2 hover: transition-colors group" style={{ backgroundColor: 'var(--color-bg)' }} style={{ backgroundColor: 'var(--color-bg)' }}
+              className="aspect-square  rounded-lg flex flex-col items-center justify-center gap-2 hover: transition-colors group" className="bg-page" className="bg-page"
             >
-              <Icon className="w-8 h-8  group-hover:" style={{ color: 'var(--color-text-secondary)' }} style={{ color: 'var(--color-text)' }} />
-              <span className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{shape.label}</span>
+              <Icon className="w-8 h-8  group-hover:" className="text-secondary" className="text-body" />
+              <span className="text-xs " className="text-secondary">{shape.label}</span>
             </button>
           );
         })}
       </div>
 
-      <div className="pt-4 border-t " style={{ borderColor: 'var(--color-border)' }}>
-        <div className="text-xs  mb-2" style={{ color: 'var(--color-text-secondary)' }}>Color</div>
+      <div className="pt-4 border-t " className="border-default">
+        <div className="text-xs  mb-2" className="text-secondary">Color</div>
         <div className="grid grid-cols-8 gap-2">
           {colors.map((color) => (
             <button

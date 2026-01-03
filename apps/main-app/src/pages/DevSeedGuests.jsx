@@ -1,16 +1,7 @@
-﻿import {
-  collection,
-  doc,
-  getDocs,
-  limit,
-  query,
-  setDoc,
-  writeBatch,
-  serverTimestamp,
-  deleteDoc,
-} from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 import { db } from '../firebaseConfig';
 // No exigimos autenticación explícita aquí; la ruta es de desarrollo

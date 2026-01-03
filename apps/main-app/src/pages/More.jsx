@@ -9,7 +9,7 @@ import LanguageSelector from '../components/ui/LanguageSelector';
 import NotificationCenter from '../components/NotificationCenter';
 import DarkModeToggle from '../components/DarkModeToggle';
 import Nav from '../components/Nav';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 // PushService import removed; push controls moved out to Notification Center
 
 export default function More() {
@@ -53,7 +53,8 @@ export default function More() {
   // Push handlers removed
 
   return (
-    <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
+    <>
+      <div className="relative flex flex-col min-h-screen pb-20 overflow-y-auto" style={{ backgroundColor: '#EDE8E0' }}>
         {/* Botones superiores derechos */}
         <div className="absolute top-4 right-4 flex items-center space-x-3" style={{ zIndex: 100 }}>
           <LanguageSelector variant="minimal" />
@@ -91,7 +92,7 @@ export default function More() {
                   to="/perfil"
                   onClick={() => setOpenUserMenu(false)}
                   className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
-                  style={{ color: 'var(--color-text)' }}
+                  className="text-body"
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
@@ -105,7 +106,7 @@ export default function More() {
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   className="flex items-center px-3 py-2.5 text-sm rounded-xl transition-all duration-200"
-                  style={{ color: 'var(--color-text)' }}
+                  className="text-body"
                 >
                   <Mail className="w-4 h-4 mr-3" />
                   {t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
@@ -117,7 +118,7 @@ export default function More() {
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm flex items-center" style={{ color: 'var(--color-text)' }}>
+                    <span className="text-sm flex items-center" className="text-body">
                       <Moon className="w-4 h-4 mr-3" />
                       {t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}
                     </span>
@@ -133,7 +134,7 @@ export default function More() {
                     setOpenUserMenu(false);
                   }}
                   className="w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 flex items-center"
-                  style={{ color: 'var(--color-danger)' }}
+                  className="text-danger"
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-10)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
@@ -197,7 +198,7 @@ export default function More() {
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               marginBottom: 0,
-            }}>Gestión de Boda</p>
+            }}>{t('common:inspiration.weddingManagement')}</p>
           </div>
         </header>
 
@@ -208,29 +209,49 @@ export default function More() {
         <div className="relative">
           <button
             onClick={() => setOpenMenu(openMenu === 'invitados' ? null : 'invitados')}
-            className="p-6 flex flex-col text-left w-full transition-all duration-200"
+            className="flex flex-col text-left w-full transition-all duration-200"
             style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border-soft)',
-              borderRadius: 'var(--radius-lg)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              border: '1px solid #EEF2F7',
+              padding: '24px',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-2px)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
-              e.currentTarget.style.borderColor = 'var(--color-primary)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
-              e.currentTarget.style.borderColor = 'var(--color-border-soft)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
             }}
           >
-            <Users size={32} style={{ color: 'var(--color-primary)', marginBottom: '12px' }} />
-            <h2 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              backgroundColor: '#E8F5E9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '16px',
+            }}>
+              <Users size={24} style={{ color: '#4A9B5F' }} />
+            </div>
+            <h2 style={{
+              color: '#1F2937',
+              fontSize: '16px',
+              fontWeight: 600,
+              marginBottom: '6px',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>
               {t('pages.more.sections.guests.title')}
             </h2>
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            <p style={{
+              fontSize: '14px',
+              color: '#6B7280',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>
               {t('pages.more.sections.guests.description')}
             </p>
           </button>
@@ -251,7 +272,7 @@ export default function More() {
               <Link 
                 to="/invitados" 
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -260,7 +281,7 @@ export default function More() {
               <Link
                 to="/invitados/seating"
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -273,29 +294,49 @@ export default function More() {
         <div className="relative">
           <button
             onClick={() => setOpenMenu(openMenu === 'proveedores' ? null : 'proveedores')}
-            className="p-6 flex flex-col text-left w-full transition-all duration-200"
+            className="flex flex-col text-left w-full transition-all duration-200"
             style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border-soft)',
-              borderRadius: 'var(--radius-lg)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              border: '1px solid #EEF2F7',
+              padding: '24px',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-2px)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
-              e.currentTarget.style.borderColor = 'var(--color-primary)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
-              e.currentTarget.style.borderColor = 'var(--color-border-soft)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
             }}
           >
-            <Briefcase size={32} style={{ color: 'var(--color-primary)', marginBottom: '12px' }} />
-            <h2 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              backgroundColor: '#E8F4FD',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '16px',
+            }}>
+              <Briefcase size={24} style={{ color: '#5EBBFF' }} />
+            </div>
+            <h2 style={{
+              color: '#1F2937',
+              fontSize: '16px',
+              fontWeight: 600,
+              marginBottom: '6px',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>
               {t('pages.more.sections.providers.title')}
             </h2>
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            <p style={{
+              fontSize: '14px',
+              color: '#6B7280',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>
               {t('pages.more.sections.providers.description')}
             </p>
           </button>
@@ -316,7 +357,7 @@ export default function More() {
               <Link 
                 to="/proveedores" 
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -325,7 +366,7 @@ export default function More() {
               <Link
                 to="/proveedores/contratos"
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -338,29 +379,49 @@ export default function More() {
         <div className="relative">
           <button
             onClick={() => setOpenMenu(openMenu === 'protocolo' ? null : 'protocolo')}
-            className="p-6 flex flex-col text-left w-full transition-all duration-200"
+            className="flex flex-col text-left w-full transition-all duration-200"
             style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border-soft)',
-              borderRadius: 'var(--radius-lg)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              border: '1px solid #EEF2F7',
+              padding: '24px',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-2px)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
-              e.currentTarget.style.borderColor = 'var(--color-primary)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
-              e.currentTarget.style.borderColor = 'var(--color-border-soft)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
             }}
           >
-            <Clock size={32} style={{ color: 'var(--color-primary)', marginBottom: '12px' }} />
-            <h2 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              backgroundColor: '#FFF3E0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '16px',
+            }}>
+              <Clock size={24} style={{ color: '#FF9800' }} />
+            </div>
+            <h2 style={{
+              color: '#1F2937',
+              fontSize: '16px',
+              fontWeight: 600,
+              marginBottom: '6px',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>
               {t('pages.more.sections.protocol.title')}
             </h2>
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            <p style={{
+              fontSize: '14px',
+              color: '#6B7280',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>
               {t('pages.more.sections.protocol.description')}
             </p>
           </button>
@@ -381,7 +442,7 @@ export default function More() {
               <Link
                 to="/protocolo/momentos-especiales"
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -390,16 +451,16 @@ export default function More() {
               <Link
                 to="/protocolo/timing"
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 {t('pages.more.sections.protocol.links.timing')}
               </Link>
               <Link
-                to="/protocolo/checklist"
+                to="/checklist"
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -408,7 +469,7 @@ export default function More() {
               <Link
                 to="/protocolo/ayuda-ceremonia"
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -417,7 +478,7 @@ export default function More() {
               <Link
                 to="/protocolo/documentos"
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -430,29 +491,49 @@ export default function More() {
         <div className="relative">
           <button
             onClick={() => setOpenMenu(openMenu === 'extras' ? null : 'extras')}
-            className="p-6 flex flex-col text-left w-full transition-all duration-200"
+            className="flex flex-col text-left w-full transition-all duration-200"
             style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border-soft)',
-              borderRadius: 'var(--radius-lg)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              border: '1px solid #EEF2F7',
+              padding: '24px',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-2px)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
-              e.currentTarget.style.borderColor = 'var(--color-primary)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
-              e.currentTarget.style.borderColor = 'var(--color-border-soft)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
             }}
           >
-            <Layers size={32} style={{ color: 'var(--color-primary)', marginBottom: '12px' }} />
-            <h2 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              backgroundColor: '#F3E5F5',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '16px',
+            }}>
+              <Layers size={24} style={{ color: '#AB47BC' }} />
+            </div>
+            <h2 style={{
+              color: '#1F2937',
+              fontSize: '16px',
+              fontWeight: 600,
+              marginBottom: '6px',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>
               {t('pages.more.sections.extras.title')}
             </h2>
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            <p style={{
+              fontSize: '14px',
+              color: '#6B7280',
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+            }}>
               {t('pages.more.sections.extras.description')}
             </p>
           </button>
@@ -473,7 +554,7 @@ export default function More() {
               <Link 
                 to="/diseno-web" 
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -482,7 +563,7 @@ export default function More() {
               <Link 
                 to="/editor-disenos" 
                 className="block px-4 py-3 font-medium transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -491,7 +572,7 @@ export default function More() {
               <Link 
                 to="/disenos" 
                 className="block px-4 py-3 text-sm transition-colors"
-                style={{ color: 'var(--color-text-secondary)' }}
+                className="text-secondary"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -500,7 +581,7 @@ export default function More() {
               <Link 
                 to="/ideas" 
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -509,7 +590,7 @@ export default function More() {
               <Link 
                 to="/momentos" 
                 className="block px-4 py-3 transition-colors"
-                style={{ color: 'var(--color-text)' }}
+                className="text-body"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-lavender)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -521,16 +602,52 @@ export default function More() {
       </div>
 
       {/* Perfil y Configuración */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
         <Link
           to="/info-boda"
-          className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left transition-shadow"
+          className="flex flex-col text-left transition-all duration-200"
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '20px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            border: '1px solid #EEF2F7',
+            padding: '24px',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+          }}
         >
-          <Heart size={32} className="text-primary mb-2" />
-          <h2 className="font-semibold mb-1">
+          <div style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '12px',
+            backgroundColor: '#FCE4EC',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '16px',
+          }}>
+            <Heart size={24} style={{ color: '#C97C8F' }} />
+          </div>
+          <h2 style={{
+            color: '#1F2937',
+            fontSize: '16px',
+            fontWeight: 600,
+            marginBottom: '6px',
+            fontFamily: "'DM Sans', 'Inter', sans-serif",
+          }}>
             {t('pages.more.sections.weddingInfo.title', { defaultValue: 'Información de la Boda' })}
           </h2>
-          <p className="text-sm text-muted">
+          <p style={{
+            fontSize: '14px',
+            color: '#6B7280',
+            fontFamily: "'DM Sans', 'Inter', sans-serif",
+          }}>
             {t('pages.more.sections.weddingInfo.description', {
               defaultValue: 'Configura fecha, lugar, menú, FAQs y más',
             })}
@@ -539,13 +656,49 @@ export default function More() {
 
         <Link
           to="/perfil"
-          className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left transition-shadow"
+          className="flex flex-col text-left transition-all duration-200"
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '20px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            border: '1px solid #EEF2F7',
+            padding: '24px',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+          }}
         >
-          <User size={32} className="text-primary mb-2" />
-          <h2 className="font-semibold mb-1">
+          <div style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '12px',
+            backgroundColor: '#FFF4E6',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '16px',
+          }}>
+            <User size={24} style={{ color: '#D4A574' }} />
+          </div>
+          <h2 style={{
+            color: '#1F2937',
+            fontSize: '16px',
+            fontWeight: 600,
+            marginBottom: '6px',
+            fontFamily: "'DM Sans', 'Inter', sans-serif",
+          }}>
             {t('pages.more.sections.profile.title')}
           </h2>
-          <p className="text-sm text-muted">
+          <p style={{
+            fontSize: '14px',
+            color: '#6B7280',
+            fontFamily: "'DM Sans', 'Inter', sans-serif",
+          }}>
             {t('pages.more.sections.profile.description')}
           </p>
         </Link>
@@ -560,6 +713,9 @@ export default function More() {
       </div>
       </div>
       </div>
-    </div>
+      </div>
+      {/* Bottom Navigation */}
+      <Nav active="more" />
+    </>
   );
 }

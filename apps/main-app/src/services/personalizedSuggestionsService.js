@@ -1,11 +1,11 @@
 /**
  * Servicio de sugerencias personalizadas de música usando OpenAI
  * Genera recomendaciones basadas en gustos del usuario y contexto
+ * Usa el proxy backend para centralizar llamadas a OpenAI
  */
 
 import { generateUserMusicProfile } from './musicPreferencesService';
-
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+import { apiPost } from './apiClient';
 
 /**
  * Generar sugerencias personalizadas para un momento específico
@@ -32,37 +32,30 @@ export async function generatePersonalizedSuggestions({
       count,
     });
 
-    // Llamar a OpenAI
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content:
-              'Eres un experto DJ de bodas y curador musical. Tu especialidad es recomendar canciones perfectas para momentos específicos de bodas, considerando los gustos musicales únicos de cada pareja.',
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        temperature: 0.8,
-        max_tokens: 1500,
-      }),
+    // Llamar a OpenAI vía proxy backend
+    const response = await apiPost('/api/proxy/openai', {
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'Eres un experto DJ de bodas y curador musical. Tu especialidad es recomendar canciones perfectas para momentos específicos de bodas, considerando los gustos musicales únicos de cada pareja.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      temperature: 0.8,
+      max_tokens: 1500,
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      throw new Error(`Proxy OpenAI error: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+    const content = data.response;
 
     if (!content) {
       throw new Error('No content in OpenAI response');
@@ -283,31 +276,28 @@ Responde SOLO con un JSON array en este formato:
   }
 ]`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'Eres un experto DJ de bodas especializado en curar playlists perfectas.',
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        temperature: 0.8,
-        max_tokens: 2000,
-      }),
+    const response = await apiPost('/api/proxy/openai', {
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: 'Eres un experto DJ de bodas especializado en curar playlists perfectas.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      temperature: 0.8,
+      max_tokens: 2000,
     });
 
+    if (!response.ok) {
+      throw new Error(`Proxy OpenAI error: ${response.status}`);
+    }
+
     const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+    const content = data.response;
     const suggestions = parseOpenAISuggestions(content);
 
     return {

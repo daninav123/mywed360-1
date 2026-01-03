@@ -63,11 +63,12 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const sendingRef = useRef(false);
 
-  // Inicializar el email del usuario
+  // Obtener el email del usuario autenticado desde PostgreSQL
   useEffect(() => {
     const initializeEmail = async () => {
       if (userProfile) {
-        const email = await EmailService.initEmailService(userProfile);
+        const email = userProfile.myWed360Email || (await EmailService.initEmailService(userProfile));
+        console.log('[EmailComposer] Email del usuario:', email);
         setUserEmail(email);
       }
     };
@@ -414,9 +415,9 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
               <span className="text-gray-800">
                 {userEmail || tEmail('composer.status.loadingEmail')}
               </span>
-              {userEmail && userEmail.includes('@malove.app') ? (
+              {userEmail && userEmail.includes('@planivia.net') ? (
                 <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                  MaLoveApp
+                  Planivia
                 </span>
               ) : userProfile && !userProfile.emailUsername ? (
                 <a

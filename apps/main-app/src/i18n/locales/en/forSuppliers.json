@@ -1,0 +1,48 @@
+{
+  "hero": {
+    "title": "Grow Your Wedding Business",
+    "subtitle": "Connect with engaged couples and grow your bookings with our professional platform",
+    "cta": {
+      "primary": "Join Now",
+      "secondary": "Learn More"
+    }
+  },
+  "benefits": {
+    "title": "Why Join Planivia",
+    "subtitle": "Everything you need to succeed in the wedding industry",
+    "exposure": {
+      "title": "Maximum Exposure",
+      "description": "Get discovered by thousands of engaged couples looking for services like yours"
+    },
+    "bookings": {
+      "title": "Direct Bookings",
+      "description": "Receive inquiries and manage bookings directly through our platform"
+    },
+    "grow": {
+      "title": "Grow Your Business",
+      "description": "Access analytics and insights to optimize your services and pricing"
+    }
+  },
+  "features": {
+    "title": "Professional Tools",
+    "description": "Everything you need to manage and grow your wedding business",
+    "profile": {
+      "title": "Professional Profile",
+      "description": "Showcase your work with a beautiful portfolio and detailed service listings"
+    },
+    "messaging": {
+      "title": "Direct Messaging",
+      "description": "Communicate with couples and planners directly through our platform"
+    },
+    "reviews": {
+      "title": "Reviews & Ratings",
+      "description": "Build your reputation with verified reviews from real couples"
+    }
+  },
+  "cta": {
+    "title": "Ready to Grow Your Business?",
+    "subtitle": "Join thousands of wedding professionals on Planivia",
+    "primary": "Create Supplier Account",
+    "secondary": "View Pricing"
+  }
+}

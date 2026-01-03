@@ -1,4 +1,4 @@
-﻿import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+﻿const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 

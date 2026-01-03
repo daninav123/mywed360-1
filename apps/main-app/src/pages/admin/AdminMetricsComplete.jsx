@@ -34,9 +34,9 @@ const KPICard = ({ title, value, subtitle, color = 'gray', description = '' }) =
         aria-describedby={hasTooltip ? tooltipId : undefined}
         tabIndex={hasTooltip ? 0 : undefined}
       >
-        <p className="text-xs " style={{ color: 'var(--color-text-secondary)' }}>{title}</p>
+        <p className="text-xs " className="text-secondary">{title}</p>
         <p className={`text-2xl font-bold ${textClass}`}>{value}</p>
-        {subtitle && <p className="text-xs  mt-1" style={{ color: 'var(--color-muted)' }}>{subtitle}</p>}
+        {subtitle && <p className="text-xs  mt-1" className="text-muted">{subtitle}</p>}
       </div>
       {hasTooltip && (
         <div
@@ -98,7 +98,7 @@ const AdminMetricsComplete = () => {
       </div>
 
       {loading ? (
-        <div className="py-12 text-center " style={{ color: 'var(--color-muted)' }}>{t('admin:metrics.loading')}</div>
+        <div className="py-12 text-center " className="text-muted">{t('admin:metrics.loading')}</div>
       ) : (
         <div>
           {activeTab === 'resumen' && <ResumenTab data={data} />}
@@ -264,7 +264,7 @@ const ResumenTab = ({ data }) => {
       {tasksSample.length > 0 && (
         <div className="rounded-lg border p-4">
           <h3 className="font-semibold mb-3">{t('admin:metrics.charts.progressSample')}</h3>
-          <ul className="space-y-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+          <ul className="space-y-2 text-sm " className="text-secondary">
             {tasksSample.map((sample) => (
               <li key={sample.weddingId} className="flex items-center justify-between">
                 <span className="font-medium">
@@ -281,7 +281,7 @@ const ResumenTab = ({ data }) => {
 
       <div className="rounded-lg border p-4">
         <h3 className="font-semibold mb-3">{t('admin:metrics.charts.exploreTitle')}</h3>
-        <p className="text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+        <p className="text-sm " className="text-secondary">
           {t('admin:metrics.charts.exploreDesc')}
         </p>
       </div>
@@ -401,7 +401,7 @@ const ProductoTab = ({ data }) => {
       {Array.isArray(plannerStats.top) && plannerStats.top.length > 0 && (
         <div className="rounded-lg border p-4">
           <h3 className="font-semibold mb-3">{t('admin:metrics.charts.topPlanners')}</h3>
-          <ol className="space-y-2 text-sm " style={{ color: 'var(--color-text-secondary)' }}>
+          <ol className="space-y-2 text-sm " className="text-secondary">
             {plannerStats.top.map((entry, index) => (
               <li key={`${entry.plannerId || 'sin_asignar'}-${index}`} className="flex items-center justify-between">
                 <span>
