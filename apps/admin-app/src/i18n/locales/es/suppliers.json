@@ -1,0 +1,70 @@
+{
+  "plans": {
+    "loading": "Cargando...",
+    "back": "Volver",
+    "pageTitle": "Elige el plan perfecto para tu negocio",
+    "pageSubtitle": "Comienza gratis y escala cuando estés listo",
+    "currentPlan": "PLAN ACTUAL",
+    "mostPopular": "MÁS POPULAR",
+    "free": "Gratis",
+    "monthly": "/mes",
+    "billedAnnually": "Facturado anualmente ({price}€/año)",
+    "upgrade": "Actualizar",
+    "start": "Comenzar",
+    "planTypes": {
+      "free": {
+        "name": "FREE",
+        "period": "Gratis para siempre",
+        "description": "Perfecto para empezar y probar la plataforma",
+        "cta": "Plan Actual"
+      },
+      "basic": {
+        "name": "BASIC",
+        "period": "/mes",
+        "description": "Para profesionales que quieren más visibilidad y leads",
+        "cta": "Mejorar a BASIC"
+      },
+      "pro": {
+        "name": "PRO",
+        "period": "/mes",
+        "description": "Para empresas que buscan máximo rendimiento y control",
+        "cta": "Mejorar a PRO"
+      }
+    },
+    "features": {
+      "publicProfile": "Perfil público básico",
+      "portfolioPhotos": "Hasta 10 fotos en portfolio",
+      "requestsPerMonth": "Hasta 5 solicitudes/mes",
+      "emailNotifications": "Notificaciones por email",
+      "organicSearch": "Búsqueda orgánica",
+      "verifiedBadge": "Badge verificado",
+      "unlimitedRequests": "Solicitudes ilimitadas",
+      "unlimitedPortfolio": "Portfolio ilimitado",
+      "featuredSearches": "Destacado en búsquedas",
+      "advancedAnalytics": "Analíticas avanzadas",
+      "apiWebhooks": "API + Webhooks",
+      "prioritySupport": "Soporte prioritario",
+      "allFromFree": "Todo de FREE, más:",
+      "verifiedBadgeCheck": "Badge verificado ✓",
+      "noWatermark": "Sin marca de agua",
+      "basicStats": "Estadísticas básicas",
+      "autoReplies": "Respuestas automáticas",
+      "teamManager": "Gestor de equipo",
+      "allFromBasic": "Todo de BASIC, más:",
+      "advancedAnalyticsChart": "Analíticas avanzadas 📊",
+      "prioritySupport247": "Soporte prioritario 24/7",
+      "crmIntegration": "Integración con CRM",
+      "whiteLabel": "White label",
+      "customDomain": "Dominio personalizado",
+      "monthlyConsulting": "Consultoría mensual",
+      "betaAccess": "Acceso beta a features",
+      "noPaymentCommissions": "Sin comisiones en pagos",
+      "seoPriority": "Prioridad en SEO"
+    },
+    "toast": {
+      "redirectingPayment": "Redirigiendo a la página de pago...",
+      "welcomePlan": "¡Bienvenido al plan {planName}!",
+      "errorChanging": "Error al procesar el cambio de plan"
+    }
+  }
+}

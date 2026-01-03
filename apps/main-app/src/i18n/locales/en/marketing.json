@@ -1,0 +1,1252 @@
+{
+  "nav": {
+    "home": "Home",
+    "app": "The App",
+    "pricing": "Pricing",
+    "login": "Login / Sign up",
+    "loginShort": "Log in",
+    "signupShort": "Sign up",
+    "plans": "Plans",
+    "accessCenter": "Access Center",
+    "contact": "Contact",
+    "legal": "Legal"
+  },
+  "common": {
+    "copyright": "© {year} Planivia. All rights reserved.",
+    "logoAlt": "Planivia Logo",
+    "contactLabel": "Contact Planivia"
+  },
+  "landing": {
+    "hero": {
+      "title": "Plan Your Perfect Wedding",
+      "subtitle": "From 'Yes!' to 'I Do' - organize every magical moment with the platform loved by thousands of couples worldwide",
+      "cta": {
+        "primary": "Start Planning Free",
+        "secondary": "See How It Works"
+      },
+      "brandLabel": "Planivia",
+      "logoAlt": "Planivia logo",
+      "badge": "All-in-one wedding planning platform",
+      "description": [
+        "Planivia unifies planning, finances, communication, and design in one workspace.",
+        "Streamline daily tasks, engage vendors, and deliver a memorable experience for every guest."
+      ],
+      "actions": {
+        "primary": "Start for free",
+        "secondary": "See everything the app includes"
+      },
+      "highlights": [
+        {
+          "value": "360°",
+          "label": "Full event visibility"
+        },
+        {
+          "value": "+50",
+          "label": "Active integrations"
+        },
+        {
+          "value": "24/7",
+          "label": "Access from any device"
+        }
+      ],
+      "widget": {
+        "summaryLabel": "Overview",
+        "eventName": "Valeria & Tomás Wedding",
+        "growth": "+18% this week",
+        "confirmedGuests": {
+          "label": "Confirmed guests",
+          "value": "132"
+        },
+        "budget": {
+          "label": "Budget executed",
+          "value": "$18.4k",
+          "pendingInvoices": "4 invoices pending"
+        },
+        "tasks": {
+          "label": "Critical tasks this week",
+          "items": [
+            {
+              "day": "21",
+              "text": "Confirm menu tasting and send feedback to catering."
+            },
+            {
+              "day": "22",
+              "text": "Draft VIP seating plan and share it with protocol."
+            }
+          ]
+        },
+        "assistant": {
+          "label": "Planivia assistant",
+          "message": "\"Your timeline is 82% complete. Send the lodging reminder before Monday and confirm the remaining vendors.\""
+        }
+      }
+    },
+    "features": {
+      "title": "Everything You Need, Beautifully Organized",
+      "subtitle": "Powerful tools designed for modern couples",
+      "planning": {
+        "title": "Smart Planning",
+        "description": "Organize every detail with intelligent timelines and automated reminders"
+      },
+      "guests": {
+        "title": "Guest Management",
+        "description": "Track RSVPs, dietary preferences, and seating arrangements effortlessly"
+      },
+      "vendors": {
+        "title": "Vendor Network",
+        "description": "Connect with trusted wedding professionals and manage all communications"
+      }
+    },
+    "benefits": {
+      "title": "Designed for Your Journey",
+      "subtitle": "From engagement to honeymoon, we've got you covered",
+      "collaboration": "Real-time collaboration with your partner",
+      "time": "Save hours with automated workflows",
+      "security": "Secure document storage and contracts",
+      "design": "Beautiful customizable designs",
+      "registry": "Integrated gift registry management",
+      "ai": "AI-powered planning assistant"
+    },
+    "blog": {
+      "title": "Inspiration & Advice",
+      "description": "Discover articles, guides and trends to plan your perfect wedding. From decoration to protocol, everything you need to know.",
+      "cta": {
+        "primary": "Visit Blog",
+        "secondary": "See Articles"
+      }
+    },
+    "social": {
+      "title": "Join 50,000+ Couples Planning Their Dream Wedding",
+      "quote": "This platform transformed our wedding planning from overwhelming to enjoyable. Every detail organized beautifully in one place.",
+      "author": "— Sarah & Michael, married June 2024"
+    },
+    "stats": {
+      "couples": "Happy Couples",
+      "vendors": "Trusted Vendors",
+      "tasks": "Tasks Completed",
+      "rating": "Average Rating"
+    },
+    "explore": {
+      "title": "Explore Our Platform",
+      "subtitle": "Discover all the features and services we offer",
+      "app": {
+        "title": "Wedding Planning App",
+        "description": "Complete suite of tools to organize your perfect day"
+      },
+      "suppliers": {
+        "title": "For Suppliers",
+        "description": "Grow your wedding business with our vendor network"
+      },
+      "planners": {
+        "title": "For Planners",
+        "description": "Professional tools for wedding planning businesses"
+      },
+      "learnMore": "Learn More"
+    },
+    "modules": {
+      "title": "Everything you need in one place",
+      "description": "Planivia streamlines logistics with collaborative modules for planners, vendors, and guests.",
+      "timeline": {
+        "title": "Smart Timeline",
+        "description": "Organize every detail with intelligent task management and automated reminders"
+      },
+      "guests": {
+        "title": "Guest Management",
+        "description": "Complete RSVP system with seating charts and dietary tracking"
+      },
+      "budget": {
+        "title": "Budget & Finance",
+        "description": "Track expenses, payments and vendor contracts in real-time"
+      },
+      "communication": {
+        "title": "Communication Center",
+        "description": "Send invitations, updates and reminders to all guests"
+      },
+      "design": {
+        "title": "Design Tools",
+        "description": "Create beautiful invitations and wedding websites"
+      },
+      "analytics": {
+        "title": "Analytics Dashboard",
+        "description": "Real-time insights and progress tracking for your team"
+      },
+      "items": [
+        {
+          "title": "Guest management",
+          "description": "Centralize RSVPs, seating, and preferences in one place with always-synced information."
+        },
+        {
+          "title": "Finance control",
+          "description": "Track budgets, payments, and contracts with smart reminders and clear reports for your team."
+        },
+        {
+          "title": "Design and communication",
+          "description": "Wedding website, invitations, and email campaigns ready to send from a single workflow."
+        }
+      ]
+    },
+    "planner": {
+      "badge": "Built for planners",
+      "title": "Total control of your event portfolio without spreadsheets.",
+      "description": "Planivia makes it easy to run multiple weddings with dashboards, reusable templates, and exportable reports. Coordinate your team and stay ahead with a single platform.",
+      "highlights": [
+        {
+          "key": "portfolio",
+          "title": "Multi-wedding portfolio",
+          "description": "Manage simultaneous events with independent boards. Switch weddings in one click without losing context."
+        },
+        {
+          "key": "kits",
+          "title": "Repeatable kits",
+          "description": "Duplicate checklists, budgets, and communication templates to reuse your best workflows in seconds."
+        },
+        {
+          "key": "alerts",
+          "title": "Proactive alerts",
+          "description": "Get notified about critical tasks, expiring contracts, and pending payments for every client."
+        }
+      ],
+      "dashboard": {
+        "title": "Planner view",
+        "portfolioLabel": "Current portfolio",
+        "portfolioValue": "8 active weddings",
+        "portfolioBadge": "2 new this month",
+        "statusLabel": "Client status",
+        "statusItems": [
+          "⬢ Ana & Diego – timeline: 92%",
+          "⬢ Laura & Marco – payments: 3 invoices pending",
+          "⬢ Carolina & Javier – guests: 156 confirmed"
+        ],
+        "performanceLabel": "Monthly performance",
+        "performanceNote": "Average time per wedding: 38% less than last year."
+      }
+    },
+    "stories": {
+      "badge": "Real stories",
+      "title": "Planivia empowers planners and couples worldwide",
+      "description": "More than 12k weddings are managed in Planivia. Every team leverages automations, insights, and templates to spend more time on creativity.",
+      "testimonials": [
+        {
+          "quote": "We integrated Planivia into our process and now share dashboards with key vendors. The team arrives prepared to every meeting.",
+          "name": "Martina R.",
+          "role": "Boutique planner in Madrid"
+        },
+        {
+          "quote": "As a couple we needed clarity. The reminders and guest portal let us respond fast without duplicate emails.",
+          "name": "David & Sofía",
+          "role": "250-guest celebration, Bogotá"
+        }
+      ],
+      "trust": {
+        "title": "Trusted by Planivia",
+        "brands": [
+          "Lumiere Events",
+          "Novia Atelier",
+          "Festiva Group",
+          "Urban Weddings"
+        ],
+        "note": "200+ active planners across Europe and LATAM rely on Planivia to standardize processes and deliver memorable experiences."
+      }
+    },
+    "faq": {
+      "badge": "Frequently asked questions",
+      "title": "Everything you need to know before getting started",
+      "items": [
+        {
+          "question": "Can I try Planivia for free?",
+          "answer": "Yes. The Essentials plan is free forever and unlocks core features (guests, tasks, website). The Professional plan offers a 14-day trial with advanced integrations."
+        },
+        {
+          "question": "Does Planivia work for planners running multiple events?",
+          "answer": "Absolutely. The multi-event dashboard lets you switch weddings, share permissions with collaborators, and automate updates with vendors for each event."
+        },
+        {
+          "question": "What onboarding support will I receive?",
+          "answer": "We provide guided onboarding, a template library, and optional consulting. The Enterprise plan includes a dedicated manager and training sessions for your team."
+        }
+      ],
+      "form": {
+        "title": "Request a personalized demo",
+        "description": "Tell us about your operation and schedule a video call with our team. You will receive recommendations tailored to your current workflow and a quick-start guide.",
+        "fields": {
+          "name": {
+            "label": "Full name",
+            "placeholder": "Your name"
+          },
+          "email": {
+            "label": "Contact email",
+            "placeholder": "you@youragency.com"
+          }
+        },
+        "messages": {
+          "submit": "Schedule demo",
+          "submitting": "Sending request...",
+          "success": "Thank you! Our team will reach out in less than 24 hours.",
+          "error": "Please fill in your name and email to request a demo."
+        },
+        "consent": "By submitting you agree to receive Planivia related communications. You can unsubscribe at any time."
+      }
+    },
+    "cta": {
+      "title": "Ready to use in minutes.",
+      "description": "Create your account, import your guest list, and enable automations that support you from day one.",
+      "primary": "Create free account",
+      "secondary": "Compare plans"
+    }
+  },
+  "appOverview": {
+    "hero": {
+      "title": "All-in-One Wedding Planning Platform",
+      "subtitle": "Everything you need to plan, organize, and celebrate your perfect wedding day - all in one beautiful platform",
+      "cta": {
+        "primary": "Start Free Trial",
+        "secondary": "See Pricing"
+      },
+      "description": "From the first checklist to the final report, Planivia supports professional teams and couples who want complete control of their event.",
+      "stats": [
+        {
+          "value": "12k+",
+          "label": "weddings planned with Planivia"
+        },
+        {
+          "value": "4.8/5",
+          "label": "average planner satisfaction"
+        },
+        {
+          "value": "30%",
+          "label": "time saved in logistics coordination"
+        }
+      ],
+      "workspace": {
+        "badge": "Planivia Workspace",
+        "title": "A connected ecosystem",
+        "description": "Synced modules, personalised roles, and granular permissions so you can collaborate without losing context.",
+        "tags": [
+          "Dashboard",
+          "Guests",
+          "Finance",
+          "Communication",
+          "Design",
+          "Automations"
+        ]
+      },
+      "tasks": {
+        "title": "Task Management",
+        "description": "Organize every detail with intelligent task management and automated reminders"
+      },
+      "guests": {
+        "title": "Guest Management",
+        "description": "Complete RSVP system with seating charts and dietary tracking"
+      },
+      "finance": {
+        "title": "Budget & Finance",
+        "description": "Track expenses, payments and vendor contracts in real-time"
+      },
+      "design": {
+        "title": "Design Tools",
+        "description": "Create beautiful invitations and wedding websites"
+      },
+      "analytics": {
+        "title": "Analytics Dashboard",
+        "description": "Real-time insights and progress tracking for your wedding"
+      },
+      "items": [
+        {
+          "title": "Collaborative dashboard",
+          "description": "Tasks, milestones, and reminders in a central board that updates in real time."
+        },
+        {
+          "title": "Provider CRM",
+          "description": "Compare proposals, manage contracts, and track payments and deliverables."
+        },
+        {
+          "title": "Financial management",
+          "description": "Smart budgets, spending control, and detailed reports by category."
+        },
+        {
+          "title": "Guest experience",
+          "description": "Website, automatic RSVP, interactive seating, and personalised messages in a single flow."
+        },
+        {
+          "title": "Email automation",
+          "description": "Prebuilt flows, dynamic segments, and metrics to measure engagement."
+        },
+        {
+          "title": "Intelligent assistant",
+          "description": "AI-powered recommendations to build agendas, checklists, and answer contextual questions."
+        }
+      ]
+    },
+    "modulesTitle": "Core Modules",
+    "modulesSubtitle": "Powerful tools designed to simplify every aspect of wedding planning",
+    "modules": {
+      "timeline": {
+        "title": "Smart Timeline",
+        "description": "Organize every detail with intelligent task management and automated reminders"
+      },
+      "guests": {
+        "title": "Guest Management",
+        "description": "Complete RSVP system with seating charts and dietary tracking"
+      },
+      "budget": {
+        "title": "Budget & Finance",
+        "description": "Track expenses, payments and vendor contracts in real-time"
+      },
+      "communication": {
+        "title": "Communication Center",
+        "description": "Send invitations, updates and reminders to all guests"
+      },
+      "design": {
+        "title": "Design Tools",
+        "description": "Create beautiful invitations and wedding websites"
+      },
+      "analytics": {
+        "title": "Analytics Dashboard",
+        "description": "Real-time insights and progress tracking for your team"
+      }
+    },
+    "features": {
+      "vendors": "Vendor management & contracts",
+      "notifications": "Smart notifications & reminders",
+      "storage": "Secure document storage",
+      "mobile": "Mobile app for iOS & Android",
+      "collaboration": "Collaborative planning tools",
+      "export": "Export & reporting tools"
+    },
+    "integration": {
+      "title": "Everything Works Together Seamlessly",
+      "subtitle": "All modules are deeply integrated to provide a unified experience. Changes sync automatically across every feature."
+    },
+    "collaboration": {
+      "title": "Built for Collaboration",
+      "description": "Invite your partner, family, and wedding planner to collaborate in real-time. Everyone stays updated with automatic notifications and shared access to plans, budgets, and guest lists.",
+      "sync": "Real-time sync across all devices",
+      "permissions": "Role-based permissions for team members",
+      "activity": "Activity feed with full history",
+      "comments": "Comments and notes on every item"
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "subtitle": "Join thousands of couples planning their dream wedding",
+      "primary": "Start Planning Free",
+      "secondary": "View Pricing Plans"
+    },
+    "integrations": {
+      "title": "Integrations and automations that work for you.",
+      "description": "Connect Planivia with payment services, calendars, and communication tools. Configure automatic triggers for RSVP, provider confirmations, or task follow-ups.",
+      "items": [
+        "Integrations with Google Calendar, Gmail, and productivity suites.",
+        "Visual automations with conditions and reusable templates.",
+        "API for internal developments and connections to external systems."
+      ],
+      "cta": {
+        "title": "Immediate access",
+        "description": "Every account includes a free trial and a guided demo with our onboarding team.",
+        "button": "Request demo"
+      }
+    }
+  },
+  "pricing": {
+    "title": "Simple, transparent pricing",
+    "subtitle": "Choose the perfect plan for your wedding journey. All plans include a 14-day free trial.",
+    "billingCycle": {
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "savePercent": "Save 17%"
+    },
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "description": "Perfect for small, intimate weddings",
+        "features": {
+          "guests": "Up to 50 guests",
+          "budgetTracking": "Basic budget tracking",
+          "taskChecklist": "Task checklist",
+          "emailSupport": "Email support",
+          "mobileApp": "Mobile app access",
+          "weddingEvents": "1 wedding event"
+        }
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "Most popular for full-scale weddings",
+        "badge": "Most Popular",
+        "features": {
+          "guests": "Up to 250 guests",
+          "budgetTools": "Advanced budget & finance tools",
+          "seatingChart": "Seating chart designer",
+          "website": "Custom wedding website",
+          "prioritySupport": "Priority support",
+          "unlimitedVendors": "Unlimited vendors",
+          "rsvpManagement": "RSVP management",
+          "giftRegistry": "Gift registry integration"
+        }
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "For wedding planners & luxury events",
+        "features": {
+          "unlimitedGuests": "Unlimited guests",
+          "multiWedding": "Multi-wedding management",
+          "whiteLabel": "White-label options",
+          "accountManager": "Dedicated account manager",
+          "customIntegrations": "Custom integrations",
+          "teamTools": "Team collaboration tools",
+          "analytics": "Advanced analytics",
+          "apiAccess": "API access"
+        }
+      }
+    },
+    "perMonth": "month",
+    "perYear": "year",
+    "startFreeTrial": "Start Free Trial",
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about our pricing",
+      "questions": {
+        "changePlans": {
+          "q": "Can I change plans later?",
+          "a": "Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately."
+        },
+        "afterTrial": {
+          "q": "What happens after the free trial?",
+          "a": "After your 14-day trial, you'll be charged based on your selected plan. Cancel anytime during the trial with no charges."
+        },
+        "refunds": {
+          "q": "Do you offer refunds?",
+          "a": "Yes, we offer a 30-day money-back guarantee on all annual plans."
+        },
+        "multipleWeddings": {
+          "q": "Can I use it for multiple weddings?",
+          "a": "The Premium plan supports unlimited weddings. Other plans are for single wedding events."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Still Have Questions?",
+      "subtitle": "Our team is here to help you find the perfect plan",
+      "button": "Contact Sales"
+    },
+    "footer": "© 2025 Wedding Planner. Making dream weddings come true.",
+    "free": "Free",
+    "pro": "Professional",
+    "enterprise": "Enterprise",
+    "cta": "Get started"
+  },
+  "planners": {
+    "meta": {
+      "title": "Planivia for planners | Run multiple weddings from a single workspace",
+      "description": "Coordinate weddings with your team, centralize vendors, and automate workflows with the professional Planivia platform.",
+      "canonical": "https://planivia.net/para-planners",
+      "ogTitle": "Planivia for planners | Run multiple weddings from a single workspace",
+      "ogDescription": "Manage projects, finances, and communication with tools built for wedding planners.",
+      "image": "https://planivia.net/maloveapp-logo.png",
+      "twitterTitle": "Planivia for planners | Run multiple weddings from a single workspace",
+      "twitterDescription": "Streamline your wedding planning agency with dashboards, automations, and collaborative tools."
+    },
+    "hero": {
+      "logoAlt": "Planivia",
+      "brand": "Planivia",
+      "badge": "For Wedding Planners",
+      "title": "Manage every wedding from one professional platform",
+      "description": [
+        "Planivia is the definitive software for wedding planners—multi-wedding dashboard, reusable templates, collaborative teamwork, and real-time analytics.",
+        "Your clients automatically access premium features. No hidden fees."
+      ],
+      "primaryCta": "Start free for 14 days",
+      "secondaryCta": "View plans",
+      "stats": {
+        "label": "Your Dashboard",
+        "title": "Planner View",
+        "badge": "8 active weddings",
+        "cards": [
+          {
+            "title": "Ana & Diego",
+            "subtitle": "Progress: 92%",
+            "badge": "In progress"
+          },
+          {
+            "title": "Laura & Marco",
+            "subtitle": "3 pending payments",
+            "badge": "Attention"
+          },
+          {
+            "title": "Carolina & Javier",
+            "subtitle": "156 confirmed",
+            "badge": "Guests"
+          }
+        ]
+      }
+    },
+    "benefits": {
+      "sectionTitle": "Everything you need to run weddings professionally",
+      "sectionDescription": "Tools crafted specifically for wedding planners",
+      "multiWedding": {
+        "title": "Multi-wedding management",
+        "description": "Unified dashboard to manage all your active weddings. Switch between events with one click."
+      },
+      "team": {
+        "title": "Collaborative team",
+        "description": "Invite collaborators, assign tasks, and keep your entire team in sync in real time."
+      },
+      "templates": {
+        "title": "Reusable templates",
+        "description": "Duplicate checklists, budgets, and successful workflows to standardize your operation."
+      },
+      "analytics": {
+        "title": "Advanced analytics",
+        "description": "Performance reports, KPIs per wedding, and a consolidated dashboard for your agency."
+      },
+      "premiumClients": {
+        "title": "Clients on premium",
+        "description": "Couples you manage automatically get premium features at no extra cost."
+      },
+      "marketplace": {
+        "title": "Marketplace visibility",
+        "description": "Be featured in our planner marketplace to win new clients."
+      }
+    },
+    "plans": {
+      "badge": "Plans for Planners",
+      "sectionTitle": "Choose the plan that fits your agency",
+      "sectionDescription": "All plans include free updates and support",
+      "freeLabel": "Free",
+      "exploratory": {
+        "name": "Exploratory",
+        "badge": "Free trial",
+        "suffix": "forever",
+        "description": "Perfect for getting to know the platform",
+        "weddings": "0 real weddings",
+        "features": [
+          "Full demo access",
+          "Explore every feature",
+          "Preloaded sample data",
+          "Perfect for onboarding",
+          "No credit card required"
+        ],
+        "cta": "Start for free"
+      },
+      "studio": {
+        "name": "Studio",
+        "badge": "Independent planners",
+        "suffix": "/year",
+        "description": "For planners handling a handful of weddings each year",
+        "weddings": "Up to 5 active weddings",
+        "features": [
+          "5 active weddings at once",
+          "Duplicable templates",
+          "Marketplace priority",
+          "Your clients in premium mode",
+          "Unlimited exports",
+          "Priority support"
+        ],
+        "cta": "Start with Studio"
+      },
+      "studioPlus": {
+        "name": "Studio Plus",
+        "badge": "More collaborators",
+        "suffix": "/year",
+        "description": "Studio with team capacity and specialized support",
+        "weddings": "Up to 5 weddings + 7 collaborators",
+        "features": [
+          "Everything in Studio",
+          "+7 collaborators included",
+          "Vendor concierge",
+          "Preferred negotiations",
+          "Sessions with specialists",
+          "Advanced analytics"
+        ],
+        "cta": "Choose Studio Plus"
+      },
+      "agency": {
+        "name": "Agency",
+        "badge": "Boutique agencies",
+        "suffix": "/year",
+        "description": "For boutique agencies managing multiple weddings",
+        "weddings": "Up to 10 active weddings",
+        "features": [
+          "10 active weddings at once",
+          "10 collaborators",
+          "Marketplace PRO",
+          "Multi-client automations",
+          "Custom reports",
+          "Consolidated analytics"
+        ],
+        "cta": "Start with Agency"
+      },
+      "agencyPlus": {
+        "name": "Agency Plus",
+        "badge": "White label",
+        "suffix": "/year",
+        "description": "Agency with your branding and dedicated support",
+        "weddings": "Up to 10 weddings + white label",
+        "features": [
+          "Everything in Agency",
+          "Full white label",
+          "No Planivia branding",
+          "API integrations",
+          "24/7 dedicated support",
+          "Personalized onboarding"
+        ],
+        "cta": "Choose Agency Plus"
+      },
+      "teams": {
+        "name": "Teams",
+        "badge": "Large teams",
+        "suffix": "/year",
+        "description": "For agencies with high volume",
+        "weddings": "Up to 40 active weddings",
+        "features": [
+          "40 active weddings at once",
+          "1 lead planner + 3 additional",
+          "Team management",
+          "Consolidated dashboard",
+          "Task assignment",
+          "Productivity reports"
+        ],
+        "cta": "Start with Teams"
+      },
+      "teamsUnlimited": {
+        "name": "Teams Unlimited",
+        "badge": "Enterprise",
+        "suffix": "/year",
+        "description": "No limits, maximum customization",
+        "weddings": "Unlimited weddings",
+        "features": [
+          "Unlimited weddings",
+          "Unlimited collaborators",
+          "White label + custom domain",
+          "Custom API",
+          "24/7 dedicated support",
+          "Personalized training"
+        ],
+        "cta": "Contact for Enterprise"
+      }
+    },
+    "useCases": {
+      "badge": "Use Cases",
+      "sectionTitle": "Find the ideal plan for your operation",
+      "recommendedLabel": "Recommended",
+      "independent": {
+        "title": "Independent planners",
+        "description": "Manage 1-5 weddings per year with professional organization",
+        "recommended": "Studio or Studio Plus"
+      },
+      "boutique": {
+        "title": "Boutique agencies",
+        "description": "Small team handling 5-15 weddings annually",
+        "recommended": "Agency or Agency Plus"
+      },
+      "established": {
+        "title": "Established agencies",
+        "description": "Large teams with 30+ weddings per year",
+        "recommended": "Teams or Teams Unlimited"
+      }
+    },
+    "testimonials": {
+      "0": {
+        "quote": "Planivia transformed our operation. We used to rely on spreadsheets and lost hours on manual tasks. Now everything is centralized and automated.",
+        "name": "María González",
+        "role": "Director at Momentos Perfectos"
+      },
+      "1": {
+        "quote": "Best ROI we've seen. We recovered the investment in the first month just from the time saved coordinating with clients.",
+        "name": "Carlos Ruiz",
+        "role": "Independent Wedding Planner"
+      },
+      "2": {
+        "quote": "Reusable templates are a game changer. We clone a successful wedding and have the entire setup ready in minutes.",
+        "name": "Ana Martínez",
+        "role": "Founder, Eventos Especiales"
+      },
+      "badge": "Testimonials",
+      "sectionTitle": "Wedding planners already trust us"
+    },
+    "demo": {
+      "badge": "Personalized Demo",
+      "title": "Schedule a demo with our team",
+      "description": "We'll show you how Planivia can transform your agency operations. No commitment.",
+      "checklist": [
+        "Review of your current workflow",
+        "Personalized recommendations",
+        "ROI estimation for your agency",
+        "Answers to all your questions"
+      ],
+      "form": {
+        "title": "Request your demo",
+        "description": "Fill out the form and we'll contact you in under 24 hours.",
+        "fields": {
+          "name": {
+            "label": "Full name *",
+            "placeholder": "Your name"
+          },
+          "email": {
+            "label": "Email *",
+            "placeholder": "you@email.com"
+          },
+          "company": {
+            "label": "Agency/Business",
+            "placeholder": "Your agency name"
+          }
+        },
+        "submit": "Request demo",
+        "submitting": "Sending...",
+        "messages": {
+          "success": "Thank you! We'll reach out soon to schedule your personalized demo.",
+          "error": "Please fill in all required fields."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Start managing your weddings professionally today",
+      "description": "Try it free for 14 days. No credit card required. Cancel anytime.",
+      "primary": "Start free trial",
+      "secondary": "See all plans"
+    }
+  },
+  "partners": {
+    "meta": {
+      "title": "Partner Program | Planivia",
+      "description": "Join the Planivia partner program and earn recurring commissions with marketing resources, training, and dedicated support.",
+      "canonical": "https://planivia.net/partners",
+      "ogTitle": "Partner Program | Planivia",
+      "ogDescription": "Earn recurring revenue by recommending Planivia to planners and vendors with enablement materials and real-time tracking.",
+      "image": "https://planivia.net/maloveapp-logo.png",
+      "twitterTitle": "Partner Program | Planivia",
+      "twitterDescription": "Generate recurring commissions by promoting the all-in-one wedding planning platform."
+    },
+    "hero": {
+      "logoAlt": "Planivia",
+      "brand": "Planivia",
+      "badge": "Partner Program",
+      "title": "Earn commissions by helping couples plan their perfect wedding",
+      "description": [
+        "Join our partner program and receive recurring commissions for every client you refer to Planivia.",
+        "No upfront investment. Attractive payouts. Marketing assets included."
+      ],
+      "cta": "Request Program Access"
+    },
+    "benefits": {
+      "title": "Why become a Planivia partner?",
+      "subtitle": "Benefits designed to maximise your earning potential",
+      "items": [
+        {
+          "icon": "commissions",
+          "title": "Attractive commissions",
+          "description": "Earn recurring commissions for every subscription you sell."
+        },
+        {
+          "icon": "analytics",
+          "title": "Tracking dashboard",
+          "description": "Monitor conversions, commissions, and stats in real time."
+        },
+        {
+          "icon": "materials",
+          "title": "Marketing collateral",
+          "description": "Access presentations, demos, and assets to accelerate your sales."
+        },
+        {
+          "icon": "support",
+          "title": "Dedicated support",
+          "description": "A partner success team ready to help you with prospects."
+        },
+        {
+          "icon": "training",
+          "title": "Included training",
+          "description": "Full onboarding on the platform and best practices to sell it."
+        },
+        {
+          "icon": "unlimited",
+          "title": "No limits",
+          "description": "There is no cap on your commissions—the more you sell, the more you earn."
+        }
+      ]
+    },
+    "process": {
+      "badge": "Simple process",
+      "title": "How it works",
+      "subtitle": "Start earning in 4 easy steps",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Join the program",
+          "description": "Submit the application form and wait for our approval."
+        },
+        {
+          "step": "2",
+          "title": "Get trained",
+          "description": "Access materials and training sessions about the platform."
+        },
+        {
+          "step": "3",
+          "title": "Share your link",
+          "description": "Receive your unique affiliate link to track conversions."
+        },
+        {
+          "step": "4",
+          "title": "Earn commissions",
+          "description": "Collect recurring commissions for every customer who subscribes."
+        }
+      ]
+    },
+    "profiles": {
+      "badge": "Ideal profile",
+      "title": "Are you a good fit?",
+      "subtitle": "We look for professionals connected to the wedding industry",
+      "items": [
+        {
+          "icon": "consultants",
+          "title": "Wedding consultants",
+          "description": "Advisors who work with couples and can recommend professional tools."
+        },
+        {
+          "icon": "influencers",
+          "title": "Industry influencers",
+          "description": "Creators with an audience interested in wedding planning."
+        },
+        {
+          "icon": "eventPros",
+          "title": "Event professionals",
+          "description": "Planners who can introduce Planivia within their network."
+        }
+      ]
+    },
+    "form": {
+      "anchor": "partners-form",
+      "badge": "Access request",
+      "title": "Join the Partner Program",
+      "description": "Complete the form and our team will review your application. We will contact you within 48 hours.",
+      "fields": {
+        "name": {
+          "label": "Full name *",
+          "placeholder": "Your name"
+        },
+        "email": {
+          "label": "Email *",
+          "placeholder": "you@email.com"
+        },
+        "experience": {
+          "label": "Industry experience",
+          "placeholder": "Choose an option",
+          "options": [
+            {
+              "value": "consultant",
+              "label": "Wedding consultant"
+            },
+            {
+              "value": "influencer",
+              "label": "Influencer / Content creator"
+            },
+            {
+              "value": "event-pro",
+              "label": "Event professional"
+            },
+            {
+              "value": "supplier",
+              "label": "Wedding vendor"
+            },
+            {
+              "value": "other",
+              "label": "Other"
+            }
+          ]
+        },
+        "about": {
+          "label": "Tell us about you",
+          "placeholder": "Describe your experience, network, and why you want to become a partner..."
+        }
+      },
+      "submit": "Submit application",
+      "submitting": "Sending...",
+      "messages": {
+        "success": "Thanks for your interest! We will review your application and get in touch shortly.",
+        "error": "Please fill in all required fields."
+      },
+      "consent": "By submitting you agree that we review your profile and contact you regarding the Planivia partner program. We never share your information with third parties."
+    },
+    "finalCta": {
+      "title": "Ready to start earning recurring revenue?",
+      "description": "Join our partner program and start earning commissions today.",
+      "primary": "Request access now"
+    },
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "ProgramMembership",
+      "name": "Planivia Partner Program",
+      "description": "Join the Planivia partner program and earn recurring commissions by recommending our wedding planning platform.",
+      "url": "https://planivia.net/partners",
+      "hostingOrganization": {
+        "@type": "Organization",
+        "name": "Planivia",
+        "url": "https://planivia.net",
+        "logo": "https://planivia.net/maloveapp-logo.png",
+        "sameAs": [
+          "https://www.linkedin.com/company/maloveapp",
+          "https://www.instagram.com/planivia.net",
+          "https://www.facebook.com/maloveapp"
+        ]
+      }
+    }
+  },
+  "suppliers": {
+    "meta": {
+      "title": "Planivia for suppliers | Reach qualified couples",
+      "description": "Publish your portfolio on Planivia, reach couples in your area and receive qualified enquiries with centralised metrics and messaging.",
+      "ogTitle": "Planivia for suppliers | Reach qualified couples",
+      "ogDescription": "Manage your presence, pay only per view and convert couples into clients with professional tools.",
+      "twitterTitle": "Planivia for suppliers | Reach qualified couples",
+      "twitterDescription": "Showcase your wedding business, receive qualified leads and get real-time analytics.",
+      "canonical": "https://planivia.net/para-proveedores",
+      "image": "https://planivia.net/maloveapp-logo.png"
+    },
+    "hero": {
+      "brand": "Planivia",
+      "logoAlt": "Planivia logo",
+      "badge": "For Wedding Suppliers",
+      "title": "Connect with couples looking for your services",
+      "description": [
+        "Planivia helps you reach thousands of couples planning their wedding. Pay-per-view model with no monthly subscriptions or commission fees.",
+        "Build a professional portfolio, receive qualified requests and manage everything from your dashboard."
+      ],
+      "primaryCta": "Create your profile for free",
+      "secondaryCta": "See how it works",
+      "stats": {
+        "label": "Your dashboard",
+        "title": "Supplier panel",
+        "growthBadge": "+24% this month",
+        "metrics": [
+          {
+            "icon": "eye",
+            "label": "Profile views",
+            "value": "1,248",
+            "hint": "156 tokens available"
+          },
+          {
+            "icon": "messageSquare",
+            "label": "Requests",
+            "value": "47",
+            "hint": "12 waiting for reply"
+          },
+          {
+            "icon": "star",
+            "label": "Rating",
+            "value": "4.9",
+            "hint": "Based on 28 reviews"
+          }
+        ]
+      }
+    },
+    "benefits": {
+      "title": "Why suppliers choose Planivia",
+      "subtitle": "Professional tools to grow your wedding business",
+      "items": [
+        {
+          "icon": "users",
+          "title": "Reach thousands of couples",
+          "description": "Appear in search results when couples look for services like yours in their area."
+        },
+        {
+          "icon": "camera",
+          "title": "Professional portfolio",
+          "description": "Create a public page with photo gallery, services, pricing and reviews."
+        },
+        {
+          "icon": "messageSquare",
+          "title": "Direct enquiries",
+          "description": "Couples contact you directly within the platform with their needs and contact details."
+        },
+        {
+          "icon": "barChart",
+          "title": "Management dashboard",
+          "description": "Track enquiries, conversations and projects from a single panel."
+        },
+        {
+          "icon": "trendingUp",
+          "title": "No commission fees",
+          "description": "Only pay per view. We never charge commission on signed contracts."
+        },
+        {
+          "icon": "shield",
+          "title": "Verified supplier badge",
+          "description": "Increase trust with a verification badge for potential clients."
+        }
+      ]
+    },
+    "howItWorks": {
+      "badge": "Simple process",
+      "title": "How it works",
+      "description": "Five steps to start receiving wedding enquiries",
+      "steps": [
+        {
+          "title": "Sign up for free",
+          "description": "Create your supplier account with no cost or obligation."
+        },
+        {
+          "title": "Complete your profile",
+          "description": "Add photos, services, pricing and coverage areas."
+        },
+        {
+          "title": "Buy credits",
+          "description": "Purchase view tokens according to your needs. No monthly subscriptions."
+        },
+        {
+          "title": "Appear in searches",
+          "description": "When a couple looks for your category, your profile can show up and uses 1 token."
+        },
+        {
+          "title": "Receive enquiries",
+          "description": "Interested couples send you quote requests with all their information."
+        }
+      ]
+    },
+    "tokens": {
+      "badge": "Token system",
+      "title": "Pay per view, no surprises",
+      "description": "You only pay when your profile appears in a couple’s search results",
+      "howTitle": "How do tokens work?",
+      "howList": [
+        "Purchase token packs that fit your goals (e.g. 100, 500, 1,000 tokens)",
+        "When a couple searches your category, your profile can be shown",
+        "If you appear in their results, 1 token is consumed",
+        "Tokens never expire—you use them at your own pace",
+        "Pause your profile whenever you want without losing tokens"
+      ],
+      "includedTitle": "What’s included",
+      "included": [
+        "Pay-per-view token model",
+        "No fixed monthly subscription",
+        "Buy exactly the tokens you need",
+        "Tokens never expire",
+        "No commission on booked contracts",
+        "Dashboard and messaging included",
+        "Customisable public portfolio page",
+        "Unlimited portfolio updates"
+      ],
+      "notice": "💡 Pricing for token packs will be announced soon"
+    },
+    "testimonials": {
+      "badge": "Testimonials",
+      "title": "Suppliers already growing with Planivia",
+      "items": [
+        {
+          "quote": "Since joining Planivia I receive qualified enquiries every week. Couples arrive with clear information and defined budgets.",
+          "name": "Carlos Mendoza",
+          "role": "Wedding photographer",
+          "rating": 5
+        },
+        {
+          "quote": "I love the token system. I only pay when I am seen, unlike other platforms with monthly fees even if you get no clients.",
+          "name": "Laura Vega",
+          "role": "Wedding planner",
+          "rating": 5
+        },
+        {
+          "quote": "The dashboard is complete. I manage enquiries, chats and contracts from a single place.",
+          "name": "Roberto Jiménez",
+          "role": "Catering & events",
+          "rating": 5
+        }
+      ]
+    },
+    "categoriesSection": {
+      "badge": "Available categories",
+      "title": "Does your business fit Planivia?",
+      "description": "We work with every kind of wedding supplier",
+      "list": [
+        "Photography & Video",
+        "Catering & Banquets",
+        "Venues",
+        "Music & DJs",
+        "Decor & Flowers",
+        "Dresses & Suits",
+        "Beauty & Styling",
+        "Invitations & Stationery",
+        "Cakes & Desserts",
+        "Transportation",
+        "Entertainment",
+        "Wedding Planner",
+        "Other"
+      ],
+      "formTitle": "Request more information",
+      "formDescription": "Fill in the form and our team will reach out to explain every step."
+    },
+    "form": {
+      "fields": {
+        "name": {
+          "label": "Full name *",
+          "placeholder": "Your name"
+        },
+        "email": {
+          "label": "Email *",
+          "placeholder": "you@email.com"
+        },
+        "business": {
+          "label": "Business name *",
+          "placeholder": "Your company"
+        },
+        "category": {
+          "label": "Category",
+          "placeholder": "Select a category"
+        }
+      },
+      "submit": "Request information",
+      "submitting": "Sending...",
+      "consent": "By submitting you agree to be contacted about Planivia for suppliers.",
+      "messages": {
+        "success": "Thank you! We will get in touch within 24 hours.",
+        "error": "Please fill in all the required fields."
+      }
+    },
+    "finalCta": {
+      "title": "Start receiving wedding enquiries today",
+      "description": "Register for free, complete your profile and appear in thousands of searches.",
+      "primary": "Register now",
+      "secondary": "See more details"
+    },
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Planivia for suppliers",
+      "serviceType": "Qualified lead generation for wedding suppliers",
+      "provider": {
+        "@type": "Organization",
+        "name": "Planivia",
+        "url": "https://planivia.net",
+        "logo": "https://planivia.net/maloveapp-logo.png"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Spain"
+      },
+      "serviceAudience": {
+        "@type": "Audience",
+        "audienceType": "Wedding suppliers and professionals"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://planivia.net/para-proveedores",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/InStock",
+        "description": "Pay-per-view system with portfolio, analytics and integrated messaging tools."
+      }
+    }
+  },
+  "footer": {
+    "product": "Product",
+    "features": "Features",
+    "pricing": "Pricing",
+    "demo": "Request Demo",
+    "forProfessionals": "For Professionals",
+    "suppliers": "Suppliers",
+    "planners": "Wedding Planners",
+    "partners": "Partners",
+    "company": "Company",
+    "about": "About Us",
+    "contact": "Contact",
+    "blog": "Blog",
+    "support": "Support",
+    "help": "Help Center",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  }
+}

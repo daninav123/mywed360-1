@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Peony flower -->
+  <g id="peony" transform="translate(60, 60)">
+    <!-- Outer petals -->
+    <ellipse cx="0" cy="-35" rx="18" ry="25" fill="#F5D5E0" opacity="0.8" transform="rotate(0 0 -35)"/>
+    <ellipse cx="25" cy="-25" rx="18" ry="25" fill="#F0C5D5" opacity="0.8" transform="rotate(45 25 -25)"/>
+    <ellipse cx="35" cy="0" rx="18" ry="25" fill="#EBB5CA" opacity="0.8" transform="rotate(90 35 0)"/>
+    <ellipse cx="25" cy="25" rx="18" ry="25" fill="#F5D5E0" opacity="0.8" transform="rotate(135 25 25)"/>
+    <ellipse cx="0" cy="35" rx="18" ry="25" fill="#F0C5D5" opacity="0.8" transform="rotate(180 0 35)"/>
+    <ellipse cx="-25" cy="25" rx="18" ry="25" fill="#EBB5CA" opacity="0.8" transform="rotate(225 -25 25)"/>
+    <ellipse cx="-35" cy="0" rx="18" ry="25" fill="#F5D5E0" opacity="0.8" transform="rotate(270 -35 0)"/>
+    <ellipse cx="-25" cy="-25" rx="18" ry="25" fill="#F0C5D5" opacity="0.8" transform="rotate(315 -25 -25)"/>
+    
+    <!-- Middle layer -->
+    <ellipse cx="0" cy="-22" rx="14" ry="20" fill="#E8A5BC" opacity="0.85" transform="rotate(22.5 0 -22)"/>
+    <ellipse cx="22" cy="0" rx="14" ry="20" fill="#E095AF" opacity="0.85" transform="rotate(112.5 22 0)"/>
+    <ellipse cx="0" cy="22" rx="14" ry="20" fill="#D885A2" opacity="0.85" transform="rotate(202.5 0 22)"/>
+    <ellipse cx="-22" cy="0" rx="14" ry="20" fill="#E8A5BC" opacity="0.85" transform="rotate(292.5 -22 0)"/>
+    
+    <!-- Inner petals -->
+    <circle cx="0" cy="0" r="16" fill="#E095AF" opacity="0.9"/>
+    <circle cx="0" cy="0" r="12" fill="#D885A2" opacity="0.85"/>
+    <circle cx="0" cy="0" r="8" fill="#CF7595" opacity="0.9"/>
+    
+    <!-- Center -->
+    <circle cx="0" cy="0" r="5" fill="#B85D7F" opacity="0.95"/>
+    <circle cx="0" cy="0" r="2" fill="#9D4A6A" opacity="1"/>
+    
+    <!-- Stamens -->
+    <g opacity="0.6">
+      <circle cx="0" cy="-3" r="1.5" fill="#D4A574"/>
+      <circle cx="3" cy="0" r="1.5" fill="#D4A574"/>
+      <circle cx="0" cy="3" r="1.5" fill="#D4A574"/>
+      <circle cx="-3" cy="0" r="1.5" fill="#D4A574"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,46 @@
+# CA - Canadá
+
+**Estado de verificación**: ⚠️ VERIFICACIÓN PARCIAL  
+**Última actualización**: 28/12/2025  
+**Verificado por**: Fuentes secundarias  
+**Próxima revisión**: 28/03/2026
+
+---
+
+## ℹ️ Información General
+
+**Fuente oficial primaria**: ⚠️ PENDIENTE  
+**Autoridad competente**: Provincial/Territorial Registry (varía por provincia)  
+
+---
+
+## 💍 MATRIMONIO CIVIL
+
+### Autoridad
+**⚠️ PENDIENTE DE VERIFICAR** - Varía por provincia/territorio
+
+### 📄 Documentos Requeridos
+**⚠️ PENDIENTE DE VERIFICAR**
+
+### 📋 Procedimiento
+**⚠️ PENDIENTE DE VERIFICAR**
+
+### ⏱️ Plazos
+**⚠️ PENDIENTE DE VERIFICAR**
+
+### 💰 Costos
+**⚠️ PENDIENTE DE VERIFICAR**
+
+---
+
+## 🏳️‍🌈 MATRIMONIO IGUALITARIO
+**Estado**: ✅ **LEGAL** - CONFIRMADO
+
+**VERIFICADO:**
+- Matrimonio igualitario legal en Canadá
+- Desde 2005
+
+---
+
+**Última verificación**: 28/12/2025  
+**Nivel de confianza**: BAJO (excepto marriage equality)

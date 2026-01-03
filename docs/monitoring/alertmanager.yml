@@ -1,0 +1,28 @@
+route:
+  receiver: 'default'
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 2h
+
+receivers:
+  - name: 'default'
+    # Slack (opcional): usa un Incoming Webhook
+    slack_configs:
+      - send_resolved: true
+        api_url: ${SLACK_WEBHOOK_URL}
+        channel: '#wind-surf-alerts'
+        title: '{{ template  – slack.title –  . }}'
+        text: '{{ template  – slack.text –  . }}'
+    # Email (opcional): usa SMTP del sistema/relay externo
+    email_configs:
+      - to: ${ALERT_EMAIL_TO}
+        from: ${ALERT_EMAIL_FROM}
+        smarthost: '${SMTP_HOST}:${SMTP_PORT}'
+        auth_username: ${SMTP_USER}
+        auth_password: ${SMTP_PASS}
+        require_tls: true
+
+# Templates básicos
+templates:
+  - 'alertmanager.tmpl'

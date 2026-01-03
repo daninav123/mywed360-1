@@ -1,0 +1,24 @@
+{
+  "watch": [
+    "index.js",
+    "routes/**/*.js",
+    "middlewares/**/*.js",
+    "utils/**/*.js",
+    "db.js",
+    "logger.js",
+    ".env",
+    ".env.local"
+  ],
+  "ignore": [
+    "node_modules/**",
+    "logs/**",
+    "*.log",
+    "../docs/**",
+    "../src/**",
+    "../dist/**",
+    "../public/**",
+    "test/**"
+  ],
+  "ext": "js,json",
+  "exec": "node index.js"
+}

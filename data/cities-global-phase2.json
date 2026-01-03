@@ -1,0 +1,483 @@
+{
+  "phase2Countries": [
+    {
+      "code": "hr",
+      "name": "Croacia",
+      "locale": "hr-HR",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 1,
+      "marketSize": "800M_EUR",
+      "cities": [
+        {"name": "Dubrovnik", "slug": "dubrovnik", "lat": "42.6507", "lng": "18.0944", "population": 42615},
+        {"name": "Split", "slug": "split", "lat": "43.5081", "lng": "16.4402", "population": 178102},
+        {"name": "Zagreb", "slug": "zagreb", "lat": "45.8150", "lng": "15.9819", "population": 790017},
+        {"name": "Hvar", "slug": "hvar", "lat": "43.1729", "lng": "16.4411", "population": 4251}
+      ]
+    },
+    {
+      "code": "si",
+      "name": "Eslovenia",
+      "locale": "sl-SI",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 2,
+      "marketSize": "300M_EUR",
+      "cities": [
+        {"name": "Liubliana", "slug": "liubliana", "lat": "46.0569", "lng": "14.5058", "population": 292988},
+        {"name": "Bled", "slug": "bled", "lat": "46.3683", "lng": "14.1146", "population": 8003},
+        {"name": "Maribor", "slug": "maribor", "lat": "46.5547", "lng": "15.6459", "population": 95171}
+      ]
+    },
+    {
+      "code": "hu",
+      "name": "Hungría",
+      "locale": "hu-HU",
+      "currency": "HUF",
+      "currencySymbol": "Ft",
+      "priority": 3,
+      "marketSize": "500M_EUR",
+      "cities": [
+        {"name": "Budapest", "slug": "budapest", "lat": "47.4979", "lng": "19.0402", "population": 1752286},
+        {"name": "Eger", "slug": "eger", "lat": "47.9026", "lng": "20.3774", "population": 53020},
+        {"name": "Pécs", "slug": "pecs", "lat": "46.0727", "lng": "18.2323", "population": 145347}
+      ]
+    },
+    {
+      "code": "ro",
+      "name": "Rumanía",
+      "locale": "ro-RO",
+      "currency": "RON",
+      "currencySymbol": "lei",
+      "priority": 4,
+      "marketSize": "400M_EUR",
+      "cities": [
+        {"name": "Bucarest", "slug": "bucarest", "lat": "44.4268", "lng": "26.1025", "population": 1883425},
+        {"name": "Brașov", "slug": "brasov", "lat": "45.6580", "lng": "25.6012", "population": 253200},
+        {"name": "Cluj-Napoca", "slug": "cluj-napoca", "lat": "46.7712", "lng": "23.6236", "population": 324576}
+      ]
+    },
+    {
+      "code": "bg",
+      "name": "Bulgaria",
+      "locale": "bg-BG",
+      "currency": "BGN",
+      "currencySymbol": "лв",
+      "priority": 5,
+      "marketSize": "250M_EUR",
+      "cities": [
+        {"name": "Sofía", "slug": "sofia", "lat": "42.6977", "lng": "23.3219", "population": 1238438},
+        {"name": "Plovdiv", "slug": "plovdiv", "lat": "42.1354", "lng": "24.7453", "population": 346893}
+      ]
+    },
+    {
+      "code": "mv",
+      "name": "Maldivas",
+      "locale": "en-MV",
+      "currency": "MVR",
+      "currencySymbol": "Rf",
+      "priority": 1,
+      "marketSize": "500M_USD",
+      "cities": [
+        {"name": "Malé", "slug": "male-maldives", "lat": "4.1755", "lng": "73.5093", "population": 133019},
+        {"name": "Maafushi", "slug": "maafushi", "lat": "3.9336", "lng": "73.5056", "population": 2000}
+      ]
+    },
+    {
+      "code": "mu",
+      "name": "Mauricio",
+      "locale": "en-MU",
+      "currency": "MUR",
+      "currencySymbol": "₨",
+      "priority": 2,
+      "marketSize": "200M_USD",
+      "cities": [
+        {"name": "Port Louis", "slug": "port-louis", "lat": "-20.1609", "lng": "57.5012", "population": 149194},
+        {"name": "Grand Baie", "slug": "grand-baie", "lat": "-20.0092", "lng": "57.5816", "population": 13000}
+      ]
+    },
+    {
+      "code": "sc",
+      "name": "Seychelles",
+      "locale": "en-SC",
+      "currency": "SCR",
+      "currencySymbol": "₨",
+      "priority": 3,
+      "marketSize": "150M_USD",
+      "cities": [
+        {"name": "Victoria", "slug": "victoria-seychelles", "lat": "-4.6191", "lng": "55.4513", "population": 26450},
+        {"name": "Praslin", "slug": "praslin", "lat": "-4.3197", "lng": "55.7449", "population": 7533}
+      ]
+    },
+    {
+      "code": "lk",
+      "name": "Sri Lanka",
+      "locale": "si-LK",
+      "currency": "LKR",
+      "currencySymbol": "Rs",
+      "priority": 4,
+      "marketSize": "300M_USD",
+      "cities": [
+        {"name": "Colombo", "slug": "colombo", "lat": "6.9271", "lng": "79.8612", "population": 752993},
+        {"name": "Kandy", "slug": "kandy", "lat": "7.2906", "lng": "80.6337", "population": 125400},
+        {"name": "Galle", "slug": "galle", "lat": "6.0535", "lng": "80.2210", "population": 99478}
+      ]
+    },
+    {
+      "code": "vn",
+      "name": "Vietnam",
+      "locale": "vi-VN",
+      "currency": "VND",
+      "currencySymbol": "₫",
+      "priority": 5,
+      "marketSize": "1000M_USD",
+      "cities": [
+        {"name": "Ho Chi Minh", "slug": "ho-chi-minh", "lat": "10.8231", "lng": "106.6297", "population": 8993082},
+        {"name": "Hanoi", "slug": "hanoi", "lat": "21.0285", "lng": "105.8542", "population": 8053663},
+        {"name": "Da Nang", "slug": "da-nang", "lat": "16.0544", "lng": "108.2022", "population": 1134310},
+        {"name": "Hoi An", "slug": "hoi-an", "lat": "15.8794", "lng": "108.3350", "population": 152160}
+      ]
+    },
+    {
+      "code": "kh",
+      "name": "Camboya",
+      "locale": "km-KH",
+      "currency": "KHR",
+      "currencySymbol": "៛",
+      "priority": 6,
+      "marketSize": "200M_USD",
+      "cities": [
+        {"name": "Phnom Penh", "slug": "phnom-penh", "lat": "11.5564", "lng": "104.9282", "population": 2281951},
+        {"name": "Siem Reap", "slug": "siem-reap", "lat": "13.3633", "lng": "103.8564", "population": 245494}
+      ]
+    },
+    {
+      "code": "np",
+      "name": "Nepal",
+      "locale": "ne-NP",
+      "currency": "NPR",
+      "currencySymbol": "Rs",
+      "priority": 7,
+      "marketSize": "150M_USD",
+      "cities": [
+        {"name": "Kathmandu", "slug": "kathmandu", "lat": "27.7172", "lng": "85.3240", "population": 1442271},
+        {"name": "Pokhara", "slug": "pokhara", "lat": "28.2096", "lng": "83.9856", "population": 414141}
+      ]
+    },
+    {
+      "code": "jm",
+      "name": "Jamaica",
+      "locale": "en-JM",
+      "currency": "JMD",
+      "currencySymbol": "$",
+      "priority": 1,
+      "marketSize": "400M_USD",
+      "cities": [
+        {"name": "Montego Bay", "slug": "montego-bay", "lat": "18.4762", "lng": "-77.8939", "population": 110115},
+        {"name": "Negril", "slug": "negril", "lat": "18.2971", "lng": "-78.3488", "population": 3000},
+        {"name": "Ocho Rios", "slug": "ocho-rios", "lat": "18.4078", "lng": "-77.1036", "population": 16671}
+      ]
+    },
+    {
+      "code": "bs",
+      "name": "Bahamas",
+      "locale": "en-BS",
+      "currency": "BSD",
+      "currencySymbol": "$",
+      "priority": 2,
+      "marketSize": "300M_USD",
+      "cities": [
+        {"name": "Nassau", "slug": "nassau", "lat": "25.0443", "lng": "-77.3504", "population": 274400},
+        {"name": "Paradise Island", "slug": "paradise-island", "lat": "25.0863", "lng": "-77.3210", "population": 0}
+      ]
+    },
+    {
+      "code": "bb",
+      "name": "Barbados",
+      "locale": "en-BB",
+      "currency": "BBD",
+      "currencySymbol": "$",
+      "priority": 3,
+      "marketSize": "200M_USD",
+      "cities": [
+        {"name": "Bridgetown", "slug": "bridgetown", "lat": "13.0969", "lng": "-59.6145", "population": 110000},
+        {"name": "Holetown", "slug": "holetown", "lat": "13.1833", "lng": "-59.6417", "population": 1500}
+      ]
+    },
+    {
+      "code": "lc",
+      "name": "Santa Lucía",
+      "locale": "en-LC",
+      "currency": "XCD",
+      "currencySymbol": "$",
+      "priority": 4,
+      "marketSize": "150M_USD",
+      "cities": [
+        {"name": "Castries", "slug": "castries", "lat": "14.0101", "lng": "-60.9875", "population": 70000},
+        {"name": "Soufrière", "slug": "soufriere", "lat": "13.8567", "lng": "-61.0585", "population": 8472}
+      ]
+    },
+    {
+      "code": "ke",
+      "name": "Kenia",
+      "locale": "sw-KE",
+      "currency": "KES",
+      "currencySymbol": "Sh",
+      "priority": 1,
+      "marketSize": "300M_USD",
+      "cities": [
+        {"name": "Nairobi", "slug": "nairobi", "lat": "-1.2864", "lng": "36.8172", "population": 4397073},
+        {"name": "Mombasa", "slug": "mombasa", "lat": "-4.0435", "lng": "39.6682", "population": 1208333},
+        {"name": "Diani Beach", "slug": "diani-beach", "lat": "-4.2861", "lng": "39.5758", "population": 10000}
+      ]
+    },
+    {
+      "code": "tz",
+      "name": "Tanzania",
+      "locale": "sw-TZ",
+      "currency": "TZS",
+      "currencySymbol": "Sh",
+      "priority": 2,
+      "marketSize": "200M_USD",
+      "cities": [
+        {"name": "Dar es Salaam", "slug": "dar-es-salaam", "lat": "-6.7924", "lng": "39.2083", "population": 6698602},
+        {"name": "Zanzíbar", "slug": "zanzibar", "lat": "-6.1659", "lng": "39.2026", "population": 223033}
+      ]
+    },
+    {
+      "code": "lb",
+      "name": "Líbano",
+      "locale": "ar-LB",
+      "currency": "LBP",
+      "currencySymbol": "ل.ل",
+      "priority": 1,
+      "marketSize": "400M_USD",
+      "cities": [
+        {"name": "Beirut", "slug": "beirut", "lat": "33.8886", "lng": "35.4955", "population": 2060000},
+        {"name": "Byblos", "slug": "byblos", "lat": "34.1208", "lng": "35.6481", "population": 40000}
+      ]
+    },
+    {
+      "code": "jo",
+      "name": "Jordania",
+      "locale": "ar-JO",
+      "currency": "JOD",
+      "currencySymbol": "د.ا",
+      "priority": 2,
+      "marketSize": "300M_USD",
+      "cities": [
+        {"name": "Ammán", "slug": "amman", "lat": "31.9454", "lng": "35.9284", "population": 4007526},
+        {"name": "Petra", "slug": "petra", "lat": "30.3285", "lng": "35.4444", "population": 26000},
+        {"name": "Aqaba", "slug": "aqaba", "lat": "29.5321", "lng": "35.0063", "population": 188160}
+      ]
+    },
+    {
+      "code": "om",
+      "name": "Omán",
+      "locale": "ar-OM",
+      "currency": "OMR",
+      "currencySymbol": "ر.ع.",
+      "priority": 3,
+      "marketSize": "250M_USD",
+      "cities": [
+        {"name": "Mascate", "slug": "mascate", "lat": "23.5880", "lng": "58.3829", "population": 1560330},
+        {"name": "Salalah", "slug": "salalah", "lat": "17.0151", "lng": "54.0924", "population": 331949}
+      ]
+    },
+    {
+      "code": "is",
+      "name": "Islandia",
+      "locale": "is-IS",
+      "currency": "ISK",
+      "currencySymbol": "kr",
+      "priority": 1,
+      "marketSize": "200M_ISK",
+      "cities": [
+        {"name": "Reikiavik", "slug": "reikiavik", "lat": "64.1466", "lng": "-21.9426", "population": 131136},
+        {"name": "Akureyri", "slug": "akureyri", "lat": "65.6835", "lng": "-18.0878", "population": 19219}
+      ]
+    },
+    {
+      "code": "mt",
+      "name": "Malta",
+      "locale": "mt-MT",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 2,
+      "marketSize": "150M_EUR",
+      "cities": [
+        {"name": "La Valeta", "slug": "la-valeta", "lat": "35.8989", "lng": "14.5146", "population": 6444},
+        {"name": "Mdina", "slug": "mdina", "lat": "35.8869", "lng": "14.4035", "population": 243},
+        {"name": "Gozo", "slug": "gozo", "lat": "36.0444", "lng": "14.2417", "population": 31678}
+      ]
+    },
+    {
+      "code": "cy",
+      "name": "Chipre",
+      "locale": "el-CY",
+      "currency": "EUR",
+      "currencySymbol": "€",
+      "priority": 3,
+      "marketSize": "200M_EUR",
+      "cities": [
+        {"name": "Nicosia", "slug": "nicosia", "lat": "35.1856", "lng": "33.3823", "population": 116000},
+        {"name": "Limassol", "slug": "limassol", "lat": "34.7070", "lng": "33.0227", "population": 237000},
+        {"name": "Ayia Napa", "slug": "ayia-napa", "lat": "34.9818", "lng": "33.9994", "population": 3000}
+      ]
+    },
+    {
+      "code": "fj",
+      "name": "Fiyi",
+      "locale": "en-FJ",
+      "currency": "FJD",
+      "currencySymbol": "$",
+      "priority": 1,
+      "marketSize": "100M_USD",
+      "cities": [
+        {"name": "Nadi", "slug": "nadi", "lat": "-17.7765", "lng": "177.4350", "population": 42284},
+        {"name": "Denarau", "slug": "denarau", "lat": "-17.7856", "lng": "177.3519", "population": 5000}
+      ]
+    },
+    {
+      "code": "pf",
+      "name": "Polinesia Francesa",
+      "locale": "fr-PF",
+      "currency": "XPF",
+      "currencySymbol": "₣",
+      "priority": 2,
+      "marketSize": "150M_USD",
+      "cities": [
+        {"name": "Bora Bora", "slug": "bora-bora", "lat": "-16.5004", "lng": "-151.7414", "population": 10605},
+        {"name": "Tahití", "slug": "tahiti", "lat": "-17.6509", "lng": "-149.4260", "population": 189517}
+      ]
+    },
+    {
+      "code": "cu",
+      "name": "Cuba",
+      "locale": "es-CU",
+      "currency": "CUP",
+      "currencySymbol": "$",
+      "priority": 1,
+      "marketSize": "150M_USD",
+      "cities": [
+        {"name": "La Habana", "slug": "la-habana", "lat": "23.1136", "lng": "-82.3666", "population": 2130431},
+        {"name": "Varadero", "slug": "varadero", "lat": "23.1459", "lng": "-81.2860", "population": 26860},
+        {"name": "Trinidad", "slug": "trinidad-cu", "lat": "21.8022", "lng": "-79.9843", "population": 73466}
+      ]
+    },
+    {
+      "code": "ht",
+      "name": "Haití",
+      "locale": "fr-HT",
+      "currency": "HTG",
+      "currencySymbol": "G",
+      "priority": 5,
+      "marketSize": "50M_USD",
+      "cities": [
+        {"name": "Puerto Príncipe", "slug": "puerto-principe", "lat": "18.5944", "lng": "-72.3074", "population": 987310}
+      ]
+    },
+    {
+      "code": "ni",
+      "name": "Nicaragua",
+      "locale": "es-NI",
+      "currency": "NIO",
+      "currencySymbol": "C$",
+      "priority": 3,
+      "marketSize": "80M_USD",
+      "cities": [
+        {"name": "Managua", "slug": "managua", "lat": "12.1364", "lng": "-86.2514", "population": 1028808},
+        {"name": "Granada", "slug": "granada-ni", "lat": "11.9344", "lng": "-85.9560", "population": 123697},
+        {"name": "San Juan del Sur", "slug": "san-juan-del-sur", "lat": "11.2529", "lng": "-85.8704", "population": 19200}
+      ]
+    },
+    {
+      "code": "sv",
+      "name": "El Salvador",
+      "locale": "es-SV",
+      "currency": "USD",
+      "currencySymbol": "$",
+      "priority": 4,
+      "marketSize": "100M_USD",
+      "cities": [
+        {"name": "San Salvador", "slug": "san-salvador", "lat": "13.6929", "lng": "-89.2182", "population": 525990},
+        {"name": "Santa Ana", "slug": "santa-ana-sv", "lat": "13.9942", "lng": "-89.5597", "population": 245421}
+      ]
+    },
+    {
+      "code": "hn",
+      "name": "Honduras",
+      "locale": "es-HN",
+      "currency": "HNL",
+      "currencySymbol": "L",
+      "priority": 5,
+      "marketSize": "70M_USD",
+      "cities": [
+        {"name": "Tegucigalpa", "slug": "tegucigalpa", "lat": "14.0723", "lng": "-87.1921", "population": 1126534},
+        {"name": "Roatán", "slug": "roatan", "lat": "16.3120", "lng": "-86.5258", "population": 110000}
+      ]
+    },
+    {
+      "code": "bz",
+      "name": "Belice",
+      "locale": "en-BZ",
+      "currency": "BZD",
+      "currencySymbol": "$",
+      "priority": 2,
+      "marketSize": "120M_USD",
+      "cities": [
+        {"name": "Ciudad de Belice", "slug": "ciudad-belice", "lat": "17.4920", "lng": "-88.1888", "population": 61461},
+        {"name": "San Pedro", "slug": "san-pedro-bz", "lat": "17.9159", "lng": "-87.9650", "population": 16444},
+        {"name": "Placencia", "slug": "placencia", "lat": "16.5145", "lng": "-88.3664", "population": 3458}
+      ]
+    },
+    {
+      "code": "aw",
+      "name": "Aruba",
+      "locale": "nl-AW",
+      "currency": "AWG",
+      "currencySymbol": "ƒ",
+      "priority": 1,
+      "marketSize": "150M_USD",
+      "cities": [
+        {"name": "Oranjestad", "slug": "oranjestad", "lat": "12.5092", "lng": "-70.0086", "population": 28294},
+        {"name": "Palm Beach", "slug": "palm-beach-aruba", "lat": "12.5775", "lng": "-70.0428", "population": 5000}
+      ]
+    },
+    {
+      "code": "ge",
+      "name": "Georgia",
+      "locale": "ka-GE",
+      "currency": "GEL",
+      "currencySymbol": "₾",
+      "priority": 4,
+      "marketSize": "150M_USD",
+      "cities": [
+        {"name": "Tiflis", "slug": "tiflis", "lat": "41.7151", "lng": "44.8271", "population": 1118035},
+        {"name": "Batumi", "slug": "batumi", "lat": "41.6168", "lng": "41.6367", "population": 172934}
+      ]
+    },
+    {
+      "code": "am",
+      "name": "Armenia",
+      "locale": "hy-AM",
+      "currency": "AMD",
+      "currencySymbol": "֏",
+      "priority": 5,
+      "marketSize": "80M_USD",
+      "cities": [
+        {"name": "Ereván", "slug": "erevan", "lat": "40.1792", "lng": "44.4991", "population": 1093485}
+      ]
+    }
+  ],
+  "targetPhase2": {
+    "totalNewCountries": 35,
+    "totalNewCities": 150,
+    "newSEOPages": 1050,
+    "grandTotal": {
+      "countries": 88,
+      "cities": 405,
+      "pages": 2835
+    }
+  }
+}

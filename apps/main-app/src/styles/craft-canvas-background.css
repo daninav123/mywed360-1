@@ -1,0 +1,25 @@
+/* Estilos para el fondo del canvas de Craft.js */
+
+.craft-canvas-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  /* Usar CSS variables definidas en el style inline */
+  background-image: var(--bg-image, none);
+  background-size: var(--bg-size, cover);
+  background-repeat: var(--bg-repeat, no-repeat);
+  background-position: center;
+  opacity: var(--bg-opacity, 1);
+}
+
+/* Asegurar que el contenido del canvas esté por encima del fondo */
+.craft-canvas-background > * {
+  position: relative;
+  z-index: 1;
+}

@@ -1,0 +1,3535 @@
+{
+  "app": {
+    "name": "MaLove.App",
+    "brandName": "MaLoveApp",
+    "tagline": "Your perfect wedding, digitally organized",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "close": "Close",
+    "open": "Open",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "continue": "Continue",
+    "finish": "Finish"
+  },
+  "add": "Add",
+  "delete": "Delete",
+  "save": "Save",
+  "cancel": "Cancel",
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "guests": "Guests",
+    "providers": "Providers",
+    "finance": "Finance",
+    "seating": "Seating Plan",
+    "email": "Email",
+    "designs": "Designs",
+    "website": "Wedding Website",
+    "contracts": "Contracts",
+    "tasks": "Tasks",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "more": "More",
+    "createEvent": "Create new event",
+    "weddings": "Weddings",
+    "emailInbox": "Email Inbox",
+    "darkMode": "Dark mode",
+    "userMenu": "User menu"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot your password?",
+    "resetPassword": "Reset Password",
+    "loginWithGoogle": "Login with Google",
+    "loginWithFacebook": "Login with Facebook",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "createAccount": "Create Account",
+    "welcomeBack": "Welcome back!",
+    "createYourAccount": "Create your account",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "loginError": "Login error",
+    "registerError": "Registration error",
+    "invalidCredentials": "Invalid credentials",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "invalidEmail": "Invalid email format"
+  },
+  "authLogin": {
+    "title": "Access your account",
+    "subtitle": "Use your email and password or choose a social provider.",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "Your password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "submit": "Sign in",
+    "submitting": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Create one",
+    "hero": {
+      "title": "Manage everything from a single dashboard",
+      "description": "Access your guests, tasks, budgets, and documents in seconds. Track event progress and keep your team in sync.",
+      "features": [
+        "Sync vendors and contracts.",
+        "Automate emails and personalized reminders.",
+        "Receive alerts when something needs your attention."
+      ]
+    },
+    "validation": {
+      "missingEmail": "Enter your email address.",
+      "missingPassword": "Enter your password."
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password.",
+      "generic": "We couldn't sign you in. Try again or contact support."
+    },
+    "social": {
+      "divider": "or continue with",
+      "button": "Continue with {{provider}}",
+      "pending": "Continue the sign-in flow in the {{provider}} window."
+    }
+  },
+  "protocol": {
+    "ceremony": {
+      "titleRequired": "Title is required",
+      "confirmDelete": "Delete this event?"
+    },
+    "specialMoments": {
+      "title": "Special Moments",
+      "description": "Plan each key moment with the right music and timing.",
+      "buttons": {
+        "addSection": "Add section",
+        "addMoment": "Add moment",
+        "duplicateShort": "Dup →",
+        "moveShort": "Move →",
+        "use": "Use",
+        "searchWithAI": "Search with AI",
+        "confirm": "Confirm",
+        "clear": "Clear",
+        "remove": "Remove"
+      },
+      "tooltips": {
+        "addSection": "Add custom section",
+        "deleteMoment": "Delete",
+        "duplicateHere": "Duplicate in this section",
+        "duplicateElse": "Duplicate in another section",
+        "moveElse": "Move to another section",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "play": "Play",
+        "pause": "Pause",
+        "stop": "Stop",
+        "blockHeader": "Double-click to rename section (right-click for more options)"
+      },
+      "toggles": {
+        "showAdvanced": "Show advanced details",
+        "hideAdvanced": "Hide advanced details",
+        "hideRecipient": "Hide recipient",
+        "showPlayer": "Player",
+        "hidePlayer": "Hide"
+      },
+      "labels": {
+        "dragHandle": "Drag to reorder",
+        "stateNone": "No status",
+        "optionalBadge": "Optional",
+        "optionalToggle": "Optional",
+        "type": "Type",
+        "location": "Location",
+        "state": "Status",
+        "song": "Song",
+        "time": "Time",
+        "duration": "Duration",
+        "language": "Language",
+        "tempo": "Tempo",
+        "era": "Decade",
+        "genre": "Genre",
+        "volume": "Volume",
+        "recipientHint": "Choose who this moment is for (optional)",
+        "recipientDefault": "Recipient",
+        "recipientRoleFallback": "Assigned role",
+        "recipientSummary": "Recipient: {{label}}",
+        "responsibles": "Responsible people",
+        "requirements": "Technical requirements / notes",
+        "relatedSuppliers": "Related suppliers",
+        "actionDuplicate": "Duplicate to:",
+        "actionMove": "Move to:",
+        "playerNowPlaying": "Playing preview",
+        "musicInspiration": "Music inspiration",
+        "aiTitle": "Find the perfect song (AI)",
+        "viewOn": "View on:"
+      },
+      "placeholders": {
+        "momentTitle": "Moment title",
+        "location": "Chapel, garden, ballroom...",
+        "song": "Song name",
+        "time": "hh:mm",
+        "duration": "e.g. 10 min",
+        "recipientManual": "Recipient name or role",
+        "requirements": "Sound, lighting, special elements...",
+        "supplier": "Name or reference",
+        "searchSong": "Search song by name...",
+        "aiPrompt": "Describe the moment: \"first dance, spanish ballad\"",
+        "role": "Role / function",
+        "name": "Name",
+        "contact": "Contact (phone/email)"
+      },
+      "options": {
+        "recipient": {
+          "none": "No recipient",
+          "custom": "Specify manually",
+          "rolePrefix": "Role: {{role}}",
+          "table": "· Table {{table}}"
+        },
+        "languages": {
+          "es": "Spanish",
+          "en": "English"
+        },
+        "tempo": {
+          "any": "Any",
+          "slow": "Slow",
+          "medium": "Medium",
+          "fast": "Fast"
+        },
+        "era": {
+          "any": "Any",
+          "80s": "80s",
+          "90s": "90s",
+          "2000s": "2000s",
+          "2010s": "2010s",
+          "current": "Current"
+        },
+        "genre": {
+          "any": "Any",
+          "pop": "Pop",
+          "rock": "Rock",
+          "jazz": "Jazz",
+          "latin": "Latin",
+          "classical": "Classical",
+          "indie": "Indie",
+          "rnb": "R&B"
+        }
+      },
+      "helperTexts": {
+        "recipientDetails": "Table: {{table}} · Diet: {{diet}}",
+        "responsiblesEmpty": "Add who is in charge of this moment.",
+        "suppliersEmpty": "Record suppliers relevant to this moment.",
+        "spotifyEmbed": "You pasted a Spotify link. A preview is shown.",
+        "sectionTip": "Tip: double-click the section name to rename it. Right-click to delete or move the section. Use \"Dup →\" to duplicate a moment into another section and \"Move →\" to move it.",
+        "noOtherSections": "No other sections available."
+      },
+      "menu": {
+        "duplicateHere": "Duplicate in this section",
+        "duplicateElse": "Duplicate in another section",
+        "move": "Move to another section",
+        "delete": "Delete moment"
+      },
+      "player": {
+        "show": "Player",
+        "hide": "Hide",
+        "play": "Play",
+        "pause": "Pause",
+        "stop": "Stop",
+        "volume": "Volume"
+      },
+      "ai": {
+        "loading": "Fetching recommendations...",
+        "error": "Could not fetch recommendations. Try again.",
+        "resultsTitle": "AI recommendations",
+        "preferencesPrefix": "Preferences",
+        "preferences": {
+          "language": {
+            "es": "spanish language",
+            "en": "english language"
+          },
+          "tempo": {
+            "slow": "slow tempo",
+            "medium": "medium tempo",
+            "fast": "fast tempo"
+          },
+          "era": {
+            "80s": "1980s decade",
+            "90s": "1990s decade",
+            "2000s": "2000s decade",
+            "2010s": "2010s decade",
+            "current": "current decade"
+          },
+          "genre": {
+            "pop": "pop genre",
+            "rock": "rock genre",
+            "jazz": "jazz genre",
+            "latin": "latin genre",
+            "classical": "classical genre",
+            "indie": "indie genre",
+            "rnb": "R&B genre"
+          }
+        }
+      },
+      "search": {
+        "loading": "Searching...",
+        "error": "Could not search songs. Try again later.",
+        "resultsTitle": "Results"
+      },
+      "aria": {
+        "reorderHandle": "Drag to reorder"
+      },
+      "defaults": {
+        "newMoment": "New moment {{count}}",
+        "momentTitle": "New moment"
+      },
+      "empty": {
+        "title": "There are no moments in this section.",
+        "subtitle": "Click \"Add moment\" to create one."
+      },
+      "prompts": {
+        "newSection": "Name for the new section (e.g., Rehearsal, Brunch...)",
+        "blockAction": "Action: delete | move-left | move-right",
+        "deleteSection": "Remove section \"{{name}}\"?",
+        "renameSection": "New name for the section:",
+        "duplicateIn": "Duplicate to (type exactly):\n{{list}}",
+        "moveTo": "Move to (type exactly):\n{{list}}"
+      },
+      "momentTypes": {
+        "entrada": "Entrance",
+        "lectura": "Reading",
+        "votos": "Vows",
+        "anillos": "Ring exchange",
+        "baile": "Dance",
+        "discurso": "Speech",
+        "corte_pastel": "Cake cutting",
+        "salida": "Exit",
+        "otro": "Other"
+      },
+      "states": {
+        "pendiente": "Pending",
+        "confirmado": "Confirmed",
+        "ensayo": "Rehearsal"
+      },
+      "recipientRoles": {
+        "novia": "Bride",
+        "novio": "Groom",
+        "planner": "Planner",
+        "oficiante": "Officiant / Master of ceremonies",
+        "familia": "Close family",
+        "amigo": "Friend",
+        "proveedor": "Supplier"
+      },
+      "warnings": {
+        "missingTime": "Add an estimated time.",
+        "missingResponsible": "Assign at least one responsible person.",
+        "missingRecipient": "Assign a recipient or role.",
+        "missingSong": "Add a song."
+      },
+      "toasts": {
+        "validationReminder": "Some required fields are missing. Check the alerts in each moment.",
+        "maxMomentsInSection": "You've reached the maximum of {{count}} moments in this section.",
+        "responsibleLimit": "Maximum {{count}} responsibles per moment.",
+        "supplierDraftRequired": "Enter a supplier before adding it.",
+        "supplierLimit": "Maximum {{count}} suppliers per moment.",
+        "supplierAlreadyExists": "That supplier is already registered.",
+        "selectTargetSection": "Select a destination section.",
+        "momentDuplicated": "Moment duplicated successfully.",
+        "selectDifferentSection": "Choose a different section to move the moment.",
+        "momentMoved": "Moment moved to the new section.",
+        "createAnotherSection": "Create another section to use this action.",
+        "songApplied": "Song applied to the last moment."
+      }
+    },
+    "checklist": {
+      "title": "Last-minute checklist",
+      "description": "Quick summary of the must-do items right before the event.",
+      "manualDefaults": {
+        "specialGifts": "Gifts prepared for the special moments"
+      },
+      "buttons": {
+        "addCheckpoint": "Add checkpoint",
+        "view": "View"
+      },
+      "statuses": {
+        "pending": "pending",
+        "in-progress": "in progress",
+        "done": "completed"
+      },
+      "categories": {
+        "documentation": "Documentation",
+        "providers": "Suppliers",
+        "ceremony": "Ceremony",
+        "contingency": "Contingency",
+        "personal": "Personal",
+        "technical": "Technical"
+      },
+      "badges": {
+        "critical": "Critical",
+        "custom": "Custom",
+        "documents": "Documents"
+      },
+      "labels": {
+        "due": "Due:",
+        "overdue": "Overdue!",
+        "notesPlaceholder": "Add notes...",
+        "documents": "Documents:",
+        "manualTitle": "Manual checkpoints"
+      },
+      "manual": {
+        "empty": "Add checkpoints with the \"{{button}}\" button.",
+        "toggleDone": "Mark done",
+        "togglePending": "Mark pending",
+        "removeTooltip": "Delete"
+      },
+      "providersCard": {
+        "title": "Suppliers",
+        "confirmed": "Confirmed:",
+        "pending": "Pending: {{count}}",
+        "link": "View"
+      },
+      "momentsCard": {
+        "title": "Moments (music)",
+        "assigned": "Songs assigned:",
+        "missing": "Missing assignments: {{count}}",
+        "empty": "No moments configured"
+      },
+      "toasts": {
+        "statusUpdated": "\"{{label}}\" marked as {{status}}",
+        "missingName": "Enter a name for the item",
+        "customAdded": "Item \"{{label}}\" added",
+        "customRemoved": "Item removed",
+        "exported": "Checklist exported",
+        "imported": "{{count}} custom items imported",
+        "importError": "We couldn't import the file",
+        "importFormat": "Invalid file format"
+      },
+      "prompts": {
+        "deleteCustom": "Delete \"{{label}}\"?"
+      },
+      "import": {
+        "warn": "Could not import {{label}}"
+      },
+      "addModal": {
+        "title": "Add checkpoint",
+        "nameLabel": "Checkpoint name",
+        "namePlaceholder": "E.g. Gifts prepared for the special moments",
+        "notesLabel": "Notes (optional)",
+        "notesPlaceholder": "Details or reminders"
+      },
+      "tooltips": {
+        "markCritical": "Mark as critical",
+        "edit": "Edit",
+        "save": "Save",
+        "delete": "Delete"
+      }
+    }
+  },
+  "public": {
+    "payment": {
+      "success": {
+        "loadingMessage": "Verifying your payment...",
+        "errorTitle": "Payment verification failed",
+        "errorDescription": "We couldn't verify your payment session. Please contact support.",
+        "buttons": {
+          "backPricing": "Back to plans",
+          "contactSupport": "Contact support",
+          "goDashboard": "Go to dashboard"
+        },
+        "title": "Payment completed successfully",
+        "description": "Your subscription has been activated.",
+        "detailsHeading": "Purchase details:",
+        "statusLabel": "Status:",
+        "status": {
+          "complete": "Completed"
+        },
+        "totalLabel": "Total:",
+        "redirectNotice": "You will be redirected automatically in 5 seconds...",
+        "emailNotice": "You'll receive a confirmation email with your purchase details."
+      },
+      "cancel": {
+        "title": "Payment cancelled",
+        "description": "You cancelled the payment process. No charge was made.",
+        "supportCard": {
+          "title": "Did you have any issues?",
+          "description": "If you experienced an error or have questions about our plans, our team is ready to help."
+        },
+        "buttons": {
+          "backPricing": "Back to plans",
+          "contactSupport": "Contact support",
+          "backHome": "Return to home"
+        },
+        "faq": {
+          "title": "Need help?",
+          "link": "View FAQs"
+        },
+        "support": {
+          "title": "Support",
+          "emailLink": "Send email"
+        }
+      }
+    },
+    "invitation": {
+      "accept": {
+        "processing": "Processing invitation...",
+        "success": "Invitation accepted! Redirecting...",
+        "error": "We couldn't accept the invitation: {{message}}"
+      }
+    },
+    "rsvp": {
+      "loading": "Loading...",
+      "notFound": "Guest not found",
+      "title": "RSVP confirmation",
+      "greeting": "Hi {{name}}, please let us know if you will attend.",
+      "question": "Will you attend?",
+      "statusOptions": {
+        "accepted": "Yes",
+        "rejected": "No"
+      },
+      "companionsLabel": "Number of companions",
+      "allergensLabel": "Allergies or dietary restrictions",
+      "messagePlaceholder": "Message",
+      "submit": "Submit response",
+      "thanksTitle": "Thank you, {{name}}!",
+      "thanksDescription": "We have recorded your response. See you soon.",
+      "toasts": {
+        "fetchError": "We could not load your invitation.",
+        "submitSuccess": "Response saved!",
+        "submitError": "Something went wrong while sending your response."
+      },
+      "errors": {
+        "fetchNotFound": "Guest not found",
+        "submit": "Error submitting response"
+      }
+    },
+    "supplierPortal": {
+      "loading": "Loading...",
+      "error": "Link is invalid or has expired",
+      "errorWithReason": "Link is invalid or has expired ({{reason}})",
+      "title": "Supplier portal",
+      "thanksTitle": "Thank you!",
+      "thanksDescription": "We have received your response. We will get in touch shortly.",
+      "labels": {
+        "wedding": "Wedding",
+        "supplier": "Supplier",
+        "availability": "Availability",
+        "message": "Message",
+        "budget": "Budget (optional)",
+        "amount": "Amount",
+        "links": "File link (Drive, Dropbox)",
+        "description": "Budget description or details"
+      },
+      "availability": {
+        "available": "Available",
+        "unavailable": "Not available",
+        "unknown": "To be confirmed"
+      },
+      "placeholders": {
+        "message": "Comments, questions, or conditions",
+        "amount": "Amount",
+        "links": "File link (Drive, Dropbox)",
+        "description": "Budget description or details"
+      },
+      "buttons": {
+        "submit": "Send",
+        "submitting": "Sending..."
+      },
+      "alerts": {
+        "submitError": "We could not submit the response: {{message}}"
+      }
+    },
+    "weddingSite": {
+      "loading": "Loading...",
+      "alerts": {
+        "success": "Thank you for your response!",
+        "error": "We couldn't submit the form."
+      },
+      "defaults": {
+        "title": "Our wedding",
+        "storyTitle": "Our story",
+        "timelineTitle": "Schedule",
+        "galleryTitle": "Gallery",
+        "rsvpTitle": "RSVP",
+        "giftsTitle": "Gift registry",
+        "giftsDescription": "We appreciate your gift sent to the following account:",
+        "mapTitle": "How to get there"
+      },
+      "countdown": {
+        "days": "{{value}}d",
+        "hours": "{{value}}h",
+        "minutes": "{{value}}m",
+        "seconds": "{{value}}s"
+      },
+      "rsvp": {
+        "placeholders": {
+          "name": "Your name",
+          "guests": "Number of guests",
+          "message": "Message"
+        },
+        "options": {
+          "yes": "I will attend",
+          "no": "I won't attend"
+        },
+        "button": "Send"
+      }
+    },
+    "publicWedding": {
+      "loading": "Loading...",
+      "error": "Unavailable ({{reason}})",
+      "defaults": {
+        "title": "Our wedding",
+        "storyTitle": "Our story",
+        "timelineTitle": "Schedule",
+        "galleryTitle": "Gallery",
+        "iframeTitle": "Wedding Site"
+      }
+    },
+    "moments": {
+      "guest": {
+        "loading": "Preparing your space to share memories...",
+        "errorTitle": "We could not open the memories gallery",
+        "errorDescription": "{{message}}",
+        "errorHint": "If you believe this is a mistake, ask the couple for a new link.",
+        "errors": {
+          "incompleteLink": "The link is incomplete. Ask the couple for a new QR code.",
+          "invalidLink": "This link is no longer valid."
+        },
+        "closedTitle": "The gallery is closed",
+        "closedDescription": "The upload window closed{{date}}.",
+        "closedHint": "If you still have memories to share, let the couple know so they can reopen the link.",
+        "form": {
+          "badge": "Collaborative memories",
+          "title": "Thanks for capturing memories!",
+          "description": "Upload your favourite photos from the event. The host will review them and showcase them in the live slideshow.",
+          "deadline": "The gallery accepts new photos until {{date}}.",
+          "remainingDays": {
+            "one": "You have 1 day left to share memories.",
+            "other": "You have {{count}} days left to share memories."
+          },
+          "compressionNotice": "Photos are automatically optimised to save space.",
+          "nameLabel": "Your name",
+          "namePlaceholder": "E.g. Laura G.",
+          "emailLabel": "Email (optional)",
+          "emailPlaceholder": "We'll let you know when your photos are featured",
+          "termsLabel": "I consent to sharing my photos with the couple and confirm I have permission to do so.",
+          "submit": "Start uploading photos",
+          "tip": "Tip: photos are grouped by scene (ceremony, reception, party…) to help the host.",
+          "errors": {
+            "missingName": "Add your name so we can personalise your contributions.",
+            "missingTerms": "You must accept the privacy policy.",
+            "uploadsClosed": "This gallery is no longer accepting new photos."
+          }
+        },
+        "scenes": {
+          "other": "Other"
+        },
+        "uploadStates": {
+          "badge": "Collaborative memories",
+          "greeting": "Hi, {{name}} ✨",
+          "remainingUploads": "Upload up to {{count}} additional photos.",
+          "remainingUploadsOne": "Upload 1 additional photo.",
+          "remainingUploadsUnlimited": "Upload as many photos as you like.",
+          "reviewHint": "The host will review them and share them with the group.",
+          "remainingDays": {
+            "one": "You still have 1 day to send your best photos.",
+            "other": "You still have {{count}} days to send your best photos."
+          },
+          "deadline": "Available until {{date}}.",
+          "compressionNotice": "New photos are automatically optimised to save space.",
+          "progressTitle": "Your progress",
+          "progressDescription": "You've shared {{count}} {{count, plural, one {photo} other {photos}}}. Thank you for contributing to the memories!",
+          "uploadStatus": "Scene: {{scene}} · {{size}} KB",
+          "uploadReview": "Under review",
+          "recentUploadsTitle": "Your latest uploads",
+          "uploadsEmpty": "Approved photos will appear in the event slideshow and the final gallery. The host will let you know when they're ready.",
+          "guestFallback": "Guest"
+        },
+        "toasts": {
+          "firstUpload": "✨ Achievement unlocked! First memory shared!",
+          "thirdUpload": "🎉 You're a collaborative superstar! Keep sharing memories.",
+          "fifthUpload": "🌟 Star memories! Your photos will shine in the slideshow.",
+          "default": "Photo uploaded successfully"
+        }
+      },
+      "public": {
+        "loading": "Preparing the gallery...",
+        "error": "This link is no longer valid. Ask the couple for a new one.",
+        "errorTitle": "We couldn't open the gallery",
+        "errorDescription": "This link is no longer valid or has been revoked. Ask the couple for a new one.",
+        "errors": {
+          "incompleteLink": "The link is incomplete. Ask the couple for a new QR code.",
+          "invalidLink": "This link is no longer valid."
+        },
+        "hero": {
+          "badge": "Memories gallery",
+          "titleFallback": "Share your best moments",
+          "description": "Pick a moment for your memories and upload them straight from your phone.",
+          "deadline": "Available until {{date}} · {{remaining}}",
+          "remaining": {
+            "lastDay": "Final day",
+            "days": "{{count}} days remaining"
+          },
+          "closed": "Uploads have finished for this gallery."
+        },
+        "form": {
+          "title": "Share your memories",
+          "description": "Upload your favourite photos with a message and they'll appear in the shared gallery.",
+          "nameLabel": "Your name",
+          "namePlaceholder": "E.g. Laura G.",
+          "emailLabel": "Email (optional)",
+          "emailPlaceholder": "We'll let you know when your memories stand out",
+          "sceneLabel": "Scene or moment",
+          "termsLabel": "I consent to sharing my photos with the couple.",
+          "termsDescription": "I confirm I have permission to share these images and allow the couple to use them in the gallery.",
+          "start": "Get started",
+          "startUpload": "Start uploading memories",
+          "tip": "Pro tip! Pick the matching scene to help the couple organise their photos."
+        },
+        "list": {
+          "title": "Featured moments",
+          "count": "{{count}} moments available",
+          "cardDescription": "Upload your photos or videos for this moment instantly.",
+          "empty": "The hosts haven't configured specific moments yet. Come back later to share your memories."
+        },
+        "recent": {
+          "title": "Latest contributions",
+          "item": "{{scene}} · {{size}} KB"
+        },
+        "status": {
+          "cleanup": "The gallery will remain available for approximately {{duration}} before it is archived automatically.",
+          "cleanupToday": "one more day",
+          "cleanupDays": "{{count}} more days"
+        },
+        "overlay": {
+          "selected": "Selected moment",
+          "close": "Close",
+          "start": "Start uploading memories",
+          "remainingUploads": "You can upload {{count, plural, one {1 additional file} other {{count} additional files}} with this link."
+        },
+        "uploadStates": {
+          "title": "Shared memories",
+          "description": "Thanks for collaborating. Your photos will be reviewed before everyone can see them.",
+          "recentUploads": "Latest uploads",
+          "statusReview": "Under review",
+          "dropzoneTitle": "Drag & drop your photos here",
+          "dropzoneSubtitle": "Up to 20 files, JPG or PNG"
+        },
+        "toasts": {
+          "uploadsClosed": "This gallery is no longer accepting new photos.",
+          "missingName": "Add your name so we can personalise your contributions.",
+          "missingTerms": "You must accept the privacy policy.",
+          "success": "Thanks! Your file was uploaded successfully."
+        }
+      }
+    }
+  },
+  "authSignup": {
+    "title": "Create your account",
+    "subtitle": "Register with your email or continue with your favourite social account.",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "roleLabel": "Role",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "Minimum 8 characters",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "submit": "Create account",
+    "submitting": "Creating account...",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Sign up",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginLink": "Sign in",
+    "hero": {
+      "title": "Welcome to MaLoveApp",
+      "description": "Centralise tasks, guests, and vendors in one place. Our assistant guides you every step so your wedding runs perfectly.",
+      "features": [
+        "Smart timeline so you never miss a task.",
+        "Automated emails and reminders for guests.",
+        "Curated vendor catalogue with personalised recommendations."
+      ]
+    },
+    "roleOptions": {
+      "particular": "Couple",
+      "planner": "Wedding planner",
+      "assistant": "Assistant"
+    },
+    "validation": {
+      "missingEmail": "Enter your email address.",
+      "missingPassword": "Enter your password.",
+      "shortPassword": "Your password must be at least 8 characters long."
+    },
+    "errors": {
+      "emailInUse": "That email address is already registered.",
+      "weakPassword": "Choose a stronger password to finish signing up.",
+      "invalidEmail": "Please enter a valid email address.",
+      "generic": "We couldn't create your account. Try again or contact support."
+    },
+    "successMessage": "Account created successfully. Redirecting to your dashboard...",
+    "social": {
+      "divider": "or continue with",
+      "button": "Continue with {{provider}}",
+      "pending": "Complete the sign-up flow in the {{provider}} window."
+    }
+  },
+  "passwordStrength": {
+    "labels": {
+      "veryWeak": "Very weak",
+      "weak": "Weak",
+      "medium": "Fair",
+      "strong": "Strong",
+      "veryStrong": "Excellent"
+    },
+    "title": "Password strength",
+    "suggestions": {
+      "start": "Enter a password with at least 8 characters.",
+      "length8": "Use at least 8 characters.",
+      "length12": "Increase the length to 12 characters or more.",
+      "case": "Mix uppercase and lowercase letters.",
+      "numbers": "Add numbers to strengthen it.",
+      "symbols": "Include symbols such as !, %, # or similar.",
+      "repetition": "Avoid repeating the same character several times in a row.",
+      "common": "Avoid common words or predictable sequences."
+    }
+  },
+  "wedding": {
+    "permissions": {
+      "updateError": "Could not update permissions. Please try again."
+    },
+    "status": {
+      "updateError": "Could not update status. Please try again."
+    },
+    "form": {
+      "nameRequired": "Name is required",
+      "saveError": "Error saving wedding"
+    },
+    "site": {
+      "rsvpSuccess": "Thank you for confirming your attendance",
+      "rsvpError": "Error sending your response. Please try again."
+    },
+    "share": {
+      "linkCopied": "Link copied"
+    }
+  },
+  "guests": {
+    "email": {
+      "sent": "Email sent to {{email}}",
+      "sentSuccess": "Email sent successfully",
+      "sendError": "Error sending email: {{error}}",
+      "sendFailed": "Could not send email"
+    },
+    "filters": {
+      "allStatuses": "All statuses",
+      "noGuestsForBulk": "There are no guests to send invitations",
+      "totalGuests": "{{count}} guest in total",
+      "totalGuests_plural": "{{count}} guests in total",
+      "searchPlaceholder": "Search by name, email or phone...",
+      "tablePlaceholder": "Filter by table...",
+      "saveTheDate": {
+        "title": "Send SAVE THE DATE via WhatsApp",
+        "label": "Send SAVE THE DATE"
+      },
+      "bulkInvite": {
+        "title": "Send the formal invitation via WhatsApp API",
+        "label": "Bulk invitations (API)"
+      }
+    },
+    "errors": {
+      "missingPhone": "Guest phone number is missing"
+    }
+  },
+  "providers": {
+    "provider": "Provider",
+    "providers": "Providers",
+    "addProvider": "Add Provider",
+    "editProvider": "Edit Provider",
+    "deleteProvider": "Delete Provider",
+    "providerName": "Provider Name",
+    "providerService": "Service",
+    "providerContact": "Contact",
+    "providerEmail": "Provider Email",
+    "providerPhone": "Provider Phone",
+    "providerWebsite": "Website",
+    "providerAddress": "Address",
+    "providerBudget": "Budget",
+    "providerStatus": "Status",
+    "providerNotes": "Notes",
+    "searchProviders": "Search Providers",
+    "filterByService": "Filter by Service",
+    "photographer": "Photographer",
+    "videographer": "Videographer",
+    "florist": "Florist",
+    "caterer": "Caterer",
+    "dj": "DJ",
+    "band": "Band",
+    "venue": "Venue",
+    "decorator": "Decorator",
+    "makeup": "Makeup",
+    "hairdresser": "Hairdresser"
+  },
+  "finance": {
+    "contributions": {
+      "nameAmountRequired": "Name and amount are required",
+      "confirmDelete": "Delete this contribution?",
+      "status": {
+        "received": "Received",
+        "confirmed": "Confirmed",
+        "pending": "Pending"
+      }
+    },
+    "reports": {
+      "generateError": "We couldn't generate the report. Please try again.",
+      "exported": "Report exported in {{format}} format"
+    },
+    "budget": {
+      "errors": {
+        "nameRequired": "Category name is required",
+        "amountInvalid": "Amount must be a valid number"
+      },
+      "advisorErrors": {
+        "requestFailed": "Unable to fetch advisor recommendation",
+        "refreshFailed": "Unable to refresh advisor recommendation",
+        "applyFailed": "Unable to apply the recommended scenario"
+      }
+    }
+  },
+  "seating": {
+    "seatingPlan": "Seating Plan",
+    "table": "Table",
+    "tables": "Tables",
+    "seat": "Seat",
+    "seats": "Seats",
+    "addTable": "Add Table",
+    "editTable": "Edit Table",
+    "deleteTable": "Delete Table",
+    "tableName": "Table Name",
+    "tableCapacity": "Table Capacity",
+    "assignGuest": "Assign Guest",
+    "unassignGuest": "Unassign Guest",
+    "autoAssign": "Auto Assign",
+    "ceremonyLayout": "Ceremony Layout",
+    "receptionLayout": "Reception Layout",
+    "viewLayout": "View Layout",
+    "editLayout": "Edit Layout",
+    "saveLayout": "Save Layout",
+    "resetLayout": "Reset Layout",
+    "summary": {
+      "sectionLabel": "Overview",
+      "assignedTitle": "{{count}} guests seated",
+      "assignedSubtitle": "{{assigned}} of {{total}} guests and companions",
+      "noGuests": "No guests added yet",
+      "metrics": {
+        "pending": "Pending:",
+        "tables": "Active tables:",
+        "capacity": "Available capacity:",
+        "capacitySuffix": "seats"
+      },
+      "actions": {
+        "generateLayout": "Generate automatic layout",
+        "regenerateLayout": "Regenerate layout",
+        "reviewPending": "Review pending guests"
+      },
+      "progress": {
+        "ceremony": "Ceremony ready",
+        "banquet": "Banquet assigned",
+        "occupancy": "Capacity used"
+      },
+      "map": {
+        "title": "Space map",
+        "separator": "•"
+      }
+    },
+    "footer": {
+      "stats": {
+        "assignedValue": "{{value}}%",
+        "assigned": "assigned ({{assigned}}/{{total}})",
+        "tables": "tables",
+        "conflicts": "conflicts",
+        "trendIncrease": "+{{value}}%"
+      },
+      "buttons": {
+        "export": "Export",
+        "autoAssign": "Auto AI",
+        "autoAssignLoading": "Assigning..."
+      }
+    },
+    "collaborators": {
+      "title": "Active collaborators ({{count}})",
+      "unknown": "User",
+      "editing_one": "Editing {{count}} element",
+      "editing_other": "Editing {{count}} elements",
+      "synced": "Synced in real time"
+    },
+    "toolbar": {
+      "syncing": "Syncing...",
+      "synced": "Synced",
+      "syncError": "Sync error",
+      "offline": "Offline",
+      "undo": "Undo",
+      "undoTooltip": "Undo (Ctrl+Z)",
+      "redo": "Redo",
+      "redoTooltip": "Redo (Ctrl+Y)",
+      "hideTables": "Hide tables",
+      "showTables": "Show tables",
+      "hideRulers": "Hide rulers",
+      "showRulers": "Show rulers",
+      "rulers": "Rulers",
+      "snapEnabled": "Snap on",
+      "enableSnap": "Enable grid snap",
+      "disableSnap": "Disable snap",
+      "snap": "Snap",
+      "hideSeatNumbers": "Hide seat numbers",
+      "showSeatNumbers": "Show seat numbers",
+      "seatNumbers": "Numbers",
+      "disableValidations": "Disable validations",
+      "enableValidations": "Enable validations",
+      "validations": "Checks",
+      "spaceConfig": "Configure space",
+      "space": "Space",
+      "ceremonyConfig": "Configure ceremony",
+      "ceremony": "Ceremony",
+      "banquetConfig": "Configure banquet",
+      "banquet": "Banquet",
+      "clearBanquet": "Clear layout",
+      "clear": "Clear",
+      "templates": "Templates",
+      "export": "Export",
+      "capacityTooltip": "Global capacity",
+      "capacityShort": "Cap",
+      "autoAssign": "Auto-assign guests",
+      "autoAssignShort": "Auto-assign",
+      "backgroundConfig": "Configure background",
+      "background": "Background",
+      "alignMenu": "Align/Distribute",
+      "align": "Align",
+      "alignLeft": "Left",
+      "alignCenterX": "Center X",
+      "alignRight": "Right",
+      "alignTop": "Top",
+      "alignCenterY": "Center Y",
+      "alignBottom": "Bottom",
+      "distribute": "Distribute",
+      "distributeHorizontal": "Horizontal",
+      "distributeVertical": "Vertical",
+      "hotkeys": "Shortcuts"
+    },
+    "snapshots": {
+      "title": "Snapshots",
+      "button": "Snapshots",
+      "manage": "Manage snapshots",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Base layout",
+      "saveCurrent": "Save current",
+      "empty": "No snapshots",
+      "load": "Load",
+      "delete": "Delete",
+      "nameRequired": "Enter a name"
+    },
+    "sidebar": {
+      "tools": "Tools",
+      "pending": "Pending ({{count}})",
+      "hideGuests": "Hide guests",
+      "showGuests": "Show guests",
+      "searchGuests": "Search guests...",
+      "noResults": "No matches",
+      "allAssigned": "All guests assigned",
+      "conflictsTitle": "Conflicts",
+      "conflictPerimeter": "Perimeter",
+      "conflictObstacle": "Obstacles",
+      "conflictAisles": "Aisles",
+      "conflictOverbooking": "Overbooking",
+      "noConflicts": "No conflicts",
+      "focusTable": "Center on layout",
+      "fix": "Fix",
+      "noSuggestions": "No suggestions",
+      "assignGuestButton": "Assign",
+      "weightsTitle": "Weights",
+      "weightFit": "Fit",
+      "weightSide": "Side",
+      "weightTogether": "Seat together",
+      "weightAvoid": "Avoid",
+      "tableDefault": "Table {{id}}",
+      "configureTable": "Configure table",
+      "type": "Type",
+      "seats": "Seats",
+      "shape": "Shape",
+      "dimensions": "Dimensions",
+      "widthCm": "Width (cm)",
+      "lengthCm": "Length (cm)",
+      "assignedGuests": "Assigned guests ({{count}})",
+      "removeGuest": "Remove guest",
+      "noAssigned": "No guests assigned",
+      "usePanelToAssign": "Use this panel to assign guests.",
+      "guests": "Guests",
+      "duplicateTable": "Duplicate table",
+      "deleteTable": "Delete table"
+    },
+    "tools": {
+      "pan": "Pan",
+      "moveTables": "Move tables",
+      "boundary": "Perimeter",
+      "doors": "Doors",
+      "obstacles": "Obstacles",
+      "aisles": "Aisles",
+      "erase": "Erase"
+    },
+    "hints": {
+      "boundary": "Click and drag to outline the venue limits.",
+      "obstacle": "Click to place obstacles and drag to adjust their size.",
+      "door": "Click to add doors or access points.",
+      "aisle": "Drag to mark aisles between tables."
+    },
+    "export": {
+      "pdf": "PDF",
+      "png": "PNG",
+      "csv": "CSV"
+    },
+    "hotkeys": {
+      "title": "Keyboard Shortcuts",
+      "items": {
+        "undoRedo": "Undo / Redo",
+        "tools": "Tools (Pan, Move, Perimeter, Doors, Obstacles, Aisles)",
+        "zoomFit": "Zoom in / out / Fit",
+        "selectAll": "Select all",
+        "escape": "Clear selection / close menus",
+        "rotate": "Rotate -5° / +5° (Shift: ±15°)",
+        "align": "Align (start/end)",
+        "distribute": "Distribute (X/Y)",
+        "tabs": "Switch tab (Ceremony/Banquet)",
+        "toggles": "Rules / Numbers / Validations",
+        "panels": "Templates / Space settings",
+        "drawFinalizeCancel": "Finalize / Cancel drawing",
+        "backspaceDelete": "Remove point / Delete table",
+        "tabExactLength": "Exact segment length"
+      }
+    }
+  },
+  "email": {
+    "requiredFields": "Please complete required fields",
+    "sentSuccess": "Email sent successfully",
+    "sendError": "Error sending email: {{message}}",
+    "markReadError": "Could not mark as read",
+    "deleteError": "Could not delete email"
+  },
+  "tasks": {
+    "task": "Task",
+    "tasks": "Tasks",
+    "addTask": "Add Task",
+    "editTask": "Edit Task",
+    "deleteTask": "Delete Task",
+    "taskTitle": "Task Title",
+    "taskDescription": "Description",
+    "taskDueDate": "Due Date",
+    "taskPriority": "Priority",
+    "taskStatus": "Status",
+    "taskAssignee": "Assigned to",
+    "completed": "Completed",
+    "inProgress": "In progress",
+    "notStarted": "Not started",
+    "overdue": "Overdue",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "todoList": "To-Do List",
+    "completedTasks": "Completed Tasks",
+    "upcomingTasks": "Upcoming Tasks"
+  },
+  "profile": {
+    "synced": "Synced",
+    "subscription": {
+      "type": "Subscription type",
+      "free": "Free",
+      "premium": "Premium"
+    }
+  },
+  "forms": {
+    "required": "Required",
+    "optional": "Optional",
+    "pleaseSelect": "Please select",
+    "selectOption": "Select an option",
+    "enterText": "Enter text",
+    "chooseFile": "Choose file",
+    "uploadFile": "Upload file",
+    "dragAndDrop": "Drag and drop files here",
+    "invalidFormat": "Invalid format",
+    "fileTooLarge": "File too large",
+    "fieldRequired": "This field is required",
+    "invalidEmail": "Invalid email",
+    "invalidPhone": "Invalid phone",
+    "invalidUrl": "Invalid URL",
+    "passwordTooShort": "Password too short",
+    "passwordsDoNotMatch": "Passwords do not match"
+  },
+  "messages": {
+    "saveSuccess": "Saved successfully",
+    "saveError": "Error saving",
+    "deleteSuccess": "Deleted successfully",
+    "updateSuccess": "Updated successfully",
+    "logisticsUpdated": "Logistics updated successfully",
+    "publishSuccess": "Page published!",
+    "publishSuccessWithUrl": "Page published! Public URL: {{url}}",
+    "savedNoActiveWedding": "Page saved. No active wedding to publish publicly.",
+    "generateWebFirst": "Generate the web first"
+  },
+  "dates": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This week",
+    "nextWeek": "Next week",
+    "thisMonth": "This month",
+    "nextMonth": "Next month",
+    "selectDate": "Select date",
+    "dateFormat": "mm/dd/yyyy",
+    "timeFormat": "HH:mm"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "draft": "Draft",
+    "published": "Published"
+  },
+  "inspiration": {
+    "alt": "inspiration",
+    "altWithTags": "inspiration: {{tags}}",
+    "aria": "Inspiration image",
+    "ariaWithTags": "Inspiration image: {{tags}}",
+    "addFav": "Add to favorites",
+    "removeFav": "Remove from favorites"
+  },
+  "compose": {
+    "toField": "Recipient field",
+    "subjectField": "Subject field",
+    "ccField": "CC field",
+    "bccField": "BCC field",
+    "insertQuickReply": "Insert suggested reply"
+  },
+  "rsvp": {
+    "reminderSimulation": "Simulation: candidates={{attempted}}, sent={{sent}}, skipped={{skipped}}",
+    "reminderSent": "Sent: candidates={{attempted}}, sent={{sent}}, skipped={{skipped}}",
+    "reminderSimulationError": "Error simulating reminders",
+    "reminderSendError": "Error sending reminders",
+    "linkCopied": "RSVP link copied",
+    "linkCopyError": "Could not generate/copy link"
+  },
+  "common": {
+    "add": "Add",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "suppliers": {
+      "overview": {
+        "defaults": {
+          "serviceGroup": "Other services",
+          "otherService": "Other service",
+          "country": "Spain"
+        },
+        "actions": {
+          "manageServices": "Manage services",
+          "newSupplier": "New supplier",
+          "clear": "Clear"
+        },
+        "services": {
+          "count": "{{count}} services",
+          "confirmedCount": "{{count}} confirmed",
+          "pendingCount": "{{count}} pending",
+          "title": "Hired services",
+          "shortlistCount": "{{count}} in list",
+          "reviewShortlist": "Review shortlist",
+          "emptyShortlist": "No suppliers in the list",
+          "exploreHint": "Explore suppliers to add to your list"
+        },
+        "title": "Supplier management",
+        "metrics": {
+          "totalProviders": "Total suppliers",
+          "confirmed": "Confirmed",
+          "pending": "Pending",
+          "shortlist": "Shortlist"
+        },
+        "exploration": {
+          "title": "Explore suppliers",
+          "subtitle": "Search and discover suppliers for your event",
+          "collapseAria": "Collapse exploration section",
+          "searchPlaceholder": "Search suppliers...",
+          "recentSearches": "Recent searches"
+        },
+        "status": {
+          "pending": "Pending",
+          "confirmed": "Confirmed"
+        },
+        "shortlist": {
+          "loading": "Loading list...",
+          "error": "Error loading list",
+          "empty": "You have no saved suppliers",
+          "savedAt": "Saved {{value}}",
+          "match": "{{value}}% match"
+        },
+        "modals": {
+          "board": {
+            "title": "Services board",
+            "description": "Manage all your hired services"
+          },
+          "options": {
+            "title": "Options for {{label}}",
+            "confirmedTitle": "Confirmed",
+            "contactTitle": "Contacted / In negotiation",
+            "contactEmpty": "No suppliers contacted yet",
+            "shortlistTitle": "Shortlist",
+            "shortlistEmpty": "No suppliers in the list"
+          }
+        },
+        "drawer": {
+          "title": "Supplier details",
+          "empty": "Select a supplier to view details"
+        },
+        "toasts": {
+          "missingQuery": "Please enter a search term",
+          "noResults": "No results found",
+          "success": "Found {{count}} suppliers ({{registered}} registered, {{cached}} cached)",
+          "error": "Search error. Try again.",
+          "wantedServicesSaved": "Services saved successfully",
+          "wantedServicesError": "Error saving services",
+          "providerSaved": "Supplier saved successfully",
+          "providerError": "Error saving supplier"
+        }
+      },
+      "smartFilters": {
+        "title": "Smart filters",
+        "subtitle": "(from your profile)",
+        "buttons": {
+          "reset": "Reset",
+          "resetTitle": "Reset to profile values",
+          "clear": "Clear all",
+          "clearTitle": "Clear all filters"
+        },
+        "empty": {
+          "title": "We couldn't detect filters in your wedding profile.",
+          "hint": "Go to {{section}} to set budget, guests and style."
+        },
+        "fields": {
+          "budget": {
+            "label": "Budget",
+            "placeholder": "Budget",
+            "editTitle": "Edit budget"
+          },
+          "guests": {
+            "label": "Guests",
+            "placeholder": "Guests",
+            "editTitle": "Edit guest count"
+          },
+          "style": {
+            "label": "Style",
+            "placeholder": "Style",
+            "editTitle": "Edit style"
+          },
+          "location": {
+            "label": "Location",
+            "placeholder": "Location",
+            "editTitle": "Edit location"
+          }
+        },
+        "hints": {
+          "automated": "AI applied these filters automatically. Click edit to adjust them."
+        }
+      },
+      "favorites": {
+        "title": "Saved suppliers",
+        "loading": "Loading your saved suppliers...",
+        "confirmRemove": "Remove this supplier from favorites?",
+        "stats_one": "{{filtered}} of {{total}} saved supplier",
+        "stats_other": "{{filtered}} of {{total}} saved suppliers",
+        "searchPlaceholder": "Search by name, category or city",
+        "actions": {
+          "export": "Export shortlist",
+          "removeTooltip": "Remove from favorites"
+        },
+        "filters": {
+          "allCategories": "All categories",
+          "results_one": "{{count}} supplier matches your filters",
+          "results_other": "{{count}} suppliers match your filters",
+          "clear": "Clear filters",
+          "empty": "No suppliers match the current filters."
+        },
+        "empty": {
+          "title": "No saved suppliers yet",
+          "description": "Save the vendors you love to compare them later.",
+          "hintPrefix": "Use the",
+          "hintSuffix": "icon to add them to your list."
+        },
+        "toasts": {
+          "removed": "Supplier removed from favorites",
+          "removeError": "We couldn't remove the supplier. Try again.",
+          "exportSoon": "Export coming soon. We're working on it!"
+        },
+        "notesLabel": "Notes:",
+        "addedAt": "Saved {{value}}",
+        "button": {
+          "save": "Save",
+          "saved": "Saved"
+        },
+        "errors": {
+          "loginRequired": "You need to sign in to manage favorites.",
+          "activeWeddingRequired": "Select an active wedding to manage favorites.",
+          "authToken": "We couldn't refresh your authentication token.",
+          "alreadyExists": "This supplier is already in your favorites.",
+          "saveFailed": "We couldn't save the favorite. Try again.",
+          "removeFailed": "We couldn't remove the favorite. Try again.",
+          "loadFailed": "We couldn't load your favorites. Please retry later."
+        }
+      },
+      "selectFavorites": {
+        "subtitle": "Pick one of your favorites",
+        "empty": {
+          "title": "You don't have favorites in this category",
+          "description": "Search suppliers and save them as favorites with the ❤️ button",
+          "cta": "Browse suppliers"
+        },
+        "assign": {
+          "action": "Assign",
+          "loading": "Assigning..."
+        },
+        "toast": {
+          "assigned": "{{name}} assigned successfully",
+          "error": "Couldn't assign supplier"
+        },
+        "footer": {
+          "more": "Browse more suppliers"
+        },
+        "notes": "\"{{note}}\""
+      },
+      "portfolio": {
+        "categories": {
+          "all": "All",
+          "bodas": "Weddings",
+          "decoracion": "Decor",
+          "flores": "Flowers",
+          "ceremonia": "Ceremony",
+          "recepcion": "Reception",
+          "otros": "Other"
+        },
+        "toasts": {
+          "loadError": "We couldn't load the portfolio.",
+          "uploaded": "Photo uploaded successfully",
+          "deleted": "Photo deleted",
+          "updated": "Photo updated",
+          "deleteError": "We couldn't delete the photo",
+          "genericError": "Unexpected error. Please try again."
+        },
+        "dashboard": {
+          "title": "Photo portfolio",
+          "loading": "Loading portfolio...",
+          "deleteConfirm": "Delete this photo?",
+          "actions": {
+            "addPhoto": "Add photo"
+          },
+          "photoCount": {
+            "one": "1 photo",
+            "other": "{{count}} photos"
+          },
+          "coverCount": {
+            "one": "1 cover",
+            "other": "{{count}} covers"
+          },
+          "coverPhoto": {
+            "untitled": "Untitled cover"
+          },
+          "viewModes": {
+            "grid": "Grid view",
+            "list": "List view"
+          },
+          "filters": {
+            "label": "Filter by category",
+            "placeholder": "Select a category"
+          },
+          "zeroState": {
+            "title": "No photos yet",
+            "description": "Showcase your best work to attract new couples.",
+            "cta": "Upload first photo"
+          },
+          "coverPhotoCard": {
+            "title": "Cover photo",
+            "description": "This photo appears at the top of your public portfolio."
+          },
+          "stats": {
+            "views": "Views",
+            "likes": "Favorites"
+          },
+          "photoCard": {
+            "open": "Open details",
+            "edit": "Edit",
+            "delete": "Delete"
+          }
+        },
+        "upload": {
+          "title": "Add photo",
+          "dropzone": {
+            "title": "Drag your image here",
+            "subtitle": "or click to select a file",
+            "requirements": "Formats: JPG, PNG, WebP · Max size: 5MB",
+            "change": "Change image"
+          },
+          "form": {
+            "title": {
+              "label": "Title (optional)",
+              "placeholder": "Maria & John's wedding - Valencia"
+            },
+            "description": {
+              "label": "Description (optional)",
+              "placeholder": "Sunset beach ceremony..."
+            },
+            "category": {
+              "label": "Category *"
+            },
+            "tags": {
+              "label": "Tags (comma separated)",
+              "placeholder": "sunset, beach, ceremony"
+            },
+            "featured": "Mark as featured",
+            "isCover": "Set as cover photo"
+          },
+          "progress": {
+            "uploading": "Uploading..."
+          },
+          "actions": {
+            "submit": "Upload photo",
+            "submitting": "Uploading..."
+          },
+          "errors": {
+            "invalidType": "Invalid file type. Only JPG, PNG and WebP are allowed.",
+            "tooLarge": "File is too large. Maximum size is 5MB.",
+            "noImage": "Select an image before continuing.",
+            "noCategory": "Select a category.",
+            "uploadFailed": "We couldn't save the photo.",
+            "generic": "We couldn't upload the photo. Please try again."
+          }
+        },
+        "lightbox": {
+          "categories": {
+            "bodas": "Weddings",
+            "decoracion": "Decor",
+            "flores": "Flowers",
+            "ceremonia": "Ceremony",
+            "recepcion": "Reception",
+            "otros": "Other",
+            "unknown": "Uncategorised"
+          },
+          "tooltips": {
+            "editPhoto": "Edit photo",
+            "cancelEdit": "Cancel edit",
+            "deletePhoto": "Delete photo"
+          },
+          "toasts": {
+            "updated": "Photo updated successfully",
+            "updateError": "We couldn't update the photo",
+            "genericError": "Unexpected error updating the photo"
+          },
+          "image": {
+            "altFallback": "Portfolio photo"
+          },
+          "tags": {
+            "featured": "Featured"
+          },
+          "view": {
+            "noTitle": "Untitled photo",
+            "categoryLabel": "Category:",
+            "tagsLabel": "Tags:"
+          },
+          "meta": {
+            "uploadedAt": "Uploaded: {{value}}"
+          },
+          "form": {
+            "title": {
+              "label": "Title",
+              "placeholder": "Photo title"
+            },
+            "description": {
+              "label": "Description",
+              "placeholder": "Photo description"
+            },
+            "category": {
+              "label": "Category"
+            },
+            "tags": {
+              "label": "Tags (comma separated)",
+              "placeholder": "tag1, tag2, tag3"
+            },
+            "featured": "Mark as featured",
+            "isCover": "Set as cover photo",
+            "save": {
+              "loading": "Saving..."
+            }
+          }
+        }
+      },
+      "configureServices": "Configure services",
+      "suggested": "Suggested",
+      "addServicePlaceholder": "Add service (e.g. Photography)",
+      "labels": {
+        "provider": "Provider",
+        "service": "Service"
+      }
+    }
+  },
+  "pages": {
+    "more": {
+      "sections": {
+        "providers": {
+          "links": {
+            "providers": "Providers",
+            "contracts": "Contracts"
+          }
+        }
+      }
+    }
+  },
+  "pricing": {
+    "hero": {
+      "badge": "Per-event model",
+      "title": "Clear plans for every celebration.",
+      "description": "One-time payments in euros for couples and flexible packages for planners. Each license stays active for 30 days after the event and you can extend it whenever you need more time.",
+      "benefitsTitle": "Key benefits",
+      "benefits": [
+        "Licenses switch to read-only automatically once the event date passes.",
+        "Planner packs include a free month and quota tracking.",
+        "Alerts 30 / 7 / 1 days before expiration keep everything under control."
+      ],
+      "cta": "Create free account",
+      "highlights": {
+        "payPerEvent": {
+          "title": "Pay per event",
+          "description": "Activate only what you need for each wedding. No automatic renewals."
+        },
+        "collaboration": {
+          "title": "Controlled collaboration",
+          "description": "Invite helpers and suppliers with clear permissions and action tracking."
+        },
+        "syncStatus": {
+          "title": "Synced status",
+          "description": "Stripe webhooks keep licenses and packs up to date with internal alerts."
+        }
+      }
+    },
+    "sections": {
+      "couples": {
+        "label": "Couples",
+        "title": "Plans for couples",
+        "description": "Each purchase enables a full wedding until 30 days after the event. Add an extension if you need more time."
+      },
+      "planners": {
+        "label": "Planners",
+        "title": "Packages for planners",
+        "description": "Every pack includes a 1-month free trial. Choose 12 monthly payments or a single annual payment with a 15% discount. Stripe keeps the available seats updated automatically."
+      },
+      "needHelp": {
+        "title": "Need help choosing the right plan?",
+        "description": "We help you configure licenses, automations, and reports based on your workflow. Schedule a session and design a rollout that matches your pace.",
+        "cta": "Talk to a specialist"
+      },
+      "quickStart": {
+        "title": "Ready to use in minutes.",
+        "description": "Create your account, connect Stripe, and activate your licenses immediately. The system will notify renewals and you can keep closed weddings in read-only mode when they finish.",
+        "primaryCta": "Create free account",
+        "secondaryCta": "Access hub"
+      }
+    },
+    "couplePlans": {
+      "free": {
+        "name": "Free",
+        "priceLabel": "Free",
+        "priceSuffix": "per wedding",
+        "description": "Plan an intimate wedding or test the platform at no cost.",
+        "features": [
+          "1 active wedding with up to 80 guests",
+          "Basic seating plan and budget tracking",
+          "Supplier directory and visible listings",
+          "Essential templates and standard support"
+        ],
+        "cta": "Create free account"
+      },
+      "weddingPass": {
+        "name": "Wedding Pass",
+        "priceSuffix": "one-time payment per wedding",
+        "description": "Unlock every premium tool for your event without annual subscriptions.",
+        "features": [
+          "Unlimited guests and suppliers",
+          "Direct contact with suppliers and full protocol tools",
+          "Up to 50 website designs and priority support",
+          "Premium planning templates"
+        ],
+        "cta": "Buy Wedding Pass"
+      },
+      "weddingPassPlus": {
+        "name": "Wedding Pass Plus",
+        "priceSuffix": "one-time payment per wedding",
+        "description": "The most complete option for premium weddings and collaborative work with helpers.",
+        "features": [
+          "Everything included in Wedding Pass",
+          "Remove branding from invitations, PDFs, and screens",
+          "Full design library and memories gallery",
+          "1 helper with full access to the wedding"
+        ],
+        "cta": "Choose Wedding Pass Plus"
+      }
+    },
+    "plannerPlans": {
+      "cta": "Start free trial",
+      "pack5": {
+        "name": "Planner Pack 5",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "Up to 5 active weddings simultaneously with professional tools.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "Priority in the directory and priority support",
+          "Assign and reassign licenses as needed"
+        ]
+      },
+      "pack15": {
+        "name": "Planner Pack 15",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "Designed for growing planners managing multiple projects in parallel.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "Client analytics and extended visibility",
+          "Priority in the directory and priority support"
+        ]
+      },
+      "teams40": {
+        "name": "Teams 40",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "Teams coordinating many weddings and requiring advanced collaboration.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "40 active weddings per calendar year",
+          "Includes 3 additional profiles with limited access",
+          "Consolidated dashboard and advanced collaboration"
+        ]
+      },
+      "teamsUnlimited": {
+        "name": "Teams Unlimited",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "The definitive solution with unlimited weddings and profiles for large agencies.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "Full white-label and custom domain",
+          "24/7 dedicated support and tailored training",
+          "API access and expert onboarding"
+        ]
+      }
+    }
+  },
+  "marketingAccess": {
+    "backLink": "Back to home",
+    "hero": {
+      "badge": "MaLoveApp Access",
+      "login": {
+        "title": "Manage everything from one place",
+        "description": "Access your guests, tasks, budgets, and documents in seconds. Keep your team in sync across every event.",
+        "features": [
+          "One dashboard for tasks, budget, and seating",
+          "Invite collaborators with controlled permissions",
+          "Real-time updates across desktop and mobile"
+        ]
+      },
+      "signup": {
+        "title": "Welcome to MaLoveApp",
+        "description": "Centralise planning, automate reminders, and let our assistant guide you every step of the way.",
+        "features": [
+          "Onboarding guided by our planning assistant",
+          "Templates for budgets, guests, and suppliers",
+          "Stripe-powered licensing with instant activation"
+        ]
+      }
+    },
+    "toggle": {
+      "login": "Sign in",
+      "signup": "Create account"
+    },
+    "loggedIn": {
+      "title": "Active session",
+      "description": "Your MaLoveApp account is already open. Continue with your events or sign out if you need to switch accounts.",
+      "primaryCta": "Go to dashboard",
+      "secondaryCta": "Sign out"
+    },
+    "loginForm": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Your password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "submitting": "Signing in&"
+    },
+    "signup": {
+      "info": "Complete the form to create your account.",
+      "successMessage": "Account created successfully. Redirecting to your dashboard&",
+      "socialPending": "Complete the sign-up flow in the {{provider}} window."
+    },
+    "switch": {
+      "noAccount": "Do not have an account?",
+      "registerLink": "Create one",
+      "alreadyHaveAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "social": {
+      "redirect": "Redirecting to {{provider}}..."
+    },
+    "errors": {
+      "provider": "We could not authenticate with {{provider}}."
+    }
+  },
+  "budgetPrediction": {
+    "header": {
+      "title": "AI budget prediction",
+      "subtitle": "Intelligent analysis of your budget"
+    },
+    "actions": {
+      "analyzing": "Analyzing...",
+      "refresh": "Update prediction"
+    },
+    "metrics": {
+      "riskLabel": "Risk level",
+      "confidence": "Confidence",
+      "spent": "Spent",
+      "projected": "Projected",
+      "dailyRate": "Daily spend",
+      "daysRemaining": "Days remaining"
+    },
+    "sections": {
+      "recommendations": "Recommendations",
+      "categoryAnalysis": "Category analysis"
+    },
+    "emptyState": {
+      "title": "AI predictions available soon",
+      "description": "You need at least 5 transactions to generate predictions. You currently have {{count}}."
+    },
+    "riskLabels": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "recommendations": {
+      "projectedOverage": {
+        "message": "Projected overage of {{amount}}",
+        "action": "Consider reviewing discretionary expenses"
+      },
+      "highDailyRate": {
+        "message": "Your daily spending rate is high",
+        "action": "Try spacing large purchases further apart"
+      },
+      "onTrack": {
+        "message": "You're on track with the budget!",
+        "action": "Keep this spending pace"
+      }
+    }
+  },
+  "seatingMobile": {
+    "header": {
+      "title": "Seating plan"
+    },
+    "search": {
+      "placeholder": "Search tables or guests..."
+    },
+    "stats": {
+      "tables": "Tables",
+      "guests": "Guests",
+      "pending": "Unassigned"
+    },
+    "tables": {
+      "moreGuests": "+{{count}} more guests",
+      "empty": "Empty table",
+      "assignedGuests": "{{count}} guests assigned",
+      "occupancyLabel": "occupancy"
+    },
+    "pending": {
+      "title": "Pending guests ({{count}})",
+      "moreGuests": "+{{count}} more guests"
+    },
+    "actions": {
+      "assign": "Assign",
+      "remove": "Remove",
+      "close": "Close"
+    },
+    "tableDetail": {
+      "capacity": "Capacity",
+      "occupancy": "Occupancy",
+      "guestsHeading": "Guests",
+      "noGuests": "No guests assigned"
+    }
+  },
+  "categories": {
+    "decoration": "Decoration",
+    "cocktail": "Cocktail",
+    "banquet": "Banquet",
+    "ceremony": "Ceremony",
+    "flowers": "Flowers",
+    "dress": "Dresses",
+    "cake": "Cakes",
+    "photography": "Photography"
+  },
+  "services": {
+    "catering": "Catering",
+    "photography": "Fotografía",
+    "video": "Vdeo",
+    "music": "Música",
+    "musicDJ": "Música/DJ",
+    "decoration": "Decoración",
+    "flowers": "Flores",
+    "transport": "Transporte",
+    "dresses": "Vestidos",
+    "suits": "Trajes",
+    "pastry": "Pastelera",
+    "invitations": "Invitaciones",
+    "furnitureRental": "Alquiler de mobiliario",
+    "lighting": "Iluminacin",
+    "makeup": "Maquillaje",
+    "hairdressing": "Peluquera",
+    "jewelry": "Joyera",
+    "entertainment": "Animacin",
+    "weddingPlanner": "Wedding Planner",
+    "ceremonyVenue": "Lugar de ceremonia",
+    "receptionVenue": "Lugar de celebración",
+    "accommodation": "Alojamiento",
+    "honeymoon": "Viaje de novios",
+    "sound": "Sonido",
+    "photoBooth": "Fotomatn",
+    "officiant": "Oficiante",
+    "weddingCake": "Tarta nupcial",
+    "favors": "Detalles/Regaos",
+    "security": "Seguridad",
+    "dayCoordination": "Coordinacin día B",
+    "other": "Otro"
+  },
+  "suppliers": {
+    "configureServices": "Configure desired services",
+    "suggested": "Suggested",
+    "addServicePlaceholder": "Add service (e.g. Photography)",
+    "noServicesAdded": "You haven't added services yet.",
+    "labels": {
+      "provider": "Provider",
+      "service": "Service"
+    },
+    "compare": {
+      "title": "Compare suppliers",
+      "summary": "Comparing {{count}} supplier",
+      "summary_plural": "Comparing {{count}} suppliers",
+      "empty": {
+        "title": "No suppliers to compare",
+        "description": "Select suppliers from the search results using the compare checkbox.",
+        "cta": "Back to search"
+      },
+      "actions": {
+        "back": "Back to search",
+        "clearAll": "Clear all",
+        "clear": "Clear comparison",
+        "remove": "Remove"
+      },
+      "features": {
+        "basic": "Basic information",
+        "rating": "Rating",
+        "location": "Location",
+        "price": "Price",
+        "portfolio": "Portfolio",
+        "reviews": "Reviews"
+      },
+      "table": {
+        "feature": "Feature",
+        "image": "Image",
+        "description": "Description",
+        "contact": "Contact",
+        "type": "Type",
+        "notAvailable": "Not available",
+        "notSpecified": "Not specified",
+        "noRatings": "No ratings yet",
+        "noLocation": "Not specified",
+        "seePortfolio": "View portfolio →",
+        "reviewsCount": "{{count}} review",
+        "reviewsCount_plural": "{{count}} reviews",
+        "categoryFallback": "Uncategorised"
+      },
+      "price": {
+        "notSpecified": "Not specified"
+      },
+      "typeBadges": {
+        "registered": "Registered",
+        "cached": "Cached",
+        "internet": "Internet"
+      }
+    },
+    "register": {
+      "title": "Register your business",
+      "subtitle": "Join the platform and stand out to thousands of couples searching for suppliers",
+      "form": {
+        "email": {
+          "label": "Email *",
+          "placeholder": "you@email.com"
+        },
+        "password": {
+          "label": "Password *",
+          "placeholder": "Minimum 6 characters"
+        },
+        "confirmPassword": {
+          "label": "Confirm password *",
+          "placeholder": "Repeat your password"
+        },
+        "name": {
+          "label": "Business name *",
+          "placeholder": "e.g. Maria Lopez Photography"
+        },
+        "category": {
+          "label": "Category *"
+        },
+        "location": {
+          "label": "City *",
+          "placeholder": "e.g. Valencia"
+        },
+        "phone": {
+          "label": "Phone",
+          "placeholder": "612 345 678"
+        },
+        "website": {
+          "label": "Website",
+          "placeholder": "https://yourwebsite.com"
+        },
+        "description": {
+          "label": "Describe your service",
+          "placeholder": "Tell us about your service, experience, style..."
+        }
+      },
+      "categories": {
+        "photography": "Photography",
+        "video": "Video",
+        "catering": "Catering",
+        "flowers": "Flowers & decor",
+        "music": "Music / DJ",
+        "beauty": "Hair & makeup",
+        "stationery": "Invitations",
+        "attire": "Dresses & suits",
+        "jewelry": "Jewelry",
+        "transport": "Transport",
+        "accommodation": "Accommodation",
+        "other": "Other services"
+      },
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "passwordLength": "Password must be at least 6 characters",
+        "server": "Registration error",
+        "generic": "We couldn't complete the registration. Please try again."
+      },
+      "buttons": {
+        "submit": "Register business",
+        "submitting": "Registering..."
+      },
+      "login": {
+        "question": "Already have an account?",
+        "link": "Sign in"
+      },
+      "benefits": {
+        "title": "Benefits of registering",
+        "items": [
+          "Appear first in searches with the \"Verified\" badge",
+          "Manage your profile: photos, pricing, services",
+          "Receive direct enquiries from interested couples",
+          "Analytics dashboard for views, clicks, conversions",
+          "Stand out compared to non-registered suppliers"
+        ]
+      },
+      "toasts": {
+        "registerSuccess": "Supplier registered successfully.",
+        "claimedSuccess": "Profile claimed and activated successfully."
+      }
+    },
+    "overview": {
+      "title": "Supplier Management",
+      "metrics": {
+        "totalProviders": "Total Providers",
+        "confirmed": "Confirmed",
+        "pending": "Pending",
+        "shortlist": "Shortlist"
+      },
+      "defaults": {
+        "country": "Spain",
+        "serviceGroup": "Services",
+        "otherService": "Other",
+        "fallbackName": "provider"
+      },
+      "shortlist": {
+        "loading": "Loading shortlist...",
+        "error": "Could not load the shortlist.",
+        "empty": "Save candidates from your searches or manual registrations to build the initial shortlist.",
+        "savedAt": "Saved {{value}}",
+        "match": "Match {{value}}"
+      },
+      "status": {
+        "pending": "Pending",
+        "confirmed": "Confirmed"
+      },
+      "toasts": {
+        "missingQuery": "Add a term or complete your profile to improve searches.",
+        "noResults": "No matches found. Try with other search terms.",
+        "success": "✅ {{count}} suppliers found ({{registered}} verified, {{cached}} cached, {{internet}} from internet)",
+        "error": "Could not complete search.",
+        "wantedServicesSaved": "Desired services updated.",
+        "wantedServicesError": "Could not save desired services.",
+        "providerSaved": "Provider saved.",
+        "providerError": "Could not save provider."
+      },
+      "searchMode": {
+        "label": "Search in:",
+        "auto": "🔍 Auto (Hybrid)",
+        "database": "💾 Database only",
+        "internet": "🌐 Internet only",
+        "indicator": "🎯 Search mode: {{mode}}"
+      },
+      "breakdown": {
+        "title": "Found {{total}} suppliers ({{registered}} registered, {{cached}} cached, {{internet}} from the web)"
+      },
+      "actions": {
+        "manageServices": "Manage services",
+        "newSupplier": "New supplier",
+        "clear": "Clear"
+      },
+      "exploration": {
+        "title": "Exploration and shortlist",
+        "subtitle": "Explore suppliers, save ideas and review your pending candidates",
+        "collapseAria": "Collapse exploration",
+        "searchPlaceholder": "Search by supplier, service or note",
+        "recentSearches": "Recent searches:"
+      },
+      "results": {
+        "title": "Search results",
+        "query": "Query: {{value}}",
+        "loading": "Searching suppliers...",
+        "empty": "No results found with current filters.",
+        "breakdown": "📊 Found: {{registered}} verified · {{cached}} cached · {{internet}} from internet"
+      },
+      "pagination": {
+        "label": "Page {{current}} of {{total}}"
+      },
+      "buttons": {
+        "explore": "Explore suppliers"
+      },
+      "services": {
+        "title": "Services by category",
+        "count": "{{count}} service",
+        "count_other": "{{count}} services",
+        "confirmedCount": "{{count}} confirmed",
+        "confirmedCount_other": "{{count}} confirmed",
+        "pendingCount": "{{count}} pending",
+        "pendingCount_other": "{{count}} pending",
+        "shortlistCount": "{{count}} saved option",
+        "shortlistCount_other": "{{count}} saved options",
+        "reviewShortlist": "Review saved options",
+        "emptyShortlist": "No saved options yet",
+        "exploreHint": "Click to explore"
+      },
+      "drawer": {
+        "title": "Supplier details",
+        "titleWithName": "{{name}} - Details",
+        "imageAlt": "Image of {{name}}",
+        "fallbackName": "supplier",
+        "serviceUnknown": "Unknown service",
+        "location": "Location: {{value}}",
+        "priceRange": "Price range: {{value}}",
+        "email": "Email: {{value}}",
+        "phone": "Phone: {{value}}",
+        "openLink": "Open link",
+        "empty": "No supplier selected"
+      },
+      "modals": {
+        "options": {
+          "title": "Saved options · {{label}}",
+          "confirmedTitle": "Confirmed provider",
+          "contactTitle": "Contacted providers",
+          "contactEmpty": "No candidates registered among current providers.",
+          "shortlistTitle": "Shortlist",
+          "shortlistEmpty": "You haven't saved proposals for this service yet."
+        },
+        "newProvider": {
+          "title": "New provider"
+        },
+        "board": {
+          "title": "Services board",
+          "description": "Review the status of each service and add options directly from this panel."
+        }
+      }
+    },
+    "rfqModal": {
+      "defaults": {
+        "subject": "Request for proposal: {servicio}",
+        "body": "Hello {proveedor_nombre},\\n\\nWe are {novios} and we are planning our wedding on {fecha_evento} at {lugar}. We would love to learn about your availability and rates for {servicio}.\\n\\nEvent details:\\n• Guests: {invitados}\\n• Approx. budget: {presupuesto}\\n• Planner: {organizador}\\n\\nCould you send us an initial proposal or schedule a quick call?\\n\\nThank you!\\n\\n{organizador}",
+        "unknownDate": "Date to be confirmed"
+      },
+      "title": "Send RFQ ({{count}})",
+      "missingEmails": "{{count, plural, one=1 supplier is missing an email. Add it to include them in the RFQ., other={{count}} suppliers are missing an email. Add them to include them in the RFQ.}}",
+      "templates": {
+        "label": "Saved templates",
+        "placeholder": "Select a template",
+        "nameLabel": "Template name",
+        "namePlaceholder": "e.g. Photographer follow-up",
+        "serviceLabel": "Default service",
+        "servicePlaceholder": "e.g. Photography",
+        "save": "Save template",
+        "delete": "Delete template",
+        "defaultName": "Untitled template"
+      },
+      "subjectLabel": "Email subject",
+      "messageLabel": "Message",
+      "variablesLabel": "Available variables",
+      "variablesInsert": "Insert variable",
+      "reminders": {
+        "title": "Automatic reminders",
+        "clear": "Clear reminders",
+        "none": "No reminders scheduled",
+        "add": "Add reminder in {{day}} days",
+        "summary": "Reminders scheduled for {{days}} days",
+        "disabled": "Automatic reminders are disabled"
+      },
+      "attachments": {
+        "title": "Attachments",
+        "namePlaceholder": "Display name",
+        "urlPlaceholder": "URL (https://...)",
+        "remove": "Remove",
+        "add": "Add attachment",
+        "upload": "Upload from device",
+        "uploading": "Uploading..."
+      },
+      "errors": {
+        "upload": "Failed to upload attachment: {{message}}"
+      },
+      "preview": {
+        "title": "Preview",
+        "subject": "Subject:"
+      },
+      "result": {
+        "success": "{{count}} requests sent successfully.",
+        "reminders": "Reminders scheduled: {{days}}",
+        "failure": "{{count}} emails failed to send.",
+        "failureSummary": "{{sentCount}} suppliers received the request. Reminders scheduled: {{reminders}}."
+      },
+      "buttons": {
+        "close": "Close",
+        "send": "Send RFQ",
+        "sending": "Sending..."
+      }
+    },
+    "mergeWizard": {
+      "title": "Merge or split service lines",
+      "description": "Select the service lines that will be affected and choose whether to merge them into a single card or move them to a new supplier. Changes are applied immediately in Firestore.",
+      "statusOptions": {
+        "pending": "Pending",
+        "contacted": "Contacted",
+        "quote": "Quote",
+        "selected": "Selected",
+        "confirmed": "Confirmed",
+        "rejected": "Rejected"
+      },
+      "lists": {
+        "heading": "Supplier lines",
+        "selected": "Selected: {{selected}}/{{total}}",
+        "empty": "This supplier has no service lines yet.",
+        "unnamed": "Untitled",
+        "meta": "Status: {{status}} · Budget: {{budget}}",
+        "budgetValue": "€ {{amount}}",
+        "budgetUnknown": "—"
+      },
+      "actionPanel": {
+        "title": "Action",
+        "merge": "Merge into a single line",
+        "split": "Move to a new supplier"
+      },
+      "merge": {
+        "primaryLabel": "Primary line",
+        "primaryPlaceholder": "Select a line",
+        "primaryOption": "{{name}} · {{status}}",
+        "nameLabel": "Merged name",
+        "namePlaceholder": "e.g. Catering + Open bar",
+        "statusLabel": "Status",
+        "statusKeep": "Keep current",
+        "budgetLabel": "Merged budget",
+        "budgetPlaceholder": "e.g. 2500",
+        "notesLabel": "Notes",
+        "notesPlaceholder": "Additional notes"
+      },
+      "split": {
+        "nameLabel": "Name for the new supplier",
+        "namePlaceholder": "e.g. Exclusive Catering",
+        "serviceLabel": "Primary service",
+        "servicePlaceholder": "e.g. Catering",
+        "statusLabel": "Initial status",
+        "copyContact": "Copy contact details from the original supplier"
+      },
+      "errors": {
+        "createProvider": "We couldn't create the new supplier.",
+        "merge": "We couldn't merge the selected lines.",
+        "split": "We couldn't split the supplier."
+      },
+      "warnings": {
+        "irreversible": "This action is irreversible. Consider exporting the supplier before making permanent changes."
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "merge": "Merge lines",
+        "mergeSubmitting": "Applying…",
+        "split": "Create new supplier",
+        "splitSubmitting": "Creating…"
+      }
+    },
+    "tracking": {
+      "shared": {
+        "notAvailable": "—"
+      },
+      "status": {
+        "sent": "Sent",
+        "delivered": "Delivered",
+        "read": "Read",
+        "responded": "Responded",
+        "error": "Error",
+        "pending": "Pending",
+        "unknown": "Unknown"
+      },
+      "list": {
+        "filters": {
+          "all": "All",
+          "sent": "Sent",
+          "delivered": "Delivered",
+          "read": "Read",
+          "responded": "Responded",
+          "error": "Error",
+          "pending": "Pending"
+        },
+        "empty": "No tracking records match the selected filter.",
+        "placeholders": {
+          "provider": "Supplier",
+          "subject": "(No subject)"
+        },
+        "sentAt": "Sent: {{value}}",
+        "updatedAt": "Updated: {{value}}",
+        "openCount": "{{count, plural, one=Opened {{count}} time, other=Opened {{count}} times}}",
+        "details": "View details"
+      },
+      "modal": {
+        "title": "Email tracking",
+        "closeAria": "Close",
+        "placeholders": {
+          "recipient": "recipient",
+          "recipientEmail": "supplier@example.com",
+          "subject": "(No subject)"
+        },
+        "emailInfo": {
+          "title": "Email information",
+          "fields": {
+            "subject": "Subject",
+            "provider": "Supplier",
+            "recipient": "Recipient",
+            "sent": "Sent",
+            "updated": "Last updated",
+            "opens": "Opens"
+          },
+          "openCount": "{{count, plural, one=Opened {{count}} time, other=Opened {{count}} times}}",
+          "websiteLink": "View website: {{url}}"
+        },
+        "activities": {
+          "send": "Email sent to {{email}}",
+          "deliver": "Email delivered to the destination server",
+          "openFirst": "Email opened for the first time",
+          "openNth": "Open #{{index}}",
+          "errorDefault": "Email delivery error"
+        },
+        "activity": {
+          "title": "Activity history"
+        },
+        "error": {
+          "title": "Error",
+          "default": "Email delivery error"
+        },
+        "content": {
+          "title": "Email content",
+          "fromLabel": "From:",
+          "fromValue": "Your MaLoveApp email",
+          "toLabel": "To:",
+          "subjectLabel": "Subject:",
+          "placeholderRecipientEmail": "supplier@example.com",
+          "body": {
+            "greeting": "Hello supplier,",
+            "intro": "This is a sample of the email content that was sent to the supplier.",
+            "note": "In a real implementation, the actual email body would appear here.",
+            "farewell": "Best regards,",
+            "signature": "Your name"
+          }
+        },
+        "buttons": {
+          "schedule": "Schedule follow-up",
+          "close": "Close",
+          "reply": "Reply"
+        }
+      },
+      "card": {
+        "pendingTooltip": "Follow-up pending",
+        "statusFallback": "To define",
+        "nameFallback": "Supplier without name",
+        "serviceFallback": "Service not set",
+        "estimatedBudget": "Estimated budget",
+        "shared": {
+          "notAvailable": "—"
+        },
+        "statusLabels": {
+          "new": "New",
+          "contacted": "Contacted",
+          "selected": "Selected",
+          "confirmed": "Confirmed",
+          "rejected": "Rejected",
+          "discarded": "Discarded",
+          "pending": "Pending",
+          "unknown": "Status not set"
+        },
+        "rating": {
+          "count": "({{count}})"
+        },
+        "labels": {
+          "lastContact": "Last contact",
+          "nextStep": "Next step",
+          "owner": "Owner",
+          "nextPayment": "Next payment"
+        },
+        "buttons": {
+          "view": "View record",
+          "promote": "Promote to confirmed",
+          "schedule": "Log next action",
+          "archive": "Discard"
+        },
+        "metrics": {
+          "matchLabel": "AI match:",
+          "experienceLabel": "Experience:",
+          "responseLabel": "Responsiveness:",
+          "percent": "{{value}}%"
+        },
+        "portal": {
+          "responded": "Portal responded",
+          "pending": "Portal pending"
+        },
+        "groupTooltip": "Group: {{name}}",
+        "budget": {
+          "acceptedTooltip": "Accepted budget: {{amount}}",
+          "latestTooltip": "Latest budget: {{amount}}",
+          "genericTooltip": "Budget",
+          "accepted": "Accepted budget",
+          "pending": "Pending budget ({{count}})",
+          "received": "Budget received"
+        },
+        "contactLabel": "Contact: {{value}}",
+        "phoneLabel": "Phone: {{value}}",
+        "priceLabel": "Price: {{value}}",
+        "depositPaid": "Deposit paid",
+        "dateLabel": "{{value}}",
+        "actions": {
+          "view": "View",
+          "edit": "Edit",
+          "viewBudget": "View budget",
+          "assignGroup": "Assign to group",
+          "delete": "Delete",
+          "reserve": "Schedule",
+          "requestQuote": "Request quote",
+          "requestMeeting": "Request meeting"
+        },
+        "autoEmail": {
+          "signature": "Automatically sent from MaLove.App",
+          "subjectQuote": "Quote request - {{target}}",
+          "subjectMeeting": "Meeting request - {{target}}",
+          "missingEmail": "Add a supplier contact email to send automatic requests.",
+          "successQuote": "Quote request sent automatically.",
+          "successMeeting": "Meeting request sent automatically.",
+          "sendErrorRetry": "We couldn't send the automatic email. Please try again.",
+          "sendError": "We couldn't send the automatic email.",
+          "sending": "Sending...",
+          "userFallback": "Planner",
+          "guestsFallback": "100",
+          "appendedQuote": "We would love to receive a detailed quote including rates, conditions, and availability for our date.",
+          "appendedMeeting": "Could we schedule a meeting (in person or video call) to review the service and confirm availability? Let us know which times work best for you.",
+          "closing": "Looking forward to your reply.",
+          "searchQuery": {
+            "quote": "Wedding vendor quote request",
+            "meeting": "Schedule meeting with wedding vendor"
+          }
+        },
+        "tracking": {
+          "status": "Tracking: {{status}}",
+          "last": "Last: {{value}}",
+          "thread": "Thread: {{count}}",
+          "openInboxTitle": "Open inbox",
+          "openInbox": "View email",
+          "detailsTitle": "View tracking details",
+          "details": "Details",
+          "defaultSubject": "Message for {{name}}",
+          "pendingTodos": {
+            "tasks": "Pending tasks",
+            "followUps": "Follow-ups needed",
+            "assigned": "Assigned to-dos"
+          },
+          "lastAgo": {
+            "justNow": "Just now",
+            "minutes": "{count, plural, one=1 min ago, other={{count}} min ago}",
+            "hours": "{count, plural, one=1 h ago, other={{count}} h ago}",
+            "days": "{count, plural, one=1 day ago, other={{count}} days ago}"
+          }
+        },
+        "emails": {
+          "toggleTitle": "View related emails",
+          "hide": "Hide emails",
+          "show": "Related emails ({{count}})",
+          "loading": "Loading emails...",
+          "empty": "No related emails",
+          "noSubject": "(No subject)",
+          "openInbox": "Open in inbox"
+        },
+        "favorite": {
+          "add": "Mark as favorite",
+          "remove": "Remove from favorites"
+        },
+        "hybrid": {
+          "defaults": {
+            "name": "Supplier",
+            "service": "weddings"
+          },
+          "location": "📍 {{city}}",
+          "imageAlt": "Image of {{name}}",
+          "badges": {
+            "registered": "Verified ✓",
+            "cached": "Cached",
+            "internet": "From the web",
+            "portfolio": "Portfolio"
+          },
+          "favorite": {
+            "add": "Add to favorites",
+            "remove": "Remove from favorites"
+          },
+          "compare": {
+            "add": "Add to compare",
+            "remove": "Remove from compare"
+          },
+          "reviews": {
+            "count": {
+              "one": "{{count}} review",
+              "other": "{{count}} reviews"
+            }
+          },
+          "contact": {
+            "primary": "Contact",
+            "whatsapp": "WhatsApp",
+            "email": "Email",
+            "phone": "Call",
+            "whatsappTitle": "Contact via WhatsApp",
+            "emailTitle": "Send email",
+            "whatsappMessage": "Hi {{name}}, I found your {{service}} service on {{brand}} and I'd love to get more information.",
+            "emailSubject": "Enquiry from {{brand}} - {{service}}",
+            "emailBody": "Hi {{name}},\\n\\nI found your service on {{brand}} and would love to receive more information.\\n\\nThanks!"
+          },
+          "actions": {
+            "viewProfile": "View profile",
+            "markConfirmed": "Book supplier",
+            "viewWebsite": "Visit website",
+            "viewDetails": "View details",
+            "viewPortfolio": "View portfolio",
+            "share": "Share"
+          },
+          "share": {
+            "message": "Check out this vendor! {{name}} - {{service}}",
+            "toast": "Opening WhatsApp to share"
+          },
+          "followUp": {
+            "reminder": "💡 More than 7 days ago • Consider following up",
+            "lastContact": "Last contact: {{date}} via {{method}}",
+            "lastContactNoMethod": "Last contact: {{date}}",
+            "methods": {
+              "whatsapp": "WhatsApp",
+              "email": "Email",
+              "phone": "Phone",
+              "other": "{{method}}"
+            }
+          },
+          "source": {
+            "label": "Source: {{source}}",
+            "internet": "Internet"
+          }
+        }
+      },
+      "pendingTodos": {
+        "tasks": "Pending tasks",
+        "followUps": "Follow-ups needed",
+        "assigned": "Assigned to-dos"
+      }
+    },
+    "kanban": {
+      "columns": {
+        "por_definir": "To classify",
+        "vistos": "Viewed",
+        "contactado": "Contacted",
+        "presupuesto": "Quote",
+        "contratado": "Contracted",
+        "rechazado": "Rejected"
+      },
+      "badges": {
+        "group": "Group: {{name}}",
+        "nextAction": "Next action: {{value}}"
+      },
+      "actions": {
+        "reset": "Reset",
+        "budget": "Quote",
+        "hire": "Mark as contracted",
+        "reject": "Mark as rejected"
+      },
+      "placeholders": {
+        "name": "Supplier",
+        "service": "Service",
+        "empty": "Drag suppliers here",
+        "notAvailable": "—"
+      }
+    },
+    "aiSearchModal": {
+      "title": "Smart search",
+      "closeAria": "Close",
+      "inputPlaceholder": "Describe what you're looking for...",
+      "search": "Search",
+      "searching": "Searching...",
+      "example": "Example: \"Documentary style wedding photographer in Seville\"",
+      "filters": {
+        "service": "Service",
+        "all": "All"
+      },
+      "suggestionsTitle": "Suggestions",
+      "suggestions": [
+        "Documentary style photographer",
+        "Catering for 120 guests",
+        "DJ available in August",
+        "Vintage florist in Madrid",
+        "Outdoor venue near Barcelona"
+      ],
+      "footer": {
+        "powered": "Powered by AI",
+        "close": "Close"
+      }
+    },
+    "aiSearch": {
+      "services": {
+        "generic": "Wedding services",
+        "photo": "Photography",
+        "video": "Video",
+        "catering": "Catering",
+        "music": "Music",
+        "flowers": "Flowers"
+      },
+      "defaults": {
+        "suggestedName": "Suggested provider {{index}}"
+      },
+      "aiSummary": {
+        "matchesPreferences": "Matches your key preferences.",
+        "priceRange": "Estimated price range: {{price}}.",
+        "location": "Located in {{location}}.",
+        "locationAvailable": "Available near {{location}}."
+      },
+      "errors": {
+        "openaiFailed": "AI supplier search is not available. Configure OPENAI_API_KEY in the backend or enable an alternative engine.",
+        "openaiInvalidResponse": "The AI service returned an invalid format. Try again later or check the backend logs.",
+        "openaiRequestFailed": "Could not contact OpenAI. Check your credentials and connectivity.",
+        "serpUnavailable": "The fallback engine (SerpAPI) is not configured. Provide SERPAPI_API_KEY to enable it.",
+        "rateLimited": "Rate limit exceeded. Try again in a few minutes.",
+        "http": "Error {{status}}",
+        "generic": "Unable to complete the supplier search.",
+        "aiResponse": "AI search responded {{status}}",
+        "externalResponse": "The external search responded {{status}}",
+        "internalResponse": "The internal search responded {{status}}",
+        "unknownStatus": "unknown",
+        "offline": "Could not connect to the server. Make sure the backend is running at http://localhost:4004.",
+        "backendUnavailable": "The backend server is unavailable. Ensure it is running at http://localhost:4004.",
+        "openaiNotConfigured": "AI search requires OPENAI_API_KEY to be set in the backend. Add your OpenAI API key to the backend .env file.",
+        "noLocalResults": "No suppliers were found in the internal database.",
+        "noResults": "No suppliers matched your search. Try different terms or configure the AI search service."
+      },
+      "demoResults": [
+        {
+          "id": "1",
+          "name": "Naturaleza Viva Photography",
+          "service": "Photography",
+          "snippet": "Studio specialized in wedding photography with a natural, documentary style. We capture your most emotional and spontaneous moments.",
+          "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
+          "location": "Madrid",
+          "price": "€1,200 - €2,500",
+          "tags": [
+            "natural",
+            "documentary",
+            "outdoor",
+            "sunlight"
+          ],
+          "keywords": [
+            "photographer",
+            "natural",
+            "documentary",
+            "wedding"
+          ]
+        },
+        {
+          "id": "2",
+          "name": "Lente Azul Photography",
+          "service": "Photography",
+          "snippet": "More than 10 years of experience in beach weddings and natural spaces. Personalized packages for every couple.",
+          "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
+          "location": "Barcelona",
+          "price": "€1,500 - €3,000",
+          "tags": [
+            "beach",
+            "outdoor",
+            "nature"
+          ],
+          "keywords": [
+            "photographer",
+            "wedding",
+            "beach",
+            "experience"
+          ]
+        },
+        {
+          "id": "3",
+          "name": "Delicious Moments Catering",
+          "service": "Catering",
+          "snippet": "Catering with vegetarian, vegan and allergy-friendly options. Specialists in events from 50 to 200 guests.",
+          "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
+          "location": "Madrid",
+          "price": "€70 - €120 per guest",
+          "tags": [
+            "vegetarian",
+            "vegan",
+            "buffet"
+          ],
+          "keywords": [
+            "catering",
+            "buffet",
+            "event"
+          ]
+        },
+        {
+          "id": "4",
+          "name": "DJ Sounds & Lights",
+          "service": "Music",
+          "snippet": "DJ with professional sound and lighting equipment. Extensive experience in weddings and corporate events.",
+          "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
+          "location": "Valencia",
+          "price": "€800 - €1,500",
+          "tags": [
+            "dj",
+            "music",
+            "lighting"
+          ],
+          "keywords": [
+            "dj",
+            "music",
+            "event"
+          ]
+        },
+        {
+          "id": "5",
+          "name": "Flores del Jardín",
+          "service": "Flowers",
+          "snippet": "Artisan florist specialized in vintage and boho decoration. We work with local, seasonal product.",
+          "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
+          "location": "Seville",
+          "price": "€500 - €1,500",
+          "tags": [
+            "flowers",
+            "decoration",
+            "boho"
+          ],
+          "keywords": [
+            "flowers",
+            "decoration",
+            "wedding"
+          ]
+        }
+      ]
+    },
+    "aiResultList": {
+      "loading": {
+        "title": "Searching suppliers...",
+        "subtitle": "Analyzing your query: \"{{query}}\""
+      },
+      "error": {
+        "title": "Search error",
+        "retry": "Try again"
+      },
+      "emptyQuery": {
+        "title": "Search suppliers with AI",
+        "description": "Describe what you need in natural language and AI will find the best suppliers."
+      },
+      "noResults": {
+        "title": "No results found",
+        "description": "No suppliers match your search \"{{query}}\". Try different terms or check that the backend is running correctly."
+      },
+      "fallbackNotice": "Showing demo results because the server is unavailable.",
+      "summary": {
+        "prefix": "Found ",
+        "suffix": " suppliers for your search:"
+      },
+      "matchBadge": "{{value}}% match",
+      "locationLabel": "Location:",
+      "aiAnalysis": "AI analysis",
+      "buttons": {
+        "view": "View details",
+        "add": "Add",
+        "email": "Send email",
+        "select": "Select"
+      },
+      "links": {
+        "emailTitle": "Send email",
+        "phoneTitle": "Call",
+        "instagramTitle": "Open Instagram",
+        "instagramLabel": "Instagram"
+      }
+    },
+    "aiEmailModal": {
+      "title": "Contact {{name}}",
+      "closeAria": "Close",
+      "success": {
+        "title": "Email sent successfully",
+        "message": "Your message was sent to the supplier. You'll receive a notification when they reply."
+      },
+      "error": {
+        "title": "Error sending the email"
+      },
+      "from": "Sending from:",
+      "to": "To:",
+      "subject": {
+        "label": "Subject",
+        "placeholder": "Email subject"
+      },
+      "body": {
+        "label": "Message",
+        "placeholder": "Write your message here..."
+      },
+      "aiSummary": "Why this supplier?",
+      "buttons": {
+        "cancel": "Cancel",
+        "send": "Send email",
+        "sending": "Sending..."
+      }
+    },
+    "reservationModal": {
+      "title": "Schedule meeting with {{name}}",
+      "actions": {
+        "closeAria": "Close modal",
+        "cancel": "Cancel",
+        "confirm": "Confirm booking"
+      },
+      "form": {
+        "dateLabel": "Date *",
+        "timeLabel": "Time *",
+        "contactMethodLabel": "Preferred contact method",
+        "contactMethods": {
+          "email": "Email",
+          "phone": "Phone",
+          "inPerson": "In person",
+          "videoCall": "Video call"
+        },
+        "notesLabel": "Notes or questions for the supplier",
+        "notesPlaceholder": "Any additional information relevant to the meeting..."
+      },
+      "providerInfo": {
+        "title": "Contact information",
+        "contact": "Contact:",
+        "phone": "Phone:",
+        "email": "Email:",
+        "location": "Location:"
+      },
+      "emailSection": {
+        "title": "Contact by email",
+        "description": "Send a direct email to check availability or request more information before confirming the booking.",
+        "button": "Compose email to the supplier"
+      },
+      "emailForm": {
+        "title": "Send email to the supplier",
+        "closeAria": "Close email composer",
+        "subjectLabel": "Subject",
+        "bodyLabel": "Message",
+        "send": "Send email",
+        "sending": "Sending..."
+      },
+      "emailSuccess": {
+        "title": "Email sent",
+        "description": "Your message was sent to {{name}} from {{email}}. We'll notify you when they reply."
+      },
+      "errors": {
+        "emailRequired": "Subject and message are required.",
+        "dateRequired": "The date is required.",
+        "timeRequired": "The time is required."
+      }
+    },
+    "formModal": {
+      "title": {
+        "create": "New supplier",
+        "edit": "Edit supplier"
+      },
+      "actions": {
+        "closeAria": "Close modal",
+        "cancel": "Cancel",
+        "save": "Save",
+        "update": "Update",
+        "saving": "Saving..."
+      },
+      "sections": {
+        "basic": "Basic information",
+        "contact": "Contact details",
+        "additional": "Additional information"
+      },
+      "fields": {
+        "name": {
+          "label": "Name *",
+          "placeholder": "Supplier name"
+        },
+        "service": {
+          "label": "Service *",
+          "placeholder": "Type of service"
+        },
+        "budget": {
+          "label": "Budget",
+          "prefix": "€",
+          "placeholder": "0"
+        },
+        "status": {
+          "label": "Status"
+        },
+        "contact": {
+          "label": "Contact person",
+          "placeholder": "Contact name"
+        },
+        "phone": {
+          "label": "Phone",
+          "placeholder": "+34 XXX XXX XXX"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "email@example.com"
+        },
+        "web": {
+          "label": "Website",
+          "placeholder": "https://example.com"
+        },
+        "location": {
+          "label": "Location",
+          "placeholder": "City, province"
+        },
+        "appointment": {
+          "label": "Meeting date"
+        },
+        "notes": {
+          "label": "Notes",
+          "placeholder": "Additional notes about the supplier"
+        },
+        "image": {
+          "label": "Image URL",
+          "placeholder": "https://example.com/image.jpg",
+          "help": "Enter an image URL for the supplier (optional)"
+        }
+      },
+      "status": {
+        "options": {
+          "new": "New",
+          "contacted": "Contacted",
+          "pending": "Pending",
+          "hired": "Booked",
+          "discarded": "Discarded"
+        }
+      },
+      "errors": {
+        "general": "We couldn't save the supplier. Please try again.",
+        "nameRequired": "Name is required.",
+        "serviceRequired": "Service is required.",
+        "emailInvalid": "Email format is invalid.",
+        "webInvalid": "Website must start with http:// or https://"
+      }
+    },
+    "confirmedCard": {
+      "nameFallback": "Supplier",
+      "serviceFallback": "Service not set",
+      "statusBadge": "Confirmed",
+      "nextPayment": {
+        "label": "Next payment",
+        "none": "No scheduled date"
+      },
+      "summary": {
+        "assigned": "Assigned",
+        "paid": "Paid",
+        "pending": "Pending"
+      },
+      "groupLabel": "Group: {{name}}",
+      "actions": {
+        "view": "View record",
+        "registerPayment": "Record payment",
+        "viewContract": "View contract",
+        "portal": "Supplier portal"
+      },
+      "shared": {
+        "notAvailable": "—"
+      }
+    },
+    "detail": {
+      "info": {
+        "nameFallback": "Unnamed supplier",
+        "serviceFallback": "Service not set"
+      },
+      "placeholders": {
+        "notAvailable": "—"
+      },
+      "sections": {
+        "about": "About {{name}}",
+        "contact": "Contact"
+      },
+      "contact": {
+        "email": "Email",
+        "phone": "Phone",
+        "website": "Website"
+      },
+      "gallery": {
+        "previous": "Previous image",
+        "next": "Next image"
+      },
+      "portfolio": {
+        "title": "Portfolio",
+        "viewPublic": "View full page",
+        "photoAlt": "Photo {{index}}",
+        "empty": "No photos available yet",
+        "viewAll": "View all photos ({{count}})"
+      }
+    }
+  },
+  "designsLibrary": {
+    "myDesigns": {
+      "title": "My designs",
+      "backLink": "Back to Designs",
+      "warning": {
+        "noWedding": "Select a wedding to view its designs."
+      },
+      "loading": "Loading...",
+      "messages": {
+        "loadError": "We couldn’t load your designs",
+        "deleteError": "We couldn’t delete the design"
+      },
+      "confirmDelete": "Delete this design permanently?",
+      "noItems": "You don’t have any saved designs yet.",
+      "item": {
+        "typeFallback": "design",
+        "categoryFallback": "general",
+        "noPreview": "No preview available"
+      },
+      "actions": {
+        "edit": "Edit",
+        "download": "Download",
+        "delete": "Delete"
+      }
+    },
+    "vectorEditor": {
+      "title": "Vector editor (AI)",
+      "warning": {
+        "openHint": "Open this editor from an AI generated image to vectorise it automatically."
+      },
+      "controls": {
+        "modeLabel": "Mode",
+        "modes": {
+          "color": "Colour (ImageTracer)",
+          "mono": "Monochrome (Potrace)"
+        },
+        "color": {
+          "colors": "Colours",
+          "ltres": "ltres (0-1)",
+          "qtres": "qtres (0-1)",
+          "stroke": "Stroke"
+        },
+        "mono": {
+          "threshold": "Threshold (0-255)"
+        },
+        "vectorize": {
+          "action": "Vectorise again",
+          "loading": "Vectorising..."
+        },
+        "viewOriginal": "View original",
+        "saveToWedding": "Save to wedding"
+      },
+      "palette": {
+        "title": "Wedding palette",
+        "save": "Save palette",
+        "addColor": "+ colour"
+      },
+      "messages": {
+        "vectorizeError": "We couldn't vectorise the image",
+        "loadSvgError": "We couldn't load the SVG",
+        "paletteLoadWarning": "We couldn't load the palette",
+        "noSvg": "No SVG available yet."
+      },
+      "toasts": {
+        "noContent": "There is no SVG content to save.",
+        "saveSuccess": "SVG saved successfully.",
+        "saveError": "We couldn't save the SVG.",
+        "paletteSaved": "Palette saved successfully.",
+        "paletteSaveError": "We couldn't save the palette."
+      }
+    }
+  },
+  "websitePreview": {
+    "empty": {
+      "title": "Preview your wedding website",
+      "description": "Generate the page with the assistant to preview the result and publish it.",
+      "editLogistics": "Edit logistics before generating"
+    },
+    "previewTitle": "Preview your wedding website",
+    "windowTitle": "Preview – Your wedding site",
+    "previewFrameTitle": "Preview",
+    "status": {
+      "checking": "Checking…",
+      "invalid": "Invalid slug",
+      "reserved": "Slug reserved",
+      "taken": "Taken",
+      "available": "Available",
+      "unknown": "We couldn’t verify"
+    },
+    "actions": {
+      "publish": {
+        "default": "Publish page",
+        "loading": "Publishing..."
+      },
+      "editLogistics": "Edit logistics",
+      "openNewTab": "Open in new tab",
+      "downloadHtml": "Download HTML",
+      "copyLink": "Copy link",
+      "showQr": "Show QR",
+      "hideQr": "Hide QR"
+    },
+    "slug": {
+      "label": "Public slug",
+      "placeholder": "my-wedding-anna-luis",
+      "suggestions": "Suggestions:"
+    },
+    "qr": {
+      "title": "QR for the public site",
+      "close": "Close",
+      "alt": "QR"
+    },
+    "toasts": {
+      "linkCopied": "Link copied to clipboard"
+    }
+  },
+  "websiteGenerator": {
+    "gallery": {
+      "title": "Choose a style for your site"
+    },
+    "prompt": {
+      "title": "Customise your site",
+      "description": "Describe how you want your website to look, colours, style, or any specific requirements.",
+      "selectedTemplate": {
+        "prefix": "Using template: ",
+        "suffix": ". You can edit the suggested text or add more details."
+      },
+      "exploreLibrary": "Browse prompt library",
+      "variablesHint": "Use variables like {nombres}, {fecha}, {ubicacion}",
+      "placeholder": "Describe how you want your site to look (style, colours, sections, logistics, etc.)"
+    },
+    "promptLibrary": {
+      "title": "Prompt library",
+      "close": "Close",
+      "intro": "Choose a prompt to auto-fill the generator.",
+      "tokensIntro": "Replace the variables with your own data:",
+      "tokens": {
+        "names": "{nombres}",
+        "date": "{fecha}",
+        "location": "{ubicacion}"
+      },
+      "builtIn": {
+        "title": "Default prompts",
+        "use": "Use prompt"
+      },
+      "custom": {
+        "title": "My prompts",
+        "new": "New prompt",
+        "loading": "Loading personal library…",
+        "empty": "You don't have any custom prompts yet. Create one to reuse your favourite instructions.",
+        "templateLabel": "Suggested template:",
+        "templateFallback": "Custom",
+        "untitled": "Untitled"
+      },
+      "buttons": {
+        "use": "Use",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "form": {
+        "editTitle": "Edit custom prompt",
+        "createTitle": "New custom prompt",
+        "labels": {
+          "name": "Name",
+          "template": "Suggested template",
+          "description": "Description",
+          "prompt": "Prompt"
+        },
+        "placeholders": {
+          "name": "Prompt for modern style",
+          "description": "Short note to identify the type of instructions.",
+          "prompt": "Describe the tone, structure and key elements you want."
+        },
+        "cancel": "Cancel",
+        "save": "Save prompt",
+        "saving": "Saving…"
+      },
+      "errors": {
+        "required": "Prompt cannot be empty.",
+        "save": "Could not save prompt.",
+        "delete": "Could not delete prompt."
+      },
+      "confirmDelete": "Delete this custom prompt?"
+    },
+    "profileSummary": {
+      "title": "Profile data applied",
+      "conjunction": "and",
+      "labels": {
+        "couple": "Couple",
+        "date": "Date",
+        "ceremony": "Ceremony",
+        "reception": "Reception",
+        "contact": "Contact",
+        "additionalInfo": "Additional info"
+      }
+    },
+    "versions": {
+      "title": "Published versions",
+      "columns": {
+        "date": "Date",
+        "template": "Template",
+        "prompt": "Prompts",
+        "actions": "Actions"
+      },
+      "fallbackTemplate": "Custom",
+      "noPrompt": "No instructions"
+    },
+    "logistics": {
+      "title": "Edit site logistics",
+      "description": "Configure shuttle schedules, recommended lodging and travel guidance. Changes are saved to the active wedding.",
+      "story": {
+        "title": "Couple story",
+        "placeholder": "Tell the couple’s story in 2-3 paragraphs."
+      },
+      "notes": {
+        "title": "Notes / recommendations",
+        "placeholder": "Include recommendations, dress code, or any useful information."
+      },
+      "transportation": {
+        "title": "General transportation",
+        "placeholder": "Eg: Shuttles will depart from the main hotel 45 minutes before the ceremony..."
+      },
+      "schedule": {
+        "title": "Shuttle schedule",
+        "add": "Add time",
+        "departure": "Departs from",
+        "destination": "Arrives at",
+        "notes": "Notes"
+      },
+      "lodging": {
+        "title": "Recommended lodging",
+        "add": "Add lodging",
+        "remove": "Remove lodging",
+        "placeholders": {
+          "name": "Hotel or lodging name",
+          "distance": "Distance or travel time",
+          "priceRange": "Price range",
+          "link": "Booking link",
+          "amenities": "Amenities or notes (separated by comma or line break)"
+        }
+      },
+      "travel": {
+        "title": "Travel guide",
+        "summaryPlaceholder": "General overview",
+        "byPlanePlaceholder": "How to arrive by plane",
+        "byTrainPlaceholder": "How to arrive by train or bus",
+        "byCarPlaceholder": "How to arrive by car",
+        "tipsPlaceholder": "Additional tips",
+        "airportsPlaceholder": "Nearby airports (one per line)",
+        "stationsPlaceholder": "Nearby stations (one per line)"
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "add": "Add question",
+        "remove": "Remove question",
+        "questionPlaceholder": "Question",
+        "answerPlaceholder": "Answer"
+      }
+    },
+    "logisticsActions": {
+      "cancel": "Cancel",
+      "save": "Save logistics",
+      "saving": "Saving…"
+    },
+    "actions": {
+      "generate": "Generate Website",
+      "generating": "Generating..."
+    }
+  },
+  "actions": {
+    "close": "Close"
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "serviceRequired": "Service is required",
+    "emailInvalid": "Invalid email",
+    "linkMustStartHttp": "Link must start with http:// or https://",
+    "titleRequired": "Title is required",
+    "companionNegative": "Number of companions cannot be negative",
+    "selectCompanionType": "Select companion type",
+    "companionMismatch": "Set \"No companion\" or add one",
+    "fieldRequired": "This field is required",
+    "emailRequired": "Email is required",
+    "emailFormat": "Email format is invalid",
+    "phoneFormat": "Phone format is invalid",
+    "urlFormat": "URL must start with http:// or https://",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least {{count}} characters",
+    "nameMinLength": "Name must be at least {{count}} characters",
+    "nameMaxLength": "Name cannot exceed {{count}} characters",
+    "postalCodeInvalid": "Postal code is invalid",
+    "dniInvalid": "DNI/NIE is invalid",
+    "password": {
+      "veryWeak": "Very weak",
+      "weak": "Weak",
+      "acceptable": "Acceptable",
+      "good": "Good",
+      "excellent": "Excellent",
+      "suggestions": {
+        "minLength": "Enter a password with at least {{count}} characters.",
+        "useMinChars": "Use at least {{count}} characters.",
+        "increase12": "Increase length to 12 characters or more.",
+        "mixCase": "Combine uppercase and lowercase.",
+        "addNumbers": "Add numbers to strengthen it.",
+        "addSymbols": "Include symbols like !, %, # or similar.",
+        "avoidRepetition": "Avoid repeating the same character multiple times in a row.",
+        "avoidCommon": "Avoid common words or predictable sequences."
+      }
+    }
+  },
+  "errors": {
+    "generic": "An unexpected error occurred",
+    "networkError": "Network error. Check your connection.",
+    "permissionDenied": "Insufficient permissions",
+    "openaiDisabled": "Direct OpenAI disabled (use backend)",
+    "missingOpenAIKey": "Missing OpenAI key",
+    "openaiError": "Error connecting to OpenAI",
+    "loadError": "Error loading data",
+    "saveError": "Error saving changes",
+    "deleteError": "Error deleting",
+    "updateError": "Error updating",
+    "publishError": "Error publishing",
+    "offlineError": "You're offline. Connect to the internet to publish the microsite.",
+    "generateWebError": "An error occurred while generating the web page. Please try again.",
+    "activateUrlError": "Could not activate public URL at this time. Please try again later.",
+    "saveLogisticsError": "Could not save logistics. Please try again."
+  },
+  "website": {
+    "generate": "Generate website",
+    "publish": "Publish",
+    "preview": "Preview",
+    "edit": "Edit",
+    "logistics": {
+      "title": "Logistics",
+      "venue": "Venue",
+      "address": "Address",
+      "time": "Time",
+      "parking": "Parking",
+      "accommodation": "Accommodation"
+    }
+  },
+  "admin": {
+    "clipboard": {
+      "copied": "Copied to clipboard",
+      "copyError": "Error copying"
+    },
+    "partner": {
+      "linkGenerated": "Link generated and copied:\n{{url}}",
+      "linkError": "Error generating link",
+      "managerCreated": "Sales manager created successfully",
+      "managerConfirmError": "No confirmation received for new manager. Check backend.",
+      "commercialCreated": "Sales representative created successfully",
+      "commercialConfirmError": "No confirmation received for new representative. Check backend."
+    },
+    "users": {
+      "exportSuccess": "User data exported successfully",
+      "sendEmail": "Send email to {{email}}",
+      "resetPassword": "Reset password for {{name}}",
+      "suspendError": "Error suspending user: {{message}}",
+      "reactivateError": "Error reactivating user: {{message}}"
+    },
+    "portfolio": {
+      "exported": "✅ Portfolio exported: {{total}} weddings",
+      "exportError": "Error exporting portfolio: {{message}}"
+    },
+    "dashboard": {
+      "errors": {
+        "overview": "We couldn't load the admin overview."
+      },
+      "noData": "no data"
+    },
+    "support": {
+      "responseSuccess": "Response sent successfully",
+      "responseError": "Error sending response: {{message}}"
+    },
+    "alerts": {
+      "resolveError": "Could not mark the alert as resolved.",
+      "resolveAction": "Mark as resolved",
+      "resolving": "Resolving…"
+    }
+  },
+  "weddings": {
+    "syncCrmError": "Could not queue CRM sync. Please try again.",
+    "bulkSyncError": "Could not queue selected weddings. Please try again.",
+    "createError": "Could not create wedding. Check permissions.",
+    "updateStatusError": "Could not update wedding status. Please try again."
+  },
+  "whatsapp": {
+    "selectGuests": "Select at least one guest",
+    "coupleNameRequired": "The message must include the couple name or the {coupleName} variable",
+    "assetUrlRequired": "Add the designed invitation URL before continuing",
+    "providerNotConfigured": "WhatsApp API provider is not configured. Please configure it before sending.",
+    "coupleNameMissing": "The message must include the couple name for each selected guest",
+    "sendComplete": "Send completed. Success: {{ok}}, Failed: {{fail}}",
+    "modal": {
+      "title": "Send via WhatsApp",
+      "tabs": {
+        "personal": "Personal phone",
+        "api": "App number (API)"
+      },
+      "personal": {
+        "description": "WhatsApp will open on your device with the prepared message. Confirm the send manually.",
+        "businessToggle": "Open in WhatsApp Business"
+      },
+      "api": {
+        "providerStatusLine": "Provider status: {{status}}",
+        "status": {
+          "checking": "Checking…",
+          "configured": "Configured",
+          "notConfigured": "Not configured"
+        },
+        "providerName": "Provider: {{provider}}",
+        "healthLabel": "Health: {{status}}",
+        "healthStatus": {
+          "ok": "OK",
+          "degraded": "Degraded"
+        },
+        "healthFallback": "(fallback: {{value}})",
+        "viewMetrics": "View metrics",
+        "metrics": {
+          "loading": "Loading metrics…",
+          "total": "Total: {{value}}",
+          "delivery": "Delivery: {{percentage}}%",
+          "read": "Read: {{percentage}}%"
+        },
+        "noteUnconfigured": "Note: The API provider is not ready. You can use the \"Personal phone\" tab (deeplink) as an alternative."
+      },
+      "labels": {
+        "message": "Message"
+      },
+      "actions": {
+        "sendSingle": "Send to this guest",
+        "sendBulkPending": "Bulk: pending guests",
+        "sendBulkPendingTitle": "Send to pending guests through the API"
+      },
+      "defaultMessage": {
+        "generic": "Hello! We'd love to invite you to our wedding. Can you confirm your attendance?",
+        "named": "Hello {{name}}! We'd love to have you at our wedding. Can you confirm your attendance?"
+      }
+    },
+    "inviteTemplate": {
+      "title": "Edit message (WhatsApp API)",
+      "labels": {
+        "template": "Template (supports {guestName})"
+      },
+      "placeholder": "Hi {guestName}! We are {coupleName} and we'd love to celebrate with you...",
+      "variables": {
+        "title": "Available variables:"
+      },
+      "tokens": {
+        "guestName": "{guestName}",
+        "coupleName": "{coupleName}"
+      },
+      "examples": {
+        "guestName": "María"
+      },
+      "previewTitle": "Preview",
+      "confirmAddCouple": "The message does not include {coupleName}. It will be added automatically to identify the couple.",
+      "appendCouple": "We are {coupleName}",
+      "toast": {
+        "saveError": "We couldn't save the template."
+      }
+    }
+  },
+  "design": {
+    "svg": {
+      "noContent": "No SVG to save",
+      "saved": "SVG saved to wedding",
+      "saveError": "Could not save SVG"
+    },
+    "palette": {
+      "saved": "Palette saved",
+      "saveError": "Could not save palette"
+    }
+  },
+  "supplier": {
+    "register": {
+      "claimedSuccess": "Profile claimed successfully! You can now manage your information.",
+      "registerSuccess": "Registration successful! Welcome to the platform."
+    }
+  },
+  "chat": {
+    "open": "Open chat",
+    "noteMarked": "Note marked as important",
+    "messages": {
+      "user": "User",
+      "assistant": "Assistant",
+      "emptyPrompt": "How can I help you with {{subject}}?",
+      "greeting": "Hello! I'm here to help you with {{subject}}"
+    },
+    "defaults": {
+      "event": "event",
+      "wedding": "wedding",
+      "yourPlanning": "your planning",
+      "task": "task",
+      "meeting": "meeting"
+    },
+    "commands": {
+      "taskAdded": "Task added",
+      "meetingAdded": "Meeting added",
+      "taskUpdated": "Task updated",
+      "taskDeleted": "Task deleted",
+      "taskCompleted": "Task completed"
+    }
+  },
+  "general": "General",
+  "notes": "Notas",
+  "apply": "Aplicar",
+  "pagination": "Paginacin"
+}

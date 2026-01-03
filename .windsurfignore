@@ -1,0 +1,76 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+
+# Builds
+dist/
+build/
+**/dist/
+**/build/
+
+# Logs
+*.log
+*.log.*
+logs/
+**/logs/
+backend/logs/
+error.log
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# Temp files
+*.tmp
+*.temp
+temp/
+tmp/
+*debug*.txt
+*dev*.txt
+build*.txt
+modal_test_output.txt
+new_debug.txt
+
+# Test results
+cypress/screenshots/
+cypress/videos/
+cypress-results.json
+test-results/
+junit.xml
+
+# Reports
+lint-report.json
+lint_errors.json
+eslint_*.json
+
+# Large generated files
+package-lock.json
+**/package-lock.json
+roadmap_aggregated.json
+
+# Git
+.git/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backups
+*.bak
+*.backup
+*.old

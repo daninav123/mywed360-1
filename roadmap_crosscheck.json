@@ -1,0 +1,745 @@
+{
+  "generatedAt": "2025-12-27T00:34:38.406Z",
+  "counts": {
+    "modules": 40,
+    "tasks": 26,
+    "docSpecs": 97,
+    "taskSpecs": 0,
+    "actualSpecs": 16
+  },
+  "dupSpecTasks": [],
+  "aggregatedMissingSpecs": [
+    {
+      "module": "0. Administración Global (estado 2025-10-14)",
+      "spec": "cypress/e2e/admin/admin-flow.cy.js"
+    },
+    {
+      "module": "1. Registro y Autenticación (estado 2025-10-08)",
+      "spec": "cypress/e2e/auth/flow1-social-login.cy.js"
+    },
+    {
+      "module": "1. Registro y Autenticación (estado 2025-10-08)",
+      "spec": "cypress/e2e/auth/flow1-verify-email.cy.js"
+    },
+    {
+      "module": "10. Gestión de Bodas Múltiples (estado 2025-10-16)",
+      "spec": "cypress/e2e/weddings/multi-weddings-flow.cy.js"
+    },
+    {
+      "module": "10. Gestión de Bodas Múltiples (estado 2025-10-16)",
+      "spec": "cypress/e2e/weddings/wedding-team-flow.cy.js"
+    },
+    {
+      "module": "11. Protocolo y Ceremonias (visión global)",
+      "spec": "cypress/e2e/protocolo/ceremony-tabs-flow.cy.js"
+    },
+    {
+      "module": "11A. Momentos Especiales de la Boda",
+      "spec": "cypress/e2e/protocolo/protocolo-flows.cy.js"
+    },
+    {
+      "module": "11B. Timeline Global del Día B",
+      "spec": "cypress/e2e/protocolo/protocolo-flows.cy.js"
+    },
+    {
+      "module": "11C. Checklist de Última Hora",
+      "spec": "cypress/e2e/protocolo/protocolo-flows.cy.js"
+    },
+    {
+      "module": "11D. Guía de Documentación Legal",
+      "spec": "cypress/e2e/protocolo/protocolo-flows.cy.js"
+    },
+    {
+      "module": "11E. Ayuda a Lecturas y Votos",
+      "spec": "cypress/e2e/email/smart-composer.cy.js"
+    },
+    {
+      "module": "11E. Ayuda a Lecturas y Votos",
+      "spec": "cypress/e2e/email/ai-provider-email.cy.js"
+    },
+    {
+      "module": "12. Notificaciones y Configuración (estado 2025-10-07)",
+      "spec": "cypress/e2e/notifications/preferences-flow.cy.js"
+    },
+    {
+      "module": "14. Checklist Avanzado (estado 2025-10-07)",
+      "spec": "cypress/e2e/tasks/all_subtasks_modal.cy.js"
+    },
+    {
+      "module": "15. Contratos y Documentos (estado 2025-10-07)",
+      "spec": "cypress/e2e/contracts/contracts-flow.cy.js"
+    },
+    {
+      "module": "16. Asistente Virtual y Automatizaciones IA (estado 2025-10-07)",
+      "spec": "cypress/e2e/email/ai-provider-email.cy.js"
+    },
+    {
+      "module": "16. Asistente Virtual y Automatizaciones IA (estado 2025-10-07)",
+      "spec": "cypress/e2e/email/smart-composer.cy.js"
+    },
+    {
+      "module": "16. Asistente Virtual y Automatizaciones IA (estado 2025-10-07)",
+      "spec": "cypress/e2e/assistant/chat-fallback-context.cy.js"
+    },
+    {
+      "module": "17. Gamificacion y Progreso (estado 2025-10-13)",
+      "spec": "cypress/e2e/gamification/gamification-progress-happy.cy.js"
+    },
+    {
+      "module": "17. Gamificacion y Progreso (estado 2025-10-13)",
+      "spec": "cypress/e2e/gamification/gamification-milestone-unlock.cy.js"
+    },
+    {
+      "module": "17. Gamificacion y Progreso (estado 2025-10-13)",
+      "spec": "cypress/e2e/gamification/gamification-history.cy.js"
+    },
+    {
+      "module": "18. Generador de Documentos Legales (estado 2025-10-07)",
+      "spec": "cypress/e2e/protocolo/legal-docs-generator.cy.js"
+    },
+    {
+      "module": "18. Generador de Documentos Legales (estado 2025-10-07)",
+      "spec": "cypress/e2e/protocolo/legal-docs-validation.cy.js"
+    },
+    {
+      "module": "18. Generador de Documentos Legales (estado 2025-10-07)",
+      "spec": "cypress/e2e/protocolo/legal-docs-versioning.cy.js"
+    },
+    {
+      "module": "19. Diseno de Invitaciones (estado 2025-10-07)",
+      "spec": "cypress/e2e/invitaciones_rsvp.cy.js"
+    },
+    {
+      "module": "2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08",
+      "spec": "cypress/e2e/onboarding/create-event-cta.cy.js"
+    },
+    {
+      "module": "2. Descubrimiento Personalizado de la Boda",
+      "spec": "cypress/e2e/onboarding/discovery-personalized.cy.js"
+    },
+    {
+      "module": "2. Descubrimiento Personalizado de la Boda",
+      "spec": "cypress/e2e/onboarding/onboarding-mode-selector.cy.js"
+    },
+    {
+      "module": "20. Buzon Interno y Estadisticas (estado 2025-10-07)",
+      "spec": "cypress/e2e/email_inbox_smoke.cy.js"
+    },
+    {
+      "module": "20. Buzon Interno y Estadisticas (estado 2025-10-07)",
+      "spec": "cypress/e2e/email/read-email.cy.js"
+    },
+    {
+      "module": "20. Buzon Interno y Estadisticas (estado 2025-10-07)",
+      "spec": "cypress/e2e/email/send-email.cy.js"
+    },
+    {
+      "module": "20. Buzon Interno y Estadisticas (estado 2025-10-07)",
+      "spec": "cypress/e2e/email/folders-management.cy.js"
+    },
+    {
+      "module": "20. Buzon Interno y Estadisticas (estado 2025-10-07)",
+      "spec": "cypress/e2e/email/tags-filters.cy.js"
+    },
+    {
+      "module": "20. Buzon Interno y Estadisticas (estado 2025-10-07)",
+      "spec": "cypress/e2e/compose_quick_replies.cy.js"
+    },
+    {
+      "module": "20. Buzon Interno y Estadisticas (estado 2025-10-07)",
+      "spec": "cypress/e2e/email/smart-composer.cy.js"
+    },
+    {
+      "module": "21. Sitio Público (estado 2025-10-07)",
+      "spec": "cypress/e2e/inspiration/inspiration-flow.cy.js"
+    },
+    {
+      "module": "21. Sitio Público (estado 2025-10-07)",
+      "spec": "cypress/e2e/inspiration_smoke.cy.js"
+    },
+    {
+      "module": "21. Sitio Público (estado 2025-10-07)",
+      "spec": "cypress/e2e/news/news-flow.cy.js"
+    },
+    {
+      "module": "23. Metricas del Proyecto (estado 2025-10-14)",
+      "spec": "cypress/e2e/performance/email-performance.cy.js"
+    },
+    {
+      "module": "23. Metricas del Proyecto (estado 2025-10-14)",
+      "spec": "cypress/e2e/finance/finance-analytics.cy.js"
+    },
+    {
+      "module": "23. Metricas del Proyecto (estado 2025-10-14)",
+      "spec": "cypress/e2e/gamification/gamification-history.cy.js"
+    },
+    {
+      "module": "23. Metricas del Proyecto (estado 2025-10-14)",
+      "spec": "cypress/e2e/budget_flow.cy.js"
+    },
+    {
+      "module": "24. Inspiracion Visual Unificada (estado 2025-10-12)",
+      "spec": "cypress/e2e/inspiration/inspiration-gallery.cy.js"
+    },
+    {
+      "module": "24. Inspiracion Visual Unificada (estado 2025-10-12)",
+      "spec": "cypress/e2e/inspiration/inspiration-home-gallery.cy.js"
+    },
+    {
+      "module": "24. Inspiracion Visual Unificada (estado 2025-10-12)",
+      "spec": "cypress/e2e/inspiration/inspiration-save-board.cy.js"
+    },
+    {
+      "module": "24. Inspiracion Visual Unificada (estado 2025-10-12)",
+      "spec": "cypress/e2e/inspiration/inspiration-share.cy.js"
+    },
+    {
+      "module": "25. Planes y Suscripciones (estado 2025-10-13)",
+      "spec": "cypress/e2e/subscriptions/subscription-flow.cy.js"
+    },
+    {
+      "module": "27. Momentos (Álbum Compartido) — estado 2025-10-24",
+      "spec": "cypress/e2e/moments/moments-empty-state.cy.js"
+    },
+    {
+      "module": "28. Dashboard Wedding Planner (estado 2025-10-13)",
+      "spec": "cypress/e2e/dashboard/diagnostic-panel.cy.js"
+    },
+    {
+      "module": "28. Dashboard Wedding Planner (estado 2025-10-13)",
+      "spec": "cypress/e2e/dashboard/global-search-shortcuts.cy.js"
+    },
+    {
+      "module": "28. Dashboard Wedding Planner (estado 2025-10-13)",
+      "spec": "cypress/e2e/dashboard/main-navigation.cy.js"
+    },
+    {
+      "module": "28. Dashboard Wedding Planner (estado 2025-10-13)",
+      "spec": "cypress/e2e/dashboard/planner-dashboard.cy.js"
+    },
+    {
+      "module": "29. Upgrade de Rol (Owner → Assistant → Planner) (estado 2025-10-13)",
+      "spec": "cypress/e2e/account/role-upgrade-flow.cy.js"
+    },
+    {
+      "module": "2B. Asistente Conversacional para Crear Bodas/Eventos · estado 2025-10-11",
+      "spec": "cypress/e2e/onboarding/assistant-conversation-happy.cy.js"
+    },
+    {
+      "module": "2B. Asistente Conversacional para Crear Bodas/Eventos · estado 2025-10-11",
+      "spec": "cypress/e2e/onboarding/assistant-context-switch.cy.js"
+    },
+    {
+      "module": "2B. Asistente Conversacional para Crear Bodas/Eventos · estado 2025-10-11",
+      "spec": "cypress/e2e/onboarding/assistant-followups.cy.js"
+    },
+    {
+      "module": "2B. Asistente Conversacional para Crear Bodas/Eventos · estado 2025-10-11",
+      "spec": "cypress/e2e/onboarding/create-event-assistant.cy.js"
+    },
+    {
+      "module": "2C. Personalización IA Continua (estado 2025-10-14)",
+      "spec": "cypress/e2e/personalization/personalization-preferences.cy.js"
+    },
+    {
+      "module": "3. Gestión de Invitados (estado 2025-10-07)",
+      "spec": "cypress/e2e/guests/guest-segment-sync.cy.js"
+    },
+    {
+      "module": "3. Gestión de Invitados (estado 2025-10-07)",
+      "spec": "cypress/e2e/guests/guest-whatsapp-flow.cy.js"
+    },
+    {
+      "module": "3. Gestión de Invitados (estado 2025-10-07)",
+      "spec": "cypress/e2e/guests/guest-import.cy.js"
+    },
+    {
+      "module": "30. Página de inicio (estado 2025-10-13)",
+      "spec": "cypress/e2e/home/home-greeting-names.cy.js"
+    },
+    {
+      "module": "31. Estilo Global (estado 2025-10-13)",
+      "spec": "cypress/e2e/style/style-global.cy.js"
+    },
+    {
+      "module": "5b. Timeline y Tareas (estado 2025-10-07)",
+      "spec": "cypress/e2e/tasks/all_subtasks_modal.cy.js"
+    },
+    {
+      "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
+      "spec": "cypress/e2e/finance/finance-flow.cy.js"
+    },
+    {
+      "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
+      "spec": "cypress/e2e/finance/finance-budget.cy.js"
+    },
+    {
+      "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
+      "spec": "cypress/e2e/finance/finance-transactions.cy.js"
+    },
+    {
+      "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
+      "spec": "cypress/e2e/finance/finance-contributions.cy.js"
+    },
+    {
+      "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
+      "spec": "cypress/e2e/finance/finance-analytics.cy.js"
+    },
+    {
+      "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
+      "spec": "cypress/e2e/budget_flow.cy.js"
+    },
+    {
+      "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
+      "spec": "cypress/e2e/finance/finance-advisor-chat.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/send-email.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/read-email.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/folders-management.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/tags-filters.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/smart-composer.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/ai-provider-email.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/compose_quick_replies.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email_inbox_smoke.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/read-email-attachments.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/read-email-list.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/read-email-open.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/read-email-unread-status.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/send-email-attachment.cy.js"
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "spec": "cypress/e2e/email/send-email-validation.cy.js"
+    },
+    {
+      "module": "8. Diseno Web y Personalizacion (estado 2025-10-08)",
+      "spec": "cypress/e2e/web/diseno-web-flow.cy.js"
+    },
+    {
+      "module": "9. RSVP y Confirmaciones (estado 2025-10-07)",
+      "spec": "cypress/e2e/rsvp/rsvp_confirm_by_token.cy.js"
+    },
+    {
+      "module": "9. RSVP y Confirmaciones (estado 2025-10-07)",
+      "spec": "cypress/e2e/rsvp/rsvp_invalid_token.cy.js"
+    },
+    {
+      "module": "9. RSVP y Confirmaciones (estado 2025-10-07)",
+      "spec": "cypress/e2e/rsvp/rsvp_reminders.cy.js"
+    },
+    {
+      "module": "9. RSVP y Confirmaciones (estado 2025-10-07)",
+      "spec": "cypress/e2e/rsvp/rsvp_confirm.cy.js"
+    },
+    {
+      "module": "9. RSVP y Confirmaciones (estado 2025-10-07)",
+      "spec": "cypress/e2e/invitaciones_rsvp.cy.js"
+    },
+    {
+      "module": "9. RSVP y Confirmaciones (estado 2025-10-07)",
+      "spec": "cypress/e2e/rsvp_confirm.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_smoke.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_assign_unassign.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_capacity_limit.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_no_overlap.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_obstacles_no_overlap.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_template_circular.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_template_u_l_imperial.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_ceremony.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_fit.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_aisle_min.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_toasts.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_auto_ai.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_area_type.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_delete_duplicate.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating-content-flow.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating-basic.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating-conflicts.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating_ui_panels.cy.js"
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "spec": "cypress/e2e/seating/seating-export.cy.js"
+    }
+  ],
+  "modulesWithNoTaskForSpecs": [
+    {
+      "module": "0. Administración Global (estado 2025-10-14)",
+      "specs": ["cypress/e2e/admin/admin-flow.cy.js"]
+    },
+    {
+      "module": "1. Registro y Autenticación (estado 2025-10-08)",
+      "specs": [
+        "cypress/e2e/auth/flow1-signup.cy.js",
+        "cypress/e2e/auth/flow1-social-login.cy.js",
+        "cypress/e2e/auth/flow1-password-reset.cy.js",
+        "cypress/e2e/auth/flow1-verify-email.cy.js",
+        "cypress/e2e/auth/auth-flow.cy.js"
+      ]
+    },
+    {
+      "module": "10. Gestión de Bodas Múltiples (estado 2025-10-16)",
+      "specs": [
+        "cypress/e2e/weddings/multi-weddings-flow.cy.js",
+        "cypress/e2e/weddings/wedding-team-flow.cy.js"
+      ]
+    },
+    {
+      "module": "11. Protocolo y Ceremonias (visión global)",
+      "specs": ["cypress/e2e/protocolo/ceremony-tabs-flow.cy.js"]
+    },
+    {
+      "module": "11A. Momentos Especiales de la Boda",
+      "specs": ["cypress/e2e/protocolo/protocolo-flows.cy.js"]
+    },
+    {
+      "module": "11B. Timeline Global del Día B",
+      "specs": ["cypress/e2e/protocolo/protocolo-flows.cy.js"]
+    },
+    {
+      "module": "11C. Checklist de Última Hora",
+      "specs": ["cypress/e2e/protocolo/protocolo-flows.cy.js"]
+    },
+    {
+      "module": "11D. Guía de Documentación Legal",
+      "specs": ["cypress/e2e/protocolo/protocolo-flows.cy.js"]
+    },
+    {
+      "module": "11E. Ayuda a Lecturas y Votos",
+      "specs": [
+        "cypress/e2e/email/smart-composer.cy.js",
+        "cypress/e2e/email/ai-provider-email.cy.js"
+      ]
+    },
+    {
+      "module": "12. Notificaciones y Configuración (estado 2025-10-07)",
+      "specs": ["cypress/e2e/notifications/preferences-flow.cy.js"]
+    },
+    {
+      "module": "14. Checklist Avanzado (estado 2025-10-07)",
+      "specs": ["cypress/e2e/tasks/all_subtasks_modal.cy.js"]
+    },
+    {
+      "module": "15. Contratos y Documentos (estado 2025-10-07)",
+      "specs": ["cypress/e2e/contracts/contracts-flow.cy.js"]
+    },
+    {
+      "module": "16. Asistente Virtual y Automatizaciones IA (estado 2025-10-07)",
+      "specs": [
+        "cypress/e2e/email/ai-provider-email.cy.js",
+        "cypress/e2e/email/smart-composer.cy.js",
+        "cypress/e2e/assistant/chat-fallback-context.cy.js"
+      ]
+    },
+    {
+      "module": "17. Gamificacion y Progreso (estado 2025-10-13)",
+      "specs": [
+        "cypress/e2e/gamification/gamification-progress-happy.cy.js",
+        "cypress/e2e/gamification/gamification-milestone-unlock.cy.js",
+        "cypress/e2e/gamification/gamification-history.cy.js"
+      ]
+    },
+    {
+      "module": "18. Generador de Documentos Legales (estado 2025-10-07)",
+      "specs": [
+        "cypress/e2e/protocolo/legal-docs-generator.cy.js",
+        "cypress/e2e/protocolo/legal-docs-validation.cy.js",
+        "cypress/e2e/protocolo/legal-docs-versioning.cy.js"
+      ]
+    },
+    {
+      "module": "19. Diseno de Invitaciones (estado 2025-10-07)",
+      "specs": ["cypress/e2e/invitaciones_rsvp.cy.js"]
+    },
+    {
+      "module": "2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08",
+      "specs": [
+        "cypress/e2e/onboarding/create-event-flow.cy.js",
+        "cypress/e2e/onboarding/create-event-cta.cy.js"
+      ]
+    },
+    {
+      "module": "2. Descubrimiento Personalizado de la Boda",
+      "specs": [
+        "cypress/e2e/onboarding/discovery-personalized.cy.js",
+        "cypress/e2e/onboarding/onboarding-mode-selector.cy.js"
+      ]
+    },
+    {
+      "module": "20. Buzon Interno y Estadisticas (estado 2025-10-07)",
+      "specs": [
+        "cypress/e2e/email_inbox_smoke.cy.js",
+        "cypress/e2e/email/read-email.cy.js",
+        "cypress/e2e/email/send-email.cy.js",
+        "cypress/e2e/email/folders-management.cy.js",
+        "cypress/e2e/email/tags-filters.cy.js",
+        "cypress/e2e/compose_quick_replies.cy.js",
+        "cypress/e2e/email/smart-composer.cy.js"
+      ]
+    },
+    {
+      "module": "21. Sitio Público (estado 2025-10-07)",
+      "specs": [
+        "cypress/e2e/inspiration/inspiration-flow.cy.js",
+        "cypress/e2e/inspiration_smoke.cy.js",
+        "cypress/e2e/news/news-flow.cy.js"
+      ]
+    },
+    {
+      "module": "23. Metricas del Proyecto (estado 2025-10-14)",
+      "specs": [
+        "cypress/e2e/performance/email-performance.cy.js",
+        "cypress/e2e/finance/finance-analytics.cy.js",
+        "cypress/e2e/gamification/gamification-history.cy.js",
+        "cypress/e2e/budget_flow.cy.js",
+        "cypress/e2e/finance/finance-flow-full.cy.js"
+      ]
+    },
+    {
+      "module": "24. Inspiracion Visual Unificada (estado 2025-10-12)",
+      "specs": [
+        "cypress/e2e/inspiration/inspiration-gallery.cy.js",
+        "cypress/e2e/inspiration/inspiration-home-gallery.cy.js",
+        "cypress/e2e/inspiration/inspiration-save-board.cy.js",
+        "cypress/e2e/inspiration/inspiration-share.cy.js"
+      ]
+    },
+    {
+      "module": "25. Planes y Suscripciones (estado 2025-10-13)",
+      "specs": ["cypress/e2e/subscriptions/subscription-flow.cy.js"]
+    },
+    {
+      "module": "27. Momentos (Álbum Compartido) — estado 2025-10-24",
+      "specs": ["cypress/e2e/moments/moments-empty-state.cy.js"]
+    },
+    {
+      "module": "28. Dashboard Wedding Planner (estado 2025-10-13)",
+      "specs": [
+        "cypress/e2e/dashboard/diagnostic-panel.cy.js",
+        "cypress/e2e/dashboard/global-search-shortcuts.cy.js",
+        "cypress/e2e/dashboard/main-navigation.cy.js",
+        "cypress/e2e/dashboard/planner-dashboard.cy.js"
+      ]
+    },
+    {
+      "module": "29. Upgrade de Rol (Owner → Assistant → Planner) (estado 2025-10-13)",
+      "specs": ["cypress/e2e/account/role-upgrade-flow.cy.js"]
+    },
+    {
+      "module": "2B. Asistente Conversacional para Crear Bodas/Eventos · estado 2025-10-11",
+      "specs": [
+        "cypress/e2e/onboarding/assistant-conversation-happy.cy.js",
+        "cypress/e2e/onboarding/assistant-context-switch.cy.js",
+        "cypress/e2e/onboarding/assistant-followups.cy.js",
+        "cypress/e2e/onboarding/create-event-assistant.cy.js"
+      ]
+    },
+    {
+      "module": "2C. Personalización IA Continua (estado 2025-10-14)",
+      "specs": ["cypress/e2e/personalization/personalization-preferences.cy.js"]
+    },
+    {
+      "module": "3. Gestión de Invitados (estado 2025-10-07)",
+      "specs": [
+        "cypress/e2e/guests/guest-segment-sync.cy.js",
+        "cypress/e2e/guests/guest-whatsapp-flow.cy.js",
+        "cypress/e2e/guests/guest-import.cy.js"
+      ]
+    },
+    {
+      "module": "30. Página de inicio (estado 2025-10-13)",
+      "specs": ["cypress/e2e/home/home-greeting-names.cy.js"]
+    },
+    {
+      "module": "31. Estilo Global (estado 2025-10-13)",
+      "specs": ["cypress/e2e/style/style-global.cy.js"]
+    },
+    {
+      "module": "5b. Timeline y Tareas (estado 2025-10-07)",
+      "specs": ["cypress/e2e/tasks/all_subtasks_modal.cy.js"]
+    },
+    {
+      "module": "6. Gestion de Presupuesto (estado 2025-10-08)",
+      "specs": [
+        "cypress/e2e/finance/finance-flow.cy.js",
+        "cypress/e2e/finance/finance-flow-full.cy.js",
+        "cypress/e2e/finance/finance-budget.cy.js",
+        "cypress/e2e/finance/finance-transactions.cy.js",
+        "cypress/e2e/finance/finance-contributions.cy.js",
+        "cypress/e2e/finance/finance-analytics.cy.js",
+        "cypress/e2e/budget_flow.cy.js",
+        "cypress/e2e/finance/finance-advisor-chat.cy.js"
+      ]
+    },
+    {
+      "module": "7. Comunicaciones y Email (estado 2025-10-13)",
+      "specs": [
+        "cypress/e2e/email/send-email.cy.js",
+        "cypress/e2e/email/read-email.cy.js",
+        "cypress/e2e/email/folders-management.cy.js",
+        "cypress/e2e/email/tags-filters.cy.js",
+        "cypress/e2e/email/smart-composer.cy.js",
+        "cypress/e2e/email/ai-provider-email.cy.js",
+        "cypress/e2e/compose_quick_replies.cy.js",
+        "cypress/e2e/email_inbox_smoke.cy.js",
+        "cypress/e2e/email/read-email-attachments.cy.js",
+        "cypress/e2e/email/read-email-list.cy.js",
+        "cypress/e2e/email/read-email-open.cy.js",
+        "cypress/e2e/email/read-email-unread-status.cy.js",
+        "cypress/e2e/email/send-email-attachment.cy.js",
+        "cypress/e2e/email/send-email-validation.cy.js"
+      ]
+    },
+    {
+      "module": "8. Diseno Web y Personalizacion (estado 2025-10-08)",
+      "specs": ["cypress/e2e/web/diseno-web-flow.cy.js"]
+    },
+    {
+      "module": "9. RSVP y Confirmaciones (estado 2025-10-07)",
+      "specs": [
+        "cypress/e2e/rsvp/rsvp_confirm_by_token.cy.js",
+        "cypress/e2e/rsvp/rsvp_invalid_token.cy.js",
+        "cypress/e2e/rsvp/rsvp_reminders.cy.js",
+        "cypress/e2e/rsvp/rsvp_confirm.cy.js",
+        "cypress/e2e/invitaciones_rsvp.cy.js",
+        "cypress/e2e/rsvp_confirm.cy.js"
+      ]
+    },
+    {
+      "module": "Flujo 13: E2E del Seating Plan",
+      "specs": [
+        "cypress/e2e/seating/seating_smoke.cy.js",
+        "cypress/e2e/seating/seating_assign_unassign.cy.js",
+        "cypress/e2e/seating/seating_capacity_limit.cy.js",
+        "cypress/e2e/seating/seating_no_overlap.cy.js",
+        "cypress/e2e/seating/seating_obstacles_no_overlap.cy.js",
+        "cypress/e2e/seating/seating_template_circular.cy.js",
+        "cypress/e2e/seating/seating_template_u_l_imperial.cy.js",
+        "cypress/e2e/seating/seating_ceremony.cy.js",
+        "cypress/e2e/seating/seating_fit.cy.js",
+        "cypress/e2e/seating/seating_aisle_min.cy.js",
+        "cypress/e2e/seating/seating_toasts.cy.js",
+        "cypress/e2e/seating/seating_auto_ai.cy.js",
+        "cypress/e2e/seating/seating_area_type.cy.js",
+        "cypress/e2e/seating/seating_delete_duplicate.cy.js",
+        "cypress/e2e/seating/seating-content-flow.cy.js",
+        "cypress/e2e/seating/seating-basic.cy.js",
+        "cypress/e2e/seating/seating-conflicts.cy.js",
+        "cypress/e2e/seating/seating_ui_panels.cy.js",
+        "cypress/e2e/seating/seating-export.cy.js"
+      ]
+    }
+  ],
+  "tasksSpecNotInDocs": [],
+  "tasksWithMissingSpecOnDisk": [],
+  "orphanSpecs": [
+    "cypress/e2e/accept-quote-flow.cy.js",
+    "cypress/e2e/auth/auth-flow.cy.js",
+    "cypress/e2e/auth/flow1-password-reset.cy.js",
+    "cypress/e2e/auth/flow1-signup.cy.js",
+    "cypress/e2e/budget/budget-flow.cy.js",
+    "cypress/e2e/finance/finance-flow-full.cy.js",
+    "cypress/e2e/invitados/invitados-flow.cy.js",
+    "cypress/e2e/momentos/momentos-export-spotify.cy.js",
+    "cypress/e2e/momentos/momentos-special-songs.cy.js",
+    "cypress/e2e/onboarding/create-event-flow.cy.js",
+    "cypress/e2e/tasks/tasks-flow.cy.js",
+    "cypress/e2e/wedding-info/info-boda-form-fields.cy.js",
+    "cypress/e2e/wedding-info/info-boda-iban-validation.cy.js",
+    "cypress/e2e/wedding-info/info-boda-navigation.cy.js",
+    "cypress/e2e/wedding-info/info-boda-save-functionality.cy.js",
+    "cypress/e2e/wedding-info/info-boda-special-features.cy.js"
+  ]
+}

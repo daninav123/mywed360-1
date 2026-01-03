@@ -1,0 +1,357 @@
+{
+  "eventosRelacionados": {
+    "title": "Eventos Relacionados",
+    "subtitle": "Gestiona despedidas, ensayos y otros eventos",
+    "addEvent": "Añadir evento",
+    "noEvents": "No hay eventos relacionados",
+    "addFirst": "Añadir primer evento",
+    "eventTypes": {
+      "despedida_soltero": "Despedida de soltero",
+      "despedida_soltera": "Despedida de soltera",
+      "ensayo": "Ensayo de ceremonia",
+      "cena_ensayo": "Cena de ensayo",
+      "brunch": "Brunch post-boda",
+      "bienvenida": "Cóctel de bienvenida",
+      "otro": "Otro evento"
+    },
+    "form": {
+      "eventType": "Tipo de evento",
+      "eventName": "Nombre del evento",
+      "date": "Fecha",
+      "time": "Hora",
+      "location": "Ubicación",
+      "description": "Descripción",
+      "budget": "Presupuesto",
+      "guests": "Invitados estimados",
+      "organizer": "Organizador",
+      "status": "Estado"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "confirmed": "Confirmado",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
+    },
+    "stats": {
+      "total": "Total eventos",
+      "confirmed": "Confirmados",
+      "totalBudget": "Presupuesto total",
+      "totalGuests": "Invitados totales"
+    },
+    "messages": {
+      "created": "Evento creado",
+      "updated": "Evento actualizado",
+      "deleted": "Evento eliminado",
+      "confirmDelete": "¿Eliminar este evento?"
+    }
+  },
+  "weddingTeam": {
+    "title": "Wedding Team",
+    "subtitle": "Organiza tu equipo de boda",
+    "addMember": "Añadir miembro",
+    "noMembers": "No hay miembros en el equipo",
+    "addFirst": "Añadir primer miembro",
+    "roles": {
+      "coordinador": "Coordinador de boda",
+      "padrino": "Padrino",
+      "madrina": "Madrina",
+      "testigo": "Testigo",
+      "dama_honor": "Dama de honor",
+      "paje": "Paje/Niño de arras",
+      "maestro_ceremonias": "Maestro de ceremonias",
+      "otro": "Otro rol"
+    },
+    "form": {
+      "role": "Rol",
+      "name": "Nombre completo",
+      "phone": "Teléfono",
+      "email": "Email",
+      "relationship": "Relación",
+      "responsibilities": "Responsabilidades",
+      "notes": "Notas adicionales",
+      "confirmed": "Confirmado"
+    },
+    "stats": {
+      "total": "Total miembros",
+      "confirmed": "Confirmados",
+      "pending": "Pendientes"
+    },
+    "messages": {
+      "created": "Miembro añadido",
+      "updated": "Miembro actualizado",
+      "deleted": "Miembro eliminado",
+      "confirmDelete": "¿Eliminar este miembro del equipo?"
+    }
+  },
+  "tramitesLegales": {
+    "title": "Trámites Legales",
+    "subtitle": "Gestiona documentación y trámites oficiales",
+    "addTramite": "Añadir trámite",
+    "noTramites": "No hay trámites registrados",
+    "addFirst": "Añadir primer trámite",
+    "categories": {
+      "civil": "Ceremonia civil",
+      "religiosa": "Ceremonia religiosa",
+      "extranjero": "Matrimonio con extranjero",
+      "regimen": "Régimen económico",
+      "otros": "Otros trámites"
+    },
+    "form": {
+      "category": "Categoría",
+      "name": "Nombre del trámite",
+      "description": "Descripción",
+      "required": "Requerido",
+      "deadline": "Fecha límite",
+      "status": "Estado",
+      "documents": "Documentos necesarios",
+      "cost": "Coste estimado",
+      "notes": "Notas"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "in_progress": "En proceso",
+      "completed": "Completado",
+      "not_required": "No requerido"
+    },
+    "stats": {
+      "total": "Total trámites",
+      "completed": "Completados",
+      "pending": "Pendientes",
+      "progress": "Progreso"
+    },
+    "messages": {
+      "created": "Trámite añadido",
+      "updated": "Trámite actualizado",
+      "deleted": "Trámite eliminado",
+      "statusChanged": "Estado actualizado",
+      "confirmDelete": "¿Eliminar este trámite?"
+    }
+  },
+  "invitadosEspeciales": {
+    "title": "Invitados Especiales",
+    "subtitle": "Gestiona necesidades especiales, dietas y alergias",
+    "addGuest": "Añadir invitado",
+    "noGuests": "No hay invitados con necesidades especiales",
+    "addFirst": "Añadir primer invitado",
+    "diets": {
+      "vegetariana": "Vegetariana",
+      "vegana": "Vegana",
+      "celiaca": "Celíaca / Sin gluten",
+      "lactosa": "Sin lactosa",
+      "kosher": "Kosher",
+      "halal": "Halal",
+      "diabetes": "Diabética",
+      "otra": "Otra"
+    },
+    "needs": {
+      "movilidad": "Movilidad reducida",
+      "visual": "Discapacidad visual",
+      "auditiva": "Discapacidad auditiva",
+      "embarazada": "Embarazada",
+      "bebe": "Con bebé",
+      "mayor": "Persona mayor",
+      "otra": "Otra"
+    },
+    "form": {
+      "name": "Nombre del invitado",
+      "diets": "Dietas especiales",
+      "allergies": "Alergias",
+      "needs": "Necesidades especiales",
+      "notes": "Notas adicionales",
+      "seating": "Ubicación preferente",
+      "contact": "Contacto de emergencia"
+    },
+    "stats": {
+      "total": "Invitados especiales",
+      "withDiets": "Con dietas",
+      "withAllergies": "Con alergias",
+      "withNeeds": "Con necesidades"
+    },
+    "messages": {
+      "created": "Invitado añadido",
+      "updated": "Invitado actualizado",
+      "deleted": "Invitado eliminado",
+      "confirmDelete": "¿Eliminar este invitado?",
+      "nameRequired": "El nombre es obligatorio"
+    }
+  },
+  "diaDeBoda": {
+    "title": "Día de la Boda",
+    "subtitle": "Checklist, timeline y contactos de emergencia",
+    "tabs": {
+      "checklist": "Checklist",
+      "timeline": "Timeline",
+      "contacts": "Contactos"
+    },
+    "checklist": {
+      "addItem": "Añadir tarea",
+      "noItems": "No hay tareas en el checklist",
+      "addFirst": "Añadir primera tarea",
+      "categories": {
+        "novios": "Novios",
+        "ceremonia": "Ceremonia",
+        "banquete": "Banquete",
+        "proveedores": "Proveedores",
+        "decoracion": "Decoración",
+        "emergencia": "Kit emergencia"
+      },
+      "form": {
+        "category": "Categoría",
+        "task": "Tarea",
+        "responsible": "Responsable",
+        "time": "Hora estimada",
+        "notes": "Notas",
+        "completed": "Completada"
+      }
+    },
+    "timeline": {
+      "addEvent": "Añadir momento",
+      "noEvents": "No hay momentos en el timeline",
+      "addFirst": "Añadir primer momento",
+      "form": {
+        "time": "Hora",
+        "event": "Momento",
+        "location": "Ubicación",
+        "duration": "Duración (min)",
+        "responsible": "Responsable",
+        "notes": "Notas importantes"
+      }
+    },
+    "contacts": {
+      "addContact": "Añadir contacto",
+      "noContacts": "No hay contactos de emergencia",
+      "addFirst": "Añadir primer contacto",
+      "roles": {
+        "coordinador": "Coordinador",
+        "fotografo": "Fotógrafo",
+        "video": "Videógrafo",
+        "catering": "Catering",
+        "floristeria": "Floristería",
+        "musica": "Música/DJ",
+        "transporte": "Transporte",
+        "lugar": "Responsable del lugar",
+        "emergencia": "Emergencias",
+        "otro": "Otro"
+      },
+      "form": {
+        "role": "Rol",
+        "name": "Nombre/Empresa",
+        "phone": "Teléfono",
+        "email": "Email",
+        "notes": "Notas"
+      }
+    },
+    "stats": {
+      "totalTasks": "Total tareas",
+      "completed": "Completadas",
+      "pending": "Pendientes",
+      "timeline": "Momentos timeline",
+      "contacts": "Contactos"
+    },
+    "messages": {
+      "itemCreated": "Elemento añadido",
+      "itemUpdated": "Elemento actualizado",
+      "itemDeleted": "Elemento eliminado",
+      "statusChanged": "Estado actualizado",
+      "confirmDelete": "¿Eliminar este elemento?"
+    }
+  },
+  "postBoda": {
+    "title": "Post-Boda",
+    "subtitle": "Agradecimientos, recuerdos y valoraciones",
+    "tabs": {
+      "thanks": "Agradecimientos",
+      "memories": "Recuerdos",
+      "ratings": "Valoraciones"
+    },
+    "thanks": {
+      "add": "Añadir agradecimiento",
+      "noThanks": "No hay agradecimientos registrados",
+      "addFirst": "Añadir primer agradecimiento",
+      "categories": {
+        "invitados": "Invitados",
+        "familia": "Familia cercana",
+        "padrinos": "Padrinos y testigos",
+        "proveedores": "Proveedores"
+      },
+      "form": {
+        "category": "Categoría",
+        "recipient": "Destinatario",
+        "email": "Email",
+        "message": "Mensaje",
+        "sent": "Enviado",
+        "dateSent": "Fecha de envío",
+        "useTemplate": "Usar plantilla"
+      },
+      "status": {
+        "sent": "Enviado",
+        "pending": "Pendiente"
+      }
+    },
+    "memories": {
+      "add": "Añadir recuerdo",
+      "noMemories": "No hay recuerdos guardados",
+      "addFirst": "Añadir primer recuerdo",
+      "types": {
+        "foto": "Foto",
+        "video": "Vídeo",
+        "mensaje": "Mensaje",
+        "otro": "Otro"
+      },
+      "form": {
+        "type": "Tipo",
+        "title": "Título",
+        "description": "Descripción",
+        "url": "URL (Drive, Dropbox, etc.)",
+        "date": "Fecha",
+        "viewDownload": "Ver/Descargar"
+      }
+    },
+    "ratings": {
+      "add": "Añadir valoración",
+      "noRatings": "No hay valoraciones registradas",
+      "addFirst": "Añadir primera valoración",
+      "providerTypes": [
+        "Fotógrafo",
+        "Videógrafo",
+        "Lugar ceremonia",
+        "Lugar banquete",
+        "Catering",
+        "Florista",
+        "DJ/Música",
+        "Coordinador",
+        "Peluquería",
+        "Maquillaje",
+        "Transporte",
+        "Otro"
+      ],
+      "form": {
+        "provider": "Proveedor",
+        "serviceType": "Tipo de servicio",
+        "rating": "Puntuación",
+        "comment": "Comentario",
+        "recommend": "¿Recomendarías este proveedor?",
+        "yes": "Recomendaría",
+        "no": "No recomendaría"
+      }
+    },
+    "stats": {
+      "thanks": "Agradecimientos",
+      "sent": "Enviados",
+      "memories": "Recuerdos",
+      "ratings": "Valoraciones",
+      "avgRating": "Puntuación media",
+      "files": "archivos",
+      "providers": "proveedores"
+    },
+    "messages": {
+      "created": "Elemento añadido",
+      "updated": "Elemento actualizado",
+      "deleted": "Elemento eliminado",
+      "confirmDelete": "¿Eliminar este elemento?",
+      "recipientRequired": "El destinatario es obligatorio",
+      "titleRequired": "El título es obligatorio",
+      "providerRequired": "El nombre del proveedor es obligatorio"
+    }
+  }
+}

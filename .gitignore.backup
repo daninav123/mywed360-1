@@ -1,0 +1,59 @@
+# Dependencies / build
+node_modules/
+dist/
+
+# Environment variables
+.env
+.env.local
+
+# Credenciales sensibles
+serviceAccount*.json
+serviceAccount.json
+
+# macOS metadata
+.DS_Store
+
+backend/logs/
+logs/
+coverage/
+
+# Logs y reportes locales
+*.log
+*.log.*
+debug_*.txt
+test-results-summary.json
+temp_*.txt
+vite_output.txt
+vitest_output.txt
+eslint_*.json
+eslint_summary.txt
+lint_errors.json
+junit.xml
+server-log.txt
+emulator-debug.log
+pglite-debug.log
+
+# Extra temporales y depuración
+*debug*.txt
+*dev*.txt
+build*.txt
+modal_test_output.txt
+new_debug.txt
+temp/
+temp-*.*
+temp_*
+temp[A-Z]*.*
+tmp_*
+vc_redist*.exe
+
+# Cypress artifacts
+cypress/screenshots/
+cypress/videos/
+
+# Backup/old files
+*.bak
+*.old.jsx
+*.part*
+
+.env*
+!.env.example

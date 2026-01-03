@@ -1,0 +1,357 @@
+{
+  "eventosRelacionados": {
+    "title": "Événements Associés",
+    "subtitle": "Gérez enterrements de vie, répétitions et autres événements",
+    "addEvent": "Ajouter événement",
+    "noEvents": "Aucun événement associé",
+    "addFirst": "Ajouter premier événement",
+    "eventTypes": {
+      "despedida_soltero": "Enterrement vie de garçon",
+      "despedida_soltera": "Enterrement vie de jeune fille",
+      "ensayo": "Répétition de cérémonie",
+      "cena_ensayo": "Dîner de répétition",
+      "brunch": "Brunch post-mariage",
+      "bienvenida": "Cocktail de bienvenue",
+      "otro": "Autre événement"
+    },
+    "form": {
+      "eventType": "Type d'événement",
+      "eventName": "Nom de l'événement",
+      "date": "Date",
+      "time": "Heure",
+      "location": "Lieu",
+      "description": "Description",
+      "budget": "Budget",
+      "guests": "Invités estimés",
+      "organizer": "Organisateur",
+      "status": "Statut"
+    },
+    "status": {
+      "pending": "En attente",
+      "confirmed": "Confirmé",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "stats": {
+      "total": "Total événements",
+      "confirmed": "Confirmés",
+      "totalBudget": "Budget total",
+      "totalGuests": "Total invités"
+    },
+    "messages": {
+      "created": "Événement créé",
+      "updated": "Événement mis à jour",
+      "deleted": "Événement supprimé",
+      "confirmDelete": "Supprimer cet événement?"
+    }
+  },
+  "weddingTeam": {
+    "title": "Équipe de Mariage",
+    "subtitle": "Organisez votre équipe de mariage",
+    "addMember": "Ajouter membre",
+    "noMembers": "Aucun membre dans l'équipe",
+    "addFirst": "Ajouter premier membre",
+    "roles": {
+      "coordinador": "Coordinateur de mariage",
+      "padrino": "Témoin",
+      "madrina": "Témoin",
+      "testigo": "Témoin",
+      "dama_honor": "Demoiselle d'honneur",
+      "paje": "Porteur d'alliances",
+      "maestro_ceremonias": "Maître de cérémonie",
+      "otro": "Autre rôle"
+    },
+    "form": {
+      "role": "Rôle",
+      "name": "Nom complet",
+      "phone": "Téléphone",
+      "email": "Email",
+      "relationship": "Relation",
+      "responsibilities": "Responsabilités",
+      "notes": "Notes supplémentaires",
+      "confirmed": "Confirmé"
+    },
+    "stats": {
+      "total": "Total membres",
+      "confirmed": "Confirmés",
+      "pending": "En attente"
+    },
+    "messages": {
+      "created": "Membre ajouté",
+      "updated": "Membre mis à jour",
+      "deleted": "Membre supprimé",
+      "confirmDelete": "Retirer ce membre de l'équipe?"
+    }
+  },
+  "tramitesLegales": {
+    "title": "Démarches Légales",
+    "subtitle": "Gérez la documentation et les démarches officielles",
+    "addTramite": "Ajouter démarche",
+    "noTramites": "Aucune démarche enregistrée",
+    "addFirst": "Ajouter première démarche",
+    "categories": {
+      "civil": "Cérémonie civile",
+      "religiosa": "Cérémonie religieuse",
+      "extranjero": "Mariage avec étranger",
+      "regimen": "Régime économique",
+      "otros": "Autres démarches"
+    },
+    "form": {
+      "category": "Catégorie",
+      "name": "Nom de la démarche",
+      "description": "Description",
+      "required": "Requis",
+      "deadline": "Date limite",
+      "status": "Statut",
+      "documents": "Documents nécessaires",
+      "cost": "Coût estimé",
+      "notes": "Notes"
+    },
+    "status": {
+      "pending": "En attente",
+      "in_progress": "En cours",
+      "completed": "Terminé",
+      "not_required": "Non requis"
+    },
+    "stats": {
+      "total": "Total démarches",
+      "completed": "Terminées",
+      "pending": "En attente",
+      "progress": "Progrès"
+    },
+    "messages": {
+      "created": "Démarche ajoutée",
+      "updated": "Démarche mise à jour",
+      "deleted": "Démarche supprimée",
+      "statusChanged": "Statut mis à jour",
+      "confirmDelete": "Supprimer cette démarche?"
+    }
+  },
+  "invitadosEspeciales": {
+    "title": "Invités Spéciaux",
+    "subtitle": "Gérez les besoins spéciaux, régimes et allergies",
+    "addGuest": "Ajouter invité",
+    "noGuests": "Aucun invité avec besoins spéciaux",
+    "addFirst": "Ajouter premier invité",
+    "diets": {
+      "vegetariana": "Végétarien",
+      "vegana": "Végétalien",
+      "celiaca": "Cœliaque / Sans gluten",
+      "lactosa": "Sans lactose",
+      "kosher": "Casher",
+      "halal": "Halal",
+      "diabetes": "Diabétique",
+      "otra": "Autre"
+    },
+    "needs": {
+      "movilidad": "Mobilité réduite",
+      "visual": "Handicap visuel",
+      "auditiva": "Handicap auditif",
+      "embarazada": "Enceinte",
+      "bebe": "Avec bébé",
+      "mayor": "Personne âgée",
+      "otra": "Autre"
+    },
+    "form": {
+      "name": "Nom de l'invité",
+      "diets": "Régimes spéciaux",
+      "allergies": "Allergies",
+      "needs": "Besoins spéciaux",
+      "notes": "Notes supplémentaires",
+      "seating": "Place préférée",
+      "contact": "Contact d'urgence"
+    },
+    "stats": {
+      "total": "Invités spéciaux",
+      "withDiets": "Avec régimes",
+      "withAllergies": "Avec allergies",
+      "withNeeds": "Avec besoins"
+    },
+    "messages": {
+      "created": "Invité ajouté",
+      "updated": "Invité mis à jour",
+      "deleted": "Invité supprimé",
+      "confirmDelete": "Supprimer cet invité?",
+      "nameRequired": "Le nom est obligatoire"
+    }
+  },
+  "diaDeBoda": {
+    "title": "Jour du Mariage",
+    "subtitle": "Checklist, planning et contacts d'urgence",
+    "tabs": {
+      "checklist": "Checklist",
+      "timeline": "Planning",
+      "contacts": "Contacts"
+    },
+    "checklist": {
+      "addItem": "Ajouter tâche",
+      "noItems": "Aucune tâche dans la checklist",
+      "addFirst": "Ajouter première tâche",
+      "categories": {
+        "novios": "Mariés",
+        "ceremonia": "Cérémonie",
+        "banquete": "Réception",
+        "proveedores": "Prestataires",
+        "decoracion": "Décoration",
+        "emergencia": "Kit urgence"
+      },
+      "form": {
+        "category": "Catégorie",
+        "task": "Tâche",
+        "responsible": "Responsable",
+        "time": "Heure estimée",
+        "notes": "Notes",
+        "completed": "Terminée"
+      }
+    },
+    "timeline": {
+      "addEvent": "Ajouter moment",
+      "noEvents": "Aucun moment dans le planning",
+      "addFirst": "Ajouter premier moment",
+      "form": {
+        "time": "Heure",
+        "event": "Moment",
+        "location": "Lieu",
+        "duration": "Durée (min)",
+        "responsible": "Responsable",
+        "notes": "Notes importantes"
+      }
+    },
+    "contacts": {
+      "addContact": "Ajouter contact",
+      "noContacts": "Aucun contact d'urgence",
+      "addFirst": "Ajouter premier contact",
+      "roles": {
+        "coordinador": "Coordinateur",
+        "fotografo": "Photographe",
+        "video": "Vidéaste",
+        "catering": "Traiteur",
+        "floristeria": "Fleuriste",
+        "musica": "Musique/DJ",
+        "transporte": "Transport",
+        "lugar": "Responsable du lieu",
+        "emergencia": "Urgences",
+        "otro": "Autre"
+      },
+      "form": {
+        "role": "Rôle",
+        "name": "Nom/Entreprise",
+        "phone": "Téléphone",
+        "email": "Email",
+        "notes": "Notes"
+      }
+    },
+    "stats": {
+      "totalTasks": "Total tâches",
+      "completed": "Terminées",
+      "pending": "En attente",
+      "timeline": "Moments planning",
+      "contacts": "Contacts"
+    },
+    "messages": {
+      "itemCreated": "Élément ajouté",
+      "itemUpdated": "Élément mis à jour",
+      "itemDeleted": "Élément supprimé",
+      "statusChanged": "Statut mis à jour",
+      "confirmDelete": "Supprimer cet élément?"
+    }
+  },
+  "postBoda": {
+    "title": "Après-Mariage",
+    "subtitle": "Remerciements, souvenirs et évaluations",
+    "tabs": {
+      "thanks": "Remerciements",
+      "memories": "Souvenirs",
+      "ratings": "Évaluations"
+    },
+    "thanks": {
+      "add": "Ajouter remerciement",
+      "noThanks": "Aucun remerciement enregistré",
+      "addFirst": "Ajouter premier remerciement",
+      "categories": {
+        "invitados": "Invités",
+        "familia": "Famille proche",
+        "padrinos": "Témoins",
+        "proveedores": "Prestataires"
+      },
+      "form": {
+        "category": "Catégorie",
+        "recipient": "Destinataire",
+        "email": "Email",
+        "message": "Message",
+        "sent": "Envoyé",
+        "dateSent": "Date d'envoi",
+        "useTemplate": "Utiliser modèle"
+      },
+      "status": {
+        "sent": "Envoyé",
+        "pending": "En attente"
+      }
+    },
+    "memories": {
+      "add": "Ajouter souvenir",
+      "noMemories": "Aucun souvenir enregistré",
+      "addFirst": "Ajouter premier souvenir",
+      "types": {
+        "foto": "Photo",
+        "video": "Vidéo",
+        "mensaje": "Message",
+        "otro": "Autre"
+      },
+      "form": {
+        "type": "Type",
+        "title": "Titre",
+        "description": "Description",
+        "url": "URL (Drive, Dropbox, etc.)",
+        "date": "Date",
+        "viewDownload": "Voir/Télécharger"
+      }
+    },
+    "ratings": {
+      "add": "Ajouter évaluation",
+      "noRatings": "Aucune évaluation enregistrée",
+      "addFirst": "Ajouter première évaluation",
+      "providerTypes": [
+        "Photographe",
+        "Vidéaste",
+        "Lieu cérémonie",
+        "Lieu réception",
+        "Traiteur",
+        "Fleuriste",
+        "DJ/Musique",
+        "Coordinateur",
+        "Coiffure",
+        "Maquillage",
+        "Transport",
+        "Autre"
+      ],
+      "form": {
+        "provider": "Prestataire",
+        "serviceType": "Type de service",
+        "rating": "Note",
+        "comment": "Commentaire",
+        "recommend": "Recommanderiez-vous ce prestataire?",
+        "yes": "Je recommanderais",
+        "no": "Je ne recommanderais pas"
+      }
+    },
+    "stats": {
+      "thanks": "Remerciements",
+      "sent": "Envoyés",
+      "memories": "Souvenirs",
+      "ratings": "Évaluations",
+      "avgRating": "Note moyenne",
+      "files": "fichiers",
+      "providers": "prestataires"
+    },
+    "messages": {
+      "created": "Élément ajouté",
+      "updated": "Élément mis à jour",
+      "deleted": "Élément supprimé",
+      "confirmDelete": "Supprimer cet élément?",
+      "recipientRequired": "Le destinataire est obligatoire",
+      "titleRequired": "Le titre est obligatoire",
+      "providerRequired": "Le nom du prestataire est obligatoire"
+    }
+  }
+}

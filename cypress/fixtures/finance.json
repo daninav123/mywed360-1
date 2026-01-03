@@ -1,0 +1,104 @@
+{
+  "weddingId": "test-wedding-001",
+  "budget": {
+    "total": 25000,
+    "categories": {
+      "venue": { "budget": 8000, "spent": 7500, "percentage": 32 },
+      "catering": { "budget": 7000, "spent": 6500, "percentage": 28 },
+      "photography": { "budget": 3000, "spent": 2800, "percentage": 12 },
+      "flowers": { "budget": 2000, "spent": 1800, "percentage": 8 },
+      "music": { "budget": 1500, "spent": 1400, "percentage": 6 },
+      "dress": { "budget": 2000, "spent": 1900, "percentage": 8 },
+      "other": { "budget": 1500, "spent": 500, "percentage": 6 }
+    }
+  },
+  "transactions": [
+    {
+      "id": "test-txn-001",
+      "date": "2025-02-15",
+      "description": "Reserva Jardín Botánico",
+      "category": "venue",
+      "amount": 3000,
+      "type": "expense",
+      "status": "paid",
+      "supplierId": "test-supplier-001",
+      "paymentMethod": "bank_transfer",
+      "createdAt": "2025-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "test-txn-002",
+      "date": "2025-03-01",
+      "description": "Adelanto Catering",
+      "category": "catering",
+      "amount": 2500,
+      "type": "expense",
+      "status": "paid",
+      "supplierId": "test-supplier-002",
+      "paymentMethod": "credit_card",
+      "createdAt": "2025-03-01T00:00:00.000Z"
+    },
+    {
+      "id": "test-txn-003",
+      "date": "2025-03-15",
+      "description": "Fotógrafo - Señal",
+      "category": "photography",
+      "amount": 1000,
+      "type": "expense",
+      "status": "paid",
+      "supplierId": "test-supplier-003",
+      "paymentMethod": "bank_transfer",
+      "createdAt": "2025-03-15T00:00:00.000Z"
+    },
+    {
+      "id": "test-txn-004",
+      "date": "2025-04-01",
+      "description": "Aportación Familia Novia",
+      "category": "contributions",
+      "amount": 10000,
+      "type": "income",
+      "status": "received",
+      "paymentMethod": "bank_transfer",
+      "createdAt": "2025-04-01T00:00:00.000Z"
+    },
+    {
+      "id": "test-txn-005",
+      "date": "2025-04-10",
+      "description": "Flores - Adelanto",
+      "category": "flowers",
+      "amount": 800,
+      "type": "expense",
+      "status": "pending",
+      "supplierId": "test-supplier-004",
+      "paymentMethod": "pending",
+      "createdAt": "2025-04-10T00:00:00.000Z"
+    }
+  ],
+  "payments": [
+    {
+      "id": "test-payment-001",
+      "supplierId": "test-supplier-001",
+      "amount": 8000,
+      "totalAmount": 8000,
+      "dueDate": "2025-09-01",
+      "status": "scheduled",
+      "installments": [
+        { "amount": 3000, "dueDate": "2025-02-15", "paid": true },
+        { "amount": 2500, "dueDate": "2025-06-15", "paid": false },
+        { "amount": 2500, "dueDate": "2025-09-01", "paid": false }
+      ]
+    },
+    {
+      "id": "test-payment-002",
+      "supplierId": "test-supplier-002",
+      "amount": 7000,
+      "totalAmount": 7000,
+      "dueDate": "2025-10-10",
+      "status": "scheduled",
+      "installments": [
+        { "amount": 2500, "dueDate": "2025-03-01", "paid": true },
+        { "amount": 2250, "dueDate": "2025-07-01", "paid": false },
+        { "amount": 2250, "dueDate": "2025-10-10", "paid": false }
+      ]
+    }
+  ]
+}

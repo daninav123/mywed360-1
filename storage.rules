@@ -1,0 +1,85 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Suppliers portfolio images - authenticated suppliers only
+    match /suppliers/{supplierId}/portfolio/{allPaths=**} {
+      // Permitir lectura pública para mostrar en perfiles
+      allow read: if true;
+      
+      // Solo el supplier dueño puede escribir/borrar
+      allow write, delete: if request.auth != null && 
+                               request.auth.token.supplierId == supplierId;
+    }
+    
+    // Wedding photos and documents
+    match /weddings/{weddingId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write, delete: if request.auth != null;
+    }
+    
+    // User profile images
+    match /users/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Public assets
+    match /public/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Web hero images - main cover images for wedding websites
+    match /web-hero-images/{weddingId}/{imageId} {
+      // Lectura pública para mostrar en webs publicadas
+      allow read: if true;
+      
+      // Solo usuarios autenticados pueden subir
+      // Validar tamaño (máximo 10MB para portadas) y tipo de archivo
+      allow write: if request.auth != null &&
+                     request.resource.size < 10 * 1024 * 1024 &&
+                     request.resource.contentType.matches('image/.*');
+      
+      // Solo usuarios autenticados pueden eliminar
+      allow delete: if request.auth != null;
+    }
+    
+    // Web galleries - photo galleries for wedding websites
+    match /web-galleries/{weddingId}/{imageId} {
+      // Lectura pública para mostrar en webs publicadas
+      allow read: if true;
+      
+      // Solo usuarios autenticados pueden subir
+      // Validar tamaño (máximo 5MB) y tipo de archivo
+      allow write: if request.auth != null &&
+                     request.resource.size < 5 * 1024 * 1024 &&
+                     request.resource.contentType.matches('image/.*');
+      
+      // Solo usuarios autenticados pueden eliminar
+      allow delete: if request.auth != null;
+    }
+    
+    // Web backgrounds - for page backgrounds in web builder
+    match /web-backgrounds/{imageId} {
+      // Lectura pública para mostrar en webs publicadas
+      allow read: if true;
+      
+      // Solo usuarios autenticados pueden subir
+      // Validar tamaño (máximo 10MB para fondos) y tipo de archivo
+      allow write: if request.auth != null &&
+                     request.resource.size < 10 * 1024 * 1024 &&
+                     request.resource.contentType.matches('image/.*');
+      
+      // Solo usuarios autenticados pueden eliminar
+      allow delete: if request.auth != null;
+    }
+    
+    // Default: deny all
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

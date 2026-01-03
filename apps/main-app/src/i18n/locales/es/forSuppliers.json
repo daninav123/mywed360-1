@@ -1,0 +1,48 @@
+{
+  "hero": {
+    "title": "Haz Crecer Tu Negocio de Bodas",
+    "subtitle": "Conecta con parejas comprometidas y aumenta tus reservas con nuestra plataforma profesional",
+    "cta": {
+      "primary": "Únete Ahora",
+      "secondary": "Saber Más"
+    }
+  },
+  "benefits": {
+    "title": "Por Qué Unirte a Planivia",
+    "subtitle": "Todo lo que necesitas para triunfar en la industria de bodas",
+    "exposure": {
+      "title": "Máxima Exposición",
+      "description": "Descúbrete por miles de parejas comprometidas buscando servicios como el tuyo"
+    },
+    "bookings": {
+      "title": "Reservas Directas",
+      "description": "Recibe consultas y gestiona reservas directamente a través de nuestra plataforma"
+    },
+    "grow": {
+      "title": "Haz Crecer Tu Negocio",
+      "description": "Accede a analíticas e insights para optimizar tus servicios y precios"
+    }
+  },
+  "features": {
+    "title": "Herramientas Profesionales",
+    "description": "Todo lo que necesitas para gestionar y hacer crecer tu negocio de bodas",
+    "profile": {
+      "title": "Perfil Profesional",
+      "description": "Muestra tu trabajo con un portafolio hermoso y listados de servicios detallados"
+    },
+    "messaging": {
+      "title": "Mensajería Directa",
+      "description": "Comunícate con parejas y planners directamente a través de nuestra plataforma"
+    },
+    "reviews": {
+      "title": "Reseñas y Valoraciones",
+      "description": "Construye tu reputación con reseñas verificadas de parejas reales"
+    }
+  },
+  "cta": {
+    "title": "¿Listo Para Hacer Crecer Tu Negocio?",
+    "subtitle": "Únete a miles de profesionales de bodas en Planivia",
+    "primary": "Crear Cuenta de Proveedor",
+    "secondary": "Ver Precios"
+  }
+}

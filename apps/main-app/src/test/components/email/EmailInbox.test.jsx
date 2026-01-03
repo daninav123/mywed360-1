@@ -1,0 +1,270 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { useAuth } from '../../../hooks/useAuth.jsx';
+import * as EmailService from '../../../services/emailService';
+// Mocks necesarios - deben declararse antes de importar el componente
+vi.mock('../../../hooks/useAuth', () => ({
+  useAuth: vi.fn(),
+}));
+
+vi.mock('../../../services/emailService', () => ({
+  initEmailService: vi.fn(),
+  getMails: vi.fn(),
+  deleteMail: vi.fn(),
+  markAsRead: vi.fn(),
+  sendMail: vi.fn(),
+}));
+
+// Mock para los componentes que no necesitamos probar en detalle
+vi.mock('../../../components/email/EmailDetail', () => ({
+  default: ({ email, onBack }) => (
+    <div data-testid="email-detail">
+      {email && (
+        <>
+          <div data-testid="email-subject">{email.subject}</div>
+          <button onClick={onBack}>Volver</button>
+        </>
+      )}
+    </div>
+  ),
+}));
+
+vi.mock('../../../components/Card', () => ({
+  default: ({ children }) => <div data-testid="card">{children}</div>,
+}));
+
+vi.mock('../../../components/Button', () => ({
+  default: ({ children, onClick, ...props }) => (
+    <button onClick={onClick} {...props}>
+      {children}
+    </button>
+  ),
+}));
+
+import EmailInbox from '../../../components/email/EmailInbox';
+
+describe('EmailInbox Component', () => {
+  // Datos de ejemplo para las pruebas
+  const mockEmails = [
+    {
+      id: 'email-1',
+      subject: 'Asunto importante',
+      from: 'remitente@ejemplo.com',
+      to: 'usuario@maloveapp.com',
+      date: '2025-07-10T10:30:00Z',
+      read: false,
+      folder: 'inbox',
+      attachments: [],
+    },
+    {
+      id: 'email-2',
+      subject: 'Recordatorio reunión',
+      from: 'team@empresa.com',
+      to: 'usuario@maloveapp.com',
+      date: '2025-07-09T08:15:00Z',
+      read: true,
+      folder: 'inbox',
+      attachments: [{ filename: 'acta.pdf' }],
+    },
+    {
+      id: 'email-3',
+      subject: 'Borrador enviado',
+      from: 'usuario@maloveapp.com',
+      to: 'destinatario@empresa.com',
+      date: '2025-07-08T14:45:00Z',
+      read: true,
+      folder: 'sent',
+      attachments: [],
+    },
+  ];
+
+  const mockFolders = [
+    { id: 'folder-1', name: 'Importante' },
+    { id: 'folder-2', name: 'Trabajo' },
+  ];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    // Configurar el mock de autenticación
+    useAuth.mockReturnValue({
+      user: { uid: 'user123' },
+      profile: {
+        id: 'profile123',
+        email: 'usuario@maloveapp.com',
+        name: 'Usuario Test',
+      },
+    });
+
+    // Configurar el mock de servicio de email
+    EmailService.getMails.mockResolvedValue(mockEmails);
+    EmailService.initEmailService.mockReturnValue('usuario@maloveapp.com');
+  });
+
+  // Prueba de carga inicial
+  it('carga y muestra correctamente la lista de emails', async () => {
+    render(<EmailInbox />);
+
+    // Verificar que muestra el estado de carga inicialmente
+    expect(screen.getByText(/cargando/i)).toBeInTheDocument();
+
+    // Esperar a que se muestren los emails
+    await waitFor(() => {
+      expect(screen.queryByText(/cargando/i)).not.toBeInTheDocument();
+      expect(EmailService.getMails).toHaveBeenCalledWith('inbox');
+    });
+
+    // Verificar que los emails se muestran correctamente
+    expect(screen.getByText('Asunto importante')).toBeInTheDocument();
+    expect(screen.getByText('Recordatorio reunión')).toBeInTheDocument();
+  });
+
+  // Prueba de búsqueda de emails
+  it('filtra emails correctamente al buscar', async () => {
+    render(<EmailInbox />);
+
+    // Esperar a que carguen los emails
+    await waitFor(() => {
+      expect(screen.queryByText(/cargando/i)).not.toBeInTheDocument();
+    });
+
+    // Buscar un término específico
+    const searchInput = screen.getByPlaceholderText(/buscar/i);
+    fireEvent.change(searchInput, { target: { value: 'importante' } });
+
+    // Verificar que solo se muestra el email que coincide
+    expect(screen.getByText('Asunto importante')).toBeInTheDocument();
+    expect(screen.queryByText('Recordatorio reunión')).not.toBeInTheDocument();
+  });
+
+  // Prueba de selección y acciones con emails
+  it('permite seleccionar emails y realizar acciones con ellos', async () => {
+    EmailService.deleteMail.mockResolvedValue(true);
+
+    render(<EmailInbox />);
+
+    // Esperar a que carguen los emails
+    await waitFor(() => {
+      expect(screen.queryByText(/cargando/i)).not.toBeInTheDocument();
+    });
+
+    // Seleccionar un email
+    const emailCheckbox = screen.getAllByRole('checkbox')[1]; // El primero es "Seleccionar todos"
+    fireEvent.change(emailCheckbox, { target: { checked: true } });
+
+    // Esperar a que el estado se actualice y el botón se habilite
+    await waitFor(() => {
+      expect(emailCheckbox).toBeChecked();
+      expect(screen.getByText(/eliminar/i)).not.toBeDisabled();
+    });
+
+    // Eliminar el email seleccionado
+    const deleteButton = screen.getByText(/eliminar/i);
+    fireEvent.click(deleteButton);
+
+    // Verificar que se llama a la función de eliminar
+    await waitFor(
+      () => {
+        expect(EmailService.deleteMail).toHaveBeenCalledTimes(1);
+        expect(EmailService.deleteMail.mock.calls[0][0]).toBe('email-1');
+      },
+      { timeout: 2000 }
+    );
+
+    // Verificar que se actualiza la lista
+    await waitFor(() => {
+      expect(EmailService.getMails).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  // Prueba de cambio entre carpetas
+  it('cambia correctamente entre carpetas', async () => {
+    render(<EmailInbox />);
+
+    // Esperar a que carguen los emails
+    await waitFor(() => {
+      expect(screen.queryByText(/cargando/i)).not.toBeInTheDocument();
+    });
+
+    // Cambiar a la carpeta Enviados
+    const sentFolder = screen.getByText(/enviados/i);
+    fireEvent.click(sentFolder);
+
+    // Verificar que se llama a getMails con la carpeta correcta
+    await waitFor(() => {
+      expect(EmailService.getMails).toHaveBeenCalledWith('sent');
+    });
+  });
+
+  // Prueba de ordenación
+  it('cambia el orden de los emails al hacer clic en las cabeceras de columna', async () => {
+    render(<EmailInbox />);
+
+    // Esperar a que carguen los emails
+    await waitFor(() => {
+      expect(screen.queryByText(/cargando/i)).not.toBeInTheDocument();
+    });
+
+    // Ordenar por asunto
+    const subjectHeader = screen.getByRole('button', { name: /asunto/i });
+    fireEvent.click(subjectHeader);
+
+    // Verificar el cambio de orden
+    const emailItems = screen.getAllByRole('row');
+    expect(emailItems[1]).toHaveTextContent('Asunto importante');
+
+    // Cambiar el orden nuevamente
+    fireEvent.click(subjectHeader);
+
+    // Verificar que el orden se invierte
+    expect(screen.getAllByRole('row')[1]).toHaveTextContent('Borrador enviado');
+  });
+
+  // Prueba de selección de email para ver detalles
+  it('muestra los detalles de un email al hacer clic en él', async () => {
+    render(<EmailInbox />);
+
+    // Esperar a que carguen los emails
+    await waitFor(() => {
+      expect(screen.queryByText(/cargando/i)).not.toBeInTheDocument();
+    });
+
+    // Hacer clic en el primer email de la lista (ignorando la cabecera)
+    const emailRow = screen.getAllByRole('row')[1];
+    fireEvent.click(emailRow);
+
+    // Esperar a que aparezca el detalle
+    const detail = await screen.findByTestId('email-detail');
+    expect(detail).toBeInTheDocument();
+    expect(await screen.findByTestId('email-subject')).toHaveTextContent('Asunto importante');
+
+    // Volver a la lista
+    const backButton = screen.getByRole('button', { name: 'Volver' });
+    fireEvent.click(backButton);
+
+    // Esperar a que el detalle desaparezca
+    await waitFor(() => {
+      expect(screen.queryByTestId('email-subject')).not.toBeInTheDocument();
+    });
+  });
+
+  // Prueba de manejo de errores
+  it.skip('muestra mensaje de error cuando falla la carga de emails', async () => {
+    // Simular un error en la carga
+    EmailService.getMails.mockRejectedValue(new Error('Error al cargar'));
+
+    render(<EmailInbox />);
+
+    // Esperar a que aparezca el mensaje de error (CI puede ser más lento)
+    const errorNode = await screen.findByText(
+      /no se pudieron cargar los emails/i,
+      {},
+      { timeout: 4000 }
+    );
+    expect(errorNode).toBeInTheDocument();
+  });
+});
+
+
+

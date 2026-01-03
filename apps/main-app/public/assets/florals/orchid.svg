@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Orquídea exótica -->
+  <defs>
+    <radialGradient id="orchidGradient">
+      <stop offset="0%" style="stop-color:#E6D5E6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C8A2D0;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <g transform="translate(100, 80)">
+    <!-- Pétalos superiores -->
+    <ellipse cx="-20" cy="-15" rx="12" ry="20" fill="url(#orchidGradient)" transform="rotate(-20 -20 -15)"/>
+    <ellipse cx="20" cy="-15" rx="12" ry="20" fill="url(#orchidGradient)" transform="rotate(20 20 -15)"/>
+    
+    <!-- Pétalos laterales -->
+    <ellipse cx="-25" cy="10" rx="15" ry="25" fill="url(#orchidGradient)" transform="rotate(-30 -25 10)"/>
+    <ellipse cx="25" cy="10" rx="15" ry="25" fill="url(#orchidGradient)" transform="rotate(30 25 10)"/>
+    
+    <!-- Labelo (pétalo central inferior característico) -->
+    <path d="M -15 15 Q -10 25 0 35 Q 10 25 15 15 Q 12 20 0 22 Q -12 20 -15 15 Z" 
+          fill="#DDA0DD" stroke="#BA55D3" stroke-width="1"/>
+    
+    <!-- Detalles del labelo -->
+    <circle cx="-5" cy="20" r="2" fill="#8B008B" opacity="0.6"/>
+    <circle cx="5" cy="20" r="2" fill="#8B008B" opacity="0.6"/>
+    <circle cx="0" cy="22" r="2" fill="#8B008B" opacity="0.6"/>
+    
+    <!-- Columna central -->
+    <ellipse cx="0" cy="5" rx="4" ry="8" fill="#E6D5E6"/>
+  </g>
+</svg>

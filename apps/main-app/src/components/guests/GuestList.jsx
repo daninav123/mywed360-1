@@ -1,0 +1,484 @@
+import {
+  User,
+  Phone,
+  Mail,
+  Edit2,
+  Trash2,
+  MessageCircle,
+  Plus,
+  Search,
+  Filter,
+  Download,
+} from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import useTranslations from '../../hooks/useTranslations';
+import { Button } from '../ui';
+
+/**
+ * Lista optimizada de invitados con filtrado y acciones
+ * Componente memoizado para mejor rendimiento
+ */
+const statusCycle = (current) => {
+  if (current === 'pending' || current === 'Pendiente') return 'confirmed';
+  if (current === 'confirmed' || current === 'Sí') return 'declined';
+  return 'pending';
+};
+
+const GuestList = React.memo(
+  ({
+    guests = [],
+    searchTerm = '',
+    statusFilter = '',
+    tableFilter = '',
+    onUpdateStatus,
+    onEdit,
+    onDelete,
+    onInviteWhatsApp,
+    onInviteEmail,
+    isLoading = false,
+    // selección múltiple
+    selectedIds = [],
+    onToggleSelect,
+    onToggleSelectAll,
+  }) => {
+    const { t, wedding, format } = useTranslations();
+    const safeWedding = wedding || { guestStatus: (s) => s };
+
+    // Defensivos por si llegan props mal formadas
+    const safeGuests = Array.isArray(guests) ? guests : [];
+    const safeSelectedIds = Array.isArray(selectedIds) ? selectedIds : [];
+
+    // Filtrado optimizado con useMemo
+    const filteredGuests = useMemo(() => {
+      try {
+        return safeGuests.filter((guest) => {
+          const matchesSearch =
+            !searchTerm ||
+            guest.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            guest.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            guest.phone?.includes(searchTerm);
+
+          const matchesStatus =
+            !statusFilter || guest.status === statusFilter || guest.response === statusFilter;
+
+          const matchesTable =
+            !tableFilter ||
+            (guest.table && guest.table.toString().toLowerCase() === tableFilter.toLowerCase());
+
+          return matchesSearch && matchesStatus && matchesTable;
+        });
+      } catch (e) {
+        if (import.meta.env.DEV) // console.error('[GuestList] filter error', e);
+        return [];
+      }
+    }, [safeGuests, searchTerm, statusFilter, tableFilter]);
+
+    // Estadísticas memoizadas
+    const stats = useMemo(() => {
+      try {
+        const confirmed = safeGuests.filter((g) => {
+          const s = String(g.status || '').toLowerCase();
+          return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
+        }).length;
+        const pending = safeGuests.filter((g) => {
+          const s = String(g.status || '').toLowerCase();
+          if (s === 'confirmed' || s === 'accepted') return false;
+          if (s === 'declined' || s === 'rejected') return false;
+          return s === 'pending' || !s || g.response === 'Pendiente';
+        }).length;
+        const declined = safeGuests.filter((g) => {
+          const s = String(g.status || '').toLowerCase();
+          return s === 'declined' || s === 'rejected' || g.response === 'No';
+        }).length;
+        const totalCompanions = safeGuests.reduce(
+          (sum, g) => sum + (parseInt(g.companion, 10) || 0),
+          0
+        );
+
+        return {
+          total: safeGuests.length,
+          confirmed,
+          pending,
+          declined,
+          totalAttendees: confirmed + totalCompanions,
+        };
+      } catch (e) {
+        if (import.meta.env.DEV) // console.error('[GuestList] stats error', e);
+        return { total: 0, confirmed: 0, pending: 0, declined: 0, totalAttendees: 0 };
+      }
+    }, [safeGuests]);
+
+    // Funciones de acción memoizadas
+    const handleEdit = useCallback(
+      (guest) => {
+        onEdit?.(guest);
+      },
+      [onEdit]
+    );
+
+    const handleDelete = useCallback(
+      (guest) => {
+        if (window.confirm(`¿Estás seguro de que quieres eliminar a ${guest.name}?`)) {
+          onDelete?.(guest);
+        }
+      },
+      [onDelete]
+    );
+
+    const handleWhatsApp = useCallback(
+      (guest, e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        onInviteWhatsApp?.(guest);
+      },
+      [onInviteWhatsApp]
+    );
+
+    const handleEmail = useCallback(
+      async (guest, e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        if (!onInviteEmail) return;
+        try {
+          const result = await onInviteEmail(guest);
+          if (result?.success) {
+            if (guest?.email) {
+              toast.success(t('guests.email.sent', { email: guest.email }));
+            } else {
+              toast.success(t('guests.email.sentSuccess'));
+            }
+          } else if (result?.error) {
+            toast.error(t('guests.email.sendError', { error: result.error }));
+          }
+        } catch (error) {
+          toast.error(t('guests.email.sendFailed'));
+        }
+      },
+      [onInviteEmail]
+    );
+
+    // Función para obtener el color del estado
+    const handleStatusToggle = useCallback(
+      (guest, e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const next = statusCycle(guest.status || guest.response);
+        onUpdateStatus?.(guest, next);
+      },
+      [onUpdateStatus]
+    );
+
+    const getStatusColor = useCallback((status) => {
+      const s = String(status || '').toLowerCase();
+      switch (s) {
+        case 'confirmed':
+        case 'accepted':
+        case 'Sí':
+          return 'text-green-600 bg-green-100';
+        case 'declined':
+        case 'rejected':
+        case 'No':
+          return 'text-red-600 bg-red-100';
+        default:
+          return 'text-yellow-600 bg-yellow-100';
+      }
+    }, []);
+
+    // Cálculos simples (sin hooks) para evitar desajustes de orden de hooks tras HMR
+    const selectedSet = new Set(safeSelectedIds);
+    const allVisibleSelected =
+      filteredGuests.length > 0 && filteredGuests.every((g) => selectedSet.has(g.id));
+
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-muted">Cargando invitados...</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        {/* Estadísticas */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white p-4 rounded-lg shadow-sm border">
+            <div className="text-2xl font-bold text-primary">{stats.total}</div>
+            <div className="text-sm text-muted">Total invitados</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm border">
+            <div className="text-2xl font-bold text-green-600">{stats.confirmed}</div>
+            <div className="text-sm text-muted">Confirmados</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm border">
+            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+            <div className="text-sm text-muted">Pendientes</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm border">
+            <div className="text-2xl font-bold text-purple-600">{stats.totalAttendees}</div>
+            <div className="text-sm text-muted">Total asistentes</div>
+          </div>
+        </div>
+
+        {/* Lista de invitados */}
+        {filteredGuests.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-lg">
+            <User size={48} className="mx-auto text-muted mb-4" />
+            <h3 className="text-lg font-medium text-body mb-2">No hay invitados</h3>
+            <p className="text-muted">
+              {searchTerm || statusFilter || tableFilter
+                ? 'No se encontraron invitados con los filtros aplicados'
+                : 'Empieza añadiendo invitados a tu lista'}
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Vista de escritorio */}
+            <div className="hidden md:block bg-surface rounded-lg shadow-sm border overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
+                        <input
+                          type="checkbox"
+                          aria-label={t('guests.actions.selectAll')}
+                          checked={allVisibleSelected}
+                          onChange={(e) => {
+                            if (onToggleSelectAll) {
+                              const ids = filteredGuests.map((g) => g.id);
+                              onToggleSelectAll(ids, e.target.checked);
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
+                        Invitado
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
+                        Contacto
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
+                        Estado
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
+                        Mesa
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
+                        Acompañantes
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
+                        Acciones
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredGuests.map((guest) => (
+                      <tr
+                        key={guest.id}
+                        className="cursor-pointer hover:bg-primary-soft"
+                        onClick={() => handleEdit(guest)}
+                      >
+                        <td
+                          className="px-4 py-4 whitespace-nowrap"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <input
+                            type="checkbox"
+                            aria-label={`Seleccionar ${guest.name}`}
+                            checked={selectedSet.has(guest.id)}
+                            onChange={(e) => onToggleSelect?.(guest.id, e.target.checked)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-10 w-10">
+                              <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                <User size={20} className="text-muted" />
+                              </div>
+                            </div>
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-body">{guest.name}</div>
+                              {guest.dietaryRestrictions && (
+                                <div className="text-xs text-orange-600">
+                                  Restricciones dietéticas
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-body">{guest.email}</div>
+                          <div className="text-sm text-muted">{guest.phone}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <button
+                            type="button"
+                            onClick={(e) => handleStatusToggle(guest, e)}
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer ${getStatusColor(guest.status || guest.response)}`}
+                          >
+                            {wedding?.guestStatus?.(guest.status) || guest.response}
+                          </button>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-body">
+                          {guest.table || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-body">
+                          {guest.companion || 0}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end space-x-2">
+                            {guest.phone && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => handleWhatsApp(guest, e)}
+                                title="Invitar por WhatsApp"
+                              >
+                                <MessageCircle size={16} />
+                              </Button>
+                            )}
+                            {guest.email && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => handleEmail(guest, e)}
+                                title="Invitar por email"
+                              >
+                                <Mail size={16} />
+                              </Button>
+                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(guest);
+                              }}
+                              title="Editar invitado"
+                            >
+                              <Edit2 size={16} />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(guest);
+                              }}
+                              title="Eliminar invitado"
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Vista móvil */}
+            <div className="md:hidden space-y-4">
+              {filteredGuests.map((guest) => (
+                <div
+                  key={guest.id}
+                  className="bg-white p-4 rounded-lg shadow-sm border cursor-pointer"
+                  onClick={() => handleEdit(guest)}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center mr-3">
+                        <User size={20} className="text-muted" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-body">{guest.name}</h3>
+                        <button
+                          type="button"
+                          onClick={(e) => handleStatusToggle(guest, e)}
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer ${getStatusColor(guest.status || guest.response)}`}
+                        >
+                          {wedding?.guestStatus?.(guest.status) || guest.response}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="pl-2" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        aria-label={`Seleccionar ${guest.name}`}
+                        checked={selectedSet.has(guest.id)}
+                        onChange={(e) => onToggleSelect?.(guest.id, e.target.checked)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 text-sm text-muted mb-4">
+                    {guest.email && (
+                      <div className="flex items-center">
+                        <Mail size={14} className="mr-2" />
+                        {guest.email}
+                      </div>
+                    )}
+                    {guest.phone && (
+                      <div className="flex items-center">
+                        <Phone size={14} className="mr-2" />
+                        {guest.phone}
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span>Mesa: {guest.table || '-'}</span>
+                      <span>Acompañantes: {guest.companion || 0}</span>
+                    </div>
+                    {guest.dietaryRestrictions && (
+                      <div className="text-orange-600 text-xs">Restricciones dietéticas</div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    {guest.phone && (
+                      <Button variant="outline" size="sm" onClick={(e) => handleWhatsApp(guest, e)}>
+                        <MessageCircle size={16} />
+                      </Button>
+                    )}
+                    {guest.email && (
+                      <Button variant="outline" size="sm" onClick={(e) => handleEmail(guest, e)}>
+                        <Mail size={16} />
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(guest);
+                      }}
+                    >
+                      <Edit2 size={16} />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(guest);
+                      }}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+);
+
+GuestList.displayName = 'GuestList';
+
+export default GuestList;

@@ -1,0 +1,4 @@
+
+> @malove/main-app@2.0.0 lint
+> eslint src --max-warnings 0 --format unix
+

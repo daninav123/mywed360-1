@@ -1,0 +1,931 @@
+openapi: 3.0.3
+info:
+  title: MaLoveApp Backend API
+  version: 0.1.0
+  description: |
+    Especificación OpenAPI 3 del backend de MaLoveApp.
+
+    Seguridad principal: Firebase Auth (Bearer token). En desarrollo puede estar activo el bypass de tokens mock (`ALLOW_MOCK_TOKENS`).
+
+    Documentación relacionada:
+    - Arquitectura: ../ARCHITECTURE.md
+    - Onboarding: ../ONBOARDING.md
+    - Monitoreo: ../monitoring/README.md
+servers:
+  - url: http://localhost:4004
+    description: Local (desarrollo)
+  - url: https://maloveapp-backend.onrender.com
+    description: Render (staging/producción)
+
+tags:
+  - name: health
+    description: Endpoints de salud del servicio
+  - name: rsvp
+    description: Confirmaciones de asistencia por token y recordatorios
+  - name: whatsapp
+    description: Webhooks y endpoints de mensajería WhatsApp
+  - name: mailgun
+    description: Webhooks de Mailgun
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cronToken:
+      type: apiKey
+      in: header
+      name: X-Cron-Token
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        time:
+          type: string
+          format: date-time
+        env:
+          type: object
+          properties:
+            nodeEnv: { type: string }
+            allowedOrigin: { type: string, nullable: true }
+            frontendBaseUrl: { type: string, nullable: true }
+            backendBaseUrl: { type: string, nullable: true }
+        push:
+          type: object
+          properties:
+            vapidConfigured: { type: boolean }
+            webPushAvailable: { type: boolean }
+            subscriptions:
+              type: object
+              properties:
+                countSampled: { type: integer }
+                sample:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id: { type: string }
+                      uid: { type: string, nullable: true }
+                      endpointPreview: { type: string, nullable: true }
+        integrations:
+          type: object
+          properties:
+            mailgun: { type: object, properties: { configured: { type: boolean } } }
+            openai: { type: object, properties: { configured: { type: boolean } } }
+            stripe: { type: object, properties: { configured: { type: boolean } } }
+            whatsapp:
+              type: object
+              properties:
+                provider: { type: string }
+                configured: { type: boolean }
+    RSVPGetResponse:
+      type: object
+      properties:
+        name: { type: string }
+        status: { type: string, enum: [pending, accepted, rejected] }
+        companions: { type: integer, minimum: 0 }
+        allergens: { type: string }
+    RSVPPutRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [accepted, rejected]
+        companions:
+          type: integer
+          minimum: 0
+          default: 0
+        allergens:
+          type: string
+          maxLength: 500
+          default:     
+    RSVPRemindersRequest:
+      type: object
+      required: [weddingId]
+      properties:
+        weddingId: { type: string }
+        limit: { type: integer, minimum: 1, maximum: 1000, default: 100 }
+        dryRun: { type: boolean, default: true }
+        minIntervalMinutes: { type: integer, minimum: 0, maximum: 10080, default: 1440 }
+        force: { type: boolean, default: false }
+    GenericOk:
+      type: object
+      properties:
+        ok: { type: boolean }
+    WhatsAppHealth:
+      type: object
+      properties:
+        provider: { type: string }
+        configured: { type: boolean }
+        ok:
+          type: boolean
+          nullable: true
+          description: Indicador heurístico opcional si se realiza verificación activa
+        message:
+          type: string
+          nullable: true
+    missingEnv:
+      type: array
+      items: { type: string }
+    Provider:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        category: { type: string }
+        status: { type: string, enum: [prospect, active, archived] }
+        phone: { type: string, nullable: true }
+        email: { type: string, nullable: true }
+        location: { type: string, nullable: true }
+        services:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              priceMin: { type: number, nullable: true }
+              priceMax: { type: number, nullable: true }
+        rating: { type: number, nullable: true, minimum: 0, maximum: 5 }
+        notes: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    ProviderList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Provider'
+        page: { type: integer, minimum: 1 }
+        limit: { type: integer, minimum: 1 }
+        total: { type: integer, minimum: 0 }
+    Contract:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        providerId: { type: string }
+        weddingId: { type: string }
+        status: { type: string, enum: [draft, sent, signed, cancelled] }
+        amount: { type: number, nullable: true }
+        currency: { type: string, nullable: true }
+        templateId: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        signedAt: { type: string, format: date-time, nullable: true }
+    Payment:
+      type: object
+      properties:
+        id: { type: string }
+        contractId: { type: string }
+        amount: { type: number }
+        currency: { type: string }
+        status: { type: string, enum: [pending, authorized, paid, failed, refunded] }
+        createdAt: { type: string, format: date-time }
+    PaymentIntent:
+      type: object
+      properties:
+        amount: { type: number }
+        currency: { type: string }
+        contractId: { type: string }
+    Email:
+      type: object
+      properties:
+        id: { type: string }
+        from: { type: string }
+        to:
+          type: array
+          items: { type: string }
+        subject: { type: string }
+        bodyHtml: { type: string }
+        bodyText: { type: string }
+        folder: { type: string, enum: [inbox, sent, archived, spam, trash] }
+        createdAt: { type: string, format: date-time }
+    EmailAnalysis:
+      type: object
+      properties:
+        entities:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string }
+              value: { type: string }
+        summary: { type: string }
+        intents:
+          type: array
+          items: { type: string }
+    Notification:
+      type: object
+      properties:
+        id: { type: string }
+        type: { type: string }
+        title: { type: string }
+        body: { type: string }
+        read: { type: boolean }
+        createdAt: { type: string, format: date-time }
+    NotificationPreference:
+      type: object
+      properties:
+        channel: { type: string, enum: [push, email, sms] }
+        enabled: { type: boolean }
+    ProviderStatus:
+      type: object
+      properties:
+        providerId: { type: string }
+        contracts:
+          type: object
+          properties:
+            total: { type: integer }
+            byStatus:
+              type: object
+              properties:
+                draft: { type: integer }
+                sent: { type: integer }
+                signed: { type: integer }
+                cancelled: { type: integer }
+            amountSigned: { type: number }
+            lastUpdate: { type: string, format: date-time, nullable: true }
+        payments:
+          type: object
+          properties:
+            total: { type: integer }
+            byStatus:
+              type: object
+              properties:
+                pending: { type: integer }
+                authorized: { type: integer }
+                paid: { type: integer }
+                failed: { type: integer }
+                refunded: { type: integer }
+            amount:
+              type: object
+              properties:
+                paid: { type: number }
+                pending: { type: number }
+                failed: { type: number }
+            lastUpdate: { type: string, format: date-time, nullable: true }
+
+paths:
+  /api/health:
+    get:
+      tags: [health]
+      summary: Estado de salud del backend
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/health/livez:
+    get:
+      tags: [health]
+      summary: Señal de liveness
+      security: []
+      responses:
+        '200': { description: Alive }
+  /api/health/readyz:
+    get:
+      tags: [health]
+      summary: Señal de readiness (comprueba Firestore superficialmente)
+      security: []
+      responses:
+        '200': { description: Ready }
+        '503': { description: Not Ready }
+
+  /api/rsvp/by-token/{token}:
+    get:
+      tags: [rsvp]
+      summary: Obtiene el estado de RSVP por token público
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Datos básicos de RSVP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RSVPGetResponse'
+        '404': { description: Not found }
+    put:
+      tags: [rsvp]
+      summary: Actualiza el estado de RSVP por token público
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RSVPPutRequest'
+      responses:
+        '200':
+          description: Actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOk'
+        '400': { description: Invalid payload }
+        '404': { description: Not found }
+
+  /api/rsvp/reminders:
+    post:
+      tags: [rsvp]
+      summary: Envía recordatorios por email a invitados pendientes (requiere rol planner)
+      description: |
+        Requiere autenticación (Firebase) y rol `planner` (verificado en el backend).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RSVPRemindersRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientSecret: { type: string }
+              examples:
+                sample:
+                  value:
+                    clientSecret: pi_abc_secret_123
+        '400': { description: Bad request }
+        '401': { description: Unauthorized }
+
+  /api/rsvp/generate-link:
+    post:
+      tags: [rsvp]
+      summary: Genera o recupera un link RSVP por invitado
+      description: Devuelve el token y el link RSVP para un invitado de una boda
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [weddingId, guestId]
+              properties:
+                weddingId: { type: string }
+                guestId: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  token: { type: string }
+                  link: { type: string }
+                  weddingId: { type: string }
+                  guestId: { type: string }
+
+  /api/whatsapp/webhook/twilio:
+    post:
+      tags: [whatsapp]
+      summary: Webhook de estados y mensajes entrantes de Twilio
+      description: |
+        Verifica la firma `X-Twilio-Signature` si `TWILIO_AUTH_TOKEN` está configurado. Acepta `application/x-www-form-urlencoded`.
+        Procesa actualizaciones de estado y mensajes entrantes para el flujo de RSVP.
+      security: []
+      requestBody:
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200': { description: Siempre responde 200 para evitar reintentos agresivos }
+
+  /api/whatsapp/provider-status:
+    get:
+      tags: [whatsapp]
+      summary: Estado del proveedor de WhatsApp (health superficial)
+      description: |
+        Expone si el proveedor (p. ej., Twilio) está configurado mediante variables de entorno.
+        Puede incluir señal `ok` y `message` cuando exista verificación activa.
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsAppHealth'
+
+  /api/mailgun/webhook:
+    post:
+      tags: [mailgun]
+      summary: Webhook de Mailgun con verificación HMAC-SHA256
+      description: |
+        Verifica la firma usando `MAILGUN_SIGNING_KEY`. Acepta `application/x-www-form-urlencoded`.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                timestamp: { type: string }
+                token: { type: string }
+                signature: { type: string }
+              additionalProperties: true
+      responses:
+        '200': { description: OK }
+        '403': { description: Invalid signature }
+        '400': { description: Bad request }
+
+  /api/providers:
+    get:
+      tags: [providers]
+      summary: Lista proveedores
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: status
+          schema: { type: string }
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderList'
+    post:
+      tags: [providers]
+      summary: Crea proveedor
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Provider'
+      responses:
+        '201': { description: Creado }
+
+  /api/providers/{id}:
+    get:
+      tags: [providers]
+      summary: Detalle proveedor
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Provider'
+        '404': { description: Not found }
+    patch:
+      tags: [providers]
+      summary: Actualiza proveedor
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Provider'
+      responses:
+        '200': { description: Actualizado }
+    delete:
+      tags: [providers]
+      summary: Elimina/archiva proveedor
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: Eliminado }
+
+  /api/providers/search:
+    get:
+      tags: [providers]
+      summary: Búsqueda con IA de proveedores
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string }
+        - in: query
+          name: location
+          schema: { type: string }
+        - in: query
+          name: budget
+          schema: { type: number }
+      responses:
+        '200': { description: OK }
+
+  /api/providers/{id}/status:
+    get:
+      tags: [providers]
+      summary: Estado agregado de contratos y pagos del proveedor
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderStatus'
+
+  /api/contracts:
+    get:
+      tags: [contracts]
+      summary: Lista contratos
+      security:
+        - bearerAuth: []
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [contracts]
+      summary: Crea contrato
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contract'
+      responses:
+        '201': { description: Creado }
+
+  /api/contracts/{id}:
+    get:
+      tags: [contracts]
+      summary: Detalle contrato
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contract'
+        '404': { description: Not found }
+    patch:
+      tags: [contracts]
+      summary: Actualiza contrato
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contract'
+      responses:
+        '200': { description: Actualizado }
+
+  /api/contracts/{id}/send:
+    post:
+      tags: [contracts]
+      summary: Envío del contrato para firma
+      security:
+        - bearerAuth: []
+      responses:
+        '200': { description: OK }
+
+  /api/payments:
+    get:
+      tags: [payments]
+      summary: Lista pagos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: contractId
+          schema: { type: string }
+          required: false
+          description: Filtra pagos por contrato
+      responses:
+        '200': { description: OK }
+
+  /api/payments/intent:
+    post:
+      tags: [payments]
+      summary: Crea intención de pago
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentIntent'
+      responses:
+        '200': { description: OK }
+
+  /api/emails:
+    get:
+      tags: [emails]
+      summary: Lista emails (por carpeta)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: folder
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+
+  /api/emails/{id}:
+    get:
+      tags: [emails]
+      summary: Detalle email
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+        '404': { description: Not found }
+
+  /api/emails/send:
+    post:
+      tags: [emails]
+      summary: Envío de email
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Email'
+      responses:
+        '200': { description: OK }
+
+  /api/emails/analyze:
+    post:
+      tags: [emails]
+      summary: Análisis IA de email
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Email'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailAnalysis'
+
+  /api/notifications:
+    get:
+      tags: [notifications]
+      summary: Lista notificaciones del usuario
+      security:
+        - bearerAuth: []
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [notifications]
+      summary: Crea una notificación
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Notification'
+      responses:
+        '201': { description: Creado }
+
+  /api/notifications/{id}:
+    patch:
+      tags: [notifications]
+      summary: Actualiza estado o preferencias de una notificación
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationPreference'
+      responses:
+        '200': { description: OK }
+
+  /api/admin/metrics/http:
+    get:
+      tags: [metrics]
+      summary: Resumen de métricas HTTP (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200': { description: OK }
+
+  /api/project-metrics:
+    get:
+      tags: [project-metrics]
+      summary: Serie temporal de métricas del proyecto (diario)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: weddingId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: module
+          required: true
+          schema: { type: string }
+        - in: query
+          name: range
+          required: false
+          schema: { type: string, enum: ['7d','30d','90d'], default: '7d' }
+        - in: query
+          name: groupBy
+          required: false
+          schema: { type: string, enum: ['daily'], default: 'daily' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  weddingId: { type: string }
+                  module: { type: string }
+                  range: { type: string }
+                  groupBy: { type: string }
+                  points:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                  refreshedAt: { type: string, format: date-time }
+                  source: { type: string }
+    post:
+      tags: [project-metrics]
+      summary: Ingesta de eventos de métricas del proyecto
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [weddingId, module, event]
+              properties:
+                weddingId: { type: string }
+                module: { type: string }
+                event: { type: string }
+                payload: { type: object, additionalProperties: true }
+                meta: { type: object, additionalProperties: true }
+                timestamp: { type: string, format: date-time }
+      responses:
+        '202': { description: Accepted }
+        '400': { description: Invalid payload }
+        '401': { description: Unauthorized }
+
+  /api/admin/metrics/backfill:
+    post:
+      tags: [metrics]
+      summary: Recalcula históricos de métricas por módulo (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [module]
+              properties:
+                module: { type: string }
+                weddingId: { type: string }
+                days: { type: integer, minimum: 1, maximum: 365, default: 90 }
+      responses:
+        '200': { description: OK }
+        '400': { description: Bad request }
+        '401': { description: Unauthorized }
+
+x-frontend-mapping:
+  rsvp:
+    components:
+      - src/pages/Invitados.jsx
+      - src/hooks/useGuests.js
+  whatsapp:
+    components:
+      - src/pages/Invitados.jsx
+      - src/hooks/useGuests.js
+  mailgun:
+    components:
+      - src/components/email/InboxContainer.jsx
+      - src/services/EmailService.js
+  /api/contracts/{id}/payments:
+    get:
+      tags: [payments]
+      summary: Lista pagos de un contrato
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'

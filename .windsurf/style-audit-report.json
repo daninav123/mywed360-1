@@ -1,0 +1,2549 @@
+{
+  "date": "2025-12-11T03:49:01.744Z",
+  "totalIssues": 231,
+  "issues": [
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/ChairItem.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 4,
+      "examples": [
+        "#cbd5e1",
+        "#e2e8f0",
+        "#94a3b8"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/FreeDrawCanvas.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#3b82f6",
+        "#10b981"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/GamificationPanel.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/Onboarding/OnboardingModeSelector.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/Search/GlobalSearch.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/Search/ImportSupplierModal.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/Search/ImportSupplierModal.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/SeatItem.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 5,
+      "examples": [
+        "#d1d5db",
+        "#6ee7b7",
+        "#a5b4fc"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/TableItem.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 32,
+      "examples": [
+        "#86efac",
+        "#7dd3fc",
+        "#fca5a5"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/TableItem.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 3,
+      "examples": [
+        "style={{ ...style, backgroundColor: isOver ? '#d1fae5' : style.backgroundColor }}",
+        "style={{ backgroundColor: lockedColor || '#6b7280', opacity: 0.9, zIndex: 30 }}",
+        "style={{ backgroundColor: lockedColor || '#2563eb', opacity: 0.85, zIndex: 30 }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/VectorEditor.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 4,
+      "examples": [
+        "#000000",
+        "#000000",
+        "#000000"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/VectorEditor.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: c }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/admin/AdminHealth.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#ef4444"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/admin/MetricsDashboard.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 6,
+      "examples": [
+        "#8884d8",
+        "#82ca9d",
+        "#ffc658"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/auth/AuthDivider.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/auth/PasswordStrengthMeter.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#6b7280",
+        "#e5e7eb",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/auth/RegisterForm.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 9,
+      "examples": [
+        "#111827",
+        "#6366f1",
+        "#111827"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/auth/SocialLoginButtons.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 5,
+      "examples": [
+        "#DB4437",
+        "#1877F2",
+        "#111827"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/canvas/HandlesLayer.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/email/EmailAliasConfig.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/email/EmailOnboardingWizard.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/email/EmailStats.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 6,
+      "examples": [
+        "#888888",
+        "#ffffff",
+        "#4CAF50"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/email/EmailTagsManager.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 4,
+      "examples": [
+        "#64748b",
+        "#64748b",
+        "#64748b"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/email/EmailTagsManager.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: safeRender(tag?.color, '#64748b') }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/email/EmailTemplateManager.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 8,
+      "examples": [
+        "#123",
+        "#123",
+        "#125"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/email/TagsManager.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 15,
+      "examples": [
+        "#64748b",
+        "#FFA500",
+        "#e53e3e"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/email/TagsManager.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 3,
+      "examples": [
+        "style={{ backgroundColor: tag.color }}",
+        "style={{ backgroundColor: color }}",
+        "style={{ backgroundColor: safeRender(tag.color, '#64748b') }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/email/TagsSidebar.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#64748b"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/email/TagsSidebar.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: tag.color || '#64748b' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/finance/BudgetAlerts.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/finance/ExpenseForm.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/finance/FinanceCashflowTimeline.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 1,
+      "examples": [
+        "hover:-translate-y-0"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/finance/FinanceOverview.jsx",
+      "pattern": "gradients",
+      "severity": "high",
+      "message": "❌ Usa degradados (bg-gradient-*) - Usar cards blancos simples",
+      "count": 5,
+      "examples": [
+        "from-[var(--color-surface)]",
+        "to-[var(--color-surface)]",
+        "from-[var(--color-danger)]"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/finance/FinanceOverview.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/finance/PaymentModal.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/finance/StatCard.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 2,
+      "examples": [
+        "style={{ color: trendColor, backgroundColor: bgColor }}",
+        "style={{ backgroundColor: color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/finance/VendorPayments.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/gallery/InspirationGallery.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#facc15"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/invitations/TemplateGallery.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 6,
+      "examples": [
+        "#d4af37",
+        "#ffffff",
+        "#ffffff"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/marketing/MarketingLayout.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 2,
+      "examples": [
+        "hover:-translate-y-0",
+        "hover:-translate-y-0"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/metrics/MetricsDashboard.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 12,
+      "examples": [
+        "#0088FE",
+        "#00C49F",
+        "#FFBB28"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/momentos/AlbumOverview.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#1f2937",
+        "#4b5563"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/momentos/MediaGallery.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 1,
+      "examples": [
+        "hover:-translate-y-0"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/momentos/SimpleMomentCard.jsx",
+      "pattern": "gradients",
+      "severity": "high",
+      "message": "❌ Usa degradados (bg-gradient-*) - Usar cards blancos simples",
+      "count": 1,
+      "examples": [
+        "bg-gradient-to-br"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/overlays/PointsOfInterestOverlay.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 9,
+      "examples": [
+        "#f97316",
+        "#d946ef",
+        "#2563eb"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/overlays/PointsOfInterestOverlay.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/protocolo/VisualTimeline.jsx",
+      "pattern": "gradients",
+      "severity": "high",
+      "message": "❌ Usa degradados (bg-gradient-*) - Usar cards blancos simples",
+      "count": 2,
+      "examples": [
+        "bg-gradient-to-r",
+        "bg-gradient-to-r"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/proveedores/ProveedorCard.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#888",
+        "#888"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/proveedores/ServicesBoard.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 9,
+      "examples": [
+        "#16a34a20",
+        "#16a34a",
+        "#0ea5e920"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/proveedores/SupplierProgressIndicator.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#6366f1"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/AIAssistantChat.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/AchievementUnlocked.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/AchievementsModal.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/ActiveCollaborators.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/ActiveCollaborators.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#3B82F6",
+        "#10B981",
+        "#6B7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/ActiveCollaborators.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/BanquetConfigAdvanced.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/BanquetConfigAdvanced.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/CollabBadge.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 4,
+      "examples": [
+        "#3B82F6",
+        "#3B82F6",
+        "#3B82F6"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/CollabBadge.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 5,
+      "examples": [
+        "style={{ backgroundColor: userColor }}",
+        "style={{ backgroundColor: user.color || '#3B82F6' }}",
+        "style={{ backgroundColor: user.color || '#3B82F6' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/CollaborationCursors.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 8,
+      "examples": [
+        "#3b82f6",
+        "#8b5cf6",
+        "#ec4899"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/CollaborationCursors.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 2,
+      "examples": [
+        "style={{ backgroundColor: user.color }}",
+        "style={{ backgroundColor: user.color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/CollaboratorCursors.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#3B82F6"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/CollaboratorCursors.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 3,
+      "examples": [
+        "style={{ backgroundColor: color }}",
+        "style={{ backgroundColor: color }}",
+        "style={{ backgroundColor: color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/ConfettiCelebration.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 5,
+      "examples": [
+        "#6366F1",
+        "#8B5CF6",
+        "#EC4899"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/ConflictToast.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#3B82F6"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/ConflictToast.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: user.color || '#3B82F6' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/DragGhostPreview.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/DrawingElements.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 19,
+      "examples": [
+        "#4f46e5",
+        "#9ca3af",
+        "#4f46e5"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/DrawingTools.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 5,
+      "examples": [
+        "#8b5cf6",
+        "#3b82f6",
+        "#ec4899"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/EnhancedExportModal.jsx",
+      "pattern": "gradients",
+      "severity": "high",
+      "message": "❌ Usa degradados (bg-gradient-*) - Usar cards blancos simples",
+      "count": 1,
+      "examples": [
+        "bg-gradient-to-r"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/EnhancedExportModal.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/FABRadial.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/GuestDragPreview.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/InitialSetupWizard.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/InitialSetupWizard.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/LayoutTemplates.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/MarqueeSelection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#6366F1",
+        "#6366F1",
+        "#6366F1"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/Minimap.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 8,
+      "examples": [
+        "#1f2937",
+        "#374151",
+        "#4B5563"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/Minimap.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/MobileToolPanel.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/OccupancyHeatmapModal.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/QuickAddTableButton.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingCanvasEnhanced.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 11,
+      "examples": [
+        "#374151",
+        "#374151",
+        "#4B5563"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingFooterStats.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingFooterStats.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#0F0F10"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingInspectorFloating.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingInspectorFloating.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#1A1A1D"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingInspectorFloating.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingInteractiveTour.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 7,
+      "examples": [
+        "#6366f1",
+        "#1f2937",
+        "#ffffff"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingLibraryPanel.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: item.color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingMobileBottomPanel.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingPlanCanvas.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#f3f4f6",
+        "#9ca3af",
+        "#9ca3af"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingPlanModern.jsx",
+      "pattern": "gradients",
+      "severity": "high",
+      "message": "❌ Usa degradados (bg-gradient-*) - Usar cards blancos simples",
+      "count": 1,
+      "examples": [
+        "bg-gradient-to-r"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingPlanModern.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingPlanRefactored.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#6366f1"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingPlanRefactored.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: member.color || '#6366f1' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingPlanSidebar.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 4,
+      "examples": [
+        "#ef4444",
+        "#dc2626",
+        "#f59e0b"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingPlanSummary.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: item.color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingPropertiesSidebar.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 6,
+      "examples": [
+        "#fbbf24",
+        "#e5e7eb",
+        "#fef3c7"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingPropertiesSidebar.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingSearchBar.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingToolbarFloating.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingToolbarFloating.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#1A1A1D"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SeatingTooltips.jsx",
+      "pattern": "gradients",
+      "severity": "high",
+      "message": "❌ Usa degradados (bg-gradient-*) - Usar cards blancos simples",
+      "count": 2,
+      "examples": [
+        "bg-gradient-to-r",
+        "bg-gradient-to-r"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SelectionMarquee.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/SnapGuides.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#6366F1",
+        "#6366F1"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/TableListMobileModal.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/TemplateGallery.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 13,
+      "examples": [
+        "#f9fafb",
+        "#e5e7eb",
+        "#fef3c7"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/TemplateGallery.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/seating/TemplateGalleryModal.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/suppliers/CompareBar.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/suppliers/PhotoLightbox.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/suppliers/ServicesProgressBar.jsx",
+      "pattern": "gradients",
+      "severity": "high",
+      "message": "❌ Usa degradados (bg-gradient-*) - Usar cards blancos simples",
+      "count": 1,
+      "examples": [
+        "bg-gradient-to-r"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/tasks/AllTasksModal.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: `${cat.bgColor}25`, borderColor: cat.borderColor }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/tasks/CalendarComponents.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 29,
+      "examples": [
+        "#ef4444",
+        "#fee2e2",
+        "#fca5a5"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/tasks/ErrorBoundary.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#fecaca",
+        "#fef2f2",
+        "#7f1d1d"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/tasks/EventsCalendar.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 9,
+      "examples": [
+        "#8592",
+        "#8594",
+        "#ccc"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/tasks/LongTermTasksGantt.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 33,
+      "examples": [
+        "#10b981",
+        "#f59e0b",
+        "#dc2626"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/tasks/TaskList.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 4,
+      "examples": [
+        "#ef4444",
+        "#ef4444",
+        "#fee2e2"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/tasks/TaskList.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: cat.color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/tasks/TaskSidePanel.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/ColorPaletteSelector.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 60,
+      "examples": [
+        "#FFE4E9",
+        "#FFC1D5",
+        "#FF9AB8"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/ColorPaletteSelector.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/DualPreview.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#999",
+        "#ffffff"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/ShareWebTools.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#9333EA",
+        "#FFFFFF"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/TemplateSelector.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 2,
+      "examples": [
+        "style={{ backgroundColor: template.tema.colorPrimario }}",
+        "style={{ backgroundColor: template.tema.colorSecundario }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/VariablesEditor.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/WebTemplateGallery.jsx",
+      "pattern": "gradients",
+      "severity": "high",
+      "message": "❌ Usa degradados (bg-gradient-*) - Usar cards blancos simples",
+      "count": 1,
+      "examples": [
+        "bg-gradient-to-br"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/WebTemplateGallery.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/WelcomeTour.jsx",
+      "pattern": "gradients",
+      "severity": "high",
+      "message": "❌ Usa degradados (bg-gradient-*) - Usar cards blancos simples",
+      "count": 1,
+      "examples": [
+        "bg-gradient-to-br"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/WelcomeTour.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 2,
+      "examples": [
+        "blur-3xl",
+        "blur-3xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/builder/AnalyticsDashboard.jsx",
+      "pattern": "gradients",
+      "severity": "high",
+      "message": "❌ Usa degradados (bg-gradient-*) - Usar cards blancos simples",
+      "count": 1,
+      "examples": [
+        "bg-gradient-to-br"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/builder/ColorPickerPanel.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 20,
+      "examples": [
+        "#FFE4E9",
+        "#FF9AB8",
+        "#FFD700"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/builder/ColorPickerPanel.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 2,
+      "examples": [
+        "style={{ backgroundColor: colores[key] }}",
+        "style={{ backgroundColor: color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/builder/DragDropProvider.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftCountdownSection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 7,
+      "examples": [
+        "#9333EA",
+        "#6B7280",
+        "#F9FAFB"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftDressCodeSection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 13,
+      "examples": [
+        "#1E3A8A",
+        "#7C2D12",
+        "#047857"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftDressCodeSection.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: color.color }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftEventInfoSection.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-fondo)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftFAQSection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 5,
+      "examples": [
+        "#F9FAFB",
+        "#1F2937",
+        "#9333EA"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftGiftRegistrySection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 8,
+      "examples": [
+        "#FF9900",
+        "#00A859",
+        "#000000"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftGiftRegistrySection.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftHeroSection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#ffffff",
+        "#ffffff"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftLocationMapSection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#F9FAFB",
+        "#1F2937",
+        "#9333EA"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftMenuSection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#FFFFFF",
+        "#1F2937",
+        "#9333EA"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftPhotoGallerySection.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-fondo)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftRSVPSection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#FFFFFF",
+        "#1F2937",
+        "#9333EA"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftStorySection.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 1,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-fondo)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftTestimonialsSection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#F9FAFB",
+        "#1F2937",
+        "#9333EA"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/CraftTravelInfoSection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 8,
+      "examples": [
+        "#F9FAFB",
+        "#1F2937",
+        "#9333EA"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/GlobalStylesPanel.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 13,
+      "examples": [
+        "#667eea",
+        "#764ba2",
+        "#89f7fe"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/PublishModal.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/ThemeSelector.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/craft/ThemeSelector.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 3,
+      "examples": [
+        "style={{ backgroundColor: tema.colores.primario }}",
+        "style={{ backgroundColor: tema.colores.secundario }}",
+        "style={{ backgroundColor: tema.colores.acento }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/decorations/DecorativeWrapper.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#FFD1DC"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/decorations/FallingPetals.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#FFD1DC"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/decorations/SectionDecorator.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#FFD1DC"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/decorations/WaveDivider.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#ffffff"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/renderer/WebRenderer.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 7,
+      "examples": [
+        "#333",
+        "#fff",
+        "#FFE4E9"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/renderer/WebRenderer.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/components/web/sections/HeroSection/HeroSection.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#667eea",
+        "#764ba2"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/features/seating/SeatingCanvas.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 4,
+      "examples": [
+        "#eaeaea",
+        "#eaeaea",
+        "#4b5563"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/hooks/useProviderEmail.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#888"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/main.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#00ff00"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/Blog.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 6,
+      "examples": [
+        "#6366f1",
+        "#6366f1",
+        "#4f46e5"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/BlogAuthor.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 7,
+      "examples": [
+        "#6366f1",
+        "#4f46e5",
+        "#6366f1"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/BlogPost.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 17,
+      "examples": [
+        "#6366f1",
+        "#4f46e5",
+        "#6366f1"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/DisenoWeb.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 2,
+      "examples": [
+        "shadow-2xl",
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/Invitaciones.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#2563eb",
+        "#fff"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/Invitados.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 9,
+      "examples": [
+        "#eee",
+        "#eee",
+        "#eee"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/Login.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 21,
+      "examples": [
+        "#f4f5f7",
+        "#6366f1",
+        "#6366f1"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/PartnerStats.jsx",
+      "pattern": "excessiveShadows",
+      "severity": "low",
+      "message": "⚠️ Sombra excesiva - Usar shadow-md",
+      "count": 1,
+      "examples": [
+        "shadow-2xl"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/ProveedoresNuevo.backup.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/PublicWeb.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 5,
+      "examples": [
+        "#9333EA",
+        "#EC4899",
+        "#F59E0B"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/PublicWedding.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#b91c1c"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/Signup.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 10,
+      "examples": [
+        "#f4f5f7",
+        "#6366f1",
+        "#6366f1"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/WebBuilderPageCraft.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 6,
+      "examples": [
+        "#000000",
+        "#333333",
+        "#666666"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/WebEditor.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#E91E63",
+        "#FFFFFF"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/WebPreview.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/WebPreview.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 8,
+      "examples": [
+        "#FFFFFF",
+        "#FFFFFF",
+        "#000000"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/WeddingSite.jsx",
+      "pattern": "blurEffects",
+      "severity": "high",
+      "message": "❌ Usa efectos blur - No permitido",
+      "count": 1,
+      "examples": [
+        "backdrop-blur"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminAlerts.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 19,
+      "examples": [
+        "#6b7280",
+        "#6b7280",
+        "#f3f4f6"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminAutomations.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 5,
+      "examples": [
+        "#6b7280",
+        "#111827",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminBlog.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#ffffff",
+        "#ffffff",
+        "#ffffff"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminBroadcast.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 10,
+      "examples": [
+        "#6b7280",
+        "#f3f4f6",
+        "#f3f4f6"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminDiscounts.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 70,
+      "examples": [
+        "#6b7280",
+        "#6b7280",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminIntegrations.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 11,
+      "examples": [
+        "#6b7280",
+        "#6b7280",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminLayout.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 28,
+      "examples": [
+        "#f4f5f7",
+        "#111827",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminLogin.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 23,
+      "examples": [
+        "#f4f5f7",
+        "#111827",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminMetrics.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 15,
+      "examples": [
+        "#3b82f6",
+        "#10b981",
+        "#f59e0b"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminMetricsComplete.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 9,
+      "examples": [
+        "#3b82f6",
+        "#10b981",
+        "#f59e0b"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminPortfolio.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 13,
+      "examples": [
+        "#6b7280",
+        "#f3f4f6",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminReports.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 15,
+      "examples": [
+        "#6b7280",
+        "#6366f1",
+        "#ffffff"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminRevolut.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 35,
+      "examples": [
+        "#6b7280",
+        "#6366f1",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminSettings.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 19,
+      "examples": [
+        "#6b7280",
+        "#6b7280",
+        "#f3f4f6"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminSuppliers.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 60,
+      "examples": [
+        "#6366f1",
+        "#6366f1",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminSupport.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 15,
+      "examples": [
+        "#6b7280",
+        "#6b7280",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminTaskTemplates.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 45,
+      "examples": [
+        "#6b7280",
+        "#6b7280",
+        "#d1d5db"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/admin/AdminUsers.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 30,
+      "examples": [
+        "#6b7280",
+        "#f3f4f6",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/disenos/Logo.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 2,
+      "examples": [
+        "#FF69B4",
+        "#FF69B4"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/disenos/VectorEditor.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 9,
+      "examples": [
+        "#1d4ed8",
+        "#dc2626",
+        "#0ea5e9"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/marketing/Access.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 2,
+      "examples": [
+        "hover:-translate-y-0",
+        "hover:-translate-y-0"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/marketing/AppOverview.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 2,
+      "examples": [
+        "hover:-translate-y-1",
+        "hover:-translate-y-0"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/marketing/ForPlanners.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 4,
+      "examples": [
+        "hover:-translate-y-0",
+        "hover:-translate-y-1",
+        "hover:-translate-y-0"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/marketing/ForSuppliers.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 3,
+      "examples": [
+        "hover:-translate-y-0",
+        "hover:-translate-y-0",
+        "hover:-translate-y-0"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/marketing/Landing.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 3,
+      "examples": [
+        "hover:-translate-y-0",
+        "hover:-translate-y-0",
+        "hover:-translate-y-0"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/marketing/Partners.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 3,
+      "examples": [
+        "hover:-translate-y-0",
+        "hover:-translate-y-0",
+        "hover:-translate-y-0"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/marketing/Pricing.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 5,
+      "examples": [
+        "hover:-translate-y-0",
+        "hover:-translate-y-1",
+        "hover:-translate-y-1"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/protocolo/DocumentosLegales.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#222"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierAnalytics.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 12,
+      "examples": [
+        "#e5e7eb",
+        "#6b7280",
+        "#6b7280"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierAnalytics.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 13,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-background)' }}",
+        "style={{ backgroundColor: 'var(--color-surface)' }}",
+        "style={{ backgroundColor: 'var(--color-surface)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierAvailability.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#ef4444",
+        "#ef4444",
+        "#ef4444"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierAvailability.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 11,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-background)' }}",
+        "style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}",
+        "style={{ backgroundColor: 'var(--color-surface)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierDashboard.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 14,
+      "examples": [
+        "#fbbf24",
+        "#fbbf24",
+        "#fbbf24"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierDashboard.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 22,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-bg)' }}",
+        "style={{ backgroundColor: 'var(--color-bg)' }}",
+        "style={{ backgroundColor: 'var(--color-surface)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierLogin.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 4,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-bg)' }}",
+        "style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}",
+        "style={{ backgroundColor: 'var(--color-surface)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierMessages.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 4,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-background)' }}",
+        "style={{ backgroundColor: 'var(--color-surface)' }}",
+        "style={{ backgroundColor: 'var(--color-primary)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierPayments.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 2,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-background)' }}",
+        "style={{ backgroundColor: 'var(--color-surface)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierRequestDetail.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 15,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-bg)' }}",
+        "style={{ backgroundColor: 'var(--color-bg)' }}",
+        "style={{ backgroundColor: 'var(--color-surface)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierRequests.jsx",
+      "pattern": "excessiveHover",
+      "severity": "low",
+      "message": "⚠️ Efecto hover excesivo - Simplificar",
+      "count": 1,
+      "examples": [
+        "hover:-translate-y-1"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierReviews.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 3,
+      "examples": [
+        "#fbbf24",
+        "#fbbf24",
+        "#d1d5db"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierReviews.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 6,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-background)' }}",
+        "style={{ backgroundColor: 'var(--color-surface)' }}",
+        "style={{ backgroundColor: 'var(--color-border)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pages/suppliers/SupplierSetPassword.jsx",
+      "pattern": "inlineStyles",
+      "severity": "medium",
+      "message": "⚠️ Estilo inline con colores - Usar Tailwind y variables",
+      "count": 7,
+      "examples": [
+        "style={{ backgroundColor: 'var(--color-bg)' }}",
+        "style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'var(--color-success)' }}",
+        "style={{ backgroundColor: 'var(--color-success)' }}"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/pwa/setupPwaToasts.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#2563eb"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/test/accessibility/EmailInbox.a11y.test.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 1,
+      "examples": [
+        "#e53e3e"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/test/accessibility/email-components.a11y.test.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 8,
+      "examples": [
+        "#ff0000",
+        "#00ff00",
+        "#0000ff"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/test/e2e/AdvancedEmailWorkflows.test.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 4,
+      "examples": [
+        "#e53e3e",
+        "#3182ce",
+        "#38a169"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/test/e2e/EmailWorkflows.test.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 4,
+      "examples": [
+        "#e53e3e",
+        "#3182ce",
+        "#38a169"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/test/unit/EmailTagsManager.test.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 5,
+      "examples": [
+        "#FF0000",
+        "#00FF00",
+        "#0000FF"
+      ]
+    },
+    {
+      "file": "/Volumes/Sin título/MaLoveApp 2/mywed360_windows/apps/main-app/src/test/unit/TagsManager.test.jsx",
+      "pattern": "hardcodedColors",
+      "severity": "medium",
+      "message": "⚠️ Color hardcodeado - Usar variables CSS",
+      "count": 4,
+      "examples": [
+        "#e53e3e",
+        "#3182ce",
+        "#d53f8c"
+      ]
+    }
+  ]
+}

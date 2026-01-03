@@ -1,0 +1,110 @@
+{
+  "weddingId": "test-wedding-001",
+  "tasks": [
+    {
+      "id": "test-task-001",
+      "title": "Confirmar lugar de ceremonia",
+      "description": "Reservar y confirmar el Jardín Botánico",
+      "category": "VENUE",
+      "priority": "high",
+      "status": "completed",
+      "dueDate": "2025-02-28",
+      "assignedTo": "test-user-owner-001",
+      "completedAt": "2025-02-15T00:00:00.000Z",
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "test-task-002",
+      "title": "Contratar catering",
+      "description": "Definir menú y confirmar catering",
+      "category": "CATERING",
+      "priority": "high",
+      "status": "completed",
+      "dueDate": "2025-03-31",
+      "assignedTo": "test-user-planner-001",
+      "completedAt": "2025-03-01T00:00:00.000Z",
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "test-task-003",
+      "title": "Reservar fotógrafo",
+      "description": "Contratar servicio de fotografía y vídeo",
+      "category": "PHOTOGRAPHY",
+      "priority": "high",
+      "status": "completed",
+      "dueDate": "2025-04-30",
+      "assignedTo": "test-user-owner-001",
+      "completedAt": "2025-03-15T00:00:00.000Z",
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "test-task-004",
+      "title": "Enviar invitaciones",
+      "description": "Diseñar e imprimir invitaciones, enviar 2 meses antes",
+      "category": "INVITATIONS",
+      "priority": "medium",
+      "status": "in_progress",
+      "dueDate": "2025-08-15",
+      "assignedTo": "test-user-assistant-001",
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "test-task-005",
+      "title": "Contratar floristería",
+      "description": "Definir arreglos florales para ceremonia y recepción",
+      "category": "FLOWERS",
+      "priority": "medium",
+      "status": "pending",
+      "dueDate": "2025-07-31",
+      "assignedTo": "test-user-planner-001",
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "test-task-006",
+      "title": "Contratar música",
+      "description": "DJ o banda en vivo para la recepción",
+      "category": "MUSIC",
+      "priority": "medium",
+      "status": "pending",
+      "dueDate": "2025-06-30",
+      "assignedTo": "test-user-owner-001",
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "test-task-007",
+      "title": "Preparar plan de asientos",
+      "description": "Organizar distribución de invitados en mesas",
+      "category": "SEATING",
+      "priority": "low",
+      "status": "pending",
+      "dueDate": "2025-09-30",
+      "assignedTo": "test-user-planner-001",
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "test-task-008",
+      "title": "Prueba de vestido",
+      "description": "Última prueba y ajustes del vestido de novia",
+      "category": "DRESS",
+      "priority": "medium",
+      "status": "pending",
+      "dueDate": "2025-09-15",
+      "assignedTo": "test-user-owner-001",
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    }
+  ],
+  "checklist": {
+    "ceremony": [
+      { "id": "check-001", "title": "Documentación legal completa", "checked": true },
+      { "id": "check-002", "title": "Testigos confirmados", "checked": true },
+      { "id": "check-003", "title": "Celebrante confirmado", "checked": false },
+      { "id": "check-004", "title": "Votos preparados", "checked": false }
+    ],
+    "reception": [
+      { "id": "check-005", "title": "Menú definido", "checked": true },
+      { "id": "check-006", "title": "Lista de música preparada", "checked": false },
+      { "id": "check-007", "title": "Decoración confirmada", "checked": false },
+      { "id": "check-008", "title": "Cronograma del día", "checked": false }
+    ]
+  }
+}

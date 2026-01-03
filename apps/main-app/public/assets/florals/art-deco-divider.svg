@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 60">
+  <!-- Divisor art deco geométrico -->
+  
+  <!-- Líneas centrales -->
+  <line x1="0" y1="30" x2="120" y2="30" stroke="#C9A959" stroke-width="2"/>
+  <line x1="180" y1="30" x2="300" y2="30" stroke="#C9A959" stroke-width="2"/>
+  
+  <!-- Elemento central -->
+  <circle cx="150" cy="30" r="15" fill="none" stroke="#C9A959" stroke-width="2"/>
+  <circle cx="150" cy="30" r="10" fill="none" stroke="#C9A959" stroke-width="1.5"/>
+  <circle cx="150" cy="30" r="5" fill="#C9A959"/>
+  
+  <!-- Elementos geométricos laterales -->
+  <g transform="translate(130, 30)">
+    <line x1="0" y1="-12" x2="0" y2="12" stroke="#C9A959" stroke-width="2"/>
+    <line x1="-5" y1="-8" x2="5" y2="-8" stroke="#C9A959" stroke-width="1.5"/>
+    <line x1="-5" y1="8" x2="5" y2="8" stroke="#C9A959" stroke-width="1.5"/>
+  </g>
+  
+  <g transform="translate(170, 30)">
+    <line x1="0" y1="-12" x2="0" y2="12" stroke="#C9A959" stroke-width="2"/>
+    <line x1="-5" y1="-8" x2="5" y2="-8" stroke="#C9A959" stroke-width="1.5"/>
+    <line x1="-5" y1="8" x2="5" y2="8" stroke="#C9A959" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Diamantes decorativos -->
+  <polygon points="110,30 115,25 120,30 115,35" fill="#C9A959" opacity="0.7"/>
+  <polygon points="180,30 185,25 190,30 185,35" fill="#C9A959" opacity="0.7"/>
+  
+  <!-- Detalles finales -->
+  <circle cx="100" cy="30" r="3" fill="#C9A959"/>
+  <circle cx="200" cy="30" r="3" fill="#C9A959"/>
+  <circle cx="80" cy="30" r="2" fill="#C9A959" opacity="0.6"/>
+  <circle cx="220" cy="30" r="2" fill="#C9A959" opacity="0.6"/>
+</svg>

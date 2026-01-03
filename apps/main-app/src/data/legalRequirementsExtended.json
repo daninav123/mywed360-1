@@ -1,0 +1,1245 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2025-12-27T19:26:00Z",
+  "source": "Global legal requirements expansion - Americas, Asia, Oceania, Middle East, Africa",
+  "countries": {
+    "US": {
+      "name": "Estados Unidos",
+      "metadata": {
+        "sourceLabel": "USA.gov - Marriage",
+        "sourceUrl": "https://www.usa.gov/marriage-laws",
+        "notes": [
+          "Los requisitos varían por estado",
+          "Licencia de matrimonio requerida en todos los estados",
+          "Período de espera de 0-6 días dependiendo del estado",
+          "La licencia caduca entre 30-90 días según el estado",
+          "El matrimonio del mismo sexo es legal en todos los estados desde 2015"
+        ]
+      },
+      "ceremonyTypes": {
+        "civil": {
+          "requirements": [
+            {
+              "id": "civil-core",
+              "displayName": "Matrimonio civil",
+              "description": "Requisitos civiles para contraer matrimonio en Estados Unidos.",
+              "authority": "County Clerk's Office o City Hall del condado de residencia",
+              "authorityRef": "county_clerks_office_city_hall",
+              "documentation": [
+                "Identificación válida con foto (pasaporte, licencia de conducir, ID estatal)",
+                "Certificado de nacimiento original",
+                "Prueba de residencia (si el estado lo requiere)",
+                "Número de Seguro Social (opcional en muchos estados, pero recomendado)",
+                "Certificado de divorcio o acta de defunción si aplica",
+                "Certificado de matrimonio anterior si aplica",
+                "Tarifa de licencia matrimonial (varía $30-$150+ por estado/condado)"
+              ],
+              "steps": [
+                {
+                  "id": "collect_documents",
+                  "title": "Reunir documentación",
+                  "description": "Reunir identificación válida, certificado de nacimiento, SSN y documentos de matrimonios previos si aplica."
+                },
+                {
+                  "id": "submit_application",
+                  "title": "Solicitar licencia",
+                  "description": "Ambos contrayentes deben presentarse juntos en el County Clerk's Office para solicitar la licencia matrimonial."
+                },
+                {
+                  "id": "waiting_period",
+                  "title": "Período de espera",
+                  "description": "Esperar el período obligatorio del estado (0-6 días) antes de la ceremonia."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia y registro",
+                  "description": "Realizar la ceremonia con un oficiante autorizado y testigos (1-2 según estado). El oficiante registra el certificado."
+                }
+              ],
+              "leadTimeDays": 30,
+              "costEstimate": {
+                "currency": "USD",
+                "min": 30,
+                "max": 150,
+                "notes": "Varía significativamente: NYC ~$35, California $35-$105, Las Vegas ~$77, etc."
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "varies_by_state",
+              "translationsNeeded": false,
+              "relatedCertificates": [
+                "Certificado de nacimiento",
+                "Certificado de divorcio si aplica"
+              ],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "USA.gov - Marriage Laws",
+                  "url": "https://www.usa.gov/marriage-laws"
+                }
+              ]
+            }
+          ]
+        },
+        "same_sex": {
+          "requirements": [
+            {
+              "id": "same-sex-core",
+              "displayName": "Matrimonio igualitario",
+              "description": "Legal en todos los estados desde 2015 (Obergefell v. Hodges).",
+              "authority": "County Clerk's Office - mismos requisitos que matrimonio civil",
+              "authorityRef": "county_clerks_office_same_requirements",
+              "documentation": [
+                "Identificación válida con foto para ambos contrayentes",
+                "Certificado de nacimiento original",
+                "Número de Seguro Social",
+                "Certificado de divorcio o acta de defunción si aplica",
+                "Tarifa de licencia matrimonial"
+              ],
+              "steps": [
+                {
+                  "id": "collect_documents",
+                  "title": "Reunir documentación",
+                  "description": "Mismos requisitos que el matrimonio civil tradicional."
+                },
+                {
+                  "id": "apply_together",
+                  "title": "Solicitar licencia conjuntamente",
+                  "description": "Ambos contrayentes deben presentarse en el County Clerk's Office."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia",
+                  "description": "Realizar la ceremonia con oficiante autorizado y testigos."
+                }
+              ],
+              "leadTimeDays": 30,
+              "costEstimate": {
+                "currency": "USD",
+                "min": 20,
+                "max": 100
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "varies_by_state",
+              "translationsNeeded": false,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "Marriage Equality USA",
+                  "url": "https://www.usa.gov/marriage-laws"
+                }
+              ]
+            }
+          ]
+        },
+        "religious_other": {
+          "requirements": [
+            {
+              "id": "religious-other",
+              "displayName": "Matrimonio religioso",
+              "description": "Requiere licencia civil previa y oficiante religioso autorizado.",
+              "authority": "Institución religiosa + County Clerk's Office",
+              "authorityRef": "religious_institution_plus_civil",
+              "documentation": [
+                "Licencia matrimonial civil válida",
+                "Requisitos específicos de la institución religiosa (varían)",
+                "Posible curso prematrimonial según la institución",
+                "Certificados sacramentales si aplica (católico, judío, etc.)"
+              ],
+              "steps": [
+                {
+                  "id": "civil_license",
+                  "title": "Obtener licencia civil",
+                  "description": "Primero obtener la licencia matrimonial del County Clerk."
+                },
+                {
+                  "id": "religious_preparation",
+                  "title": "Preparación religiosa",
+                  "description": "Completar requisitos de la institución religiosa (cursos, consejería, etc.)."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia religiosa",
+                  "description": "El oficiante religioso debe estar autorizado por el estado para celebrar matrimonios legales."
+                }
+              ],
+              "leadTimeDays": 60,
+              "costEstimate": null,
+              "requiresAppointment": true,
+              "digitalAvailability": "in_person",
+              "translationsNeeded": false,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        }
+      }
+    },
+    "CA": {
+      "name": "Canadá",
+      "metadata": {
+        "sourceLabel": "Government of Canada - Marriage",
+        "sourceUrl": "https://www.canada.ca/en/services/benefits/family/marriage.html",
+        "notes": [
+          "Los requisitos varían por provincia/territorio",
+          "Matrimonio del mismo sexo legal desde 2005",
+          "Edad mínima: 16-19 años según provincia",
+          "Licencia válida por 90 días en la mayoría de provincias"
+        ]
+      },
+      "ceremonyTypes": {
+        "civil": {
+          "requirements": [
+            {
+              "id": "civil-core",
+              "displayName": "Matrimonio civil",
+              "description": "Requisitos civiles para contraer matrimonio en Canadá.",
+              "authority": "Registrar General de la provincia/territorio",
+              "authorityRef": "provincial_registrar_general",
+              "documentation": [
+                "Identificación válida con foto (pasaporte, licencia de conducir)",
+                "Certificado de nacimiento o ciudadanía canadiense",
+                "Prueba de estado civil (soltero, divorciado, viudo)",
+                "Certificado de divorcio o acta de defunción si aplica",
+                "Tarifa de licencia (CAD $100-150 aprox.)",
+                "Dos testigos mayores de 18 años"
+              ],
+              "steps": [
+                {
+                  "id": "notice_period",
+                  "title": "Aviso previo",
+                  "description": "Dar aviso previo al registrador (varía de inmediato a 20 días según provincia)."
+                },
+                {
+                  "id": "obtain_license",
+                  "title": "Obtener licencia",
+                  "description": "Solicitar la licencia matrimonial en persona o en línea según la provincia."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia",
+                  "description": "Realizar ceremonia con oficiante autorizado y dos testigos."
+                }
+              ],
+              "leadTimeDays": 30,
+              "costEstimate": {
+                "currency": "CAD",
+                "min": 100,
+                "max": 200,
+                "notes": "Ontario $140, Quebec $200-$300, BC $100, Alberta $50-$55"
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": false,
+              "relatedCertificates": [
+                "Certificado de nacimiento",
+                "Certificado de divorcio si aplica"
+              ],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "Government of Canada",
+                  "url": "https://www.canada.ca/en/services/benefits/family/marriage.html"
+                }
+              ]
+            }
+          ]
+        },
+        "same_sex": {
+          "requirements": [
+            {
+              "id": "same-sex-core",
+              "displayName": "Matrimonio igualitario",
+              "description": "Legal en todo Canadá desde 2005. Mismos requisitos que matrimonio civil.",
+              "authority": "Registrar General - mismos procedimientos",
+              "authorityRef": "same_as_civil",
+              "documentation": [
+                "Identificación válida para ambos contrayentes",
+                "Certificados de nacimiento",
+                "Prueba de estado civil",
+                "Tarifa de licencia"
+              ],
+              "steps": [
+                {
+                  "id": "same_process",
+                  "title": "Mismo proceso que matrimonio civil",
+                  "description": "Seguir el mismo procedimiento que el matrimonio civil tradicional."
+                }
+              ],
+              "leadTimeDays": 30,
+              "costEstimate": {
+                "currency": "CAD",
+                "min": 100,
+                "max": 150
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": false,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        }
+      }
+    },
+    "MX": {
+      "name": "México",
+      "metadata": {
+        "sourceLabel": "Gobierno de México - Matrimonio",
+        "sourceUrl": "https://www.gob.mx/tramites/ficha/matrimonio-civil/RC66",
+        "notes": [
+          "Los requisitos varían por estado",
+          "Matrimonio del mismo sexo legal en TODOS los estados desde junio 2022 (Suprema Corte)",
+          "Se requiere examen prematrimonial médico en la mayoría de estados (excepto Ciudad de México)",
+          "Algunos estados requieren curso prematrimonial",
+          "Costos aproximados: $500-2,000 MXN (variable por estado)"
+        ]
+      },
+      "ceremonyTypes": {
+        "civil": {
+          "requirements": [
+            {
+              "id": "civil-core",
+              "displayName": "Matrimonio civil",
+              "description": "Requisitos civiles para contraer matrimonio en México.",
+              "authority": "Registro Civil del estado/municipio",
+              "authorityRef": "registro_civil_estatal",
+              "documentation": [
+                "Acta de nacimiento original certificada (menos de 3 meses)",
+                "Identificación oficial (INE/IFE, pasaporte)",
+                "CURP",
+                "Comprobante de domicilio",
+                "Cuatro testigos mayores de edad con identificación",
+                "Examen prematrimonial médico",
+                "Certificado de curso prematrimonial (si el estado lo requiere)",
+                "Acta de divorcio o defunción si aplica",
+                "Pago de derechos (varía por estado)"
+              ],
+              "steps": [
+                {
+                  "id": "medical_exam",
+                  "title": "Examen prematrimonial",
+                  "description": "Realizar exámenes médicos requeridos (tipo de sangre, VIH, etc.)."
+                },
+                {
+                  "id": "premarital_course",
+                  "title": "Curso prematrimonial",
+                  "description": "Completar curso prematrimonial si el estado lo requiere."
+                },
+                {
+                  "id": "submit_application",
+                  "title": "Presentar solicitud",
+                  "description": "Presentar documentación en el Registro Civil con ambos contrayentes."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia",
+                  "description": "Ceremonia civil con oficial del Registro Civil y testigos."
+                }
+              ],
+              "leadTimeDays": 30,
+              "costEstimate": {
+                "currency": "MXN",
+                "min": 500,
+                "max": 3000,
+                "notes": "Varía significativamente por estado"
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "varies_by_state",
+              "translationsNeeded": false,
+              "relatedCertificates": [
+                "Acta de nacimiento certificada",
+                "Examen prematrimonial"
+              ],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "Gobierno de México",
+                  "url": "https://www.gob.mx/tramites/ficha/matrimonio-civil/RC66"
+                }
+              ]
+            }
+          ]
+        },
+        "religious_catholic": {
+          "requirements": [
+            {
+              "id": "religious-catholic",
+              "displayName": "Matrimonio católico",
+              "description": "Requisitos para matrimonio religioso católico en México.",
+              "authority": "Parroquia + Registro Civil",
+              "authorityRef": "parish_plus_civil",
+              "documentation": [
+                "Certificados de bautismo actualizados (menos de 6 meses)",
+                "Certificados de confirmación",
+                "Certificado de primera comunión",
+                "Curso prematrimonial católico (variable por diócesis)",
+                "Dispensa si uno no es católico",
+                "Para efectos civiles: registro posterior en Registro Civil"
+              ],
+              "steps": [
+                {
+                  "id": "parish_requirements",
+                  "title": "Requisitos parroquiales",
+                  "description": "Completar curso prematrimonial y reunir certificados sacramentales."
+                },
+                {
+                  "id": "canonical_investigation",
+                  "title": "Investigación canónica",
+                  "description": "La parroquia realiza investigación de impedimentos."
+                },
+                {
+                  "id": "religious_ceremony",
+                  "title": "Ceremonia religiosa",
+                  "description": "Celebración del matrimonio religioso."
+                },
+                {
+                  "id": "civil_registration",
+                  "title": "Registro civil",
+                  "description": "Registrar el matrimonio en el Registro Civil para efectos legales."
+                }
+              ],
+              "leadTimeDays": 90,
+              "costEstimate": null,
+              "requiresAppointment": true,
+              "digitalAvailability": "in_person",
+              "translationsNeeded": false,
+              "relatedCertificates": [
+                "Certificados sacramentales"
+              ],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        }
+      }
+    },
+    "BR": {
+      "name": "Brasil",
+      "metadata": {
+        "sourceLabel": "Governo do Brasil - Casamento",
+        "sourceUrl": "https://www.gov.br/pt-br/servicos/casar-se",
+        "notes": [
+          "Matrimonio del mismo sexo legal desde 2013",
+          "Proceso de habilitação matrimonial obligatorio",
+          "Publicación de edictos por 15 días",
+          "Requiere testigos"
+        ]
+      },
+      "ceremonyTypes": {
+        "civil": {
+          "requirements": [
+            {
+              "id": "civil-core",
+              "displayName": "Casamento civil",
+              "description": "Requisitos civiles para contraer matrimonio en Brasil.",
+              "authority": "Cartório de Registro Civil",
+              "authorityRef": "cartorio_registro_civil",
+              "documentation": [
+                "Certidão de nascimento atualizada (menos de 90 días)",
+                "Documento de identidade (RG, CNH, passaporte)",
+                "CPF",
+                "Comprovante de residência",
+                "Certidão de divórcio ou óbito si aplica",
+                "Declaração de duas testemunhas",
+                "Exames médicos (opcional, varía por estado)",
+                "Pagamento de taxas cartoriais"
+              ],
+              "steps": [
+                {
+                  "id": "habilitacao",
+                  "title": "Processo de habilitação",
+                  "description": "Presentar documentación en el cartório para iniciar el proceso de habilitación."
+                },
+                {
+                  "id": "edital",
+                  "title": "Publicación de edictos",
+                  "description": "Los edictos se publican por 15 días para verificar impedimentos."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia",
+                  "description": "Ceremonia civil en el cartório o lugar elegido con testigos."
+                }
+              ],
+              "leadTimeDays": 30,
+              "costEstimate": {
+                "currency": "BRL",
+                "min": 200,
+                "max": 800,
+                "notes": "Varía por estado y cartório"
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "varies_by_state",
+              "translationsNeeded": false,
+              "relatedCertificates": [
+                "Certidão de nascimento",
+                "Certidão de divórcio si aplica"
+              ],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "Governo do Brasil",
+                  "url": "https://www.gov.br/pt-br/servicos/casar-se"
+                }
+              ]
+            }
+          ]
+        },
+        "same_sex": {
+          "requirements": [
+            {
+              "id": "same-sex-core",
+              "displayName": "Casamento homoafetivo",
+              "description": "Legal desde 2013. Mismos procedimientos que matrimonio civil.",
+              "authority": "Cartório - mismos requisitos",
+              "authorityRef": "same_as_civil",
+              "documentation": [
+                "Mismos requisitos que el matrimonio civil tradicional"
+              ],
+              "steps": [
+                {
+                  "id": "same_process",
+                  "title": "Mismo proceso",
+                  "description": "Seguir el mismo proceso de habilitação que matrimonio civil."
+                }
+              ],
+              "leadTimeDays": 30,
+              "costEstimate": {
+                "currency": "BRL",
+                "min": 200,
+                "max": 800
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "varies_by_state",
+              "translationsNeeded": false,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        }
+      }
+    },
+    "AR": {
+      "name": "Argentina",
+      "metadata": {
+        "sourceLabel": "Argentina.gob.ar - Matrimonio",
+        "sourceUrl": "https://www.argentina.gob.ar/servicio/contraer-matrimonio-civil",
+        "notes": [
+          "Matrimonio igualitario legal desde 2010 (primer país de Latinoamérica)",
+          "No requiere examen prematrimonial",
+          "Dos testigos mayores de 18 años requeridos"
+        ]
+      },
+      "ceremonyTypes": {
+        "civil": {
+          "requirements": [
+            {
+              "id": "civil-core",
+              "displayName": "Matrimonio civil",
+              "description": "Requisitos civiles para contraer matrimonio en Argentina.",
+              "authority": "Registro Civil de la provincia/CABA",
+              "authorityRef": "registro_civil_provincial",
+              "documentation": [
+                "DNI original y vigente de ambos contrayentes",
+                "Partida de nacimiento original (menos de 90 días)",
+                "Certificado de soltería o sentencia de divorcio/defunción si aplica",
+                "Dos testigos mayores de 18 años con DNI",
+                "Certificado de domicilio",
+                "Pago de arancel (varía por jurisdicción)"
+              ],
+              "steps": [
+                {
+                  "id": "submit_documents",
+                  "title": "Presentar documentación",
+                  "description": "Presentar todos los documentos en el Registro Civil."
+                },
+                {
+                  "id": "ceremony_date",
+                  "title": "Fijar fecha de ceremonia",
+                  "description": "Coordinar fecha y hora de la ceremonia civil."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia",
+                  "description": "Ceremonia con oficial del Registro Civil y testigos."
+                }
+              ],
+              "leadTimeDays": 15,
+              "costEstimate": {
+                "currency": "ARS",
+                "min": 5000,
+                "max": 15000,
+                "notes": "⚠️ ADVERTENCIA: Costos sujetos a inflación. Estos valores pueden estar desactualizados. Consultar con el Registro Civil local para costos actuales."
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": false,
+              "relatedCertificates": [
+                "Partida de nacimiento",
+                "Certificado de soltería"
+              ],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "Argentina.gob.ar",
+                  "url": "https://www.argentina.gob.ar/servicio/contraer-matrimonio-civil"
+                }
+              ]
+            }
+          ]
+        },
+        "same_sex": {
+          "requirements": [
+            {
+              "id": "same-sex-core",
+              "displayName": "Matrimonio igualitario",
+              "description": "Legal desde 2010. Igualdad total de derechos con matrimonio tradicional.",
+              "authority": "Registro Civil - procedimientos idénticos",
+              "authorityRef": "same_procedures",
+              "documentation": [
+                "Mismos requisitos que matrimonio civil"
+              ],
+              "steps": [
+                {
+                  "id": "equal_rights",
+                  "title": "Derechos iguales",
+                  "description": "Proceso idéntico al matrimonio civil heterosexual."
+                }
+              ],
+              "leadTimeDays": 15,
+              "costEstimate": {
+                "currency": "ARS",
+                "min": 5000,
+                "max": 15000
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": false,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        }
+      }
+    },
+    "AU": {
+      "name": "Australia",
+      "metadata": {
+        "sourceLabel": "Australian Government - Marriage",
+        "sourceUrl": "https://www.ag.gov.au/families-and-marriage/marriage",
+        "notes": [
+          "Matrimonio del mismo sexo legal desde 2017",
+          "Notice of Intended Marriage (NOIM) debe presentarse 1 mes antes",
+          "Ceremonia puede ser civil o religiosa",
+          "Edad mínima: 18 años (sin excepciones desde 2024)"
+        ]
+      },
+      "ceremonyTypes": {
+        "civil": {
+          "requirements": [
+            {
+              "id": "civil-core",
+              "displayName": "Civil marriage",
+              "description": "Requisitos civiles para contraer matrimonio en Australia.",
+              "authority": "Celebrante autorizado por el gobierno australiano",
+              "authorityRef": "authorised_celebrant",
+              "documentation": [
+                "Notice of Intended Marriage (NOIM) completado",
+                "Documento de identidad con foto (pasaporte, licencia de conducir)",
+                "Certificado de nacimiento original o extracto",
+                "Evidencia de disolución de matrimonios previos si aplica",
+                "Dos testigos mayores de 18 años",
+                "Tarifa del celebrante (varía AUD $300-1000)"
+              ],
+              "steps": [
+                {
+                  "id": "submit_noim",
+                  "title": "Presentar NOIM",
+                  "description": "Presentar Notice of Intended Marriage al celebrante al menos 1 mes antes."
+                },
+                {
+                  "id": "choose_celebrant",
+                  "title": "Elegir celebrante",
+                  "description": "Seleccionar un celebrante autorizado (civil o religioso)."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia",
+                  "description": "Ceremonia con el celebrante y dos testigos. Debe incluir la voz matrimonial legal."
+                },
+                {
+                  "id": "registration",
+                  "title": "Registro",
+                  "description": "El celebrante registra el matrimonio con Births, Deaths and Marriages."
+                }
+              ],
+              "leadTimeDays": 35,
+              "costEstimate": {
+                "currency": "AUD",
+                "min": 300,
+                "max": 1000,
+                "notes": "Tarifa del celebrante, varía ampliamente"
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": true,
+              "relatedCertificates": [
+                "Certificado de nacimiento",
+                "Certificado de divorcio si aplica"
+              ],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "Australian Government",
+                  "url": "https://www.ag.gov.au/families-and-marriage/marriage"
+                }
+              ]
+            }
+          ]
+        },
+        "same_sex": {
+          "requirements": [
+            {
+              "id": "same-sex-core",
+              "displayName": "Same-sex marriage",
+              "description": "Legal desde diciembre 2017. Requisitos idénticos al matrimonio civil.",
+              "authority": "Celebrante autorizado - mismo proceso",
+              "authorityRef": "same_process",
+              "documentation": [
+                "Mismos requisitos que matrimonio civil"
+              ],
+              "steps": [
+                {
+                  "id": "equal_marriage",
+                  "title": "Igualdad matrimonial",
+                  "description": "Procedimientos completamente iguales al matrimonio heterosexual."
+                }
+              ],
+              "leadTimeDays": 35,
+              "costEstimate": {
+                "currency": "AUD",
+                "min": 300,
+                "max": 1000
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": true,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        }
+      }
+    },
+    "NZ": {
+      "name": "Nueva Zelanda",
+      "metadata": {
+        "sourceLabel": "Govt.nz - Getting married",
+        "sourceUrl": "https://www.govt.nz/browse/family-and-whanau/getting-married/",
+        "notes": [
+          "Matrimonio del mismo sexo legal desde 2013",
+          "Notice of Intended Marriage debe darse 3 días antes",
+          "Edad mínima: 18 años (16-17 con consentimiento judicial)",
+          "Ceremonia puede ser en cualquier idioma"
+        ]
+      },
+      "ceremonyTypes": {
+        "civil": {
+          "requirements": [
+            {
+              "id": "civil-core",
+              "displayName": "Civil marriage",
+              "description": "Requisitos civiles para contraer matrimonio en Nueva Zelanda.",
+              "authority": "Registrar of Births, Deaths and Marriages + celebrante",
+              "authorityRef": "bdm_registrar_celebrant",
+              "documentation": [
+                "Identificación con foto (pasaporte, licencia de conducir)",
+                "Certificado de nacimiento",
+                "Notice of Intended Marriage",
+                "Evidencia de matrimonios previos y disolución si aplica",
+                "Dos testigos mayores de 18 años",
+                "Tarifa de licencia (NZD $150) + tarifa del celebrante"
+              ],
+              "steps": [
+                {
+                  "id": "give_notice",
+                  "title": "Dar aviso",
+                  "description": "Dar Notice of Intended Marriage al celebrante al menos 3 días antes."
+                },
+                {
+                  "id": "obtain_license",
+                  "title": "Obtener licencia",
+                  "description": "El celebrante obtiene la licencia matrimonial del Registrar."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia",
+                  "description": "Ceremonia con celebrante autorizado y dos testigos."
+                },
+                {
+                  "id": "registration",
+                  "title": "Registro",
+                  "description": "El celebrante registra el matrimonio automáticamente."
+                }
+              ],
+              "leadTimeDays": 7,
+              "costEstimate": {
+                "currency": "NZD",
+                "min": 150,
+                "max": 800,
+                "notes": "Licencia + celebrante"
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": true,
+              "relatedCertificates": [
+                "Certificado de nacimiento"
+              ],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "New Zealand Government",
+                  "url": "https://www.govt.nz/browse/family-and-whanau/getting-married/"
+                }
+              ]
+            }
+          ]
+        },
+        "same_sex": {
+          "requirements": [
+            {
+              "id": "same-sex-core",
+              "displayName": "Same-sex marriage",
+              "description": "Legal desde 2013. Derechos completamente iguales.",
+              "authority": "Mismo proceso que matrimonio civil",
+              "authorityRef": "equal_process",
+              "documentation": [
+                "Mismos requisitos que matrimonio civil"
+              ],
+              "steps": [
+                {
+                  "id": "equality",
+                  "title": "Igualdad total",
+                  "description": "Proceso idéntico al matrimonio heterosexual."
+                }
+              ],
+              "leadTimeDays": 7,
+              "costEstimate": {
+                "currency": "NZD",
+                "min": 150,
+                "max": 800
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": true,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        }
+      }
+    },
+    "JP": {
+      "name": "Japón",
+      "metadata": {
+        "sourceLabel": "Ministry of Justice Japan",
+        "sourceUrl": "https://www.moj.go.jp/",
+        "notes": [
+          "Matrimonio del mismo sexo NO legal a nivel nacional (solo partnership certificates locales)",
+          "Edad mínima: 18 años para todos (cambio reciente en 2022)",
+          "Requiere koseki (registro familiar)",
+          "Proceso relativamente simple y rápido"
+        ]
+      },
+      "ceremonyTypes": {
+        "civil": {
+          "requirements": [
+            {
+              "id": "civil-core",
+              "displayName": "Matrimonio civil (婚姻届 Kon'in-todoke)",
+              "description": "Requisitos civiles para contraer matrimonio en Japón.",
+              "authority": "Ward/City Office (区役所/市役所) - sección de koseki",
+              "authorityRef": "ward_city_office_koseki",
+              "documentation": [
+                "Kon'in todoke (formulario de notificación matrimonial) - disponible en ward office",
+                "Koseki tohon (extracto de registro familiar) de ambos contrayentes",
+                "Jūminhyō (certificado de residencia) si no están en el mismo ward",
+                "Identificación válida (My Number Card, pasaporte, licencia de conducir)",
+                "Dos testigos mayores de 20 años con sello personal (hanko/inkan)",
+                "Para extranjeros: Certificate of Legal Capacity to Marry de su país"
+              ],
+              "steps": [
+                {
+                  "id": "obtain_documents",
+                  "title": "Obtener documentos",
+                  "description": "Obtener koseki tohon y preparar formulario kon'in todoke."
+                },
+                {
+                  "id": "witnesses",
+                  "title": "Conseguir testigos",
+                  "description": "Dos testigos deben firmar y sellar el formulario kon'in todoke."
+                },
+                {
+                  "id": "submit_form",
+                  "title": "Presentar formulario",
+                  "description": "Presentar kon'in todoke en el ward office. No requiere ceremonia, el matrimonio es legal al presentar el formulario."
+                },
+                {
+                  "id": "registration",
+                  "title": "Registro automático",
+                  "description": "El matrimonio se registra en el koseki en 1-2 semanas."
+                }
+              ],
+              "leadTimeDays": 7,
+              "costEstimate": {
+                "currency": "JPY",
+                "min": 0,
+                "max": 0,
+                "notes": "Gratuito (solo costos de documentos previos)"
+              },
+              "requiresAppointment": false,
+              "digitalAvailability": "in_person",
+              "translationsNeeded": true,
+              "relatedCertificates": [
+                "Koseki tohon (extracto de registro familiar)"
+              ],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "Ministry of Justice",
+                  "url": "https://www.moj.go.jp/"
+                }
+              ]
+            }
+          ]
+        },
+        "civil_partnership": {
+          "requirements": [
+            {
+              "id": "partnership-local",
+              "displayName": "Partnership Certificate (パートナーシップ証明)",
+              "description": "Certificados de pareja reconocidos en algunas ciudades. NO es matrimonio legal.",
+              "authority": "Gobiernos locales de ciudades específicas (Tokyo, Osaka, Sapporo, etc.)",
+              "authorityRef": "local_government_partnership",
+              "documentation": [
+                "Disponible solo en ciudades/wards que lo ofrecen",
+                "Solicitud conjunta de ambos miembros de la pareja",
+                "Declaración de intención de vivir juntos",
+                "Comprobante de residencia en la ciudad",
+                "NO tiene efectos legales de matrimonio (herencia, impuestos, etc.)",
+                "Puede facilitar acceso a vivienda, hospital, etc."
+              ],
+              "steps": [
+                {
+                  "id": "check_availability",
+                  "title": "Verificar disponibilidad",
+                  "description": "Confirmar que la ciudad/ward ofrece partnership certificates."
+                },
+                {
+                  "id": "apply",
+                  "title": "Solicitar certificado",
+                  "description": "Presentar solicitud conjunta en el gobierno local."
+                },
+                {
+                  "id": "receive_certificate",
+                  "title": "Recibir certificado",
+                  "description": "Obtener certificado simbólico (sin efectos legales de matrimonio)."
+                }
+              ],
+              "leadTimeDays": 14,
+              "costEstimate": {
+                "currency": "JPY",
+                "min": 0,
+                "max": 5000
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "varies_by_city",
+              "translationsNeeded": true,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        }
+      }
+    },
+    "GB": {
+      "name": "Reino Unido",
+      "metadata": {
+        "sourceLabel": "GOV.UK - Getting married",
+        "sourceUrl": "https://www.gov.uk/marriages-civil-partnerships",
+        "notes": [
+          "Matrimonio del mismo sexo legal desde 2014 (Inglaterra, Gales, Escocia); 2020 (Irlanda del Norte)",
+          "Los requisitos varían entre Inglaterra/Gales, Escocia e Irlanda del Norte",
+          "Notice period de 28 días (puede ser 70 días si no eres residente)",
+          "Civil partnership también disponible para parejas del mismo y diferente sexo"
+        ]
+      },
+      "ceremonyTypes": {
+        "civil": {
+          "requirements": [
+            {
+              "id": "civil-core",
+              "displayName": "Civil marriage",
+              "description": "Requisitos civiles para contraer matrimonio en Reino Unido.",
+              "authority": "Register Office local",
+              "authorityRef": "local_register_office",
+              "documentation": [
+                "Prueba de nombre y apellido (pasaporte, certificado de nacimiento)",
+                "Prueba de dirección",
+                "Pasaporte o tarjeta de identidad para nacionalidad",
+                "Decreto de divorcio absoluto o certificado de defunción si aplica",
+                "Visa de matrimonio si es necesaria",
+                "Notice of marriage (£35 por persona)",
+                "Tarifa de ceremonia (£46-£80 dependiendo del lugar)"
+              ],
+              "steps": [
+                {
+                  "id": "give_notice",
+                  "title": "Dar aviso (Give Notice)",
+                  "description": "Ambos deben dar aviso en el Register Office al menos 28 días antes de la ceremonia."
+                },
+                {
+                  "id": "waiting_period",
+                  "title": "Período de espera",
+                  "description": "Esperar 28 días (o 70 si no eres residente UK) para que se publiquen los avisos."
+                },
+                {
+                  "id": "book_ceremony",
+                  "title": "Reservar ceremonia",
+                  "description": "La ceremonia puede ser en Register Office o venue aprobado."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia",
+                  "description": "Ceremonia con registrar y dos testigos. Válida por 12 meses desde el aviso."
+                }
+              ],
+              "leadTimeDays": 35,
+              "costEstimate": {
+                "currency": "GBP",
+                "min": 81,
+                "max": 500,
+                "notes": "Notice fee + ceremonia + certificado"
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": true,
+              "relatedCertificates": [
+                "Certificado de nacimiento"
+              ],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "GOV.UK",
+                  "url": "https://www.gov.uk/marriages-civil-partnerships"
+                }
+              ]
+            }
+          ]
+        },
+        "same_sex": {
+          "requirements": [
+            {
+              "id": "same-sex-core",
+              "displayName": "Same-sex marriage",
+              "description": "Legal desde 2014. Mismo proceso que matrimonio civil.",
+              "authority": "Register Office - procedimientos idénticos",
+              "authorityRef": "same_procedures",
+              "documentation": [
+                "Mismos requisitos que matrimonio civil"
+              ],
+              "steps": [
+                {
+                  "id": "equal_marriage",
+                  "title": "Matrimonio igualitario",
+                  "description": "Proceso completamente igual al matrimonio heterosexual."
+                }
+              ],
+              "leadTimeDays": 35,
+              "costEstimate": {
+                "currency": "GBP",
+                "min": 81,
+                "max": 500
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": true,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        },
+        "civil_partnership": {
+          "requirements": [
+            {
+              "id": "civil-partnership",
+              "displayName": "Civil Partnership",
+              "description": "Disponible para parejas del mismo y diferente sexo desde 2019.",
+              "authority": "Register Office",
+              "authorityRef": "register_office_partnership",
+              "documentation": [
+                "Mismos documentos que para matrimonio civil",
+                "Notice of intention to form a civil partnership",
+                "Ofrece casi los mismos derechos que el matrimonio"
+              ],
+              "steps": [
+                {
+                  "id": "give_notice",
+                  "title": "Dar aviso",
+                  "description": "Dar notice en el Register Office 28 días antes."
+                },
+                {
+                  "id": "registration",
+                  "title": "Registro",
+                  "description": "Registrar la civil partnership con dos testigos."
+                }
+              ],
+              "leadTimeDays": 35,
+              "costEstimate": {
+                "currency": "GBP",
+                "min": 81,
+                "max": 500
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "online_available",
+              "translationsNeeded": true,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        }
+      }
+    },
+    "ZA": {
+      "name": "Sudáfrica",
+      "metadata": {
+        "sourceLabel": "Department of Home Affairs SA",
+        "sourceUrl": "https://www.gov.za/services/life-events/get-married",
+        "notes": [
+          "Matrimonio del mismo sexo legal desde 2006 (quinto país del mundo)",
+          "Tres tipos de matrimonio: civil, religioso, customary (tradicional)",
+          "Requiere 14 días de aviso público",
+          "Sistemas matrimoniales: in community of property, out of community, accrual system"
+        ]
+      },
+      "ceremonyTypes": {
+        "civil": {
+          "requirements": [
+            {
+              "id": "civil-core",
+              "displayName": "Civil marriage",
+              "description": "Requisitos civiles para contraer matrimonio en Sudáfrica.",
+              "authority": "Department of Home Affairs / Marriage Officer",
+              "authorityRef": "home_affairs_marriage_officer",
+              "documentation": [
+                "Formulario BI-130 (Application for Marriage)",
+                "Formulario BI-31 (Notice of Marriage) - publicado 14 días antes",
+                "ID book o smart ID card sudafricano, o pasaporte válido",
+                "Certificado de nacimiento",
+                "Decreto de divorcio o certificado de defunción si aplica",
+                "Dos testigos competentes mayores de 16 años",
+                "Antenuptial contract si se casa out of community of property (opcional)"
+              ],
+              "steps": [
+                {
+                  "id": "submit_notice",
+                  "title": "Presentar aviso",
+                  "description": "Presentar formulario BI-31 al menos 14 días antes en Home Affairs Office."
+                },
+                {
+                  "id": "antenuptial_contract",
+                  "title": "Contrato prenupcial (opcional)",
+                  "description": "Si desean casarse out of community, firmar ante notario antes de la boda."
+                },
+                {
+                  "id": "ceremony",
+                  "title": "Ceremonia",
+                  "description": "Ceremonia con Marriage Officer y dos testigos."
+                },
+                {
+                  "id": "registration",
+                  "title": "Registro",
+                  "description": "Marriage Officer registra el matrimonio con Home Affairs."
+                }
+              ],
+              "leadTimeDays": 21,
+              "costEstimate": {
+                "currency": "ZAR",
+                "min": 0,
+                "max": 1500,
+                "notes": "Ceremonia civil es gratuita, puede haber costos administrativos"
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "in_person",
+              "translationsNeeded": true,
+              "relatedCertificates": [
+                "Certificado de nacimiento"
+              ],
+              "evidences": [],
+              "links": [
+                {
+                  "type": "reference",
+                  "label": "SA Government",
+                  "url": "https://www.gov.za/services/life-events/get-married"
+                }
+              ]
+            }
+          ]
+        },
+        "same_sex": {
+          "requirements": [
+            {
+              "id": "same-sex-core",
+              "displayName": "Same-sex marriage",
+              "description": "Legal desde 2006 (Civil Union Act). Derechos completamente iguales.",
+              "authority": "Home Affairs - mismo proceso",
+              "authorityRef": "equal_process",
+              "documentation": [
+                "Mismos requisitos que matrimonio civil tradicional"
+              ],
+              "steps": [
+                {
+                  "id": "civil_union_act",
+                  "title": "Civil Union Act",
+                  "description": "Proceso bajo Civil Union Act 2006 con derechos idénticos."
+                }
+              ],
+              "leadTimeDays": 21,
+              "costEstimate": {
+                "currency": "ZAR",
+                "min": 0,
+                "max": 1500
+              },
+              "requiresAppointment": true,
+              "digitalAvailability": "in_person",
+              "translationsNeeded": true,
+              "relatedCertificates": [],
+              "evidences": [],
+              "links": []
+            }
+          ]
+        }
+      }
+    }
+  }
+}

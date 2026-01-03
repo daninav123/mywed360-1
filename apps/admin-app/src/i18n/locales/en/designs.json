@@ -1,0 +1,21 @@
+{
+  "editor": {
+    "alignment": {
+      "label": "Align:",
+      "distribute": "Distribute:",
+      "alignLeft": "Align left",
+      "alignCenterH": "Center horizontally",
+      "alignRight": "Align right",
+      "alignTop": "Align top",
+      "alignCenterV": "Center vertically",
+      "alignBottom": "Align bottom",
+      "alignCenter": "Center in canvas",
+      "distributeH": "Distribute horizontally",
+      "distributeV": "Distribute vertically",
+      "alerts": {
+        "selectMultiple": "Select multiple elements to distribute",
+        "needThree": "You need at least 3 elements to distribute"
+      }
+    }
+  }
+}

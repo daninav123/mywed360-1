@@ -1,0 +1,87 @@
+{
+  "chat": {
+    "title": "Chat",
+    "placeholder": "Añade tus traducciones aquí",
+    "close": "Cerrar chat",
+    "open": "Abrir chat",
+    "sendMessage": "Enviar mensaje",
+    "messagePlaceholder": "Escribe...",
+    "send": "Enviar",
+    "connecting": "Conectando con IA...",
+    "loading": "Laden...",
+    "markImportant": "Marcar como importante",
+    "markedImportant": "Marcado como importante",
+    "noteMarked": "Nota marcada como importante",
+    "messages": {
+      "user": "Usuario",
+      "assistant": "IA",
+      "greeting": "Hola! Estoy en modo offline temporal, pero puedo guiarte por las secciones de la app para que sigas avanzando con {{subject}}.",
+      "emptyPrompt": "Puedo orientarte con tareas, invitados, presupuesto o proveedores para {{subject}}. Cuntame qu necesitas.",
+      "offlineMode": "El asistente remoto no responde, pero sigo disponible en modo gua. Pregntame por tareas, invitados, presupuesto o proveedores y te indicar dnde gestionarlo para {{subject}}.",
+      "offlineTemporary": "El asistente IA usa modo offline temporal.",
+      "noDataExtracted": "No se detectaron datos para extraer. Puedes darme más detalles?",
+      "dataExtracted": "Datos extrados:",
+      "changesApplied": "He aplicado los cambios.",
+      "connectionIssue": "Parece que hay problemas de conexin con el servidor. Puedo ayudarte con consultas bsicas sobre tu boda mientras se restablece la conexin. Qu deseas saber?",
+      "connectionError": "No se pudo conectar con el servidor de IA. Por favor, verifica tu conexin y vuelve a intentarlo.",
+      "genericError": "Ha ocurrido un error: {{error}}"
+    },
+    "guides": {
+      "suppliers": "Gestiona proveedores para {{subject}} desde la seccin Proveedores: aade fichas, marca favoritos y compara presupuestos. Quieres que te indique los pasos?",
+      "finance": "El panel de Finanzas te permite registrar gastos e ingresos y ver alertas si superas tu presupuesto de {{subject}}. Abre Finanzas y pulsa \"Añadir movimiento\".",
+      "guests": "Desde Invitados puedes importar listas, registrar confirmaciones y organizar acompaantes para {{subject}}. Tambin puedes enviar recordatorios por email.",
+      "seating": "Organiza las mesas de {{subject}} desde Seating Plan: arrastra invitados, detecta huecos y exporta el plano en PDF para tus proveedores.",
+      "tasks": "El panel de Tareas te permite marcar pendientes, crear recordatorios y coordinarlos con el timeline de {{subject}}. Revisa la pestaa de tareas para mantener todo al día."
+    },
+    "commands": {
+      "meetingRescheduled": "Reunión{{title}} reprogramada al {{date}} {{time}}.",
+      "taskAdded": "Tarea aadida",
+      "meetingAdded": "Reunión aadida",
+      "taskUpdated": "Tarea actualizada",
+      "taskDeleted": "Tarea eliminada",
+      "taskCompleted": "Tarea marcada como completada",
+      "guestAdded": "Invitado aadido",
+      "guestUpdated": "Invitado actualizado",
+      "guestDeleted": "Invitado eliminado",
+      "movementAdded": "Movimiento aadido",
+      "movementUpdated": "Movimiento actualizado",
+      "movementDeleted": "Movimiento eliminado",
+      "supplierAdded": "Proveedor aadido",
+      "supplierUpdated": "Proveedor actualizado",
+      "supplierDeleted": "Proveedor eliminado",
+      "suppliersFound": "Encontrados {{count}} proveedores",
+      "suppliersNotFound": "No se encontraron proveedores",
+      "suppliersSearchError": "Error buscando proveedores",
+      "guestMoved": "Invitado movido a mesa {{table}}",
+      "configUpdated": "Configuración actualizada"
+    },
+    "plurals": {
+      "guestsAdded_one": "{{count}} invitado aadido",
+      "guestsAdded_other": "{{count}} invitados aadidos",
+      "tasksAdded_one": "{{count}} tarea aadida",
+      "tasksAdded_other": "{{count}} tareas aadidas",
+      "meetingsAdded_one": "{{count}} reunión aadida",
+      "meetingsAdded_other": "{{count}} reuniones aadidas",
+      "movementsAdded_one": "{{count}} movimiento aadido",
+      "movementsAdded_other": "{{count}} movimientos aadidos"
+    },
+    "errors": {
+      "timeout": "Tiempo de espera agotado",
+      "connection": "Error de conexin",
+      "communication": "Error en la comunicación",
+      "noToken": "No se pudo generar el token de autenticacin"
+    },
+    "defaults": {
+      "task": "Tarea",
+      "meeting": "Reunión",
+      "guest": "Invitado",
+      "movement": "Movimiento",
+      "supplier": "Proveedor",
+      "pending": "Pendiente",
+      "event": "evento",
+      "wedding": "boda",
+      "yourPlanning": "tu planificación"
+    }
+  },
+  "_note": "Translate from es/chat.json"
+}

@@ -1,0 +1,204 @@
+{
+  "version": 2,
+  "admin": {
+    "managedByPanel": true,
+    "panelPath": "admin/timeline",
+    "collection": "adminTimelineBlocks"
+  },
+  "blocks": [
+    {
+      "key": "A",
+      "name": "Fundamentos",
+      "p0": 0.0,
+      "p1": 0.2,
+      "range": { "startPct": 0.0, "endPct": 0.2 },
+      "admin": {
+        "category": "FUNDAMENTOS",
+        "editable": true,
+        "deletable": true,
+        "panelPath": "admin/timeline",
+        "description": "Inicio del planning: onboarding, presupuesto base y primera lista de invitados."
+      },
+      "items": [
+        "Difundir la noticia y organizar la planificacion (perfil, invitar pareja, anillo, presupuesto inicial)",
+        "Crear primera version de la lista de invitados",
+        "Investigar lugares de celebracion y comenzar visitas",
+        "Decidir cortejo nupcial"
+      ]
+    },
+    {
+      "key": "B",
+      "name": "Proveedores Clave",
+      "p0": 0.1,
+      "p1": 0.8,
+      "range": { "startPct": 0.1, "endPct": 0.8 },
+      "admin": {
+        "category": "PROVEEDORES",
+        "editable": true,
+        "deletable": true,
+        "panelPath": "admin/timeline",
+        "description": "Bloques de proveedores estratégicos y contratos principales."
+      },
+      "items": [
+        "Fotografia -> contacto inicial pronto, cierre de contrato a mitad del proceso",
+        "Videografia -> decision temprana, reuniones finales hacia el final",
+        "Catering -> investigacion inicial, prueba de menu, cierre cercano a la boda",
+        "Florista -> inspiracion y primeras ideas, confirmacion en la fase final",
+        "Musica -> banda o DJ reservados pronto, reunion final mas tarde",
+        "Reposteria -> busqueda inicial, prueba de sabores meses despues, pedido final cerca de la boda"
+      ]
+    },
+    {
+      "key": "C",
+      "name": "Vestuario y Moda",
+      "p0": 0.15,
+      "p1": 0.9,
+      "range": { "startPct": 0.15, "endPct": 0.9 },
+      "admin": {
+        "category": "VESTUARIO",
+        "editable": true,
+        "deletable": true,
+        "panelPath": "admin/timeline",
+        "description": "Vestuario de boda, pruebas y outfit del cortejo."
+      },
+      "items": [
+        "Novia -> visitas iniciales, decision intermedia, pruebas finales en los ultimos meses",
+        "Novio -> compra traje en mitad del proceso, ajustes finales poco antes",
+        "Cortejo -> definir vestidos o trajes, confirmar tallas y ajustes finales mas tarde"
+      ]
+    },
+    {
+      "key": "D",
+      "name": "Estilo y Detalles",
+      "p0": 0.2,
+      "p1": 0.95,
+      "range": { "startPct": 0.2, "endPct": 0.95 },
+      "admin": {
+        "category": "DETALLES",
+        "editable": true,
+        "deletable": true,
+        "panelPath": "admin/timeline",
+        "description": "Papelería, decoración y regalos para invitados."
+      },
+      "items": [
+        "Invitaciones digitales y save-the-dates (inicio medio)",
+        "Invitaciones fisicas y papeleria (fase intermedia)",
+        "Decoracion y DIY (se puede trabajar meses antes y ultimar al final)",
+        "Recuerdos y regalos (eleccion temprana, cierre antes del evento)"
+      ]
+    },
+    {
+      "key": "E",
+      "name": "Organizacion y Logistica",
+      "p0": 0.3,
+      "p1": 1.0,
+      "range": { "startPct": 0.3, "endPct": 1.0 },
+      "admin": {
+        "category": "LOGISTICA",
+        "editable": true,
+        "deletable": true,
+        "panelPath": "admin/timeline",
+        "description": "Plan logístico general, transporte y últimos cierres operativos."
+      },
+      "items": [
+        "Transporte (se puede definir pronto, confirmar al final)",
+        "Extras y basicos del dia (ir acumulando, revision final cercana a la boda)",
+        "Confirmaciones con proveedores (ultimas semanas)",
+        "Plan B clima (al final)",
+        "Ensayo general (ultima fase)"
+      ]
+    },
+    {
+      "key": "F",
+      "name": "Celebraciones y Emociones",
+      "p0": 0.4,
+      "p1": 0.95,
+      "range": { "startPct": 0.4, "endPct": 0.95 },
+      "admin": {
+        "category": "EVENTOS",
+        "editable": true,
+        "deletable": true,
+        "panelPath": "admin/timeline",
+        "description": "Eventos satélite y preparación emocional de la pareja."
+      },
+      "items": [
+        "Eventos adicionales (preboda, brunch, etc)",
+        "Despedidas (planificacion antes, celebracion final)",
+        "Votos y discursos (escribir con calma, repasar justo antes)"
+      ]
+    },
+    {
+      "key": "G",
+      "name": "Belleza y Cuidado",
+      "p0": 0.6,
+      "p1": 0.95,
+      "range": { "startPct": 0.6, "endPct": 0.95 },
+      "admin": {
+        "category": "BELLEZA",
+        "editable": true,
+        "deletable": true,
+        "panelPath": "admin/timeline",
+        "description": "Preparación personal, pruebas de maquillaje y rutinas de bienestar."
+      },
+      "items": [
+        "Reservas peluqueria y maquillaje con antelacion",
+        "Pruebas intermedias",
+        "Rutinas de cuidado personal (ultimos meses)"
+      ]
+    },
+    {
+      "key": "H",
+      "name": "Anillos y Joyas",
+      "p0": 0.7,
+      "p1": 0.95,
+      "range": { "startPct": 0.7, "endPct": 0.95 },
+      "admin": {
+        "category": "ANILLOS",
+        "editable": true,
+        "deletable": true,
+        "panelPath": "admin/timeline",
+        "description": "Selección y ajustes de las alianzas y joyería especial."
+      },
+      "items": [
+        "Comprar anillos (diseño, tallas y recogida)",
+        "Revisar seguros y mantenimiento de joyas"
+      ]
+    },
+    {
+      "key": "I",
+      "name": "Luna de Miel",
+      "p0": 0.75,
+      "p1": 1.05,
+      "range": { "startPct": 0.75, "endPct": 1.05 },
+      "admin": {
+        "category": "VIAJE",
+        "editable": true,
+        "deletable": true,
+        "panelPath": "admin/timeline",
+        "description": "Planificación del viaje y logística post boda inmediata."
+      },
+      "items": [
+        "Planificar luna de miel (eleccion del destino, reservas y documentacion)",
+        "Preparar itinerario, maletas y checklist de viaje"
+      ]
+    },
+    {
+      "key": "J",
+      "name": "Despues de la Boda",
+      "p0": 1.0,
+      "p1": 1.05,
+      "range": { "startPct": 1.0, "endPct": 1.05 },
+      "admin": {
+        "category": "POST_EVENTO",
+        "editable": true,
+        "deletable": true,
+        "panelPath": "admin/timeline",
+        "description": "Cierre del proyecto y gestión emocional/logística del día después."
+      },
+      "items": [
+        "Disfrutar inicio del matrimonio",
+        "Organizar album y recuerdos"
+      ]
+    }
+  ]
+}

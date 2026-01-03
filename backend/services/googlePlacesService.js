@@ -1,0 +1,280 @@
+/**
+ * Google Places API Service
+ * Para buscar proveedores de bodas con datos verificados
+ */
+
+import fetch from 'node-fetch';
+import * as supplierCategories from '../../shared/supplierCategories.js';
+import { detectCategory, getCategoryName } from './categoryDetector.js';
+
+// Configuración de API - probar ambas variables
+const GOOGLE_PLACES_API_KEY =
+  process.env.GOOGLE_PLACES_API_KEY || process.env.VITE_GOOGLE_PLACES_API_KEY;
+
+// Log para debug
+if (!GOOGLE_PLACES_API_KEY) {
+  console.warn('⚠️ [GOOGLE PLACES SERVICE] No se encontró API Key en process.env');
+  console.warn('   Verificar variables: GOOGLE_PLACES_API_KEY o VITE_GOOGLE_PLACES_API_KEY');
+} else {
+  console.log(
+    `✅ [GOOGLE PLACES SERVICE] API Key configurada: ${GOOGLE_PLACES_API_KEY.substring(0, 15)}...`
+  );
+}
+
+// Categorías desde archivo centralizado
+const HIGH_COVERAGE_CATEGORIES = supplierCategories
+  .getHighCoverageCategories()
+  .flatMap((cat) => cat.keywords);
+const MEDIUM_COVERAGE_CATEGORIES = supplierCategories
+  .getMediumCoverageCategories()
+  .flatMap((cat) => cat.keywords);
+const LOW_COVERAGE_CATEGORIES = supplierCategories
+  .getLowCoverageCategories()
+  .flatMap((cat) => cat.keywords);
+
+/**
+ * Determina si debemos usar Google Places para esta categoría
+ */
+function shouldUseGooglePlaces(service) {
+  const serviceLower = (service || '').toLowerCase().trim();
+
+  // ✨ SIEMPRE buscar en Google Places - tiene mejor cobertura que Tavily
+  return true;
+
+  // Legacy: solo buscar para categorías específicas
+  // return (
+  //   HIGH_COVERAGE_CATEGORIES.includes(serviceLower) ||
+  //   MEDIUM_COVERAGE_CATEGORIES.includes(serviceLower)
+  // );
+}
+
+/**
+ * Mapea nuestras categorías a tipos de Google Places
+ */
+function mapServiceToPlaceType(service) {
+  const serviceLower = (service || '').toLowerCase().trim();
+
+  // Intentar encontrar categoría por keyword
+  const category = supplierCategories.findCategoryByKeyword(service);
+  if (category && category.googlePlacesType) {
+    return category.googlePlacesType;
+  }
+
+  // Fallback: mapeo manual legacy (por si acaso)
+  const legacyMapping = {
+    fotografos: 'photographer',
+    videografos: 'videographer',
+    musicos: null,
+    dj: null,
+  };
+
+  return legacyMapping[serviceLower] || null;
+}
+
+/**
+ * Busca proveedores en Google Places API
+ */
+async function searchGooglePlaces(service, location, maxResults = 60) {
+  if (!GOOGLE_PLACES_API_KEY) {
+    console.warn('⚠️ [GOOGLE PLACES] API Key no configurada');
+    return [];
+  }
+
+  if (!shouldUseGooglePlaces(service)) {
+    console.log(`⏭️ [GOOGLE PLACES] Categoría "${service}" no usa Google Places`);
+    return [];
+  }
+
+  const placeType = mapServiceToPlaceType(service);
+
+  try {
+    console.log(`\n🌍 [GOOGLE PLACES] Buscando: ${service} en ${location}`);
+
+    // 1. Text Search para encontrar lugares
+    // Mejorar query con palabras clave adicionales
+    let query;
+    if (placeType) {
+      query = `${placeType} wedding ${location} Spain`;
+    } else {
+      // Para servicios sin tipo específico, usar múltiples palabras clave
+      query = `${service} eventos bodas ${location} España`;
+    }
+
+    console.log(`📝 [GOOGLE PLACES] Query: "${query}"`);
+
+    const searchUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json');
+    searchUrl.searchParams.append('query', query);
+    searchUrl.searchParams.append('language', 'es');
+    searchUrl.searchParams.append('region', 'es');
+    searchUrl.searchParams.append('key', GOOGLE_PLACES_API_KEY);
+
+    const searchResponse = await fetch(searchUrl.toString());
+    const searchData = await searchResponse.json();
+
+    if (searchData.status !== 'OK' && searchData.status !== 'ZERO_RESULTS') {
+      console.error(
+        `❌ [GOOGLE PLACES] Error: ${searchData.status} - ${searchData.error_message || ''}`
+      );
+      return [];
+    }
+
+    if (!searchData.results || searchData.results.length === 0) {
+      console.log(`📊 [GOOGLE PLACES] 0 resultados para "${query}"`);
+      return [];
+    }
+
+    console.log(`📊 [GOOGLE PLACES] ${searchData.results.length} lugares encontrados`);
+
+    // 2. Obtener detalles de cada lugar (con teléfono, website, etc.)
+    const suppliers = [];
+    const maxToFetch = Math.min(searchData.results.length, maxResults);
+
+    for (let i = 0; i < maxToFetch; i++) {
+      const place = searchData.results[i];
+
+      try {
+        const details = await getPlaceDetails(place.place_id);
+
+        if (details) {
+          suppliers.push({
+            ...details,
+            source: 'google-places',
+            googlePlaceId: place.place_id,
+          });
+        }
+      } catch (error) {
+        console.error(
+          `❌ [GOOGLE PLACES] Error obteniendo detalles de ${place.name}:`,
+          error.message
+        );
+      }
+    }
+
+    console.log(`✅ [GOOGLE PLACES] ${suppliers.length} proveedores procesados`);
+    return suppliers;
+  } catch (error) {
+    console.error(`❌ [GOOGLE PLACES] Error en búsqueda:`, error.message);
+    return [];
+  }
+}
+
+/**
+ * Obtiene detalles completos de un lugar
+ */
+async function getPlaceDetails(placeId) {
+  const detailsUrl = new URL('https://maps.googleapis.com/maps/api/place/details/json');
+  detailsUrl.searchParams.append('place_id', placeId);
+  detailsUrl.searchParams.append(
+    'fields',
+    [
+      'name',
+      'formatted_phone_number',
+      'international_phone_number',
+      'website',
+      'url', // URL de Google Maps
+      'rating',
+      'user_ratings_total',
+      'formatted_address',
+      'address_components',
+      'geometry',
+      'photos',
+      'opening_hours',
+      'types',
+      'price_level',
+      'business_status',
+    ].join(',')
+  );
+  detailsUrl.searchParams.append('language', 'es');
+  detailsUrl.searchParams.append('key', GOOGLE_PLACES_API_KEY);
+
+  const response = await fetch(detailsUrl.toString());
+  const data = await response.json();
+
+  if (data.status !== 'OK') {
+    console.warn(`⚠️ [GOOGLE PLACES] No se pudieron obtener detalles: ${data.status}`);
+    return null;
+  }
+
+  const place = data.result;
+
+  // Extraer ciudad y provincia de address_components
+  let city = '';
+  let province = '';
+
+  if (place.address_components) {
+    for (const component of place.address_components) {
+      if (component.types.includes('locality')) {
+        city = component.long_name;
+      }
+      if (component.types.includes('administrative_area_level_2')) {
+        province = component.long_name;
+      }
+    }
+  }
+
+  // Formatear teléfono
+  const phone = place.formatted_phone_number || place.international_phone_number || null;
+
+  // 🤖 Detectar categoría automáticamente
+  const detectedCategory = detectCategory(place, '');
+  const categoryName = getCategoryName(detectedCategory);
+
+  return {
+    name: place.name,
+    contact: {
+      phone: phone,
+      email: null, // Google Places no proporciona email
+      website: place.website || null,
+      websiteUri: place.website || null, // Alias
+      url: place.url || null, // URL de Google Maps
+      address: place.formatted_address || null,
+    },
+    // Campos adicionales en raíz para compatibilidad
+    website: place.website || null,
+    url: place.url || null,
+    location: {
+      city: city,
+      province: province,
+      address: place.formatted_address || null,
+      coordinates: place.geometry?.location || null,
+    },
+    rating: place.rating || null,
+    reviewCount: place.user_ratings_total || 0,
+    priceLevel: place.price_level || null,
+    openingHours: place.opening_hours?.weekday_text || null,
+    photos:
+      place.photos?.slice(0, 3).map((photo) => ({
+        reference: photo.photo_reference,
+        width: photo.width,
+        height: photo.height,
+      })) || [],
+    // ✨ Categoría detectada automáticamente
+    category: detectedCategory,
+    categoryName: categoryName,
+    // Metadatos
+    verified: true, // Google Places son negocios verificados
+    registered: false,
+    status: 'google-verified',
+    badge: 'Google verificado ✓',
+    badgeType: 'success',
+  };
+}
+
+/**
+ * Genera URL de foto de Google Places
+ */
+function getPhotoUrl(photoReference, maxWidth = 400) {
+  if (!photoReference || !GOOGLE_PLACES_API_KEY) return null;
+
+  return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${GOOGLE_PLACES_API_KEY}`;
+}
+
+export {
+  searchGooglePlaces,
+  shouldUseGooglePlaces,
+  getPhotoUrl,
+  mapServiceToPlaceType,
+  HIGH_COVERAGE_CATEGORIES,
+  MEDIUM_COVERAGE_CATEGORIES,
+  LOW_COVERAGE_CATEGORIES,
+};

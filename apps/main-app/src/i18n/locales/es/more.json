@@ -1,0 +1,50 @@
+{
+  "sections": {
+    "guests": {
+      "title": "Invitados y Mesas",
+      "description": "Gestiona tu lista de invitados y distribución de mesas",
+      "links": {
+        "guests": "Lista de Invitados",
+        "seating": "Plano de Mesas"
+      }
+    },
+    "providers": {
+      "title": "Proveedores",
+      "description": "Encuentra y gestiona tus proveedores de boda",
+      "links": {
+        "providers": "Directorio de Proveedores",
+        "contracts": "Contratos"
+      }
+    },
+    "protocol": {
+      "title": "Protocolo y Cronograma",
+      "description": "Planifica tu ceremonia y momentos especiales",
+      "links": {
+        "specialMoments": "Momentos Especiales",
+        "timing": "Cronograma del Evento",
+        "checklist": "Lista de Ceremonia",
+        "ceremonyHelp": "Ayuda de Ceremonia",
+        "documents": "Documentos Legales"
+      }
+    },
+    "extras": {
+      "title": "Extras",
+      "description": "Sitio web, diseños y herramientas adicionales",
+      "links": {
+        "web": "Sitio Web de Boda",
+        "designEditor": "Editor de Diseños",
+        "designs": "Diseños",
+        "ideas": "Ideas y Notas",
+        "moments": "Momentos"
+      }
+    },
+    "weddingInfo": {
+      "title": "Información de la Boda",
+      "description": "Configura fecha, lugar, menú, FAQs y más"
+    },
+    "profile": {
+      "title": "Perfil y Configuración",
+      "description": "Gestiona tu cuenta y preferencias"
+    }
+  }
+}

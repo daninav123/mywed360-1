@@ -1,0 +1,91 @@
+﻿{
+    "kpis":  [
+                 {
+                     "id":  "active-weddings",
+                     "label":  "Bodas activas",
+                     "value":  0,
+                     "trend":  null,
+                     "testId":  "admin-kpi-active-weddings"
+                 },
+                 {
+                     "id":  "revenue-30d",
+                     "label":  "Facturación (30 días)",
+                     "value":  "0,00 €",
+                     "trend":  null,
+                     "testId":  "admin-kpi-revenue-30d"
+                 },
+                 {
+                     "id":  "downloads-30d",
+                     "label":  "Descargas app (30 días)",
+                     "value":  0,
+                     "trend":  null,
+                     "testId":  "admin-kpi-downloads-30d"
+                 },
+                 {
+                     "id":  "open-alerts",
+                     "label":  "Alertas activas",
+                     "value":  0,
+                     "trend":  null,
+                     "testId":  "admin-kpi-open-alerts"
+                 }
+             ],
+    "services":  [
+                     {
+                         "id":  "firebase",
+                         "name":  "Firebase",
+                         "status":  "operational",
+                         "latency":  "—",
+                         "incidents":  0
+                     },
+                     {
+                         "id":  "mailgun",
+                         "name":  "Mailgun",
+                         "status":  "operational",
+                         "latency":  "—",
+                         "incidents":  0
+                     },
+                     {
+                         "id":  "whatsapp",
+                         "name":  "WhatsApp",
+                         "status":  "operational",
+                         "latency":  "—",
+                         "incidents":  0
+                     },
+                     {
+                         "id":  "openai",
+                         "name":  "OpenAI",
+                         "status":  "operational",
+                         "latency":  "—",
+                         "incidents":  0
+                     }
+                 ],
+    "alerts":  [
+                   {
+                       "id":  "al-1",
+                       "severity":  "high",
+                       "module":  "Sistema",
+                       "message":  "Sin datos de métricas (modo demo)",
+                       "timestamp":  "2025-10-20 23:25",
+                       "resolved":  false
+                   }
+               ],
+    "tasks":  [
+
+              ],
+    "newTasks":  [
+
+                 ],
+    "fetchedAt":  "2025-10-20T21:25:30.359Z",
+    "source":  "realtime",
+    "meta":  {
+                 "totalUsers":  0,
+                 "activeUsers30d":  0,
+                 "totalWeddings":  0,
+                 "newWeddings30d":  0,
+                 "activeWeddings":  0,
+                 "revenue30d":  0,
+                 "downloads30d":  0,
+                 "openAlerts":  0,
+                 "computedAt":  "2025-10-20T21:25:29.308Z"
+             }
+}

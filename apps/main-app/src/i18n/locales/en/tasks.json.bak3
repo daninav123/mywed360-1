@@ -1,0 +1,74 @@
+{
+  "tasks": {
+    "title": "Tareas",
+    "newTask": "Nueva tarea",
+    "editTask": "Editar tarea",
+    "deleteTask": "Eliminar tarea",
+    "viewTask": "Ver tarea",
+    "searchPlaceholder": "Buscar tareas...",
+    "noTasks": "No hay tareas",
+    "createFirst": "Crear primera tarea",
+    "status": {
+      "pending": "Pendiente",
+      "in_progress": "En progreso",
+      "completed": "Completada",
+      "cancelled": "Cancelada"
+    },
+    "priority": {
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "urgent": "Urgente"
+    },
+    "form": {
+      "title": "Título",
+      "description": "Descripción",
+      "assignee": "Asignado a",
+      "dueDate": "Fecha límite",
+      "category": "Categoría",
+      "tags": "Etiquetas"
+    },
+    "messages": {
+      "created": "Task created successfully",
+      "updated": "Task updated successfully",
+      "deleted": "Task deleted successfully",
+      "error": "Error processing task",
+      "completed": "Task completed",
+      "assigned": "Task assigned",
+      "overdue": "Task overdue",
+      "dueToday": "Due today",
+      "dueTomorrow": "Due tomorrow",
+      "noDueDate": "No due date"
+    },
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "overdue": "Overdue",
+      "today": "Today",
+      "thisWeek": "This week",
+      "thisMonth": "This month"
+    },
+    "calendar": {
+      "month": "Month",
+      "week": "Week",
+      "day": "Day",
+      "list": "List",
+      "today": "Today"
+    },
+    "templates": {
+      "confirmMenu": "Confirmar menúú final con catering",
+      "reviewDecoration": "Revisar decoración floral",
+      "confirmPlaylist": "Confirmar playlist con DJ",
+      "coordinatePhotographer": "Coordinar horarios con fotógrafo",
+      "verifyTransport": "Verificar transporte para invitados",
+      "confirmSeating": "Confirmar asientos para ceremonia",
+      "reviewTableSetup": "Revisar montaje de mesas",
+      "soundCheck": "Prueba de sonido",
+      "confirmKidsMenu": "Confirmar menúú infantil",
+      "prepareEmergencyKit": "Preparar kit de emergencia"
+    },
+    "confirmDelete": "¿Eliminar esta tarea?"
+  },
+  "_note": "Translate from es/tasks.json"
+}

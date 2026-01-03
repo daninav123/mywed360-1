@@ -1,0 +1,100 @@
+{
+  "header": {
+    "title": "Bienvenue, {{name}}",
+    "subtitle": "Chaque détail rend votre mariage inoubliable",
+    "logoAlt": "Logo du mariage",
+    "titleFallback": "votre mariage",
+    "redo": {
+      "button": "Relancer le tutoriel",
+      "confirm": "Cela supprimera les données locales et créera une nouvelle démo. Continuer ?",
+      "success": "Tutoriel relancé. Rechargement...",
+      "error": "Impossible de relancer le tutoriel."
+    }
+  },
+  "progress": {
+    "tasksLabel": "Progression des tâches",
+    "completion": "{{value}} % terminé",
+    "expected": " · Prévu : {{value}} %",
+    "loading": "Mise à jour de la progression...",
+    "error": "Synchronisation impossible. Affichage de la dernière valeur enregistrée.",
+    "status": {
+      "complete": "Progression terminée !",
+      "ahead": "Vous êtes en avance sur le planning.",
+      "behind": "Vous êtes en retard. Revoyez vos tâches clés.",
+      "onTrack": "Tout se déroule comme prévu."
+    }
+  },
+  "quickActions": {
+    "provider": "Rechercher un prestataire",
+    "guest": "Ajouter un invité",
+    "movement": "Ajouter un mouvement",
+    "note": "Nouvelle note"
+  },
+  "stats": {
+    "confirmedGuests": "Invités confirmés",
+    "budgetSpent": "Budget dépensé",
+    "budgetValue": "{{spent}}",
+    "budgetValueWithTotal": "{{spent}} / {{total}}",
+    "providers": "Prestataires engagés",
+    "tasksCompleted": "Tâches terminées",
+    "tasksAssigned": "Tâches assignées",
+    "providersAssigned": "Prestataires assignés"
+  },
+  "gallery": {
+    "title": "Inspiration pour votre mariage"
+  },
+  "blog": {
+    "title": "Blog",
+    "source": "Source :"
+  },
+  "news": {
+    "error": "Aucun article illustré disponible dans votre langue pour le moment. Réessayez plus tard."
+  },
+  "providers": {
+    "fallbackName": "Prestataire sans nom",
+    "addSuccess": "Prestataire ajouté au panneau rapide",
+    "addError": "Impossible d'enregistrer le prestataire sélectionné."
+  },
+  "weddingName": {
+    "connector": " et "
+  },
+  "modals": {
+    "shared": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "goToGuests": "Aller aux invités",
+      "goToFinance": "Aller aux finances",
+      "goToIdeas": "Aller aux idées"
+    },
+    "guest": {
+      "title": "Ajouter un invité",
+      "name": "Nom",
+      "side": "Côté",
+      "sideBride": "Mariée",
+      "sideGroom": "Marié",
+      "sideBoth": "Les deux",
+      "contact": "Contact",
+      "missingName": "Ajoutez un nom pour l'invité.",
+      "contactNote": "Contact : {{value}}",
+      "note": "Ajouté depuis l'accueil",
+      "success": "Invité ajouté",
+      "error": "Impossible d'ajouter l'invité.",
+      "unknownError": "Une erreur s'est produite lors de l'ajout de l'invité."
+    },
+    "movement": {
+      "title": "Nouveau mouvement",
+      "concept": "Concept",
+      "amount": "Montant",
+      "date": "Date",
+      "type": "Type",
+      "expense": "Dépense",
+      "income": "Revenu",
+      "success": "Mouvement enregistré"
+    },
+    "note": {
+      "title": "Nouvelle note",
+      "placeholder": "Écrivez votre note ici...",
+      "success": "Note enregistrée"
+    }
+  }
+}

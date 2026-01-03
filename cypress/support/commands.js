@@ -1,67 +1,99 @@
 // ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
+// Comandos personalizados de Cypress
 // ***********************************************
 
-// Import cypress-file-upload plugin for attachFile command
-import 'cypress-file-upload';
+/**
+ * Comando para navegar al Seating Plan
+ */
+Cypress.Commands.add('goToSeatingPlan', () => {
+  cy.visit('/invitados/seating');
+  cy.wait(1000); // Esperar carga inicial
+});
 
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+/**
+ * Comando para cambiar de pestaña en Seating Plan
+ */
+Cypress.Commands.add('switchSeatingTab', (tabName) => {
+  cy.contains(tabName).click();
+  cy.wait(500);
+});
 
-// Comando personalizado para iniciar sesión
-Cypress.Commands.add('loginToLovenda', (email, password) => {
-  // Simular autenticación directamente con localStorage (compatible con useAuth.jsx)
+/**
+ * Comando para generar plan automáticamente
+ */
+Cypress.Commands.add('generateSeatingPlanAuto', () => {
+  cy.get('button').contains('Generar Plan Automáticamente').click();
+  cy.wait(5000); // Esperar generación
+});
+
+/**
+ * Comando para crear invitados de prueba
+ */
+Cypress.Commands.add('createTestGuests', (count = 50) => {
+  const guests = [];
+  for (let i = 1; i <= count; i++) {
+    guests.push({
+      id: `test-guest-${i}`,
+      name: `Invitado ${i}`,
+      email: `guest${i}@test.com`,
+      phone: `+34600${String(i).padStart(6, '0')}`,
+      side: i % 2 === 0 ? 'bride' : 'groom',
+      group: i % 5 === 0 ? 'family' : 'friends',
+      companion: i % 10 === 0 ? 1 : 0,
+      confirmed: true,
+    });
+  }
+
+  // Guardar en localStorage para simular
   cy.window().then((win) => {
-    win.localStorage.setItem('userEmail', email || 'usuario.test@lovenda.com');
-    win.localStorage.setItem('isLoggedIn', 'true');
-    // También configurar datos de usuario completos para compatibilidad
-    const mockUser = {
-      uid: 'cypress-test',
-      email: email || 'usuario.test@lovenda.com',
-      displayName: 'Usuario Test Cypress'
-    };
-    win.localStorage.setItem('lovenda_user', JSON.stringify(mockUser));
+    win.localStorage.setItem('test-guests', JSON.stringify(guests));
   });
 });
 
-// Comando personalizado para navegar a la bandeja de entrada de correo
-Cypress.Commands.add('navigateToEmailInbox', () => {
-  cy.visit('/email/inbox');
-  // Esperar a que la bandeja de entrada se cargue
-  cy.get('[data-testid="email-list"]', { timeout: 10000 }).should('be.visible');
+/**
+ * Comando para limpiar datos de test
+ */
+Cypress.Commands.add('cleanSeatingPlan', () => {
+  cy.window().then((win) => {
+    // Limpiar localStorage
+    const keysToRemove = [];
+    for (let i = 0; i < win.localStorage.length; i++) {
+      const key = win.localStorage.key(i);
+      if (key && (key.includes('seating') || key.includes('table'))) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach((key) => win.localStorage.removeItem(key));
+  });
 });
 
-// Comando para crear y enviar un correo electrónico
-Cypress.Commands.add('sendEmail', (recipient, subject, body) => {
-  // Navegar al formulario de composición
-  cy.get('[data-testid="compose-button"]').click();
-  
-  // Rellenar el formulario
-  cy.get('[data-testid="recipient-input"]').type(recipient);
-  cy.get('[data-testid="subject-input"]').type(subject);
-  
-  // Usar el editor de contenido (podría ser un editor rico)
-  cy.get('[data-testid="body-editor"]').type(body);
-  
-  // Enviar el correo
-  cy.get('[data-testid="send-button"]').click();
-  
-  // Esperar confirmación
-  cy.get('[data-testid="success-message"]', { timeout: 10000 }).should('be.visible');
+/**
+ * Comando para verificar toast
+ */
+Cypress.Commands.add('verifyToast', (message) => {
+  cy.get('.Toastify__toast', { timeout: 10000 }).should('be.visible').and('contain', message);
+});
+
+/**
+ * Comando para esperar a que cargue el canvas
+ */
+Cypress.Commands.add('waitForCanvas', () => {
+  cy.get('svg[data-testid="seating-canvas"]', { timeout: 10000 }).should('be.visible');
+});
+
+/**
+ * Comando para contar mesas en el canvas
+ */
+Cypress.Commands.add('countTables', () => {
+  return cy.get('g[data-table-id]').its('length');
+});
+
+/**
+ * Comando para verificar que existe el botón de generación automática
+ */
+Cypress.Commands.add('verifyAutoGenerationButton', () => {
+  cy.get('button')
+    .contains('Generar Plan Automáticamente')
+    .should('be.visible')
+    .and('not.be.disabled');
 });

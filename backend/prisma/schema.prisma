@@ -1,0 +1,631 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String              @id @default(uuid())
+  email              String              @unique
+  passwordHash       String?
+  emailVerified      Boolean             @default(false)
+  verificationToken  String?             @unique
+  resetToken         String?             @unique
+  resetTokenExpiry   DateTime?
+  provider           String              @default("email")
+  lastLogin          DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  role               UserRole            @default(OWNER)
+  guests             Guest[]
+  planners           Planner[]
+  refreshTokens      RefreshToken[]
+  suppliers          Supplier[]
+  weddings           Wedding[]           @relation("UserWeddings")
+  accessPermissions  WeddingAccess[]
+  sessions           Session[]
+  profile            UserProfile?
+
+  @@index([email])
+  @@index([role])
+  @@index([verificationToken])
+  @@index([resetToken])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+model WeddingAccess {
+  id          String      @id @default(uuid())
+  userId      String
+  weddingId   String
+  role        WeddingRole @default(VIEWER)
+  permissions Json?
+  status      String      @default("active")
+  invitedBy   String?
+  invitedAt   DateTime    @default(now())
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wedding     Wedding     @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weddingId])
+  @@index([weddingId])
+  @@index([userId])
+  @@index([role])
+  @@map("wedding_access")
+}
+
+model Wedding {
+  id                 String            @id @default(uuid())
+  userId             String
+  coupleName         String
+  weddingDate        DateTime?
+  celebrationPlace   String?
+  celebrationCity    String?
+  celebrationAddress String?
+  banquetPlace       String?
+  receptionAddress   String?
+  schedule           String?
+  numGuests          Int               @default(0)
+  weddingStyle       String?
+  colorScheme        String?
+  rsvpDeadline       DateTime?
+  giftAccount        String?
+  transportation     String?
+  importantInfo      String?
+  status             String            @default("active")
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  budgetData         Json?
+  seatingData        Json?
+  weddingInfo        Json?
+  ceremonyData       Json?
+  supplierGroupsData Json?
+  craftWebs          CraftWeb[]
+  guests             Guest[]
+  access             WeddingAccess[]
+  suppliers          WeddingSupplier[]
+  tasks              Task[]
+  timelineEvents     TimelineEvent[]
+  specialMoments     SpecialMoment[]
+  transactions       Transaction[]
+  user               User              @relation("UserWeddings", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([weddingDate])
+  @@index([status])
+  @@map("weddings")
+}
+
+model Guest {
+  id                  String   @id @default(uuid())
+  weddingId           String
+  userId              String?
+  name                String
+  email               String?
+  phone               String?
+  confirmed           Boolean  @default(false)
+  status              String   @default("pending")
+  companions          Int      @default(0)
+  dietaryRestrictions String?
+  notes               String?
+  tableNumber         Int?
+  seatNumber          Int?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User?    @relation(fields: [userId], references: [id])
+  wedding             Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+  @@index([email])
+  @@index([status])
+  @@map("guests")
+}
+
+model Supplier {
+  id           String              @id @default(uuid())
+  userId       String
+  businessName String
+  category     String
+  description  String?
+  email        String
+  phone        String?
+  website      String?
+  address      String?
+  city         String?
+  country      String?
+  instagram    String?
+  facebook     String?
+  services     Json?
+  priceRange   String?
+  rating       Float               @default(0)
+  reviewCount  Int                 @default(0)
+  verified     Boolean             @default(false)
+  featured     Boolean             @default(false)
+  active       Boolean             @default(true)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  portfolio    SupplierPortfolio[]
+  user         User                @relation(fields: [userId], references: [id])
+  weddings     WeddingSupplier[]
+
+  @@index([userId])
+  @@index([category])
+  @@index([city])
+  @@index([verified])
+  @@index([featured])
+  @@map("suppliers")
+}
+
+model SupplierPortfolio {
+  id          String   @id @default(uuid())
+  supplierId  String
+  imageUrl    String
+  title       String?
+  description String?
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  supplier    Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@index([supplierId])
+  @@map("supplier_portfolio")
+}
+
+model WeddingSupplier {
+  id              String        @id @default(uuid())
+  weddingId       String
+  supplierId      String?
+  name            String
+  service         String
+  contact         String?
+  email           String?
+  phone           String?
+  status          String        @default("Nuevo")
+  date            DateTime?
+  rating          Float         @default(0)
+  ratingCount     Int           @default(0)
+  snippet         String?
+  link            String?
+  image           String?
+  budget          Float?
+  priceRange      String?
+  favorite        Boolean       @default(false)
+  notes           String?
+  contractStatus  String?
+  budgetStatus    String?
+  paymentSchedule Json?
+  reservations    Json?
+  metadata        Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  supplier        Supplier?     @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  wedding         Wedding       @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  serviceLines    ServiceLine[]
+
+  @@index([weddingId])
+  @@index([supplierId])
+  @@index([status])
+  @@index([favorite])
+  @@map("wedding_suppliers")
+}
+
+model ServiceLine {
+  id             String          @id @default(uuid())
+  supplierId     String
+  name           String
+  categoryKey    String?
+  assignedBudget Float           @default(0)
+  status         String          @default("Pendiente")
+  notes          String?
+  deliverables   Json?
+  milestones     Json?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  supplier       WeddingSupplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@index([supplierId])
+  @@map("service_lines")
+}
+
+model CraftWeb {
+  id          String    @id @default(uuid())
+  weddingId   String
+  userId      String
+  slug        String    @unique
+  title       String
+  published   Boolean   @default(false)
+  structure   Json
+  theme       Json
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+  wedding     Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+  @@index([slug])
+  @@index([published])
+  @@map("craft_webs")
+}
+
+model RsvpResponse {
+  id                  String   @id @default(uuid())
+  webId               String
+  guestId             String?
+  name                String
+  email               String
+  status              String
+  companions          Int      @default(0)
+  dietaryRestrictions String?
+  notes               String?
+  createdAt           DateTime @default(now())
+
+  @@index([webId])
+  @@index([email])
+  @@map("rsvp_responses")
+}
+
+model Planner {
+  id           String   @id @default(uuid())
+  userId       String
+  businessName String
+  description  String?
+  email        String
+  phone        String?
+  website      String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("planners")
+}
+
+model UserProfile {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  phone         String?
+  role          String?
+  planiviaEmail String?  @unique
+  settings      Json?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([planiviaEmail])
+  @@map("user_profiles")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+enum UserRole {
+  OWNER
+  ASSISTANT
+  PLANNER
+  SUPPLIER
+  ADMIN
+}
+
+enum WeddingRole {
+  OWNER
+  PLANNER
+  ASSISTANT
+  VIEWER
+}
+
+model Task {
+  id          String    @id @default(uuid())
+  weddingId   String
+  title       String
+  description String?
+  category    String    @default("general")
+  status      String    @default("pending")
+  dueDate     DateTime?
+  priority    String?   @default("medium")
+  assignedTo  String?
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  order       Int       @default(0)
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  wedding     Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([category])
+  @@map("tasks")
+}
+
+model TimelineEvent {
+  id        String   @id @default(uuid())
+  weddingId String
+  name      String
+  startTime String
+  endTime   String
+  status    String   @default("on-time")
+  order     Int      @default(0)
+  moments   Json?
+  alerts    Json?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  wedding   Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+  @@index([order])
+  @@map("timeline_events")
+}
+
+model SpecialMoment {
+  id          String   @id @default(uuid())
+  weddingId   String
+  blockId     String
+  title       String
+  time        String?
+  duration    String?  @default("15")
+  songTitle   String?
+  artist      String?
+  spotifyId   String?
+  responsible String?
+  status      String   @default("pendiente")
+  type        String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  wedding     Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+  @@index([blockId])
+  @@map("special_moments")
+}
+
+model Transaction {
+  id          String    @id @default(uuid())
+  weddingId   String
+  category    String
+  description String
+  amount      Float
+  type        String    @default("expense")
+  status      String    @default("pending")
+  dueDate     DateTime?
+  paidDate    DateTime?
+  supplierId  String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  wedding     Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+  @@index([category])
+  @@index([status])
+  @@index([type])
+  @@map("transactions")
+}
+
+model BlogPost {
+  id                  String    @id @default(uuid())
+  slug                String    @unique
+  title               String
+  excerpt             String?
+  content             Json?
+  coverImage          Json?
+  tags                String[]
+  language            String    @default("es")
+  availableLanguages  String[]  @default(["es"])
+  translations        Json?
+  byline              Json?
+  status              String    @default("draft")
+  publishedAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([language])
+  @@map("blog_posts")
+}
+
+model Mail {
+  id            String   @id @default(uuid())
+  userId        String?
+  weddingId     String?
+  from          String
+  to            String[]
+  cc            String[]  @default([])
+  bcc           String[]  @default([])
+  subject       String
+  body          String?
+  htmlBody      String?
+  folder        String    @default("inbox")
+  read          Boolean   @default(false)
+  starred       Boolean   @default(false)
+  labels        String[]  @default([])
+  attachments   Json?
+  messageId     String?
+  inReplyTo     String?
+  references    String[]  @default([])
+  threadId      String?
+  importance    String?   @default("normal")
+  sentAt        DateTime?
+  receivedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([weddingId])
+  @@index([folder])
+  @@index([read])
+  @@index([threadId])
+  @@index([sentAt])
+  @@map("mails")
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  data      Json?
+  read      Boolean   @default(false)
+  actionUrl String?
+  priority  String    @default("normal")
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@map("notifications")
+}
+
+model QuoteRequest {
+  id              String    @id @default(uuid())
+  weddingId       String?
+  userId          String?
+  supplierId      String?
+  category        String
+  service         String?
+  eventDate       DateTime?
+  eventLocation   String?
+  guestCount      Int?
+  budget          Float?
+  description     String?
+  contactName     String
+  contactEmail    String
+  contactPhone    String?
+  status          String    @default("pending")
+  supplierEmail   String?
+  supplierInfo    Json?
+  responseData    Json?
+  metadata        Json?
+  sentAt          DateTime?
+  respondedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([weddingId])
+  @@index([userId])
+  @@index([supplierId])
+  @@index([status])
+  @@index([category])
+  @@index([contactEmail])
+  @@map("quote_requests")
+}
+
+model PushSubscription {
+  id           String   @id @default(uuid())
+  userId       String?
+  endpoint     String   @unique
+  subscription Json
+  userAgent    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+
+model RsvpToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  weddingId String
+  guestId   String
+  createdAt DateTime @default(now())
+
+  @@index([weddingId])
+  @@index([guestId])
+  @@map("rsvp_tokens")
+}
+
+model EmailInsight {
+  id                String   @id @default(uuid())
+  mailId            String   @unique
+  category          String?
+  subcategory       String?
+  priority          String?
+  sentiment         String?
+  actionRequired    Boolean  @default(false)
+  suggestedActions  Json?
+  entities          Json?
+  keywords          String[] @default([])
+  summary           String?
+  confidence        Float?
+  aiProvider        String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([mailId])
+  @@index([category])
+  @@index([actionRequired])
+  @@map("email_insights")
+}
+
+model ChecklistTab {
+  id          String          @id @default(uuid())
+  weddingId   String
+  name        String
+  position    Int             @default(0)
+  isDefault   Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  tasks       ChecklistTask[]
+
+  @@index([weddingId])
+  @@index([position])
+  @@map("checklist_tabs")
+}
+
+model ChecklistTask {
+  id          String        @id @default(uuid())
+  tabId       String
+  weddingId   String
+  title       String
+  category    String?
+  completed   Boolean       @default(false)
+  position    Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  completedAt DateTime?
+  tab         ChecklistTab  @relation(fields: [tabId], references: [id], onDelete: Cascade)
+
+  @@index([tabId])
+  @@index([weddingId])
+  @@index([completed])
+  @@index([position])
+  @@map("checklist_tasks")
+}

@@ -1,22 +1,16 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import admin from 'firebase-admin';
-import logger from '../logger.js';
+import { PrismaClient } from '@prisma/client';
+import logger from '../utils/logger.js';
+import { z, validate } from '../utils/validation.js';
+import {
+  sendSuccess,
+  sendNotFoundError,
+  sendInternalError,
+  sendValidationError,
+} from '../utils/apiResponse.js';
 
-// ------------ Firestore Init -------------
-// Se asume que ya existe inicialización global en otro punto del backend.
-// Si no, se puede hacer aquí leyendo las credenciales del entorno.
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-    });
-  } catch (err) {
-    logger.warn('Firebase admin ya estaba inicializado o no hay credencial:', err.message);
-  }
-}
-
-const db = admin.firestore();
+const prisma = new PrismaClient();
 const router = express.Router();
 
 /**
@@ -24,48 +18,90 @@ const router = express.Router();
  * Body: { name: string, phone?: string, email?: string, eventId?: string }
  * Crea un invitado y devuelve link personalizado de RSVP.
  */
-router.post('/invite', async (req, res) => {
-  try {
-    const { name, phone = '', email = '', eventId = 'default' } = req.body || {};
-    if (!name) return res.status(400).json({ error: 'name-required' });
-
-    const token = uuidv4();
-    const docRef = db.collection('guests').doc(token);
-    await docRef.set({
-      name,
-      phone,
-      email,
-      eventId,
-      token,
-      status: 'pending', // pending | accepted | rejected
-      companions: 0,
-      allergens: '',
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-
-    const link = `${process.env.FRONTEND_BASE_URL || 'http://localhost:5173'}/rsvp/${token}`;
-    res.json({ token, link });
-  } catch (err) {
-    logger.error('guest-invite-error', err);
-    res.status(500).json({ error: 'guest-invite-failed' });
-  }
+// Ruta: POST /api/guests/:weddingId/invite
+const inviteBodySchema = z.object({
+  name: z.string().min(1, 'name required'),
+  phone: z.string().min(5).max(50).optional(),
+  email: z.string().email().optional(),
+  eventId: z.string().min(1).default('default'),
 });
+const inviteParamsSchema = z.object({ weddingId: z.string().min(1) });
+
+router.post(
+  '/:weddingId/invite',
+  validate(inviteParamsSchema, 'params'),
+  validate(inviteBodySchema),
+  async (req, res) => {
+    try {
+      const { weddingId } = req.params;
+      const { name, phone = '', email = '', eventId = 'default' } = req.body;
+
+      const token = uuidv4();
+      
+      const guest = await prisma.guest.create({
+        data: {
+          id: token,
+          weddingId,
+          name,
+          phone: phone || null,
+          email: email || null,
+          status: 'pending',
+          companions: 0,
+          dietaryRestrictions: '',
+          notes: eventId !== 'default' ? `Event: ${eventId}` : null,
+        },
+      });
+
+      // Indexar token para búsqueda pública por token (ruta /api/rsvp)
+      await prisma.rsvpToken.create({
+        data: {
+          token,
+          weddingId,
+          guestId: token,
+        },
+      });
+
+      const link = `${process.env.FRONTEND_BASE_URL || 'http://localhost:5173'}/rsvp/${token}`;
+      return sendSuccess(req, res, { token, link }, 201);
+    } catch (err) {
+      logger.error('guest-invite-error', err);
+      return sendInternalError(req, res, err);
+    }
+  }
+);
 
 /**
  * GET /api/guests/:token
  * Devuelve datos del invitado (sin datos sensibles).
  */
-router.get('/:token', async (req, res) => {
+// Ruta: GET /api/guests/:weddingId/:token
+const getGuestParams = z.object({ weddingId: z.string().min(1), token: z.string().min(1) });
+router.get('/:weddingId/:token', validate(getGuestParams, 'params'), async (req, res) => {
   try {
-    const { token } = req.params;
-    const snap = await db.collection('guests').doc(token).get();
-    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
-    const data = snap.data();
-    res.json({ name: data.name, status: data.status, companions: data.companions, allergens: data.allergens });
+    const { weddingId, token } = req.params;
+    
+    const guest = await prisma.guest.findFirst({
+      where: {
+        id: token,
+        weddingId,
+      },
+    });
+    
+    if (!guest) {
+      return sendNotFoundError(req, res, 'Invitado');
+    }
+    
+    // Filtrar datos sensibles - solo exponer lo necesario para RSVP público
+    const guestData = {
+      name: guest.name,
+      status: guest.status,
+      companions: guest.companions,
+      allergens: guest.dietaryRestrictions || '',
+    };
+    return sendSuccess(req, res, guestData);
   } catch (err) {
     logger.error('guest-get-error', err);
-    res.status(500).json({ error: 'guest-get-failed' });
+    return sendInternalError(req, res, err);
   }
 });
 
@@ -74,48 +110,86 @@ router.get('/:token', async (req, res) => {
  * Body: { status: 'accepted' | 'rejected', companions?: number, allergens?: string }
  * Actualiza la respuesta del invitado.
  */
-router.put('/:token', async (req, res) => {
-  try {
-    const { token } = req.params;
-    const { status, companions = 0, allergens = '' } = req.body || {};
-    if (!['accepted', 'rejected'].includes(status)) return res.status(400).json({ error: 'invalid-status' });
-
-    const docRef = db.collection('guests').doc(token);
-    await docRef.update({ status, companions, allergens, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
-
-    res.json({ ok: true });
-  } catch (err) {
-    logger.error('guest-update-error', err);
-    res.status(500).json({ error: 'guest-update-failed' });
-  }
+// Ruta: PUT /api/guests/:weddingId/:token
+const updateGuestParams = z.object({ weddingId: z.string().min(1), token: z.string().min(1) });
+const updateGuestBody = z.object({
+  status: z.enum(['accepted', 'rejected']),
+  companions: z.coerce.number().int().min(0).max(20).default(0),
+  allergens: z.string().max(500).optional(),
 });
+router.put(
+  '/:weddingId/:token',
+  validate(updateGuestParams, 'params'),
+  validate(updateGuestBody),
+  async (req, res) => {
+    try {
+      const { weddingId, token } = req.params;
+      const { status, companions = 0, allergens = '' } = req.body;
+
+      await prisma.guest.update({
+        where: { id: token },
+        data: {
+          status,
+          companions,
+          dietaryRestrictions: allergens,
+        },
+      });
+
+      return sendSuccess(req, res, { updated: true });
+    } catch (err) {
+      logger.error('guest-update-error', err);
+      return sendInternalError(req, res, err);
+    }
+  }
+);
 
 /**
  * POST /api/guests/id/:docId/rsvp-link
  * Genera (o recupera) el enlace de RSVP para un invitado ya existente.
  * Devuelve { link, token }
  */
-router.post('/id/:docId/rsvp-link', async (req, res) => {
-  try {
-    const { docId } = req.params;
-    const docRef = db.collection('guests').doc(docId);
-    const snap = await docRef.get();
-    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
+// Ruta: POST /api/guests/:weddingId/id/:docId/rsvp-link
+const rsvpLinkParams = z.object({ weddingId: z.string().min(1), docId: z.string().min(1) });
+router.post(
+  '/:weddingId/id/:docId/rsvp-link',
+  validate(rsvpLinkParams, 'params'),
+  async (req, res) => {
+    try {
+      const { weddingId, docId } = req.params;
+      
+      let guest = await prisma.guest.findUnique({
+        where: { id: docId },
+      });
+      
+      if (!guest) {
+        return sendNotFoundError(req, res, 'Invitado');
+      }
 
-    let data = snap.data();
-    let { token } = data;
-    if (!token) {
-      token = uuidv4();
-      await docRef.update({ token, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
-      data = { ...data, token };
+      let token = docId;
+      
+      // Verificar si ya existe token RSVP
+      const existingToken = await prisma.rsvpToken.findFirst({
+        where: { guestId: docId },
+      });
+      
+      if (!existingToken) {
+        // Crear token RSVP
+        await prisma.rsvpToken.create({
+          data: {
+            token: docId,
+            weddingId,
+            guestId: docId,
+          },
+        });
+      }
+
+      const link = `${process.env.FRONTEND_BASE_URL || 'http://localhost:5173'}/rsvp/${token}`;
+      return sendSuccess(req, res, { token, link });
+    } catch (err) {
+      logger.error('rsvp-link-error', err);
+      return sendInternalError(req, res, err);
     }
-
-    const link = `${process.env.FRONTEND_BASE_URL || 'http://localhost:5173'}/rsvp/${token}`;
-    res.json({ token, link });
-  } catch (err) {
-    logger.error('rsvp-link-error', err);
-    res.status(500).json({ error: 'rsvp-link-failed' });
   }
-});
+);
 
 export default router;

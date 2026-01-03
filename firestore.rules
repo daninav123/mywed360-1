@@ -1,128 +1,31 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Colección de bodas
-    match /weddings/{weddingId} {
-      // Lectura: propietarios, planners y asistentes
-      allow read: if request.auth != null && (
-        (resource.data.ownerIds != null && request.auth.uid in resource.data.ownerIds) ||
-        (resource.data.plannerIds != null && request.auth.uid in resource.data.plannerIds) ||
-        (resource.data.assistantIds != null && request.auth.uid in resource.data.assistantIds)
-      );
-      // Escritura: propietarios y planners. Además permitimos que el invitado se añada a sí mismo como planner una única vez.
-      allow update: if isOwnerOrPlanner(weddingId) || isAddingSelfAsPlanner();
-      // Permitir crear una boda si el usuario autenticado se incluye en ownerIds o plannerIds del nuevo documento
-      allow create: if request.auth != null && (
-        (request.resource.data.ownerIds != null && request.auth.uid in request.resource.data.ownerIds) ||
-        (request.resource.data.plannerIds != null && request.auth.uid in request.resource.data.plannerIds)
-      );
-      allow delete: if isOwnerOrPlanner(weddingId);
-
-            function isAddingSelfAsPlanner() {
-        return request.auth != null &&
-          // Permitimos si la operación SOLO modifica plannerIds (ideal para FieldValue.arrayUnion)
-          request.writeFields.hasOnly(['plannerIds']);
-      }
-    }
-
-    // Subcolecciones dentro de una boda (invitados, tareas, proveedores, etc.)
-    match /weddings/{weddingId}/{document=**} {
-      allow read: if request.auth != null && (
-        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds) ||
-        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds) ||
-        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.assistantIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.assistantIds)
-      );
-      allow write: if request.auth != null && (
-        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds) ||
-        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds)
-      );
-    }
-    // Invitaciones ahora se almacenan como subcolección:
-    // weddings/{weddingId}/weddingInvitations/{code}
-    // -> Se aplican las mismas reglas que otras subcolecciones mediante el bloque
-    //    match /weddings/{weddingId}/{document=**} más arriba.
-
-    // Colección de usuarios - permitir lectura/escritura de su propio documento
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Colección de onboarding - permitir lectura/escritura de su propio documento
-    match /onboarding/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Colección de configuración - permitir lectura a usuarios autenticados
-    match /config/{document=**} {
-      allow read: if request.auth != null;
-    }
-
-    // Colección diagnosis para test de conexión
-    match /diagnosis/{docId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Colección _conexion_prueba para ping healthcheck
-    match /_conexion_prueba/{docId} {
-      // Permitir sin autenticación para prueba de conexión inicial
-      allow read, write: if true;
-    }
-
-    // Colección _test_connection para prueba de escritura
-    match /_test_connection/{docId} {
-      allow read, write: if true;
-    }
-
-    // Perfil de usuario
-    match /users/{uid} {
-      // Cualquier usuario autenticado puede leer datos de perfil básicos
-      allow read: if request.auth != null;
-      // Solo el propietario puede crear o actualizar su perfil
-      allow update, create: if request.auth != null && request.auth.uid == uid;
-    }
-
-    // Subcolecciones dentro de un perfil de usuario (p.ej. tasks, mails, etc.)
-    match /users/{uid}/{subCollection=**} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
-
-
-    // Colección de invitados por usuario (almacenamiento híbrido)
-    match /userGuests/{uid} {
-      // Cada usuario puede leer y escribir su propio documento de invitados
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
-
-    // Colecciones de datos privados por usuario (sincronización local)
-    match /userData/{uid} {
-      // Cada usuario sólo puede leer/escribir su propio documento
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
-
-    match /userSuppliers/{uid} {
-      // Cada usuario sólo puede leer/escribir sus proveedores temporales
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
-
-    match /userTasksCompleted/{uid} {
-      // Cada usuario sólo puede leer/escribir su propio documento
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
-
+    // ---- Global Helper Functions (must be defined before use) ----
+    function _isSignedIn() { return request.auth != null; }
+    
     function isOwner(wid) {
+      let wedding = get(/databases/$(database)/documents/weddings/$(wid));
       return request.auth != null &&
-        request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.ownerIds;
+        wedding != null &&
+        wedding.data.ownerIds != null &&
+        request.auth.uid in wedding.data.ownerIds;
     }
 
     function isPlanner(wid) {
+      let wedding = get(/databases/$(database)/documents/weddings/$(wid));
       return request.auth != null &&
-        request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.plannerIds;
+        wedding != null &&
+        wedding.data.plannerIds != null &&
+        request.auth.uid in wedding.data.plannerIds;
     }
 
     function isAssistant(wid) {
+      let wedding = get(/databases/$(database)/documents/weddings/$(wid));
       return request.auth != null &&
-        request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.assistantIds;
+        wedding != null &&
+        wedding.data.assistantIds != null &&
+        request.auth.uid in wedding.data.assistantIds;
     }
 
     function isOwnerOrPlanner(wid) {
@@ -131,6 +34,422 @@ service cloud.firestore {
 
     function isCollaborator(wid) {
       return isOwner(wid) || isPlanner(wid) || isAssistant(wid);
+    }
+    
+    function _isWeddingCollaborator(wid) {
+      return isCollaborator(wid);
+    }
+
+    function _progressValid() {
+      return !('progress' in request.resource.data) ||
+             (request.resource.data.progress is number && request.resource.data.progress >= 0 && request.resource.data.progress <= 100);
+    }
+
+    function _datesValid() {
+      return !('start' in request.resource.data && 'end' in request.resource.data) ||
+             (request.resource.data.start <= request.resource.data.end);
+    }
+
+    function _stringMax(value, maxLen) {
+      return value is string && value.size() <= maxLen;
+    }
+
+    function _stringOrNull(value, maxLen) {
+      return value == null || _stringMax(value, maxLen);
+    }
+
+    function _listOfStrings(value, maxItems, maxLen) {
+      return value == null ||
+             (value is list &&
+             value.size() <= maxItems &&
+             value.all(item, item is string && item.size() <= maxLen));
+    }
+
+    function _hasField(obj, field) {
+      return obj.keys().hasAny([field]);
+    }
+
+    function weddingEventFieldsValid(newData) {
+      return
+        (!_hasField(newData, 'eventType') || _stringMax(newData.eventType, 40)) &&
+        (!_hasField(newData, 'eventProfile') ||
+          (
+            newData.eventProfile is map &&
+            (!_hasField(newData.eventProfile, 'guestCountRange') || _stringOrNull(newData.eventProfile.guestCountRange, 40)) &&
+            (!_hasField(newData.eventProfile, 'formalityLevel') || _stringOrNull(newData.eventProfile.formalityLevel, 40)) &&
+            (!_hasField(newData.eventProfile, 'ceremonyType') || _stringOrNull(newData.eventProfile.ceremonyType, 60)) &&
+            (!_hasField(newData.eventProfile, 'relatedEvents') || _listOfStrings(newData.eventProfile.relatedEvents, 12, 60)) &&
+            (!_hasField(newData.eventProfile, 'notes') || _stringOrNull(newData.eventProfile.notes, 2000))
+          )
+        ) &&
+        (!_hasField(newData, 'preferences') ||
+          (
+            newData.preferences is map &&
+            (!_hasField(newData.preferences, 'style') || _stringOrNull(newData.preferences.style, 60))
+          )
+        ) &&
+        (!_hasField(newData, 'eventProfileSummary') ||
+          (
+            newData.eventProfileSummary is map &&
+            (!_hasField(newData.eventProfileSummary, 'eventType') || _stringOrNull(newData.eventProfileSummary.eventType, 40)) &&
+            (!_hasField(newData.eventProfileSummary, 'guestCountRange') || _stringOrNull(newData.eventProfileSummary.guestCountRange, 40)) &&
+            (!_hasField(newData.eventProfileSummary, 'formalityLevel') || _stringOrNull(newData.eventProfileSummary.formalityLevel, 40)) &&
+            (!_hasField(newData.eventProfileSummary, 'ceremonyType') || _stringOrNull(newData.eventProfileSummary.ceremonyType, 60)) &&
+            (!_hasField(newData.eventProfileSummary, 'style') || _stringOrNull(newData.eventProfileSummary.style, 60))
+          )
+        );
+    }
+
+    // Weddings collection
+    match /weddings/{weddingId} {
+      // Read: owners, planners and assistants
+      allow read: if request.auth != null && (
+        (resource.data.ownerIds != null && request.auth.uid in resource.data.ownerIds) ||
+        (resource.data.plannerIds != null && request.auth.uid in resource.data.plannerIds) ||
+        (resource.data.assistantIds != null && request.auth.uid in resource.data.assistantIds)
+      );
+
+      // Write: owners and planners. Allow self-adding as planner exactly once.
+      allow update: if (isOwnerOrPlanner(weddingId) || isAddingSelfAsPlanner()) &&
+        weddingEventFieldsValid(request.resource.data);
+
+      // Create: authenticated user must include themselves as owner or planner
+      allow create: if request.auth != null && (
+        (request.resource.data.ownerIds != null && request.auth.uid in request.resource.data.ownerIds) ||
+        (request.resource.data.plannerIds != null && request.auth.uid in request.resource.data.plannerIds)
+      ) && weddingEventFieldsValid(request.resource.data);
+
+      allow delete: if isOwnerOrPlanner(weddingId);
+
+      function isAddingSelfAsPlanner() {
+        return request.auth != null &&
+          request.resource.data.diff(resource.data).addedKeys().hasOnly(['plannerIds']) &&
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(['plannerIds']) &&
+          request.resource.data.diff(resource.data).removedKeys().hasOnly(['plannerIds']) &&
+          (request.resource.data.plannerIds is list) &&
+          request.auth.uid in request.resource.data.plannerIds &&
+          (
+            !(resource.data.plannerIds is list) ||
+            (
+              resource.data.plannerIds.hasOnly(request.resource.data.plannerIds) &&
+              request.resource.data.plannerIds.size() == resource.data.plannerIds.size() + 1 &&
+              !(request.auth.uid in resource.data.plannerIds)
+            )
+          );
+      }
+    }
+
+    // Specific rules for processes/items (Gantt)
+    match /weddings/{weddingId}/processes/{pid} {
+      allow read: if _isWeddingCollaborator(weddingId);
+      allow create, update: if _isWeddingCollaborator(weddingId) && _progressValid() && _datesValid();
+      allow delete: if _isWeddingCollaborator(weddingId);
+
+      match /items/{tid} {
+        allow read: if _isWeddingCollaborator(weddingId);
+        allow create, update: if _isWeddingCollaborator(weddingId) && _progressValid() && _datesValid();
+        allow delete: if _isWeddingCollaborator(weddingId);
+      }
+    }
+
+    // Subcollections inside a wedding (guests, tasks, suppliers, etc.)
+    match /weddings/{weddingId}/{document=**} {
+      // Read: owners, planners and assistants (all collaborators)
+      allow read: if isCollaborator(weddingId);
+
+      // Write: ONLY owners and planners (assistants cannot write)
+      // Additionally, if the target path is seatingPlan/banquet or seatingPlan/ceremony, validate structure.
+      allow write: if isOwnerOrPlanner(weddingId) && (
+        !((document == 'seatingPlan/banquet') || (document == 'seatingPlan/ceremony')) ||
+        isValidSeatingPlanDoc(document, request.resource.data)
+      );
+    }
+
+    // Invitations are stored as subcollection: weddings/{weddingId}/weddingInvitations/{code}
+    // They are covered by the generic wedding subcollection rules above.
+
+    // Users collection - only owner can read/write their own document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Any nested subcollection under the user profile (tasks, mails, etc.)
+      match /{subCollection=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Onboarding - only owner can read/write their own document
+    match /onboarding/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Config - readable by authenticated users
+    match /config/{document=**} {
+      allow read: if request.auth != null;
+    }
+
+    // Diagnosis collection for connectivity tests
+    match /diagnosis/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Ping/healthcheck collections
+    match /_conexion_prueba/{docId} {
+      // Public read for healthcheck; write requires auth
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /_test_connection/{docId} {
+      // Public read; write requires auth
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /_test/{docId} {
+      // Public read; write requires auth
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // User-level collections
+    match /userGuests/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /userData/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /userSuppliers/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /userTasksCompleted/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Transactions per user
+    match /transactions/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /transactions/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Finance per user
+    match /finance/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /finance/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // SeatingPlan validations
+    // Validación relajada: cualquier valor positivo de aisleMin es válido en cliente
+    // La validación estricta >= 40 se hace en backend para mejor UX
+    function isValidConfig(cfg) {
+      return cfg.width is number && cfg.height is number &&
+             cfg.width > 0 && cfg.height > 0 &&
+             cfg.aisleMin is number && cfg.aisleMin > 0 && cfg.aisleMin <= 500;
+    }
+
+    function listFieldValid(data, field) {
+      return !(data.keys().hasAny([field])) || (data[field] is list);
+    }
+
+    function isValidBanquetData(data) {
+      return listFieldValid(data, 'tables') &&
+             listFieldValid(data, 'areas') &&
+             (
+               // Require config validation if config field exists
+               (data.keys().hasAny(['config']) && data.config is map && isValidConfig(data.config)) ||
+               // Or flat config at root
+               (data.keys().hasAny(['width', 'height', 'aisleMin']) && isValidConfig(data)) ||
+               // Or no config at all (allow for incomplete docs)
+               (!data.keys().hasAny(['config', 'width', 'height', 'aisleMin']))
+             );
+    }
+
+    function isValidCeremonyData(data) {
+      return listFieldValid(data, 'tables') &&
+             listFieldValid(data, 'areas') &&
+             listFieldValid(data, 'seats');
+    }
+
+    function isValidSeatingPlanDoc(path, data) {
+      // expected: "seatingPlan/banquet" or "seatingPlan/ceremony"
+      return (path.matches('^seatingPlan/banquet$') && isValidBanquetData(data)) ||
+             (path.matches('^seatingPlan/ceremony$') && isValidCeremonyData(data));
+    }
+
+    // --- Administración Global (colecciones internas, SOLO backend) ---
+    // Estas colecciones contienen datos operativos y de control. El acceso
+    // desde apps cliente queda denegado explícitamente. El backend usa
+    // Admin SDK y no está sujeto a estas reglas.
+    match /adminSessions/{docId} {
+      allow read, write: if false;
+    }
+    match /adminAuditLogs/{docId} {
+      allow read, write: if false;
+    }
+    match /auditLogs/{docId} {
+      allow read, write: if false;
+    }
+    match /metrics/{docId} {
+      allow read, write: if false;
+      allow read, write: if false;
+    }
+    match /templates/{docId} {
+      allow read, write: if false;
+    }
+    match /broadcasts/{docId} {
+      allow read, write: if false;
+    }
+    match /reports/{docId} {
+      allow read, write: if false;
+    }
+    match /supportSummary/{docId} {
+      allow read, write: if false;
+    }
+    match /supportTickets/{docId} {
+      allow read, write: if false;
+    }
+
+    // Project Metrics: lectura para colaboradores de la boda; escritura solo backend (denegada en cliente)
+    match /projectMetrics/{weddingId}/{document=**} {
+      allow read: if isCollaborator(weddingId);
+      allow write: if false;
+    }
+
+    // Cola de eventos de métricas: acceso solo backend (denegado en cliente)
+    match /projectMetrics_events/{docId} {
+      allow read, write: if false;
+    }
+
+    // Craft.js webs - cada usuario puede gestionar sus propias webs
+    match /craft-webs/{webId} {
+      // Permitir lectura si:
+      // 1. El usuario está autenticado Y es el dueño
+      // 2. La web está publicada (para vista pública - sin autenticación)
+      allow read: if (request.auth != null && resource.data.userId == request.auth.uid) ||
+                     (resource.data.published == true);
+      
+      // Permitir list (queries) para:
+      // 1. Usuarios autenticados (para verificar slugs)
+      // 2. Queries públicas de webs publicadas (sin autenticación)
+      allow list: if request.auth != null || resource.data.published == true;
+      
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // RSVP de webs Craft.js - confirmaciones públicas de asistencia
+    match /craft-webs-rsvp/{rsvpId} {
+      // Lectura pública para ver invitados y respuestas
+      allow read: if true;
+      
+      // List/query público para buscar invitados
+      allow list: if true;
+      
+      // Crear RSVP público (sin autenticación)
+      allow create: if true;
+      
+      // Actualizar respuestas RSVP (sin autenticación)
+      allow update: if true;
+      
+      // Solo el propietario de la web puede eliminar
+      allow delete: if request.auth != null;
+    }
+    
+    // Permitir lectura y actualización pública de guests para RSVP
+    match /weddings/{weddingId}/guests/{guestId} {
+      // Lectura pública para validar invitados en RSVP
+      allow read, list: if true;
+      
+      // Actualización pública para confirmar asistencia vía RSVP
+      // Solo permitir actualizar campos específicos de confirmación
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['status', 'confirmed', 'companions', 'dietaryRestrictions', 'notes', 'updatedAt']);
+    }
+
+    // 💰 Solicitudes de presupuesto de proveedores REGISTRADOS
+    match /suppliers/{supplierId}/quote-requests/{requestId} {
+      // Lectura: el usuario que hizo la solicitud o el proveedor dueño
+      allow read: if request.auth != null && (
+        request.auth.uid == resource.data.userId ||
+        resource.data.supplierId == supplierId
+      );
+      
+      // List/query: solo el usuario puede listar sus propias solicitudes
+      allow list: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // El backend crea las solicitudes (via Admin SDK), pero permitir creación pública también
+      allow create: if true;
+      
+      // Actualizar: solo el proveedor puede actualizar (cambiar status, añadir quotes)
+      allow update: if request.auth != null;
+      
+      // Eliminar: solo el usuario que hizo la solicitud
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // 💰 Solicitudes de presupuesto de proveedores de INTERNET (Google Places)
+    match /quote-requests-internet/{requestId} {
+      // Lectura: el usuario que hizo la solicitud
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // List/query: solo el usuario puede listar sus propias solicitudes
+      allow list: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // Crear: público (sin auth) para proveedores de internet
+      allow create: if true;
+      
+      // Actualizar: solo el usuario propietario
+      allow update: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // Eliminar: solo el usuario propietario
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // 📊 Lectura pública de proveedores (para búsqueda y solicitud de presupuestos)
+    match /suppliers/{supplierId} {
+      allow read: if true;
+      allow list: if true;
+      allow write: if false; // Solo backend puede escribir
+    }
+
+    // ⚙️ Configuración del sistema (specs de proveedores, etc.)
+    match /systemConfig/{configId} {
+      // Solo admins pueden leer/escribir configuración del sistema
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // 👥 Colección de administradores (solo lectura para verificar permisos)
+    match /admins/{userId} {
+      // Solo el propio admin puede leer su documento
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Solo backend puede escribir (Admin SDK)
+      allow write: if false;
+    }
+
+    // ---- Supplier Option Suggestions (Crowdsourcing System) ----
+    match /supplier_option_suggestions/{suggestionId} {
+      allow read: if _isSignedIn();
+      allow create: if _isSignedIn() &&
+        request.resource.data.suggestedBy.userId == request.auth.uid;
+      allow update: if _isSignedIn() &&
+        (resource.data.suggestedBy.userId == request.auth.uid ||
+         request.auth.token.admin == true);
+      allow delete: if request.auth.token.admin == true;
+    }
+
+    match /supplier_dynamic_specs/{category} {
+      allow read: if true;
+      allow write: if request.auth.token.admin == true;
     }
   }
 }

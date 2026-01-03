@@ -1,8 +1,8 @@
-# Optimizaciones de Rendimiento - MyWed360
+# Optimizaciones de Rendimiento - MaLoveApp
 
 ## 📊 Resumen de Mejoras Implementadas
 
-Este documento detalla las optimizaciones de rendimiento implementadas para mejorar la experiencia de usuario y el rendimiento general de la aplicación MyWed360.
+Este documento detalla las optimizaciones de rendimiento implementadas para mejorar la experiencia de usuario y el rendimiento general de la aplicación MaLoveApp.
 
 ## 🚀 Componentes Implementados
 
@@ -25,8 +25,8 @@ Este documento detalla las optimizaciones de rendimiento implementadas para mejo
 import { LazyTasks, LazyFinance } from '../components/performance/LazyComponentLoader';
 
 // En rutas
-<Route path="/tasks" element={<LazyTasks />} />
-<Route path="/finance" element={<LazyFinance />} />
+<Route path= – /tasks –  element={<LazyTasks />} />
+<Route path= – /finance –  element={<LazyFinance />} />
 ```
 
 ### 2. imageOptimizationService.js
@@ -49,10 +49,10 @@ import { LazyTasks, LazyFinance } from '../components/performance/LazyComponentL
 import { OptimizedImage } from '../services/imageOptimizationService';
 
 <OptimizedImage 
-  src="/path/to/image.jpg"
+  src= – /path/to/image.jpg – 
   width={400}
   height={300}
-  alt="Descripción"
+  alt= – Descripción – 
 />
 ```
 
@@ -247,4 +247,4 @@ console.log(detectImageSupport());
 
 **Última actualización:** Enero 2025  
 **Versión:** 1.0.0  
-**Autor:** Sistema de Optimización MyWed360
+**Autor:** Sistema de Optimización MaLoveApp

@@ -1,0 +1,313 @@
+import { Mail, Paperclip } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { FixedSizeList as List } from 'react-window';
+import { get as apiGet } from '../../services/apiClient';
+import useTranslations from '../../hooks/useTranslations';
+
+const IS_E2E = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
+const apiOptions = (extra = {}) => ({
+  ...(extra || {}),
+  auth: IS_E2E ? false : (extra?.auth ?? true),
+  silent: extra?.silent ?? true,
+});
+
+/**
+ * Componente que muestra la lista de correos electrónicos en la bandeja
+ *
+ * @param {Object} props - Propiedades del componente
+ * @param {Array} props.emails - Lista de emails a mostrar
+ * @param {boolean} props.loading - Indica si está cargando los datos
+ * @param {string} props.selectedEmailId - ID del email seleccionado actualmente
+ * @param {Function} props.onSelectEmail - Función para seleccionar un email
+ * @param {string} props.folder - Carpeta actual (inbox, sent, trash)
+ */
+const EmailList = ({
+  emails,
+  loading,
+  selectedEmailId,
+  onSelectEmail,
+  folder,
+  height = 600,
+  itemHeight = 88,
+}) => {
+  const listRef = useRef();
+  const { currentLanguage } = useTranslations();
+
+  // Desplazar a la posición del elemento seleccionado en la lista virtual
+  useEffect(() => {
+    if (!listRef.current) return;
+    const index = emails.findIndex((e) => e.id === selectedEmailId);
+    if (index >= 0) {
+      listRef.current.scrollToItem(index, 'smart');
+    }
+  }, [selectedEmailId, emails]);
+  // Formatear fecha para mostrar en la lista
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+
+    try {
+      const date = new Date(dateStr);
+      const now = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      // Si es hoy, mostrar solo la hora
+      if (date.toDateString() === now.toDateString()) {
+        try {
+          return new Intl.DateTimeFormat(currentLanguage || 'es', {
+            hour: '2-digit',
+            minute: '2-digit',
+          }).format(date);
+        } catch {
+          return date.toTimeString();
+        }
+      }
+
+      // Si es ayer, mostrar "Ayer"
+      if (date.toDateString() === yesterday.toDateString()) {
+        return 'Ayer';
+      }
+
+      // Si es este año, mostrar día y mes
+      if (date.getFullYear() === now.getFullYear()) {
+        try {
+          return new Intl.DateTimeFormat(currentLanguage || 'es', {
+            day: '2-digit',
+            month: 'short',
+          }).format(date);
+        } catch {
+          return date.toDateString();
+        }
+      }
+
+      // Si es otro año, mostrar día/mes/año
+      try {
+        return new Intl.DateTimeFormat(currentLanguage || 'es', {
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit',
+        }).format(date);
+      } catch {
+        return date.toDateString();
+      }
+    } catch (e) {
+      // console.error('Error al formatear fecha:', e);
+      return dateStr;
+    }
+  };
+
+  // Truncar texto largo
+  const truncate = (text, maxLength = 100) => {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
+  // Eliminar tags HTML para previsualización
+  const stripHtml = (html) => {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, '');
+  };
+
+  // Función para manejar eventos de teclado en la lista
+  const handleKeyDown = (event, email, index) => {
+    switch (event.key) {
+      case 'Enter':
+      case ' ':
+        // Seleccionar el correo cuando se presiona Enter o espacio
+        event.preventDefault();
+        onSelectEmail(email);
+        break;
+      case 'ArrowDown':
+        // Mover al siguiente correo si existe
+        event.preventDefault();
+        if (index < emails.length - 1) {
+          onSelectEmail(emails[index + 1]);
+        }
+        break;
+      case 'ArrowUp':
+        // Mover al correo anterior si existe
+        event.preventDefault();
+        if (index > 0) {
+          onSelectEmail(emails[index - 1]);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div
+        className="flex items-center justify-center h-64"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <div
+          className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"
+          aria-hidden="true"
+        ></div>
+        <span className="ml-2 text-gray-800">Cargando correos...</span>
+      </div>
+    );
+  }
+
+  if (!emails.length) {
+    return (
+      <div
+        className="flex flex-col items-center justify-center h-64 text-gray-700"
+        data-testid="empty-folder-message"
+        role="status"
+        aria-live="polite"
+      >
+        <Mail size={48} className="mb-2 opacity-20" aria-hidden="true" />
+        <p className="text-center">
+          {folder === 'inbox'
+            ? 'No hay correos en tu bandeja de entrada'
+            : folder === 'sent'
+              ? 'No has enviado ningún correo'
+              : 'No hay correos en esta carpeta'}
+        </p>
+      </div>
+    );
+  }
+
+  const Row = ({ index, style }) => {
+    const email = emails[index];
+    const [insights, setInsights] = useState(null);
+    useEffect(() => {
+      if (IS_E2E) return undefined;
+      let ignore = false;
+      (async () => {
+        try {
+          if (!email?.id) return;
+          const res = await apiGet(
+            `/api/email-insights/${encodeURIComponent(email.id)}`,
+            apiOptions({ silent: true })
+          );
+          if (!res.ok) return;
+          const json = await res.json();
+          if (!ignore) setInsights(json);
+        } catch {}
+      })();
+      return () => {
+        ignore = true;
+      };
+    }, [email?.id]);
+    const totalActions = (() => {
+      try {
+        const t =
+          (insights?.tasks?.length || 0) +
+          (insights?.meetings?.length || 0) +
+          (insights?.budgets?.length || 0) +
+          (insights?.contracts?.length || 0);
+        return t;
+      } catch {
+        return 0;
+      }
+    })();
+    return (
+      <div
+        style={style}
+        data-testid="email-list-item"
+        key={email.id}
+        role="listitem"
+        aria-labelledby={`email-${email.id}-subject`}
+      >
+        <button
+          type="button"
+          className={`w-full h-full py-3 px-2 cursor-pointer text-left transition-colors hover:bg-gray-50 divide-y divide-gray-200 ${
+            selectedEmailId === email.id ? 'bg-blue-50 ring-2 ring-blue-400' : ''
+          } ${!email.read ? 'font-semibold' : ''} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          onClick={() => onSelectEmail(email)}
+          onKeyDown={(e) => handleKeyDown(e, email, index)}
+          aria-current={selectedEmailId === email.id ? 'true' : undefined}
+        >
+          <div className="flex justify-between items-center mb-1">
+            <div className="flex items-center">
+              {!email.read && (
+                <span
+                  className="w-2 h-2 bg-blue-500 rounded-full mr-2"
+                  aria-label="No leído"
+                  role="status"
+                ></span>
+              )}
+              <span className="text-sm text-gray-800">
+                {folder === 'sent' ? `Para: ${email.to}` : `De: ${email.from}`}
+              </span>
+            </div>
+            <span className="text-xs text-gray-600">
+              {formatDate(email.date || email.timestamp)}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <h4
+              id={`email-${email.id}-subject`}
+              className="text-sm mb-1 flex-grow pr-2 truncate font-medium text-gray-800"
+            >
+              {email.subject || '(Sin asunto)'}
+            </h4>
+            {totalActions > 0 && (
+              <span
+                title={`Acciones IA: ${totalActions}`}
+                className="ml-2 inline-flex items-center rounded-full bg-violet-100 text-violet-700 px-2 py-px text-[10px] font-semibold"
+              >
+                IA {totalActions}
+              </span>
+            )}
+            {email.attachments && email.attachments.length > 0 && (
+              <span role="img" aria-label="Contiene archivos adjuntos">
+                <Paperclip size={14} className="text-gray-600 shrink-0" aria-hidden="true" />
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-gray-600 line-clamp-1">
+            {truncate(stripHtml(email.body), 120)}
+          </p>
+          {email.aiClassification?.tags?.length ? (
+            <div className="mt-1 flex flex-wrap gap-1">
+              {email.aiClassification.tags.slice(0, 3).map((tag) => (
+                <span
+                  key={`${email.id}-tag-${tag}`}
+                  className="inline-flex items-center rounded-full bg-blue-50 px-2 py-px text-[10px] font-medium text-blue-700"
+                >
+                  {tag}
+                </span>
+              ))}
+              {email.aiClassification.folder && (
+                <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-px text-[10px] font-medium text-gray-600">
+                  Carpeta sugerida: {email.aiClassification.folder}
+                </span>
+              )}
+            </div>
+          ) : null}
+        </button>
+      </div>
+    );
+  };
+
+  return (
+    <div
+      data-testid="email-list"
+      className="h-full"
+      role="list"
+      aria-label={`Correos en ${folder === 'inbox' ? 'bandeja de entrada' : folder === 'sent' ? 'enviados' : folder === 'trash' ? 'papelera' : folder}`}
+    >
+      <List
+        height={height}
+        width="100%"
+        itemCount={emails.length}
+        itemSize={itemHeight}
+        outerElementType="div"
+        className="divide-y divide-gray-200"
+        ref={listRef}
+        itemKey={(index) => emails[index].id}
+      >
+        {Row}
+      </List>
+    </div>
+  );
+};
+
+export default EmailList;

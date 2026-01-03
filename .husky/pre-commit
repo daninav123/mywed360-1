@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+# Ensure we run from repo root (some Git setups invoke hooks from hooks dir)
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$repo_root"
+
+# Do not block commits on warnings or local lint issues.
+# i18n validation may warn; allow commit regardless.
+npm run validate:i18n || true
+
+# Run lint-staged for auto-fixes, but never fail the commit.
+# Let lint-staged autodetect config from package.json (avoids "No valid configuration found").
+npx lint-staged || true

@@ -9,7 +9,7 @@
 const path = require('path');
 const admin = require('firebase-admin');
 
-const keyPath = path.resolve(__dirname, '..', 'lovenda-98c77-firebase-adminsdk-fbsvc-0e1a5a524c.json');
+const keyPath = path.resolve(__dirname, '..', 'maloveapp-firebase-adminsdk.json');
 if (!admin.apps.length) {
   admin.initializeApp({ credential: admin.credential.cert(require(keyPath)) });
 }
@@ -28,3 +28,4 @@ const db = admin.firestore();
   console.error('❌ Error:', err);
   process.exit(1);
 });
+

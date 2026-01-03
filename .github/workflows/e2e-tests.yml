@@ -1,18 +1,26 @@
 name: E2E Tests
 
-env:
-  ENABLE_E2E: 'false'
-
 on:
-  push:
-    branches: [ "**" ]
-  pull_request:
-    branches: [ "**" ]
+  # push:
+  #   branches: ['**']
+  # pull_request:
+  #   branches: ['**']
+  # ⚠️ Deshabilitado: Los E2E tests son lentos y solo deben ejecutarse manualmente
   workflow_dispatch:
+    inputs:
+      enable_e2e:
+        description: 'Run E2E tests in this workflow run'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 jobs:
   e2e-tests:
-    if: ${{ false }}
+    # Solo corre si se ejecuta manualmente con enable_e2e='true' o si la variable de repo ENABLE_E2E='true'
+    if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.enable_e2e == 'true') || vars.ENABLE_E2E == 'true' }}
     runs-on: ubuntu-latest
     
     steps:
@@ -61,7 +69,7 @@ jobs:
           npm cache clean --force
           npm ci --engine-strict
 
-      - name: Start dev server and run Cypress tests
+      - name: Start dev server and run Cypress tests (email + seating + proveedores compare)
         uses: cypress-io/github-action@v5
         with:
           start: npm run start:ci
@@ -69,7 +77,7 @@ jobs:
           wait-on-timeout: 180
           browser: electron
           record: false
-          spec: cypress/e2e/email/*.cy.js
+          spec: 'cypress/e2e/email/*.cy.js,cypress/e2e/seating/**/*.cy.js,cypress/e2e/proveedores_compare.cy.js'
 
       - name: Upload screenshots on failure
         uses: actions/upload-artifact@v4

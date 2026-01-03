@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # PostgreSQL - Reemplaza Firestore
+  postgres:
+    image: postgres:16-alpine
+    container_name: malove-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: malove
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-malove_dev_password}
+      POSTGRES_DB: malove_db
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=es_ES.UTF-8"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U malove -d malove_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - malove-network
+
+  # MinIO - Reemplaza Firebase Storage (S3-compatible)
+  minio:
+    image: minio/minio:latest
+    container_name: malove-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-malove_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-malove_admin_password}
+      MINIO_BROWSER_REDIRECT_URL: http://localhost:9001
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - malove-network
+
+  # Redis - Cache y sesiones
+  redis:
+    image: redis:7-alpine
+    container_name: malove-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-malove_redis_password}
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - malove-network
+
+  # PgAdmin - Interfaz visual para PostgreSQL (opcional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: malove-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@malove.app}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - malove-network
+    profiles:
+      - dev  # Solo se levanta con: docker-compose --profile dev up
+
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local
+  redis_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  malove-network:
+    driver: bridge

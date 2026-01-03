@@ -1,0 +1,324 @@
+{
+  "invitations": {
+    "title": "Invitation Designer",
+    "subtitle": "Create beautiful invitations for your wedding",
+    "aiAssistant": {
+      "title": "AI Assistant",
+      "placeholder": "Describe how you want your invitation...",
+      "generate": "Generate invitation",
+      "generating": "Generating..."
+    },
+    "templateSelection": {
+      "title": "Template Selection",
+      "allStyles": "All styles",
+      "allPalettes": "All palettes",
+      "allTypographies": "All typographies",
+      "classic": "Classic",
+      "modern": "Modern",
+      "rustic": "Rustic",
+      "minimalist": "Minimalist",
+      "pastel": "Pastel",
+      "vibrant": "Vibrant",
+      "earth": "Earth",
+      "monochrome": "Monochrome",
+      "serif": "Serif",
+      "sans": "Sans",
+      "handwriting": "Handwriting"
+    },
+    "customization": {
+      "title": "Customization",
+      "preview": "Preview"
+    },
+    "sending": {
+      "title": "Send Invitations",
+      "testEmail": "Send test email",
+      "sendToAll": "Send to all guests",
+      "sending": "Sending...",
+      "subject": "Invitation to our wedding"
+    },
+    "buttons": {
+      "previous": "Previous",
+      "next": "Next",
+      "finish": "Finish",
+      "saveDraft": "Save draft",
+      "duplicate": "Duplicate design"
+    },
+    "toast": {
+      "generated": "Invitation generated",
+      "saved": "Draft saved",
+      "duplicated": "Design duplicated",
+      "error": "Error generating invitation"
+    }
+  },
+  "moments": {
+    "title": "Moments",
+    "subtitle": "Share and manage your wedding memories",
+    "tabs": {
+      "overview": "Overview",
+      "moderation": "Moderation",
+      "slideshow": "Slideshow",
+      "downloads": "Downloads"
+    },
+    "guestShare": {
+      "title": "Guest sharing",
+      "shareLink": "Share link",
+      "createToken": "Create access token",
+      "copyLink": "Copy link"
+    },
+    "album": {
+      "loading": "Loading album...",
+      "notFound": "Album not found",
+      "createAlbum": "Create album"
+    }
+  },
+  "ideas": {
+    "title": "Ideas & Notes",
+    "subtitle": "Save and organize your wedding ideas",
+    "tabs": {
+      "notes": "Notes",
+      "inspiration": "Inspiration",
+      "diary": "Wedding Diary"
+    },
+    "notes": {
+      "title": "Notes",
+      "addNote": "Add note",
+      "folder": "Folder",
+      "newFolder": "New folder",
+      "delete": "Delete note",
+      "confirmDelete": "Delete this note?"
+    },
+    "inspiration": {
+      "title": "Inspiration",
+      "addPost": "Add inspiration",
+      "upload": "Upload image",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "diary": {
+      "title": "Wedding Diary",
+      "addEntry": "Add entry",
+      "date": "Date",
+      "mood": "Mood",
+      "content": "What's on your mind?"
+    }
+  },
+  "children": {
+    "title": "Children Management",
+    "subtitle": "Plan activities and menu for children",
+    "activities": {
+      "title": "Activities",
+      "addActivity": "Add activity",
+      "type": "Type",
+      "time": "Time",
+      "provider": "Provider",
+      "ageRange": "Age range",
+      "notes": "Notes",
+      "completed": "Completed"
+    },
+    "menu": {
+      "title": "Children's Menu",
+      "addItem": "Add item",
+      "item": "Item",
+      "quantity": "Quantity",
+      "notes": "Notes"
+    },
+    "types": {
+      "games": "Board games",
+      "crafts": "Crafts",
+      "facepainting": "Face painting",
+      "balloons": "Balloon modeling",
+      "storytelling": "Storytelling",
+      "costumes": "Costume corner",
+      "videogames": "Video games",
+      "castle": "Bouncy castle",
+      "magic": "Magic show",
+      "animation": "Children's entertainment"
+    },
+    "menuOptions": {
+      "nuggets": "Chicken nuggets",
+      "pasta": "Pasta with tomato",
+      "pizza": "Mini pizzas",
+      "burger": "Mini burgers",
+      "salad": "Salad",
+      "fruit": "Fresh fruit",
+      "vegetables": "Raw vegetables",
+      "icecream": "Ice cream",
+      "juice": "Natural juices",
+      "water": "Water"
+    }
+  },
+  "specialGuests": {
+    "title": "Special Guest Needs",
+    "subtitle": "Manage dietary restrictions and special accommodations",
+    "add": "Add special need",
+    "search": "Search by name...",
+    "filters": {
+      "all": "All",
+      "dietary": "Dietary",
+      "allergies": "Allergies",
+      "accessibility": "Accessibility"
+    },
+    "diets": {
+      "vegetarian": "Vegetarian",
+      "vegan": "Vegan",
+      "celiac": "Celiac / Gluten-free",
+      "lactose": "Lactose-free",
+      "kosher": "Kosher",
+      "halal": "Halal",
+      "diabetes": "Diabetic",
+      "other": "Other"
+    },
+    "allergies": {
+      "title": "Allergies",
+      "common": ["Tree nuts", "Shellfish", "Fish", "Eggs", "Dairy", "Gluten", "Soy", "Sulfites", "Mustard", "Sesame"]
+    },
+    "needs": {
+      "mobility": "Reduced mobility",
+      "visual": "Visual impairment",
+      "hearing": "Hearing impairment",
+      "pregnant": "Pregnant",
+      "baby": "With baby",
+      "elderly": "Elderly person",
+      "other": "Other"
+    },
+    "form": {
+      "name": "Guest name",
+      "table": "Table",
+      "diets": "Diets",
+      "allergies": "Allergies",
+      "needs": "Special needs",
+      "notes": "Special notes",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "summary": {
+      "total": "Total with special needs",
+      "dietary": "Dietary restrictions",
+      "allergies": "Allergies",
+      "accessibility": "Accessibility needs"
+    }
+  },
+  "legalDocuments": {
+    "title": "Legal Documents Generator (MVP)",
+    "subtitle": "Generate consent and legal documents",
+    "type": "Type",
+    "date": "Date",
+    "place": "Place",
+    "coupleName": "Couple's names",
+    "thirdPartyName": "Third party name",
+    "types": {
+      "imageConsent": "Image use consent"
+    },
+    "generate": "Generate PDF",
+    "generating": "Generating..."
+  },
+  "contracts": {
+    "title": "Contracts",
+    "subtitle": "Manage supplier contracts and agreements",
+    "add": "New contract",
+    "supplier": "Supplier",
+    "service": "Service",
+    "amount": "Amount",
+    "date": "Date",
+    "status": "Status",
+    "actions": "Actions",
+    "statuses": {
+      "pending": "Pending",
+      "signed": "Signed",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "emailTemplates": {
+    "title": "Email Templates",
+    "subtitle": "Create and manage email templates",
+    "add": "New template",
+    "name": "Template name",
+    "subject": "Subject",
+    "body": "Body",
+    "save": "Save template",
+    "delete": "Delete",
+    "preview": "Preview",
+    "variables": "Available variables",
+    "variablesList": [
+      "{{guestName}} - Guest name",
+      "{{weddingDate}} - Wedding date",
+      "{{venue}} - Venue name",
+      "{{rsvpLink}} - RSVP link"
+    ]
+  },
+  "relatedEvents": {
+    "title": "Related Events",
+    "subtitle": "Manage pre-wedding and post-wedding events",
+    "add": "Add event",
+    "name": "Event name",
+    "date": "Date",
+    "time": "Time",
+    "location": "Location",
+    "description": "Description",
+    "guestList": "Guest list",
+    "types": {
+      "engagement": "Engagement party",
+      "bridal": "Bridal shower",
+      "bachelor": "Bachelor party",
+      "rehearsal": "Rehearsal dinner",
+      "welcome": "Welcome party",
+      "brunch": "Day-after brunch"
+    }
+  },
+  "weddingDay": {
+    "title": "Wedding Day",
+    "subtitle": "Timeline and coordination for your big day",
+    "timeline": "Timeline",
+    "addEvent": "Add event",
+    "time": "Time",
+    "event": "Event",
+    "location": "Location",
+    "responsible": "Responsible",
+    "notes": "Notes",
+    "status": "Status",
+    "statuses": {
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "completed": "Completed"
+    }
+  },
+  "helpCeremony": {
+    "title": "Ceremony Help",
+    "subtitle": "Tips and guidance for your ceremony",
+    "sections": {
+      "preparation": "Preparation",
+      "traditions": "Traditions",
+      "vows": "Vows",
+      "music": "Music",
+      "readings": "Readings"
+    }
+  },
+  "djDownloads": {
+    "title": "DJ Downloads",
+    "subtitle": "Download your music playlist",
+    "playlist": "Playlist",
+    "download": "Download",
+    "format": "Format",
+    "quality": "Quality"
+  },
+  "inbox": {
+    "title": "Email Inbox",
+    "subtitle": "Manage your wedding communications",
+    "compose": "Compose",
+    "folders": {
+      "inbox": "Inbox",
+      "sent": "Sent",
+      "drafts": "Drafts",
+      "trash": "Trash"
+    },
+    "filters": {
+      "all": "All",
+      "unread": "Unread",
+      "important": "Important",
+      "suppliers": "Suppliers",
+      "guests": "Guests"
+    },
+    "search": "Search emails..."
+  }
+}

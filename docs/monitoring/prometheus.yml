@@ -1,0 +1,34 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 30s
+
+# Reglas de alerta
+rule_files:
+  - alerting_rules.yml
+
+scrape_configs:
+  # Métricas del backend (Express) expuestas en /metrics
+  - job_name: 'maloveapp-backend'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['localhost:4004']  # Ajusta al host:puerto real del backend
+    # scrape_interval: 15s  # (opcional) por job
+
+  # OPCIONAL: Comprobaciones HTTP a /health usando blackbox_exporter cada 5 minutos
+  # Requiere tener un blackbox_exporter escuchando en localhost:9115 (o ajusta la dirección)
+  - job_name: 'blackbox-http'
+    scrape_interval: 5m
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - http://localhost:4004/health   # Backend health
+        - http://localhost:5173/health   # Frontend health (ajusta si tu front expone /health)
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: localhost:9115  # Dirección del blackbox_exporter

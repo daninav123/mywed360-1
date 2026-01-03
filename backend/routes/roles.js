@@ -1,10 +1,9 @@
 import express from 'express';
-import admin from 'firebase-admin';
-import logger from '../logger.js';
+import { db } from '../db.js';
 
-// Suponemos firebase-admin inicializado en index.js o guests.js
-const db = admin.firestore();
 const router = express.Router();
+const USE_FIREBASE = process.env.USE_FIREBASE !== 'false';
+const FIREBASE_AVAILABLE = USE_FIREBASE && db !== null;
 
 // Helpers ----------------------------------------------------
 async function getUserRole(eventId, uid) {
@@ -37,7 +36,7 @@ router.get('/:eventId', authMiddleware, allowRoles(['owner', 'planner']), async 
   try {
     const { eventId } = req.params;
     const snap = await db.collection('roles').doc(eventId).collection('members').get();
-    const members = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+    const members = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
     res.json(members);
   } catch (err) {
     logger.error('roles-list-error', err);
@@ -51,8 +50,14 @@ router.post('/:eventId/assign', authMiddleware, allowRoles(['owner']), async (re
     const { eventId } = req.params;
     const { uid, role } = req.body || {};
     const allowedRoles = ['owner', 'planner', 'assistant'];
-    if (!uid || !allowedRoles.includes(role)) return res.status(400).json({ error: 'invalid-data' });
-    await db.collection('roles').doc(eventId).collection('members').doc(uid).set({ role, assignedAt: admin.firestore.FieldValue.serverTimestamp() });
+    if (!uid || !allowedRoles.includes(role))
+      return res.status(400).json({ error: 'invalid-data' });
+    await db
+      .collection('roles')
+      .doc(eventId)
+      .collection('members')
+      .doc(uid)
+      .set({ role, assignedAt: admin.firestore.FieldValue.serverTimestamp() });
     res.json({ ok: true });
   } catch (err) {
     logger.error('role-assign-error', err);

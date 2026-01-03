@@ -1,0 +1,13 @@
+{
+  "name": "@malove/hooks",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  }
+}

@@ -1,66 +1,95 @@
-# Continuous Integration for Lovenda Email System
-# Ejecuta lint, pruebas unitarias, accesibilidad e integración en cada push o PR
-
 name: CI
 
 on:
   push:
+    branches: [ main, master ]
   pull_request:
+    branches: [ main, master ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  build-and-unit:
+    name: Lint, Unit Tests, Build
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.19.0'
-          registry-url: 'https://registry.npmjs.org'
-          always-auth: true
+          node-version: 20
           cache: 'npm'
 
-      - name: Upgrade npm to 11.x (fix rollup optional deps issue)
-        run: npm install -g npm@11
+      - name: Install root deps (no postinstall)
+        run: npm ci --ignore-scripts
 
-      - name: Install system libs for canvas
+      - name: Install backend deps (no postinstall)
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+          cd backend
+          npm ci --ignore-scripts
 
-      - name: Force Node 20 environment
+      - name: Lint
+        run: npm run lint
+
+      - name: Install Firebase CLI for emulator
+        run: npm install -g firebase-tools
+
+      - name: Unit tests (Vitest - without emulator)
+        run: npm run test:unit -- --exclude='**/firestore.rules*.test.js'
+        
+      - name: Start Firestore Emulator & Run Rules Tests
         run: |
-          echo "PATH=/opt/hostedtoolcache/node/20.19.0/x64/bin:$PATH" >> $GITHUB_ENV
-          echo "NODE_VERSION=20.19.0" >> $GITHUB_ENV
-          
-      - name: Verify Node version (must be 20.x)
+          npx firebase emulators:exec --only firestore "npm run test:unit -- src/__tests__/firestore.rules"
+
+      - name: Validate i18n
+        run: npm run validate:i18n
+
+      - name: Build (Vite)
+        env:
+          NODE_ENV: production
+        run: npm run build
+
+      - name: Bundle budget check
+        run: npm run check:bundle -- --maxBytes=2000000
+
+  e2e:
+    name: E2E (Cypress)
+    if: ${{ vars.CI_E2E == 'true' }}
+    needs: build-and-unit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install deps (enable scripts for Cypress)
         run: |
-          echo "Node version: $(node -v)"
-          echo "NPM version: $(npm -v)"
-          node -v | grep -E '^v20\.' || (echo "ERROR: Node 20 required but got $(node -v)" && exit 1)
-          npm -v | grep -E '^1(0|1)\.' || (echo "ERROR: NPM 10/11 required but got $(npm -v)" && exit 1)
+          npm ci
+          cd backend && npm ci
 
-      - name: Install dependencies with engine-strict
-        run: |
-          npm cache clean --force
-          npm ci --engine-strict
+      - name: Run E2E
+        env:
+          # Provide these via repo/environment secrets if needed
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+        run: npm run e2e:ci
 
-      - name: Run tests
-        run: npm run test:run -- --coverage --reporter junit
-
-      - name: Upload coverage
-        if: success()
+      - name: Upload Cypress videos (on failure)
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: coverage
-
-      - name: Archive test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: junit.xml
+          name: cypress-videos
+          path: cypress/videos

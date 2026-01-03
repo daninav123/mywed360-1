@@ -1,0 +1,74 @@
+{
+  "tutorial": {
+    "skip": "Skip",
+    "previous": "Previous",
+    "next": "Next",
+    "finish": "Finish",
+    "saving": "Saving...",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Planivia!",
+        "heading": "Start planning your wedding!",
+        "description": "We'll guide you through the first steps to set up your wedding in Planivia. This tutorial will help you customize the app and discover its main features."
+      },
+      "basicData": {
+        "title": "Basic data",
+        "heading": "Complete your wedding basic information",
+        "coupleNames": "Couple names",
+        "coupleNamesPlaceholder": "E.g.: Mary and John",
+        "weddingDate": "Wedding date",
+        "celebrationPlace": "Celebration place",
+        "celebrationPlacePlaceholder": "E.g.: Madrid"
+      },
+      "guestManagement": {
+        "title": "Guest management",
+        "heading": "Guest Management",
+        "description": "Organize your guest list, confirm attendance, and assign tables for the ceremony.",
+        "features": {
+          "addGuests": "Add guests and their companions",
+          "organizeGroups": "Organize by groups (family, friends...)",
+          "confirmAttendance": "Confirm attendance and allergies",
+          "designSeating": "Design the seating plan with drag and drop"
+        }
+      },
+      "suppliers": {
+        "title": "Suppliers",
+        "heading": "Suppliers",
+        "description": "Manage your suppliers, consult with AI, and track all contracted services.",
+        "features": {
+          "searchAI": "Search recommended suppliers with AI",
+          "markFavorites": "Mark favorites to compare options",
+          "registerPayments": "Register payments and deposits for financial control"
+        }
+      },
+      "calendarTasks": {
+        "title": "Calendar and Tasks",
+        "heading": "Planning",
+        "description": "Organize your entire calendar and task lists to maintain perfect control.",
+        "features": {
+          "syncCalendar": "Sync with Google Calendar and others",
+          "organizeTasks": "Organize tasks by priority and date",
+          "checklists": "Checklists for before and during the wedding",
+          "reminders": "Receive important reminders"
+        }
+      },
+      "designs": {
+        "title": "Designs and Invitations",
+        "heading": "AI Designs",
+        "description": "Create invitations, menus, and other visual elements for your wedding with AI assistance.",
+        "features": {
+          "generateDesigns": "Generate personalized designs with AI",
+          "createInvitations": "Create invitations, menus, and signage",
+          "designLogo": "Design your personalized wedding logo",
+          "exportHighRes": "Export in high resolution for printing"
+        }
+      },
+      "ready": {
+        "title": "Ready to start!",
+        "heading": "All set!",
+        "description": "You've completed the initial tutorial. You can now start using all Planivia features to plan your dream wedding.",
+        "hint": "Remember that you can access Settings at any time to modify your data or review this Guide again."
+      }
+    }
+  }
+}

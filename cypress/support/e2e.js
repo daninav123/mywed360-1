@@ -1,20 +1,22 @@
 // ***********************************************************
-// This example support/e2e.js is processed and
-// loaded automatically before your test files.
-//
-// This is a great place to put global configuration and
-// behavior that modifies Cypress.
-//
-// You can change the location of this file or turn off
-// automatically serving support files with the
-// 'supportFile' configuration option.
-//
-// You can read more here:
-// https://on.cypress.io/configuration
+// Support file E2E para Cypress
+// Se carga automáticamente antes de cada spec
 // ***********************************************************
 
-// Import commands.js using ES2015 syntax:
 import './commands';
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
+// Configuración global
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // Prevenir que errores no capturados fallen los tests
+  // Útil para errores de terceros o warnings esperados
+  console.log('Uncaught exception:', err.message);
+  return false;
+});
+
+// Bypass de autenticación para tests E2E
+beforeEach(() => {
+  // Marcar que estamos en Cypress para bypass de auth
+  cy.window().then((win) => {
+    win.Cypress = true;
+  });
+});

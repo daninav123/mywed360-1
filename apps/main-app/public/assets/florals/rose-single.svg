@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 200">
+  <defs>
+    <radialGradient id="roseSingleGrad">
+      <stop offset="0%" style="stop-color:#FFE4E7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <g transform="translate(75, 70)">
+    <ellipse cx="0" cy="-20" rx="12" ry="18" fill="url(#roseSingleGrad)" transform="rotate(0 0 0)"/>
+    <ellipse cx="0" cy="-20" rx="12" ry="18" fill="url(#roseSingleGrad)" transform="rotate(72 0 0)"/>
+    <ellipse cx="0" cy="-20" rx="12" ry="18" fill="url(#roseSingleGrad)" transform="rotate(144 0 0)"/>
+    <ellipse cx="0" cy="-20" rx="12" ry="18" fill="url(#roseSingleGrad)" transform="rotate(216 0 0)"/>
+    <ellipse cx="0" cy="-20" rx="12" ry="18" fill="url(#roseSingleGrad)" transform="rotate(288 0 0)"/>
+    <circle cx="0" cy="0" r="8" fill="#FF1493"/>
+  </g>
+  <path d="M 75 85 L 75 170" stroke="#2D5016" stroke-width="3" fill="none"/>
+  <ellipse cx="65" cy="120" rx="12" ry="8" fill="#4A7C4A" transform="rotate(-30 65 120)"/>
+  <ellipse cx="85" cy="140" rx="12" ry="8" fill="#4A7C4A" transform="rotate(30 85 140)"/>
+</svg>

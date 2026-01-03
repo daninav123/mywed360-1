@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+dist/
+
+# Logs grandes
+backend/logs/
+logs/
+*.log
+*.log.*
+
+# macOS
+.DS_Store
+
+# Otros temporales
+coverage/
+temp/
+test-results/
+cypress/screenshots/
+cypress/videos/
+*.bak
+*.old.jsx
+
+# PERMITIR archivos sensibles temporalmente
+# .env
+# serviceAccount*.json

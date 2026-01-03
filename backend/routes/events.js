@@ -1,13 +1,14 @@
 import express from 'express';
-import admin from 'firebase-admin';
-import logger from '../logger.js';
+import { db, admin, USE_FIREBASE } from '../db.js';
+import logger from '../utils/logger.js';
 
-// Suponemos que firebase-admin ya está inicializado en otro punto del backend
-const db = admin.firestore();
 const router = express.Router();
 
 // Middleware de autenticación muy simple (usa UID en el header Authorization)
 function authMiddleware(req, res, next) {
+  if (!USE_FIREBASE || !db) {
+    return res.status(503).json({ error: 'Firebase not available' });
+  }
   const auth = req.headers['authorization'] || '';
   if (!auth.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'unauthenticated' });
@@ -55,5 +56,46 @@ router.post('/', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'event-create-failed' });
   }
 });
+
+// GET /api/events/search?q=term
+// Devuelve una lista limitada de eventos coincidentes (título/lugar)
+router.get('/search', async (req, res) => {
+  try {
+    const q = (req.query.q || '').toString().trim().toLowerCase();
+    if (!q || q.length < 2) return res.json([]);
+
+    let snap;
+    try {
+      snap = await db.collection('events').orderBy('date', 'desc').limit(300).get();
+    } catch (_) {
+      snap = await db.collection('events').limit(300).get();
+    }
+
+    const out = [];
+    snap.docs.forEach((d) => {
+      const data = d.data() || {};
+      const title = data.title || data.name || '';
+      const location = data.location || data.place || '';
+      const hay = `${title} ${location}`.toLowerCase();
+      if (hay.includes(q)) {
+        out.push({
+          id: d.id,
+          title: title || 'Evento',
+          dateTime: data.date || data.dateTime || data.start || null,
+          location,
+        });
+      }
+    });
+    res.json(out.slice(0, 50));
+  } catch (err) {
+    logger.error('events-search-error', err);
+    res.status(500).json({ error: 'events-search-failed' });
+  }
+});
+
+// Si Firebase está deshabilitado, las rutas quedan vacías pero el router se exporta igual
+if (!USE_FIREBASE || !db) {
+  console.warn('[events.js] Firebase deshabilitado - rutas de eventos no disponibles');
+}
 
 export default router;

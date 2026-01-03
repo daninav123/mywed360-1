@@ -1,0 +1,223 @@
+{
+  "tasks": [
+    {
+      "id": "whatsapp_provider_health",
+      "title": "WhatsApp provider: health y fallback",
+      "status": "completed",
+      "sprint": 1,
+      "priority": 18,
+      "description": "Definir endpoint real para /api/whatsapp/provider-status o fallback controlado y añadir healthcheck"
+    },
+    {
+      "id": "rsvp_scheduler_dryrun",
+      "title": "RSVP Scheduler (dryRun)",
+      "status": "completed",
+      "command": "node scripts/rsvpScheduler.cjs --dryRun=true --limit=50 --minIntervalMinutes=1440",
+      "attempts": 15,
+      "sprint": 1
+    },
+    {
+      "id": "validate_schemas",
+      "title": "Validar reglas y archivos clave",
+      "status": "completed",
+      "command": "npm run validate:schemas",
+      "attempts": 15,
+      "sprint": 1
+    },
+    {
+      "id": "unit_rules",
+      "title": "Tests unitarios de reglas Firestore (seating)",
+      "status": "skipped",
+      "command": "npm run test:unit -- apps/main-app/src/__tests__/firestore.rules.seating.test.js",
+      "attempts": 53,
+      "lastError": "Skipped - Firebase not used in production",
+      "sprint": 1,
+      "priority": 10,
+      "blockedBy": ["validate_schemas"],
+      "skipReason": "Firebase no se usará en producción, tests desactivados por decisión del equipo"
+    },
+    {
+      "id": "unit_rules_exhaustive",
+      "title": "Unit: Firestore rules (exhaustive)",
+      "status": "skipped",
+      "command": "npm run test:unit -- apps/main-app/src/__tests__/firestore.rules.exhaustive.test.js",
+      "attempts": 45,
+      "lastError": "Skipped - Firebase not used in production",
+      "sprint": 1,
+      "priority": 11,
+      "blockedBy": ["validate_schemas"],
+      "skipReason": "Firebase no se usará en producción, tests desactivados por decisión del equipo"
+    },
+    {
+      "id": "unit_rules_extended",
+      "title": "Unit: Firestore rules (extended)",
+      "status": "skipped",
+      "command": "npm run test:unit -- apps/main-app/src/__tests__/firestore.rules.extended.test.js",
+      "attempts": 45,
+      "lastError": "Skipped - Firebase not used in production",
+      "sprint": 1,
+      "priority": 12,
+      "blockedBy": ["validate_schemas"],
+      "skipReason": "Firebase no se usará en producción, tests desactivados por decisión del equipo"
+    },
+    {
+      "id": "a11y_i18n_audit_core",
+      "title": "A11y+i18n audit en vistas core",
+      "status": "completed",
+      "sprint": 2,
+      "priority": 5,
+      "description": "Auditar contraste, foco, navegación teclado e internacionalización en Seating, Invitados, Tasks y Email"
+    },
+    {
+      "id": "perf_observability_setup",
+      "title": "Performance/Observabilidad: budgets + errores",
+      "status": "completed",
+      "sprint": 2,
+      "priority": 6,
+      "description": "Añadir Lighthouse CI, presupuesto de bundle (<2MB inicial) y monitorización de errores"
+    },
+    {
+      "id": "api_client_unification_phase1",
+      "title": "Unificar cliente API en servicios (fase 1)",
+      "status": "completed",
+      "sprint": 2,
+      "priority": 30,
+      "description": "Migrar emailService, EmailInbox, endpoints AI y provider search a apiClient con Authorization opcional"
+    },
+    {
+      "id": "gdpr_pii_tools",
+      "title": "GDPR: export/delete PII + retención",
+      "status": "completed",
+      "sprint": 4,
+      "priority": 5,
+      "description": "Herramientas para exportar/eliminar datos de invitados, política de retención y auditoría de accesos"
+    },
+    {
+      "id": "legal_generator_compliance",
+      "title": "Generador legal: compliance y plantillas",
+      "status": "completed",
+      "sprint": 4,
+      "priority": 10,
+      "description": "Revisión de plantillas por jurisdicción y evaluación de proveedor de firma electrónica (post-MVP)"
+    },
+    {
+      "id": "prep_vendors_ia_bootstrap",
+      "title": "Preparación Proveedores IA (dry run)",
+      "status": "completed",
+      "order": 0.1,
+      "script": "scripts/vendorsIaBootstrap.js",
+      "attempts": 3
+    },
+    {
+      "id": "prep_rsvp_dashboard_dryrun",
+      "title": "Preparación RSVP Dashboard (dry run)",
+      "status": "completed",
+      "order": 0.2,
+      "script": "scripts/rsvpDashboardDryRun.js",
+      "attempts": 2
+    },
+    {
+      "id": "prep_notifications_audit",
+      "title": "Auditoría Notificaciones (dry run)",
+      "status": "completed",
+      "order": 0.3,
+      "script": "scripts/notificationsAudit.js",
+      "attempts": 2
+    },
+    {
+      "id": "impl_vendors_ia_scaffold",
+      "title": "Implementación: Scaffold Proveedores IA",
+      "status": "completed",
+      "order": 50.1,
+      "script": "scripts/vendorsIaScaffold.js",
+      "attempts": 2
+    },
+    {
+      "id": "impl_rsvp_scaffold",
+      "title": "Implementación: Scaffold RSVP Stats",
+      "status": "completed",
+      "order": 50.2,
+      "script": "scripts/rsvpScaffold.js",
+      "attempts": 2
+    },
+    {
+      "id": "impl_notifications_scaffold",
+      "title": "Implementación: Scaffold Notification Center/Settings",
+      "status": "completed",
+      "order": 50.3,
+      "script": "scripts/notificationsScaffold.js",
+      "attempts": 2
+    },
+    {
+      "id": "impl_vendors_ia_phase1_build",
+      "title": "Implementación: Vendors IA - Fase 1 (UI mínima detrás de feature flag)",
+      "status": "completed",
+      "order": 100.1,
+      "description": "Crear VendorDashboard + ServiceCards + VendorSearch conectados a datos mock/estáticos detrás de FEATURE_VENDORS_IA=false (sin cambios en UI visible).",
+      "attempts": 2
+    },
+    {
+      "id": "impl_vendors_ia_phase2_pipeline",
+      "title": "Implementación: Vendors IA - Fase 2 (contacto IA + análisis respuestas)",
+      "status": "completed",
+      "order": 100.2,
+      "description": "Integrar plantilla de email IA, envío por backend y análisis inbound via webhook, almacenamiento en /weddings/{id}/vendors.",
+      "attempts": 1
+    },
+    {
+      "id": "impl_rsvp_stats_phase1",
+      "title": "Implementación: RSVP - Fase 1 (Dashboard métricas)",
+      "status": "completed",
+      "order": 100.3,
+      "description": "Crear página RSVPStats con agregados (confirmados/pendientes/dietas) y wiring detrás de FEATURE_RSVP_DASH=false.",
+      "attempts": 1
+    },
+    {
+      "id": "impl_rsvp_scheduler_phase1",
+      "title": "Implementación: RSVP - Fase 2 (Scheduler recordatorios + plantillas)",
+      "status": "completed",
+      "order": 100.4,
+      "description": "Programar recordatorios (cron Render/CF), plantillas Mailgun, logs y reintentos.",
+      "attempts": 1
+    },
+    {
+      "id": "impl_notifications_center_phase1",
+      "title": "Implementación: Notificaciones - Fase 1 (Centro in-app)",
+      "status": "completed",
+      "order": 100.5,
+      "description": "Implementar NotificationCenter in-app con lista y filtros; sin exposición en navegación (flag FEATURE_NOTIF_CENTER=false).",
+      "attempts": 1
+    },
+    {
+      "id": "impl_notifications_settings_phase1",
+      "title": "Implementación: Notificaciones - Fase 2 (Preferencias)",
+      "status": "completed",
+      "order": 100.6,
+      "description": "Implementar NotificationSettings (canales, quiet hours) y persistencia en perfil de usuario.",
+      "attempts": 1
+    },
+    {
+      "id": "impl_notifications_rules_phase1",
+      "title": "Implementación: Notificaciones - Fase 3 (Reglas/automatizaciones)",
+      "status": "completed",
+      "order": 100.7,
+      "description": "Constructor básico de reglas para RSVP y tareas; disparadores y acciones hacia email/push.",
+      "attempts": 1
+    },
+    {
+      "id": "placeholder_removed_1",
+      "title": "Placeholder cleanup (ignored by runner)",
+      "status": "completed",
+      "command": "",
+      "attempts": 11
+    },
+    {
+      "id": "unit_rules_collections",
+      "title": "Unit: Firestore rules (collections)",
+      "status": "failed",
+      "command": "npm run test:unit -- apps/main-app/src/__tests__/firestore.rules.collections.test.js",
+      "attempts": 20,
+      "lastError": "Task process exit code 1"
+    }
+  ]
+}

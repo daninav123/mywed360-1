@@ -1,0 +1,76 @@
+# 11E. Ayuda a Lecturas y Votos
+
+> Componente clave: `src/pages/protocolo/AyudaCeremonia.jsx`
+> Persistencia: Firestore (`weddings/{id}/ceremonyTexts/main`) con sincronización en tiempo real y metadatos de usuario
+> Pendiente: ampliar tabs dedicadas, control de versiones, integración IA y cobertura E2E para usuarios ayudantes.
+
+## 1. Objetivo y alcance
+- Proveer un espacio guiado para que ayudantes, familiares o la pareja redacten y mejoren textos que se leerán durante la ceremonia.  
+- Gestionar lecturas, sorpresas y otros momentos discursivos (votos, agradecimientos, discursos post banquete).  
+- Facilitar inspiración, control de versiones y seguimiento del estado (borrador, en revisión, final).
+
+## 2. Triggers y rutas
+- Navegación: `Más → Protocolo → Ayuda Ceremonia`.  
+- Desde Momentos Especiales (Flujo 11A) se puede redirigir cuando un momento tipo “lectura” no tiene contenido definido.  
+- Eventos de checklist pueden apuntar aquí cuando falte preparar discursos.
+
+## 3. Estado actual
+
+### Implementado hoy
+- Secciones dedicadas para "Lecturas" y "Ramos y Sorpresas", disponibles como rutas independientes dentro de Protocolo.  
+- Editor de lecturas con duración estimada automática, vista previa modal y control de estado (`draft`/`final`).  
+- Persistencia compartida en Firestore con `updatedAt`, `updatedBy` y registro de eventos (`ceremony_text_created`, `ceremony_text_finalized`).  
+- Lista de sorpresas con alta, cambio de estado y eliminación sincronizados en tiempo real.  
+- Permisos de edición basados en rol (planner/owner/assistant) expuestos desde `useCeremonyTexts`.
+
+## Roadmap / pendientes
+- Tabs adicionales (votos, discursos) y plantillas específicas por tipo.  
+- Tabs deben soportar experiencias segmentadas para cada miembro de la pareja (votos ella/él/elle) y para ayudantes.  
+- Campos extra: notas privadas, enlace directo a momentos de 11A, responsables asignados y tags de inspiración.  
+- Control de versiones con historial consultable, duplicado, favoritos y exportación (PDF/proyección).  
+- Validaciones en cliente (título requerido, evitar duplicados, longitud mínima) con surfaced feedback y recuperación ante errores de red.  
+- Integración IA (reescritura, tono) y publicación automática en flujo 21.  
+- Validación de permisos en backend y auditoría detallada, incluyendo trazabilidad de quién vio o editó cada texto.  
+- Métricas operativas en UI (duración total de ceremonia, ratio de textos finalizados) y eventos adicionales para checklist 11C.  
+- Pruebas E2E dedicadas para usuarios ayudantes y miembros de la pareja cubriendo visibilidad, estados y vistas previas.
+
+## 4. Datos y modelo
+- Documento `weddings/{id}/ceremonyTexts/main` con `{ readings, surprises, updatedAt, updatedBy, lastAction }`.  
+- Lecturas: `id`, `title`, `content`, `duration`, `status`, timestamps.  
+- Sorpresas: `id`, `type`, `recipient`, `table`, `description`, `notes`, `status`, timestamps.
+
+## 5. Reglas de negocio
+- Estados de texto: `draft`, `review`, `final` determinan qué se mostrará al público (cuando se integre con flujo 21); la interfaz debe permitir transiciones explícitas y registro de quién mueve cada estado.  
+- Duplicar un texto genera un nuevo id timestamp.  
+- Los ayudantes sólo pueden editar si tienen rol `assistant` o `planner`; `guest` lo verá en modo lectura (validación pendiente en hook de auth).
+- Visibilidad segmentada: cada miembro de la pareja únicamente accede a sus votos hasta que ambos están en `final`; los votos de la otra persona se ocultan salvo para el planner. Las lecturas creadas por ayudantes permanecen invisibles para los novios hasta que se marquen `final` o el planner las comparta explícitamente.
+
+## 6. Estados especiales
+- **Sin lecturas**: se muestra CTA para crear la primera y sugerencias predeterminadas.  
+- **Sesión expirada**: si el usuario pierde autenticación, se bloquea la edición hasta re-login.  
+- **Modo lectura**: cuando el usuario no tiene permisos, se ocultan botones de edición.
+
+## 7. Integraciones
+- **Flujo 11A**: las lecturas se vinculan a momentos concretos (ej. lectura 1, votos).  
+- **Flujo 11C**: checklist verifica que todos los textos marcados como obligatorios están en estado `final`.  
+- **Flujo 21**: exportará extractos al sitio público o a PDFs para programas impresos.  
+- **IA Generativa** (backlog): botón “Reescribir con IA” para sugerir mejoras automáticas.
+
+## 8. Métricas y eventos
+- Eventos emitidos: `ceremony_text_created`, `ceremony_text_finalized`, `ceremony_surprise_added`; añadir `ceremony_text_state_changed` y `ceremony_text_viewed` para auditoría.  
+- Indicadores sugeridos: nº textos finalizados, duración total estimada, sorpresas entregadas, ratio de textos en `review` y distribuciones de visibilidad por rol.
+
+## 9. Pruebas recomendadas
+- Unitarias: helpers de división de tabs, validación de estados y reglas de visibilidad segmentada.  
+- Integración: crear lectura → asignar a momento en 11A → marcar final y validar checklist.  
+- E2E: ayudante inicia sesión, redacta votos, marca como final y planner visualiza el resultado.
+
+
+## Cobertura E2E implementada
+- `cypress/e2e/email/smart-composer.cy.js y cypress/e2e/email/ai-provider-email.cy.js`: cubren la generación asistida de textos, reutilizada por el asistente de ceremonia.
+- Cobertura adicional pendiente para el flujo específico de textos.
+
+## 10. Checklist de despliegue
+- Verificar reglas Firestore para `ceremonyTexts`.  
+- Revisar textos de muestra y traducciones.  
+- Validar permisos según rol y auditoría (`updatedBy`).

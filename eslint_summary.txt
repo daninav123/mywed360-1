@@ -1,0 +1,17 @@
+Resumen ESLint -> 204 errores, 334 warnings
+Top archivos con más errores:
+ 37 × src\test\accessibility\email-viewer.a11y.test.jsx
+ 22 × src\pages\Proveedores.jsx
+ 19 × src\test\accessibility\email-components.a11y.test.jsx
+ 15 × src\hooks\useCalendarSync.js
+ 12 × src\components\email\UnifiedInbox\EmailDetail.jsx
+ 10 × src\test\components\email\EmailInbox.test.jsx
+  9 × src\test\performance-test.js
+  6 × src\components\proveedores\ai\AIResultList.jsx
+  5 × src\components\email\SmartEmailComposer.jsx
+  5 × src\pages\Bodas.jsx
+  5 × src\pages\user\EmailInbox.jsx
+  4 × src\components\email\CalendarIntegration.jsx
+  4 × src\components\email\EmailTagsManager.jsx
+  3 × src\components\GlobalSearch.jsx
+  3 × src\pwa\serviceWorker.js

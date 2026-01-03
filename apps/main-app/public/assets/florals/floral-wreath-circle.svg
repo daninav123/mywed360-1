@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="70" fill="none" stroke="#7A9D7A" stroke-width="2" stroke-dasharray="5,3" opacity="0.5"/>
+  <g transform="translate(100, 30)">
+    <circle cx="0" cy="0" r="8" fill="#FFB6C1"/>
+    <circle cx="0" cy="0" r="4" fill="#FF69B4"/>
+  </g>
+  <g transform="translate(170, 100)">
+    <circle cx="0" cy="0" r="8" fill="#FFE4E1"/>
+    <circle cx="0" cy="0" r="4" fill="#FFB6C1"/>
+  </g>
+  <g transform="translate(100, 170)">
+    <circle cx="0" cy="0" r="8" fill="#FFD1DC"/>
+    <circle cx="0" cy="0" r="4" fill="#FF69B4"/>
+  </g>
+  <g transform="translate(30, 100)">
+    <circle cx="0" cy="0" r="8" fill="#FFC0CB"/>
+    <circle cx="0" cy="0" r="4" fill="#FF69B4"/>
+  </g>
+  <ellipse cx="141" cy="59" rx="6" ry="4" fill="#7A9D7A" transform="rotate(45 141 59)"/>
+  <ellipse cx="141" cy="141" rx="6" ry="4" fill="#7A9D7A" transform="rotate(-45 141 141)"/>
+  <ellipse cx="59" cy="141" rx="6" ry="4" fill="#7A9D7A" transform="rotate(45 59 141)"/>
+  <ellipse cx="59" cy="59" rx="6" ry="4" fill="#7A9D7A" transform="rotate(-45 59 59)"/>
+</svg>

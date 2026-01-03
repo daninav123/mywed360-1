@@ -14,7 +14,7 @@ if (!email || !weddingId) {
   process.exit(1);
 }
 // Clave de servicio local
-const keyPath = path.resolve(__dirname, '..', 'lovenda-98c77-firebase-adminsdk-fbsvc-0e1a5a524c.json');
+const keyPath = path.resolve(__dirname, '..', 'maloveapp-firebase-adminsdk.json');
 if (!admin.apps.length) {
   admin.initializeApp({ credential: admin.credential.cert(require(keyPath)) });
 }
@@ -38,3 +38,4 @@ if (!admin.apps.length) {
     process.exit(1);
   }
 })();
+

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Hortensia - Flores agrupadas estilo pompón -->
+  <defs>
+    <radialGradient id="hydrangeaGradient" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#B8A9C9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9B88B0;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Grupo central de flores pequeñas -->
+  <g transform="translate(100, 100)">
+    <!-- Fila 1 -->
+    <circle cx="-15" cy="-15" r="8" fill="url(#hydrangeaGradient)" opacity="0.9"/>
+    <circle cx="0" cy="-18" r="8" fill="url(#hydrangeaGradient)" opacity="0.95"/>
+    <circle cx="15" cy="-15" r="8" fill="url(#hydrangeaGradient)" opacity="0.9"/>
+    
+    <!-- Fila 2 -->
+    <circle cx="-18" cy="0" r="8" fill="url(#hydrangeaGradient)" opacity="0.95"/>
+    <circle cx="-8" cy="0" r="9" fill="url(#hydrangeaGradient)"/>
+    <circle cx="8" cy="0" r="9" fill="url(#hydrangeaGradient)"/>
+    <circle cx="18" cy="0" r="8" fill="url(#hydrangeaGradient)" opacity="0.95"/>
+    
+    <!-- Fila 3 -->
+    <circle cx="-15" cy="15" r="8" fill="url(#hydrangeaGradient)" opacity="0.9"/>
+    <circle cx="0" cy="18" r="8" fill="url(#hydrangeaGradient)" opacity="0.95"/>
+    <circle cx="15" cy="15" r="8" fill="url(#hydrangeaGradient)" opacity="0.9"/>
+    
+    <!-- Capa exterior -->
+    <circle cx="-25" cy="-10" r="7" fill="#B8A9C9" opacity="0.7"/>
+    <circle cx="-25" cy="10" r="7" fill="#B8A9C9" opacity="0.7"/>
+    <circle cx="25" cy="-10" r="7" fill="#B8A9C9" opacity="0.7"/>
+    <circle cx="25" cy="10" r="7" fill="#B8A9C9" opacity="0.7"/>
+    <circle cx="-10" cy="-25" r="7" fill="#B8A9C9" opacity="0.7"/>
+    <circle cx="10" cy="-25" r="7" fill="#B8A9C9" opacity="0.7"/>
+    <circle cx="-10" cy="25" r="7" fill="#B8A9C9" opacity="0.7"/>
+    <circle cx="10" cy="25" r="7" fill="#B8A9C9" opacity="0.7"/>
+  </g>
+  
+  <!-- Tallos y hojas -->
+  <path d="M 100 120 Q 95 140 90 160" stroke="#5A7C5A" stroke-width="2" fill="none"/>
+  <ellipse cx="85" cy="145" rx="12" ry="8" fill="#7A9D7A" opacity="0.8"/>
+  <ellipse cx="92" cy="155" rx="10" ry="7" fill="#7A9D7A" opacity="0.8"/>
+</svg>

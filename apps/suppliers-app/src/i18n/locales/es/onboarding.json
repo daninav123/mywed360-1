@@ -1,0 +1,74 @@
+{
+  "tutorial": {
+    "skip": "Saltar",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "finish": "Finalizar",
+    "saving": "Guardando...",
+    "steps": {
+      "welcome": {
+        "title": "Bienvenido a MaLoveApp!",
+        "heading": "Comienza a planificar tu boda!",
+        "description": "Te guiaremos a través de los primeros pasos para configurar tu boda en MaLoveApp. Este tutorial te ayudará a personalizar la app y conocer sus funcionalidades principales."
+      },
+      "basicData": {
+        "title": "Datos básicos",
+        "heading": "Completa los datos básicos de tu boda",
+        "coupleNames": "Nombres de la pareja",
+        "coupleNamesPlaceholder": "Ej: María y Juan",
+        "weddingDate": "Fecha de la boda",
+        "celebrationPlace": "Lugar de celebración",
+        "celebrationPlacePlaceholder": "Ej: Madrid"
+      },
+      "guestManagement": {
+        "title": "Gestión de invitados",
+        "heading": "Gestión de Invitados",
+        "description": "Organiza tu lista de invitados, confirma asistencia y asigna mesas para la ceremonia.",
+        "features": {
+          "addGuests": "Añade invitados y sus acompañantes",
+          "organizeGroups": "Organiza por grupos (familia, amigos...)",
+          "confirmAttendance": "Confirma asistencias y alérgenos",
+          "designSeating": "Diseña el plano de mesas con arrastrar y soltar"
+        }
+      },
+      "suppliers": {
+        "title": "Proveedores",
+        "heading": "Proveedores",
+        "description": "Gestiona tus proveedores, consulta con IA y lleva el seguimiento de todos los servicios contratados.",
+        "features": {
+          "searchAI": "Busca proveedores recomendados con IA",
+          "markFavorites": "Marca favoritos para comparar opciones",
+          "registerPayments": "Registra pagos y señales para control financiero"
+        }
+      },
+      "calendarTasks": {
+        "title": "Calendario y Tareas",
+        "heading": "Planificación",
+        "description": "Organiza todo tu calendario y listas de tareas para llevar un control perfecto.",
+        "features": {
+          "syncCalendar": "Sincroniza con Google Calendar y otros",
+          "organizeTasks": "Organiza tareas por prioridad y fecha",
+          "checklists": "Checklists para antes y durante la boda",
+          "reminders": "Recibe recordatorios importantes"
+        }
+      },
+      "designs": {
+        "title": "Diseños e Invitaciones",
+        "heading": "Diseños con IA",
+        "description": "Crea invitaciones, menús y otros elementos visuales para tu boda con ayuda de IA.",
+        "features": {
+          "generateDesigns": "Genera diseños personalizados con IA",
+          "createInvitations": "Crea invitaciones, menús y señalización",
+          "designLogo": "Diseña tu logo de boda personalizado",
+          "exportHighRes": "Exporta en alta resolución para imprimir"
+        }
+      },
+      "ready": {
+        "title": "Listo para empezar!",
+        "heading": "Todo listo!",
+        "description": "Has completado el tutorial inicial. Ya puedes comenzar a utilizar todas las funciones de MaLoveApp para planificar la boda de tus sueños.",
+        "hint": "Recuerda que puedes acceder a la Configuración en cualquier momento para modificar tus datos o consultar esta Guía nuevamente."
+      }
+    }
+  }
+}

@@ -1,0 +1,438 @@
+{
+  "version": "2.0",
+  "created": "2025-01-22T04:15:00Z",
+  "priority": "critical-first",
+  "sprints": [
+    {
+      "sprint": "Sprint 0 - Bloqueadores Críticos",
+      "duration": "1 semana",
+      "status": "in_progress",
+      "tasks": [
+        {
+          "id": "CRIT-001",
+          "title": "Fix Tests Unitarios Firestore",
+          "priority": "critical",
+          "status": "pending",
+          "blocksTests": 13,
+          "files": [
+            "cypress/support/unit_rules.cy.js",
+            "cypress/support/unit_rules_exhaustive.cy.js",
+            "cypress/support/unit_rules_extended.cy.js",
+            "firestore.rules"
+          ],
+          "estimatedHours": 8,
+          "description": "Debugear y corregir tests unitarios de reglas Firestore que bloquean 13 tests E2E de seating"
+        },
+        {
+          "id": "CRIT-002",
+          "title": "Estandarizar Formato API Response",
+          "priority": "critical",
+          "status": "pending",
+          "files": [
+            "backend/utils/apiResponse.js",
+            "backend/routes/ai.js",
+            "backend/routes/guests.js"
+          ],
+          "estimatedHours": 4,
+          "description": "Crear helper apiResponse y refactorizar rutas para formato consistente { success, data/error, requestId }"
+        },
+        {
+          "id": "CRIT-003",
+          "title": "Proteger Datos Sensibles (PII)",
+          "priority": "critical",
+          "status": "pending",
+          "files": [
+            "backend/routes/guests.js",
+            "backend/routes/ai.js",
+            "backend/middleware/piiFilter.js"
+          ],
+          "estimatedHours": 6,
+          "description": "Filtrar PII en endpoints públicos, proteger /api/ai/debug-env, implementar data masking"
+        }
+      ]
+    },
+    {
+      "sprint": "Sprint 1 - Seating Plan",
+      "duration": "2 semanas",
+      "status": "pending",
+      "dependencies": ["CRIT-001"],
+      "tasks": [
+        {
+          "id": "SEAT-001",
+          "title": "Implementar Modo Móvil Completo",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/components/seating/SeatingPlanRefactored.jsx",
+            "src/components/seating/MobileControls.jsx",
+            "src/components/seating/FABRadial.jsx"
+          ],
+          "estimatedHours": 16,
+          "description": "FAB radial, panel inferior, detección viewport <=1024px"
+        },
+        {
+          "id": "SEAT-002",
+          "title": "GuestSidebar Mobile con Tabs",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/components/seating/GuestSidebar.jsx"
+          ],
+          "estimatedHours": 8,
+          "description": "Tabs Alertas/Recomendaciones/Staff para móvil"
+        },
+        {
+          "id": "SEAT-003",
+          "title": "Gestos Táctiles",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/components/seating/SeatingPlanRefactored.jsx",
+            "src/hooks/useTouchGestures.js"
+          ],
+          "estimatedHours": 12,
+          "description": "Pinch zoom, double tap, swipe"
+        },
+        {
+          "id": "SEAT-004",
+          "title": "Badges Colaboración",
+          "priority": "medium",
+          "status": "pending",
+          "files": [
+            "src/components/seating/CollaborationBadges.jsx"
+          ],
+          "estimatedHours": 4,
+          "description": "Mostrar badges 'En edición' para usuarios activos"
+        },
+        {
+          "id": "SEAT-005",
+          "title": "Integración Tasks y Gamificación",
+          "priority": "medium",
+          "status": "pending",
+          "files": [
+            "src/services/seatingIntegrationService.js"
+          ],
+          "estimatedHours": 8,
+          "description": "Triggers automáticos y eventos de gamificación"
+        }
+      ]
+    },
+    {
+      "sprint": "Sprint 2 - Email Optimizaciones",
+      "duration": "1.5 semanas",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "EMAIL-001",
+          "title": "Resolver Búsqueda Duplicada",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/components/email/UnifiedInbox/EmailList.jsx"
+          ],
+          "estimatedHours": 4,
+          "description": "Eliminar lógica duplicada de búsqueda/sort"
+        },
+        {
+          "id": "EMAIL-002",
+          "title": "Onboarding con Validaciones DKIM/SPF",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/components/email/EmailSetupForm.jsx",
+            "backend/services/emailValidationService.js"
+          ],
+          "estimatedHours": 8,
+          "description": "Validar DKIM/SPF y enviar correo de prueba"
+        },
+        {
+          "id": "EMAIL-003",
+          "title": "Auto-respuestas Server-Side",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "backend/routes/email-automation.js",
+            "backend/models/AutoResponse.js"
+          ],
+          "estimatedHours": 6,
+          "description": "Persistencia server-side de auto-respuestas (no localStorage)"
+        },
+        {
+          "id": "EMAIL-004",
+          "title": "Migración Definitiva de Buzón Legacy",
+          "priority": "medium",
+          "status": "pending",
+          "files": [
+            "src/components/email/Buzon_fixed_complete.jsx",
+            "src/App.jsx"
+          ],
+          "estimatedHours": 4,
+          "description": "Agregar toggle para acceso legacy solo en modo soporte"
+        },
+        {
+          "id": "EMAIL-005",
+          "title": "Carpetas con Drag & Drop",
+          "priority": "medium",
+          "status": "pending",
+          "files": [
+            "src/components/email/EmailFolderList.jsx",
+            "src/hooks/useFolderDragDrop.js"
+          ],
+          "estimatedHours": 8,
+          "description": "Completar drag & drop y alineación de etiquetas"
+        },
+        {
+          "id": "EMAIL-006",
+          "title": "Papelera con Restauración",
+          "priority": "medium",
+          "status": "pending",
+          "files": [
+            "backend/routes/email-folders.js",
+            "src/services/trashService.js"
+          ],
+          "estimatedHours": 6,
+          "description": "Restaurar a carpeta origen, métricas, vaciado backend"
+        }
+      ]
+    },
+    {
+      "sprint": "Sprint 3 - Finance Features",
+      "duration": "2 semanas",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "FIN-001",
+          "title": "UI Open Banking con Refresh Tokens",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/components/finance/OpenBankingAuth.jsx",
+            "backend/services/openBankingService.js"
+          ],
+          "estimatedHours": 12,
+          "description": "Autenticación Open Banking con refresh tokens"
+        },
+        {
+          "id": "FIN-002",
+          "title": "Importación CSV/Excel con Preview",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/components/finance/ImportTransactions.jsx",
+            "src/utils/csvParser.js"
+          ],
+          "estimatedHours": 10,
+          "description": "Preview y mapeo de columnas"
+        },
+        {
+          "id": "FIN-003",
+          "title": "Reportes Descargables",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/components/finance/ReportGenerator.jsx",
+            "backend/services/reportService.js"
+          ],
+          "estimatedHours": 12,
+          "description": "PDF/Excel para proveedores y contabilidad"
+        },
+        {
+          "id": "FIN-004",
+          "title": "Gestión de Aportaciones",
+          "priority": "medium",
+          "status": "pending",
+          "files": [
+            "src/components/finance/ContributionsManager.jsx",
+            "backend/routes/contributions.js"
+          ],
+          "estimatedHours": 16,
+          "description": "Recordatorios, agradecimientos, panel compartido"
+        },
+        {
+          "id": "FIN-005",
+          "title": "Predicción de Gasto con IA",
+          "priority": "medium",
+          "status": "pending",
+          "files": [
+            "backend/services/aiFinanceService.js",
+            "src/components/finance/BudgetPrediction.jsx"
+          ],
+          "estimatedHours": 20,
+          "description": "Predicción y recomendaciones automáticas"
+        }
+      ]
+    },
+    {
+      "sprint": "Sprint 4 - Protocolo y Ceremonias",
+      "duration": "3 semanas",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "PROT-001",
+          "title": "11A - Momentos Especiales: Campos Avanzados",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/pages/Protocolo.jsx",
+            "src/components/protocolo/MomentosEditor.jsx"
+          ],
+          "estimatedHours": 12,
+          "description": "Responsables, suppliers, estado, drag&drop"
+        },
+        {
+          "id": "PROT-002",
+          "title": "11B - Timeline Día B: Migrar a Subcolección",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "backend/routes/timing.js",
+            "firestore.rules"
+          ],
+          "estimatedHours": 8,
+          "description": "Migrar timing a weddings/{id}/timing"
+        },
+        {
+          "id": "PROT-003",
+          "title": "11C - Checklist: Alertas Push",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/components/protocolo/ChecklistUltimaHora.jsx",
+            "backend/services/pushNotificationService.js"
+          ],
+          "estimatedHours": 10,
+          "description": "Alertas sonoras/push y sync con notificaciones"
+        },
+        {
+          "id": "PROT-004",
+          "title": "11D - Documentación Legal: Catálogo Internacional",
+          "priority": "medium",
+          "status": "pending",
+          "files": [
+            "src/data/legalRequirements.js",
+            "src/components/protocolo/LegalGuide.jsx"
+          ],
+          "estimatedHours": 16,
+          "description": "Catálogo por país y variaciones"
+        },
+        {
+          "id": "PROT-005",
+          "title": "11E - Textos Ceremonia: Control de Versiones",
+          "priority": "medium",
+          "status": "pending",
+          "files": [
+            "src/components/protocolo/CeremonyTextsEditor.jsx",
+            "backend/routes/ceremony-texts.js"
+          ],
+          "estimatedHours": 12,
+          "description": "Historial, IA, export PDF"
+        }
+      ]
+    },
+    {
+      "sprint": "Sprint 5 - Proveedores y Tasks",
+      "duration": "2 semanas",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "PROV-001",
+          "title": "Scoring IA Consolidado",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "backend/services/supplierScoringService.js"
+          ],
+          "estimatedHours": 16,
+          "description": "Métricas históricas y ponderación dinámica"
+        },
+        {
+          "id": "PROV-002",
+          "title": "Portal Proveedor",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/pages/supplier/SupplierPortal.jsx",
+            "backend/routes/supplier-portal.js"
+          ],
+          "estimatedHours": 20,
+          "description": "Autenticación, feedback, vista de estado"
+        },
+        {
+          "id": "TASK-001",
+          "title": "Motor IA de Personalización de Tareas",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "backend/services/aiTaskPersonalizationService.js",
+            "src/components/tasks/TaskGenerator.jsx"
+          ],
+          "estimatedHours": 24,
+          "description": "Plantillas + LLM, dependencias, responsables"
+        },
+        {
+          "id": "TASK-002",
+          "title": "Matriz RACI",
+          "priority": "medium",
+          "status": "pending",
+          "files": [
+            "src/components/tasks/RACIMatrix.jsx"
+          ],
+          "estimatedHours": 12,
+          "description": "Asignaciones múltiples con permisos"
+        }
+      ]
+    },
+    {
+      "sprint": "Sprint 6 - Asistente IA y Automatización",
+      "duration": "2 semanas",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "AI-001",
+          "title": "Backend Multicanal",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "backend/services/AutomationOrchestrator.js",
+            "backend/workers/automationWorker.js"
+          ],
+          "estimatedHours": 20,
+          "description": "Orquestador para email/chat/WhatsApp"
+        },
+        {
+          "id": "AI-002",
+          "title": "Reglas Configurables",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "src/components/admin/AutomationRules.jsx",
+            "backend/routes/automation-rules.js"
+          ],
+          "estimatedHours": 16,
+          "description": "Sistema if/then con UI de administración"
+        },
+        {
+          "id": "AI-003",
+          "title": "Workers Async con Colas",
+          "priority": "high",
+          "status": "pending",
+          "files": [
+            "backend/workers/automationWorker.js",
+            "backend/models/AutomationQueue.js"
+          ],
+          "estimatedHours": 12,
+          "description": "Colas automationLogs y automationRules"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "totalTasks": 36,
+    "totalEstimatedHours": 428,
+    "criticalTasks": 3,
+    "highPriorityTasks": 21,
+    "mediumPriorityTasks": 12,
+    "sprintsTotal": 6,
+    "estimatedDuration": "13 semanas"
+  }
+}

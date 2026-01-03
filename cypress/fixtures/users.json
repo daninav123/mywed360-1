@@ -1,0 +1,47 @@
+{
+  "planner": {
+    "uid": "test-user-planner-001",
+    "email": "planner@test.maloveapp.com",
+    "password": "test123456",
+    "role": "planner",
+    "displayName": "Test Planner",
+    "emailVerified": true,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  "owner": {
+    "uid": "test-user-owner-001",
+    "email": "owner@test.maloveapp.com",
+    "password": "test123456",
+    "role": "owner",
+    "displayName": "Test Owner",
+    "emailVerified": true,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  "assistant": {
+    "uid": "test-user-assistant-001",
+    "email": "assistant@test.maloveapp.com",
+    "password": "test123456",
+    "role": "assistant",
+    "displayName": "Test Assistant",
+    "emailVerified": true,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  "supplier": {
+    "uid": "test-user-supplier-001",
+    "email": "supplier@test.maloveapp.com",
+    "password": "test123456",
+    "role": "supplier",
+    "displayName": "Test Supplier",
+    "emailVerified": true,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  "admin": {
+    "uid": "test-user-admin-001",
+    "email": "admin@test.maloveapp.com",
+    "password": "test123456",
+    "role": "admin",
+    "displayName": "Test Admin",
+    "emailVerified": true,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+}

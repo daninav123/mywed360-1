@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect x="30" y="50" width="140" height="120" fill="#FFFFFF" stroke="#C9A959" stroke-width="3" rx="5"/>
+  <rect x="30" y="50" width="140" height="30" fill="#C9A959"/>
+  <circle cx="60" cy="50" r="5" fill="#8B7355"/>
+  <circle cx="140" cy="50" r="5" fill="#8B7355"/>
+  <text x="100" y="125" font-family="Arial" font-size="45" font-weight="bold" fill="#C9A959" text-anchor="middle">24</text>
+  <text x="100" y="155" font-family="Arial" font-size="16" fill="#8B7355" text-anchor="middle">JUNIO</text>
+</svg>

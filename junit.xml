@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest" tests="4" failures="0" errors="0" time="0.2098306">
+    <testsuite name="src/components/seating/__tests__/SeatingPlanCanvas.test.jsx" timestamp="2025-09-15T01:06:04.503Z" hostname="dani" tests="4" failures="0" errors="0" skipped="0" time="0.2098306">
+        <testcase classname="src/components/seating/__tests__/SeatingPlanCanvas.test.jsx" name="SeatingPlanCanvas interactions &gt; sets correct cursor per tool and toggles grabbing while panning" time="0.1494869">
+            <system-err>
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/components/seating/__tests__/SeatingPlanCanvas.test.jsx" name="SeatingPlanCanvas interactions &gt; responds to keyboard zoom shortcuts (Ctrl/Cmd +, -, 0)" time="0.0262269">
+        </testcase>
+        <testcase classname="src/components/seating/__tests__/SeatingPlanCanvas.test.jsx" name="SeatingPlanCanvas interactions &gt; zooms with wheel events on the canvas element" time="0.0150757">
+        </testcase>
+        <testcase classname="src/components/seating/__tests__/SeatingPlanCanvas.test.jsx" name="SeatingPlanCanvas interactions &gt; fits to content on mount when content exists" time="0.0130769">
+        </testcase>
+    </testsuite>
+</testsuites>

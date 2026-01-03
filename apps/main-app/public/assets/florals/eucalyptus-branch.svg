@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" fill="none">
+  <!-- Eucalyptus branch horizontal -->
+  <g id="branch">
+    <!-- Main stem -->
+    <path d="M20 50 Q100 45 200 50 T380 50" stroke="#7D8F69" stroke-width="3" fill="none"/>
+    
+    <!-- Left leaves -->
+    <ellipse cx="40" cy="35" rx="12" ry="20" fill="#9DB88D" opacity="0.8" transform="rotate(-30 40 35)"/>
+    <ellipse cx="50" cy="30" rx="10" ry="18" fill="#A8C29E" opacity="0.7" transform="rotate(-45 50 30)"/>
+    <ellipse cx="40" cy="65" rx="12" ry="20" fill="#8FA67C" opacity="0.8" transform="rotate(30 40 65)"/>
+    <ellipse cx="50" cy="70" rx="10" ry="18" fill="#9DB88D" opacity="0.7" transform="rotate(45 50 70)"/>
+    
+    <!-- Middle leaves -->
+    <ellipse cx="120" cy="32" rx="14" ry="22" fill="#9DB88D" opacity="0.8" transform="rotate(-35 120 32)"/>
+    <ellipse cx="140" cy="28" rx="12" ry="20" fill="#A8C29E" opacity="0.75" transform="rotate(-50 140 28)"/>
+    <ellipse cx="120" cy="68" rx="14" ry="22" fill="#8FA67C" opacity="0.8" transform="rotate(35 120 68)"/>
+    <ellipse cx="140" cy="72" rx="12" ry="20" fill="#9DB88D" opacity="0.75" transform="rotate(50 140 72)"/>
+    
+    <!-- Center leaves -->
+    <ellipse cx="200" cy="30" rx="15" ry="24" fill="#9DB88D" opacity="0.8" transform="rotate(-40 200 30)"/>
+    <ellipse cx="220" cy="25" rx="13" ry="22" fill="#A8C29E" opacity="0.8" transform="rotate(-55 220 25)"/>
+    <ellipse cx="200" cy="70" rx="15" ry="24" fill="#8FA67C" opacity="0.8" transform="rotate(40 200 70)"/>
+    <ellipse cx="220" cy="75" rx="13" ry="22" fill="#9DB88D" opacity="0.8" transform="rotate(55 220 75)"/>
+    
+    <!-- Right leaves -->
+    <ellipse cx="280" cy="35" rx="14" ry="22" fill="#9DB88D" opacity="0.8" transform="rotate(-30 280 35)"/>
+    <ellipse cx="300" cy="30" rx="12" ry="20" fill="#A8C29E" opacity="0.75" transform="rotate(-45 300 30)"/>
+    <ellipse cx="280" cy="65" rx="14" ry="22" fill="#8FA67C" opacity="0.8" transform="rotate(30 280 65)"/>
+    <ellipse cx="300" cy="70" rx="12" ry="20" fill="#9DB88D" opacity="0.75" transform="rotate(45 300 70)"/>
+    
+    <!-- Far right leaves -->
+    <ellipse cx="350" cy="38" rx="12" ry="20" fill="#9DB88D" opacity="0.8" transform="rotate(-25 350 38)"/>
+    <ellipse cx="360" cy="35" rx="10" ry="18" fill="#A8C29E" opacity="0.7" transform="rotate(-40 360 35)"/>
+    <ellipse cx="350" cy="62" rx="12" ry="20" fill="#8FA67C" opacity="0.8" transform="rotate(25 350 62)"/>
+    <ellipse cx="360" cy="65" rx="10" ry="18" fill="#9DB88D" opacity="0.7" transform="rotate(40 360 65)"/>
+  </g>
+</svg>

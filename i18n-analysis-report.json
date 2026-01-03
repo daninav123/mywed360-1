@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-12-30T02:20:18.285Z",
+  "summary": {
+    "totalFiles": 13,
+    "cleanFiles": 13,
+    "problemFiles": 0,
+    "totalMissingInEs": 0,
+    "totalMissingInEn": 0,
+    "filesOnlyInEn": [],
+    "filesOnlyInEs": [
+      "marketing-translations.json",
+      "partners-translations-temp.json"
+    ]
+  },
+  "details": []
+}

@@ -1,0 +1,151 @@
+// ============================================
+// REGLAS FIRESTORE COMPLETAS - PROVEEDORES
+// ============================================
+// Agregar estas reglas al archivo firestore.rules existente
+
+// Dentro de la sección "match /suppliers/{supplierId} {"
+
+    // ============================================
+    // PORTFOLIO - Subcolección de fotos
+    // ============================================
+    match /portfolio/{photoId} {
+      // Lectura pública - cualquiera puede ver el portfolio
+      allow read: if true;
+      
+      // Escritura solo para el proveedor autenticado propietario
+      allow create, update, delete: if request.auth != null 
+        && request.auth.uid == get(/databases/$(database)/documents/suppliers/$(supplierId)).data.uid;
+      
+      // Validaciones de datos al crear/actualizar
+      allow create, update: if request.resource.data.keys().hasAll(['category', 'original', 'uploadedAt'])
+        && request.resource.data.category is string
+        && request.resource.data.original is string
+        && request.resource.data.uploadedAt is timestamp;
+    }
+
+    // ============================================
+    // RESEÑAS - Subcolección de reviews
+    // ============================================
+    match /reviews/{reviewId} {
+      // Lectura pública - solo reseñas aprobadas
+      allow read: if resource.data.status == 'approved';
+      
+      // Crear reseña - cualquier usuario autenticado
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.rating >= 1 
+        && request.resource.data.rating <= 5
+        && request.resource.data.comment.size() >= 10;
+      
+      // Actualizar - solo el proveedor puede responder
+      allow update: if request.auth != null 
+        && request.auth.uid == get(/databases/$(database)/documents/suppliers/$(supplierId)).data.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['supplierResponse', 'supplierResponseAt', 'updatedAt']);
+      
+      // Eliminar - solo admins (implementar según tu lógica)
+      allow delete: if false; // Por ahora no permitir eliminar
+    }
+
+    // ============================================
+    // SOLICITUDES DE PRESUPUESTO - quote-requests
+    // ============================================
+    match /quote-requests/{requestId} {
+      // Crear - público (sin auth)
+      allow create: if request.resource.data.name is string
+        && request.resource.data.email is string
+        && request.resource.data.message.size() >= 10;
+      
+      // Leer - solo el proveedor propietario
+      allow read: if request.auth != null 
+        && request.auth.uid == get(/databases/$(database)/documents/suppliers/$(supplierId)).data.uid;
+      
+      // Actualizar - solo el proveedor propietario
+      allow update: if request.auth != null 
+        && request.auth.uid == get(/databases/$(database)/documents/suppliers/$(supplierId)).data.uid;
+      
+      // No permitir eliminar
+      allow delete: if false;
+    }
+
+// ============================================
+// ÍNDICES COMPUESTOS NECESARIOS
+// ============================================
+// Crear en Firebase Console > Firestore > Índices
+
+/*
+=== PORTFOLIO ===
+
+Colección: suppliers/{supplierId}/portfolio
+Campos indexados:
+  - category (Ascendente)
+  - uploadedAt (Descendente)
+
+Colección: suppliers/{supplierId}/portfolio
+Campos indexados:
+  - featured (Ascendente)
+  - uploadedAt (Descendente)
+
+Colección: suppliers/{supplierId}/portfolio
+Campos indexados:
+  - isCover (Ascendente)
+  - uploadedAt (Descendente)
+
+=== RESEÑAS ===
+
+Colección: suppliers/{supplierId}/reviews
+Campos indexados:
+  - status (Ascendente)
+  - createdAt (Descendente)
+
+Colección: suppliers/{supplierId}/reviews
+Campos indexados:
+  - userId (Ascendente)
+  - createdAt (Descendente)
+
+=== SOLICITUDES DE PRESUPUESTO ===
+
+Colección: suppliers/{supplierId}/quote-requests
+Campos indexados:
+  - status (Ascendente)
+  - createdAt (Descendente)
+
+Colección: suppliers/{supplierId}/quote-requests
+Campos indexados:
+  - viewed (Ascendente)
+  - createdAt (Descendente)
+*/
+
+// ============================================
+// EJEMPLO COMPLETO DE REGLAS PARA SUPPLIERS
+// ============================================
+
+/*
+match /suppliers/{supplierId} {
+  // Lectura pública de perfiles de proveedores
+  allow read: if true;
+  
+  // Creación de nuevos proveedores (registro público)
+  allow create: if request.auth != null
+    && request.resource.data.keys().hasAll(['profile', 'contact', 'location'])
+    && request.resource.data.profile.registered == true;
+  
+  // Actualización solo por el propietario
+  allow update: if request.auth != null
+    && request.auth.uid == resource.data.uid;
+  
+  // Eliminación solo por el propietario o admin
+  allow delete: if request.auth != null
+    && (request.auth.uid == resource.data.uid 
+        || request.auth.token.admin == true);
+  
+  // Portfolio del proveedor (subcolección)
+  match /portfolio/{photoId} {
+    // Lectura pública
+    allow read: if true;
+    
+    // Escritura solo para el proveedor propietario
+    allow create, update, delete: if request.auth != null 
+      && request.auth.uid == get(/databases/$(database)/documents/suppliers/$(supplierId)).data.uid;
+  }
+}
+*/

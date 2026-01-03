@@ -9,8 +9,8 @@
   - NODE_ENV=production
   - ALLOWED_ORIGIN=https://tu-frontend (o http://localhost:5173 en dev)
   - MAILGUN_API_KEY
-  - MAILGUN_DOMAIN (p.ej. mywed360.com)
-  - MAILGUN_SENDING_DOMAIN (p.ej. mg.mywed360.com)
+  - MAILGUN_DOMAIN (p.ej. malove.app)
+  - MAILGUN_SENDING_DOMAIN (p.ej. mg.malove.app)
   - MAILGUN_EU_REGION=true | false (true si usas región EU)
   - OPENAI_API_KEY (opcional; si no existe, endpoints AI devolverán 500/simulado)
 
@@ -18,7 +18,7 @@
 1. Verifica que backend/index.js usa `process.env.PORT` y expone `/health`.
 2. Render YAML: se incluye `render.yaml` en la raíz.
 3. En Render:
-   - New + > Blueprint > selecciona el repo mywed360 y la rama `windows`.
+   - New + > Blueprint > selecciona el repo MaLove.App y la rama `windows`.
    - Render detectará `render.yaml`.
    - Configura las variables no sincronizadas (API keys/domains) en Settings > Environment.
 4. Deploy: Render construirá con `npm ci` y lanzará `node backend/index.js`.
@@ -39,14 +39,16 @@
 - Variables Mailgun presentes: `MAILGUN_API_KEY`, `MAILGUN_DOMAIN`, `MAILGUN_SENDING_DOMAIN`, `MAILGUN_EU_REGION`.
 
 ## Pruebas rápidas
-- Eventos Mailgun: `GET https://<backend>/api/mailgun/events?recipient=tu@correo.com&event=delivered&limit=10`.
+- Eventos Mailgun: `GET https://<backend>/api/mailgun/events→recipient=tu@correo.com&event=delivered&limit=10`.
 - Envío de prueba: `POST https://<backend>/api/mail/test-personal-email` con JSON:
+  ```json
   {
-    "from": "usuario@mywed360.com",
+    "from": "usuario@malove.app",
     "to": "destino@dominio.com",
     "subject": "Prueba",
     "message": "Hola"
   }
+  ```
 
 ## Seguridad y buenas prácticas
 - No hay API keys hardcodeadas en el código. Las rutas de Mailgun usan variables de entorno.
