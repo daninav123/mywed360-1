@@ -5,7 +5,6 @@
   "framework": "vite",
   "installCommand": "npm install",
   "devCommand": "cd apps/main-app && npm run dev",
-  "nodeVersion": "20.x",
   "rewrites": [
     {
       "source": "/(.*)",
