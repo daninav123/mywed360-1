@@ -35,13 +35,41 @@ const normalizeRegionKey = (country, region) => {
  */
 router.get('/', async (req, res) => {
   try {
-    // TODO: Implementar tabla SystemMetadata en Prisma schema
-    // Por ahora retornamos null hasta que se cree la tabla
-    console.log('[budget-benchmarks] Tabla SystemMetadata no implementada aún, retornando null');
+    const { country, region, guestCount } = req.query;
+    
+    const regionKey = normalizeRegionKey(country, region);
+    const bucket = computeGuestBucket(guestCount);
 
+    // Intentar múltiples combinaciones
+    const attempts = [
+      `${regionKey}_${bucket}`,
+      `${regionKey}_global`,
+      `global_${bucket}`,
+      'global_global'
+    ];
+
+    for (const key of attempts) {
+      // Buscar en metadata del sistema
+      const benchmark = await prisma.systemMetadata.findUnique({
+        where: { key: `budget_benchmark_${key}` },
+        select: { value: true }
+      });
+
+      if (benchmark?.value) {
+        return res.json({
+          success: true,
+          data: {
+            ...benchmark.value,
+            source: { regionKey, bucket, key }
+          }
+        });
+      }
+    }
+
+    // No hay datos disponibles
     res.json({
       success: true,
-      data: null,
+      data: null
     });
   } catch (error) {
     console.error('[budget-benchmarks] GET error:', error);

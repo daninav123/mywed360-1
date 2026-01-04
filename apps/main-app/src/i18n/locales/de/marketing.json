@@ -164,7 +164,12 @@
         ],
         "trust": {
           "title": "Trusted by MaLove.App",
-          "brands": ["Lumiere Events", "Novia Atelier", "Festiva Group", "Urban Weddings"],
+          "brands": [
+            "Lumiere Events",
+            "Novia Atelier",
+            "Festiva Group",
+            "Urban Weddings"
+          ],
           "note": "200+ active planners across Europe and LATAM rely on MaLove.App to standardize processes and deliver memorable experiences."
         }
       },
@@ -243,7 +248,14 @@
           "badge": "MaLove.App Workspace",
           "title": "A connected ecosystem",
           "description": "Synced modules, personalised roles, and granular permissions so you can collaborate without losing context.",
-          "tags": ["Dashboard", "Guests", "Finance", "Communication", "Design", "Automations"]
+          "tags": [
+            "Dashboard",
+            "Guests",
+            "Finance",
+            "Communication",
+            "Design",
+            "Automations"
+          ]
         }
       },
       "modules": {
@@ -292,5 +304,25 @@
       }
     }
   },
-  "_note": "Translate from es/marketing.json"
+  "_note": "Translate from es/marketing.json",
+  "footer": {
+    "product": "Produkt",
+    "features": "Funktionen",
+    "pricing": "Preise",
+    "demo": "Demo Anfordern",
+    "forProfessionals": "Für Profis",
+    "suppliers": "Anbieter",
+    "planners": "Wedding Planner",
+    "partners": "Partner",
+    "company": "Unternehmen",
+    "about": "Über Uns",
+    "contact": "Kontakt",
+    "blog": "Blog",
+    "support": "Support",
+    "help": "Hilfezentrum",
+    "privacy": "Datenschutz",
+    "terms": "Nutzungsbedingungen",
+    "servicesIn": "Dienstleistungen in {{city}}",
+    "nearbyCities": "Nahe Städte"
+  }
 }

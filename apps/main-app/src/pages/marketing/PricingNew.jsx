@@ -81,11 +81,17 @@ export default function PricingNew() {
         <meta property="og:title" content="Precios de Planivia - Planes desde 0€" />
         <meta property="og:description" content="Elige el plan perfecto para tu boda. Desde el plan Free gratuito hasta Wedding Pass Plus con todas las funcionalidades." />
         <meta property="og:url" content="https://planivia.net/precios" />
+        <meta property="og:image" content="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=630&fit=crop&fm=jpg&q=80" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Planes de precios de Planivia para bodas" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Precios de Planivia - Planes desde 0€" />
         <meta name="twitter:description" content="Elige el plan perfecto para tu boda" />
+        <meta name="twitter:image" content="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=630&fit=crop&fm=jpg&q=80" />
+        <meta name="twitter:image:alt" content="Planes de precios de Planivia para bodas" />
         
         {/* Canonical */}
         <link rel="canonical" href="https://planivia.net/precios" />

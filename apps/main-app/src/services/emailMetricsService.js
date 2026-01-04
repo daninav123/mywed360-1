@@ -1,53 +1,38 @@
-// Servicio para obtener métricas agregadas de Firestore
-// Cada usuario tiene un documento en la colección "emailMetrics" con los campos
-// calculados por la Cloud Function que procesa los eventos de Mailgun.
-// Si no existe el documento se devolverá null.
-
-import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-
-import { db } from '../firebaseConfig';
-
 /**
- * Devuelve el documento de métricas agregadas (resumen) para un usuario
- * @param {string} userId
- * @returns {Promise<Object|null>} datos de métricas o null si no existen
+ * Email Metrics Service - PostgreSQL Version
  */
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
+
 export async function getAggregatedStats(userId) {
   if (!userId) return null;
   try {
-    const ref = doc(db, 'emailMetrics', userId);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return null;
-    return snap.data();
-  } catch (err) {
-    // console.error('Error obteniendo métricas agregadas:', err);
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_URL}/api/email-metrics/${userId}/stats`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) return null;
+    const result = await response.json();
+    return result.stats || result.data;
+  } catch {
     return null;
   }
 }
 
-/**
- * Devuelve las métricas diarias recientes de un usuario (subcolección "daily")
- * @param {string} userId
- * @param {number} days - número de días a recuperar
- * @returns {Promise<Array>} lista de docs [{ date: 'YYYY-MM-DD', sent, received, opens, clicks }]
- */
 export async function getDailyStats(userId, days = 30) {
   if (!userId) return [];
   try {
-    const q = query(
-      collection(db, 'emailMetrics', userId, 'daily'),
-      orderBy('date', 'desc'),
-      limit(days)
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(
+      `${API_URL}/api/email-metrics/${userId}/daily?days=${days}`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
     );
-    const snap = await getDocs(q);
-    const list = [];
-    snap.forEach((docSnap) => {
-      list.push(docSnap.data());
-    });
-    // Devolver ordenado ascendente por fecha
-    return list.reverse();
-  } catch (err) {
-    // console.error('Error obteniendo métricas diarias:', err);
+    
+    if (!response.ok) return [];
+    const result = await response.json();
+    return result.stats || result.data || [];
+  } catch {
     return [];
   }
 }

@@ -2884,6 +2884,42 @@
     }
   },
   "pricing": {
+    "title": "Transparent Plans for Every Wedding",
+    "subtitle": "Start free and upgrade when you need. No commitment, cancel anytime.",
+    "startFreeTrial": "Start Free",
+    "plans": {
+      "professional": {
+        "badge": "Most Popular"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about our plans",
+      "questions": {
+        "changePlans": {
+          "q": "Can I change plans at any time?",
+          "a": "Yes, you can upgrade or downgrade your plan at any time. Changes apply immediately and we adjust pricing proportionally."
+        },
+        "afterTrial": {
+          "q": "What happens after the trial period?",
+          "a": "After the free trial period, you can choose to continue with the free Free plan or upgrade to a paid plan to unlock all features."
+        },
+        "refunds": {
+          "q": "Do you offer refunds?",
+          "a": "Yes, we offer full refunds within the first 14 days if you're not satisfied with the service, no questions asked."
+        },
+        "multipleWeddings": {
+          "q": "Can I manage multiple weddings?",
+          "a": "The Free plan allows you to manage 1 active wedding. Paid plans allow unlimited weddings, ideal for professional planners."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Have Questions?",
+      "subtitle": "Our team is here to help you find the perfect plan",
+      "button": "Contact Sales"
+    },
+    "footer": "All plans include free updates, technical support, and full mobile access",
     "hero": {
       "badge": "Per-event model",
       "title": "Clear plans for every celebration.",
@@ -6823,5 +6859,8 @@
     "tokenPayload": "Token Payload",
     "backend": "Backend",
     "localStorage": "Local Storage"
+  },
+  "forPlanners": {
+    "agencyNamePlaceholder": "Your agency or business name"
   }
 }

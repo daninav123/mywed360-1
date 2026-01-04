@@ -1,17 +1,8 @@
-/**
- * @deprecated Este hook usa Firebase Firestore.
- * Este hook se eliminará en futuras versiones.
- */
-import { onAuthStateChanged } from 'firebase/auth';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { useEffect, useState, useCallback } from 'react';
+import axios from 'axios';
+import { useAuth } from './useAuth';
 
-import { auth, db } from '../firebaseConfig';
-import {
-  addItem as addItemFS,
-  updateItem as updateItemFS,
-  deleteItem as deleteItemFS,
-} from '../utils/firestoreCollection';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 const localKey = (name) => `mywed360User_${name}`;
 const lsGet = (name, fallback) => {
@@ -26,106 +17,130 @@ const lsSet = (name, data) => {
   window.dispatchEvent(new Event(`mywed360-user-${name}`));
 };
 
-// Hook de colección bajo users/{uid}/{collectionName}
 export function useUserCollection(collectionName, fallback = []) {
+  const { currentUser } = useAuth();
   const [data, setData] = useState(() => lsGet(collectionName, fallback));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let unsubFS = null;
-    const init = (uid) => {
-      const q = query(collection(db, 'users', uid, collectionName), orderBy('createdAt', 'asc'));
-      unsubFS = onSnapshot(
-        q,
-        (snap) => {
-          const arr = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
+    let cancelled = false;
+
+    const loadCollection = async () => {
+      if (!currentUser) {
+        setData(lsGet(collectionName, fallback));
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('authToken');
+        const response = await axios.get(
+          `${API_URL}/user-collections/${collectionName}`,
+          {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }
+        );
+
+        if (!cancelled && response.data.success) {
+          const arr = response.data.data || [];
           setData(arr);
           lsSet(collectionName, arr);
-          setLoading(false);
-        },
-        () => {
-          setData(lsGet(collectionName, fallback));
-          setLoading(false);
         }
-      );
+      } catch (err) {
+        if (!cancelled) {
+          setData(lsGet(collectionName, fallback));
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
 
-    const uid = auth?.currentUser?.uid;
-    if (uid) {
-      init(uid);
-      return () => {
-        if (typeof unsubFS === 'function') unsubFS();
-      };
-    }
-
-    // Si no hay auth disponible, usar fallback
-    if (!auth) {
-      setData(lsGet(collectionName, fallback));
-      setLoading(false);
-      return;
-    }
+    loadCollection();
 
     const handler = () => setData(lsGet(collectionName, fallback));
     window.addEventListener(`mywed360-user-${collectionName}`, handler);
-    setLoading(false);
-    const unsubAuth = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        init(user.uid);
-        if (Array.isArray(data) && data.length) {
-          data.forEach((item) => addItemFS(collectionName, item).catch(() => {}));
-        }
-      }
-    });
+
     return () => {
+      cancelled = true;
       window.removeEventListener(`mywed360-user-${collectionName}`, handler);
-      unsubAuth();
-      if (typeof unsubFS === 'function') unsubFS();
     };
-  }, [collectionName, fallback]);
+  }, [collectionName, currentUser, fallback]);
 
   const addItem = useCallback(
     async (item) => {
-      if (auth.currentUser?.uid) {
-        await addItemFS(collectionName, item);
+      if (currentUser) {
+        try {
+          const token = localStorage.getItem('authToken');
+          const response = await axios.post(
+            `${API_URL}/user-collections/${collectionName}`,
+            item,
+            {
+              headers: { 'Authorization': `Bearer ${token}` }
+            }
+          );
+          
+          if (response.data.success) {
+            const next = [...data, response.data.data];
+            setData(next);
+            lsSet(collectionName, next);
+          }
+        } catch (err) {
+          console.error('Error adding item:', err);
+        }
       } else {
-        const next = [...data, { ...item, id: Date.now() }];
+        const next = [...data, { ...item, id: Date.now().toString() }];
         setData(next);
         lsSet(collectionName, next);
       }
     },
-    [collectionName, data]
+    [collectionName, data, currentUser]
   );
 
   const updateItem = useCallback(
     async (id, changes) => {
-      if (auth.currentUser?.uid) {
-        await updateItemFS(collectionName, id, changes);
-        const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
-        setData(next);
-        lsSet(collectionName, next);
-      } else {
-        const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
-        setData(next);
-        lsSet(collectionName, next);
+      if (currentUser) {
+        try {
+          const token = localStorage.getItem('authToken');
+          await axios.put(
+            `${API_URL}/user-collections/${collectionName}/${id}`,
+            changes,
+            {
+              headers: { 'Authorization': `Bearer ${token}` }
+            }
+          );
+        } catch (err) {
+          console.error('Error updating item:', err);
+        }
       }
+      
+      const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
+      setData(next);
+      lsSet(collectionName, next);
     },
-    [collectionName, data]
+    [collectionName, data, currentUser]
   );
 
   const deleteItem = useCallback(
     async (id) => {
-      if (auth.currentUser?.uid) {
-        await deleteItemFS(collectionName, id);
-        const next = data.filter((d) => d.id !== id);
-        setData(next);
-        lsSet(collectionName, next);
-      } else {
-        const next = data.filter((d) => d.id !== id);
-        setData(next);
-        lsSet(collectionName, next);
+      if (currentUser) {
+        try {
+          const token = localStorage.getItem('authToken');
+          await axios.delete(
+            `${API_URL}/user-collections/${collectionName}/${id}`,
+            {
+              headers: { 'Authorization': `Bearer ${token}` }
+            }
+          );
+        } catch (err) {
+          console.error('Error deleting item:', err);
+        }
       }
+      
+      const next = data.filter((d) => d.id !== id);
+      setData(next);
+      lsSet(collectionName, next);
     },
-    [collectionName, data]
+    [collectionName, data, currentUser]
   );
 
   return { data, loading, addItem, updateItem, deleteItem };

@@ -123,11 +123,12 @@ export async function sendMailAndPersist({
 
   const resolvedFrom =
     fromOverride ||
+    profile?.planiviaEmail ||
     profile?.maLoveEmail ||
     profile?.myWed360Email ||
     profile?.email ||
     process.env.DEFAULT_EMAIL_SENDER ||
-    'no-reply@malove.app';
+    'no-reply@planivia.net';
 
   const primaryRecipient = recipients[0];
   const ccList = normalizeAddressList(cc);
@@ -245,7 +246,7 @@ export async function sendMailAndPersist({
   } else if (!recordOnly && testMode) {
     console.log('[mailSendService] 🧪 TEST MODE activado - email NO enviado realmente');
     // Modo test: generar messageId falso pero válido
-    messageId = `<test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@malove.app>`;
+    messageId = `<test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@planivia.net>`;
     logger.info('[mailSendService] TEST MODE: Email no enviado realmente, messageId mockeado');
   }
 

@@ -25,23 +25,27 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      if (!data || !data.user) {
+      // Backend usa sendSuccess que envuelve en {success, data, requestId}
+      const responseData = data.data || data;
+      const user = responseData.user || responseData;
+      
+      if (!user || !user.id) {
         throw new Error('Invalid response structure');
       }
       
       setCurrentUser({
-        uid: data.user.id,
-        email: data.user.email,
-        displayName: data.user.name || data.user.email,
-        emailVerified: data.user.emailVerified || false,
+        uid: user.id,
+        email: user.email,
+        displayName: user.name || user.email,
+        emailVerified: user.emailVerified || false,
       });
       
       setUserProfile({
-        ...(data.user.profile || {}),
-        email: data.user.email,
-        name: data.user.name || data.user.email,
-        role: data.user.profile?.role || data.user.role,
-        weddingId: data.user.weddings?.[0]?.id,
+        ...(user.profile || {}),
+        email: user.email,
+        name: user.name || user.email,
+        role: user.profile?.role || user.role,
+        weddingId: user.weddings?.[0]?.id,
       });
     } catch (error) {
       console.error('[Auth] Error fetching user:', error);

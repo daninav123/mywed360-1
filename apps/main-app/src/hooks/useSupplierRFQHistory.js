@@ -1,8 +1,8 @@
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-
+import axios from 'axios';
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 export default function useSupplierRFQHistory(supplierId) {
   const { activeWedding } = useWedding();
@@ -11,25 +11,44 @@ export default function useSupplierRFQHistory(supplierId) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!activeWedding || !supplierId) {
-      setItems([]);
-      setLoading(false);
-      return;
-    }
-    const col = collection(db, 'weddings', activeWedding, 'suppliers', supplierId, 'rfqHistory');
-    const q = query(col, orderBy('sentAt', 'desc'));
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    let cancelled = false;
+
+    const loadRFQHistory = async () => {
+      if (!activeWedding || !supplierId) {
+        setItems([]);
         setLoading(false);
-      },
-      (err) => {
-        setError(err.message);
-        setLoading(false);
+        return;
       }
-    );
-    return () => unsub();
+
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('authToken');
+        const response = await axios.get(
+          `${API_URL}/supplier-rfq-history/${activeWedding}/${supplierId}`,
+          {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }
+        );
+
+        if (!cancelled && response.data.success) {
+          setItems(response.data.data || []);
+        }
+        setError(null);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message);
+          setItems([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    loadRFQHistory();
+
+    return () => {
+      cancelled = true;
+    };
   }, [activeWedding, supplierId]);
 
   return { items, loading, error };

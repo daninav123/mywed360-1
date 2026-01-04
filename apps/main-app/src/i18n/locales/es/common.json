@@ -2902,6 +2902,42 @@
     }
   },
   "pricing": {
+    "title": "Planes Transparentes para Cada Boda",
+    "subtitle": "Empieza gratis y actualiza cuando lo necesites. Sin permanencia, cancela cuando quieras.",
+    "startFreeTrial": "Empezar Gratis",
+    "plans": {
+      "professional": {
+        "badge": "Más Popular"
+      }
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "subtitle": "Todo lo que necesitas saber sobre nuestros planes",
+      "questions": {
+        "changePlans": {
+          "q": "¿Puedo cambiar de plan en cualquier momento?",
+          "a": "Sí, puedes actualizar o degradar tu plan en cualquier momento. Los cambios se aplican inmediatamente y ajustamos el precio proporcionalmente."
+        },
+        "afterTrial": {
+          "q": "¿Qué pasa después del periodo de prueba?",
+          "a": "Después del periodo de prueba gratuito, puedes elegir continuar con el plan Free gratuito o actualizar a un plan de pago para desbloquear todas las funcionalidades."
+        },
+        "refunds": {
+          "q": "¿Ofrecen reembolsos?",
+          "a": "Sí, ofrecemos reembolsos completos dentro de los primeros 14 días si no estás satisfecho con el servicio, sin hacer preguntas."
+        },
+        "multipleWeddings": {
+          "q": "¿Puedo gestionar varias bodas?",
+          "a": "El plan Free te permite gestionar 1 boda activa. Los planes de pago te permiten gestionar bodas ilimitadas, ideal para planners profesionales."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "¿Tienes Preguntas?",
+      "subtitle": "Nuestro equipo está aquí para ayudarte a encontrar el plan perfecto",
+      "button": "Contactar con Ventas"
+    },
+    "footer": "Todos los planes incluyen actualizaciones gratuitas, soporte técnico y acceso móvil completo",
     "hero": {
       "badge": "Modelo por evento",
       "title": "Planes flexibles por evento",
@@ -6998,6 +7034,7 @@
     }
   },
   "forPlanners": {
+    "agencyNamePlaceholder": "Nombre de tu agencia o negocio",
     "hero": {
       "title": "Escala Tu Negocio de Planificación",
       "subtitle": "Herramientas profesionales diseñadas para wedding planners que gestionan múltiples eventos. Optimiza operaciones y ofrece experiencias excepcionales.",

@@ -1,14 +1,12 @@
 /**
- * Notification Service - Sprint 7
+ * Notification Service - PostgreSQL Version
+ * Usa API backend para notificaciones
  */
 
-import { collection, addDoc, updateDoc, doc, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
-// Variable para almacenar el contexto de autenticación
 let authContext = null;
 
-// Función para registrar el contexto de autenticación desde useAuth
 export const setAuthContext = (context) => {
   authContext = context || null;
 };
@@ -22,13 +20,28 @@ const NOTIFICATION_TYPES = {
 
 class NotificationService {
   async create(weddingId, notification) {
-    const ref = collection(db, 'weddings', weddingId, 'notifications');
-    const docRef = await addDoc(ref, {
-      ...notification,
-      createdAt: new Date().toISOString(),
-      sent: false,
-    });
-    return { id: docRef.id, ...notification };
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_URL}/api/notifications`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          weddingId,
+          ...notification,
+          sent: false,
+        })
+      });
+
+      if (!response.ok) throw new Error('Error creando notificación');
+      const result = await response.json();
+      return result.notification || result.data;
+    } catch (error) {
+      console.error('Error creando notificación:', error);
+      throw error;
+    }
   }
 
   async schedule(weddingId, notification, sendAt) {
@@ -40,17 +53,36 @@ class NotificationService {
   }
 
   async getPending(weddingId) {
-    const q = query(
-      collection(db, 'weddings', weddingId, 'notifications'),
-      where('sent', '==', false)
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(
+        `${API_URL}/api/notifications?weddingId=${weddingId}&sent=false`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.notifications || result.data || [];
+    } catch (error) {
+      console.error('Error obteniendo notificaciones pendientes:', error);
+      return [];
+    }
   }
 
   async markSent(weddingId, notificationId) {
-    const ref = doc(db, 'weddings', weddingId, 'notifications', notificationId);
-    await updateDoc(ref, { sent: true, sentAt: new Date().toISOString() });
+    try {
+      const token = localStorage.getItem('authToken');
+      await fetch(`${API_URL}/api/notifications/${notificationId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ sent: true, sentAt: new Date().toISOString() })
+      });
+    } catch (error) {
+      console.error('Error marcando notificación como enviada:', error);
+    }
   }
 
   getTypes() {
@@ -58,10 +90,8 @@ class NotificationService {
   }
 }
 
-// Instancia singleton del servicio
 const notificationServiceInstance = new NotificationService();
 
-// Preferencias de notificación por defecto
 export const DEFAULT_NOTIFICATION_PREFS = {
   email: {
     newMessage: true,
@@ -88,164 +118,91 @@ export const DEFAULT_NOTIFICATION_PREFS = {
   },
 };
 
-// Exportaciones adicionales para compatibilidad con diferentes módulos
 export const addNotification = async (notification) => {
-  // Función helper para añadir notificaciones
-  // Si tiene weddingId, usa el servicio, sino solo retorna la notificación
   if (notification.weddingId) {
     return await notificationServiceInstance.create(notification.weddingId, notification);
   }
-  // Para notificaciones que no requieren persistencia, solo retornar
   return { ...notification, id: Date.now().toString() };
 };
 
-export const getNotifications = async (weddingId) => {
-  // Obtener notificaciones pendientes
-  if (!weddingId) {
-    // Si no hay weddingId, retornar array vacío
-    return [];
-  }
+export const getNotifications = async (userId, filters = {}) => {
   try {
-    return await notificationServiceInstance.getPending(weddingId);
+    const token = localStorage.getItem('authToken');
+    const params = new URLSearchParams();
+    if (filters.read !== undefined) params.append('read', filters.read);
+    if (filters.type) params.append('type', filters.type);
+    
+    const response = await fetch(
+      `${API_URL}/api/notifications?${params.toString()}`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
+
+    if (!response.ok) return [];
+    const result = await response.json();
+    return result.notifications || result.data || [];
   } catch (error) {
-    // console.error('Error obteniendo notificaciones:', error);
+    console.error('Error obteniendo notificaciones:', error);
     return [];
   }
 };
 
-export const getNotificationPrefs = () => {
-  // Obtener preferencias de notificación desde localStorage
+export const markNotificationRead = async (notificationId) => {
   try {
-    const stored = localStorage.getItem('maloveapp_notification_prefs');
-    if (stored) {
-      return { ...DEFAULT_NOTIFICATION_PREFS, ...JSON.parse(stored) };
-    }
-  } catch (error) {
-    // console.error('Error cargando preferencias:', error);
-  }
-  return DEFAULT_NOTIFICATION_PREFS;
-};
-
-export const saveNotificationPrefs = (prefs) => {
-  // Guardar preferencias de notificación en localStorage
-  try {
-    localStorage.setItem('maloveapp_notification_prefs', JSON.stringify(prefs));
+    const token = localStorage.getItem('authToken');
+    await fetch(`${API_URL}/api/notifications/${notificationId}/read`, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     return true;
   } catch (error) {
-    // console.error('Error guardando preferencias:', error);
+    console.error('Error marcando notificación como leída:', error);
     return false;
   }
 };
 
-export const isQuietHoursActive = () => {
-  // Verificar si estamos en quiet hours
-  const prefs = getNotificationPrefs();
-  if (!prefs.quietHours?.enabled) return false;
-
+export const deleteNotification = async (notificationId) => {
   try {
-    const now = new Date();
-    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    const { start, end } = prefs.quietHours;
-
-    // Si quiet hours cruza medianoche
-    if (start > end) {
-      return currentTime >= start || currentTime < end;
-    }
-    // Quiet hours normal
-    return currentTime >= start && currentTime < end;
+    const token = localStorage.getItem('authToken');
+    await fetch(`${API_URL}/api/notifications/${notificationId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return true;
   } catch (error) {
-    // console.error('Error verificando quiet hours:', error);
+    console.error('Error eliminando notificación:', error);
     return false;
   }
 };
 
-export const showNotification = (notification) => {
-  // Verificar quiet hours
-  if (isQuietHoursActive()) {
-    // console.log('Notificación silenciada por quiet hours');
-    return notification;
-  }
-
-  // Mostrar notificación en el navegador (si está soportado)
+export const showNotification = (title, options = {}) => {
   if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification(notification.message || 'Notificación', {
-      body: notification.body || notification.message,
-      icon: '/badge-72.png',
-      tag: notification.id || Date.now().toString(),
-    });
-  }
-
-  // También podríamos emitir un evento personalizado para que otros componentes lo escuchen
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('maloveapp:notification', { detail: notification }));
-  }
-
-  return notification;
-};
-
-export const shouldNotify = (notification) => {
-  // Lógica simple para determinar si se debe mostrar una notificación
-  // Puede ser extendida con preferencias de usuario, quiet hours, etc.
-  if (!notification) return false;
-
-  // Verificar quiet hours
-  if (isQuietHoursActive()) return false;
-
-  // Si el usuario tiene el contexto de auth, verificar preferencias
-  if (authContext?.preferences?.notificationsEnabled === false) {
-    return false;
-  }
-
-  // Verificar preferencias específicas por tipo
-  const prefs = getNotificationPrefs();
-  const notifType = notification.type || 'system';
-  const category = notification.category || 'updates';
-
-  if (prefs[notifType]?.[category] === false) {
-    return false;
-  }
-
-  // Por defecto, permitir notificaciones
-  return true;
-};
-
-export const markNotificationRead = async (weddingId, notificationId) => {
-  // Marcar notificación como leída
-  if (!weddingId || !notificationId) {
-    // console.warn('markNotificationRead: weddingId y notificationId son requeridos');
-    return false;
-  }
-
-  try {
-    const ref = doc(db, 'weddings', weddingId, 'notifications', notificationId);
-    await updateDoc(ref, {
-      read: true,
-      readAt: new Date().toISOString(),
-    });
-    return true;
-  } catch (error) {
-    // console.error('Error marcando notificación como leída:', error);
-    return false;
+    new Notification(title, options);
   }
 };
 
-export const deleteNotification = async (weddingId, notificationId) => {
-  // Eliminar notificación
-  if (!weddingId || !notificationId) {
-    // console.warn('deleteNotification: weddingId y notificationId son requeridos');
-    return false;
-  }
+export const shouldNotify = (preferences, type, category) => {
+  if (!preferences) return true;
+  return preferences[category]?.[type] !== false;
+};
 
-  try {
-    const ref = doc(db, 'weddings', weddingId, 'notifications', notificationId);
-    await updateDoc(ref, {
-      deleted: true,
-      deletedAt: new Date().toISOString(),
-    });
-    return true;
-  } catch (error) {
-    // console.error('Error eliminando notificación:', error);
-    return false;
+export const isQuietHoursActive = (preferences) => {
+  if (!preferences?.quietHours?.enabled) return false;
+  
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const currentTime = hours * 60 + minutes;
+  
+  const [startHour, startMin] = (preferences.quietHours.start || '22:00').split(':').map(Number);
+  const [endHour, endMin] = (preferences.quietHours.end || '08:00').split(':').map(Number);
+  
+  const startTime = startHour * 60 + startMin;
+  const endTime = endHour * 60 + endMin;
+  
+  if (startTime < endTime) {
+    return currentTime >= startTime && currentTime < endTime;
+  } else {
+    return currentTime >= startTime || currentTime < endTime;
   }
 };
 

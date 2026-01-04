@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Users, Heart, CheckCircle, Sparkles, Gift, Clock, Palette, Shield, ArrowRight, Store, Briefcase, BookOpen, PenTool } from 'lucide-react';
+import LanguageSelector from '../../components/ui/LanguageSelector';
 import { 
   PageWrapper, 
   HeroSection, 
@@ -65,24 +66,74 @@ export default function LandingNew() {
         <meta property="og:url" content="https://planivia.net/" />
         <meta property="og:site_name" content="Planivia" />
         <meta property="og:locale" content="es_ES" />
+        <meta property="og:image" content="https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&h=630&fit=crop&fm=jpg&q=80" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Planifica tu boda perfecta con Planivia" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Planivia - Planifica Tu Boda Perfecta" />
         <meta name="twitter:description" content="Software todo-en-uno para planificar tu boda perfecta" />
+        <meta name="twitter:image" content="https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&h=630&fit=crop&fm=jpg&q=80" />
+        <meta name="twitter:image:alt" content="Planifica tu boda perfecta con Planivia" />
         
         {/* Canonical */}
         <link rel="canonical" href="https://planivia.net/" />
         
-        {/* Structured Data */}
+        {/* Structured Data - WebSite */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Planivia",
+            "alternateName": "MaLove.App",
+            "url": "https://planivia.net",
+            "description": "Software todo-en-uno para planificar bodas. Gestión de invitados, presupuestos, proveedores y más.",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://planivia.net/search?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          })}
+        </script>
+        
+        {/* Structured Data - Organization */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Planivia",
+            "alternateName": "MaLove.App",
+            "url": "https://planivia.net",
+            "logo": "https://planivia.net/logo.png",
+            "description": "Plataforma líder en planificación de bodas en España y Latinoamérica",
+            "sameAs": [
+              "https://www.instagram.com/planivia",
+              "https://www.facebook.com/planivia",
+              "https://twitter.com/planivia"
+            ],
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "customer support",
+              "email": "support@planivia.net",
+              "availableLanguage": ["es", "en"]
+            }
+          })}
+        </script>
+        
+        {/* Structured Data - SoftwareApplication */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             "name": "Planivia",
-            "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Web",
-            "description": "Plataforma completa para planificación de bodas con gestión de invitados, presupuestos, proveedores y diseño web",
+            "applicationCategory": "LifestyleApplication",
+            "operatingSystem": "Web, iOS, Android",
+            "description": "Software completo para planificar bodas con gestión de invitados, presupuestos, proveedores y diseño web",
             "offers": {
               "@type": "Offer",
               "price": "0",
@@ -92,11 +143,18 @@ export default function LandingNew() {
             "aggregateRating": {
               "@type": "AggregateRating",
               "ratingValue": "4.8",
-              "ratingCount": "2500"
+              "ratingCount": "1247",
+              "bestRating": "5",
+              "worstRating": "1"
             },
-            "author": {
-              "@type": "Organization",
-              "name": "Planivia",
+            "featureList": [
+              "Gestión de invitados",
+              "Control de presupuesto",
+              "Directorio de proveedores",
+              "Diseño de página web de boda",
+              "Timeline y checklist",
+              "Seating plan interactivo"
+            ]
               "url": "https://planivia.net"
             }
           })}
@@ -104,6 +162,10 @@ export default function LandingNew() {
       </Helmet>
       
       <PageWrapper>
+        {/* Selector de idioma discreto */}
+        <div className="fixed top-4 right-4 z-50">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
         <HeroSection
           title={t('marketing:landing.hero.title')}
           subtitle={t('marketing:landing.hero.subtitle')}
@@ -423,7 +485,7 @@ export default function LandingNew() {
         style={{ borderColor: theme.colors.borderSubtle }}
       >
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-6 gap-8 mb-8">
             <div>
               <h4 style={{
                 fontFamily: theme.fonts.body,
@@ -575,6 +637,88 @@ export default function LandingNew() {
                     >
                       {item.label}
                     </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Enlaces SEO de servicios */}
+            <div>
+              <h4 style={{
+                fontFamily: theme.fonts.body,
+                fontSize: '16px',
+                fontWeight: 600,
+                color: theme.colors.textPrimary,
+                marginBottom: '16px',
+              }}>
+                Servicios
+              </h4>
+              <div className="space-y-3">
+                {[
+                  { label: 'Bodas', link: '/es/madrid/bodas' },
+                  { label: 'Gestión de Invitados', link: '/es/madrid/gestion-invitados-boda' },
+                  { label: 'Presupuesto', link: '/es/madrid/presupuesto-boda-online' },
+                  { label: 'Seating Plan', link: '/es/madrid/seating-plan-boda' },
+                  { label: 'Catering', link: '/es/madrid/catering-boda' },
+                  { label: 'Fotografía', link: '/es/madrid/fotografia-boda' },
+                ].map((item, index) => (
+                  <div key={index}>
+                    <a
+                      href={item.link}
+                      style={{
+                        fontFamily: theme.fonts.body,
+                        fontSize: '14px',
+                        color: theme.colors.textSecondary,
+                        textDecoration: 'none',
+                        transition: 'color 200ms',
+                        display: 'block',
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
+                      onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.textSecondary}
+                    >
+                      {item.label}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Enlaces SEO de ciudades */}
+            <div>
+              <h4 style={{
+                fontFamily: theme.fonts.body,
+                fontSize: '16px',
+                fontWeight: 600,
+                color: theme.colors.textPrimary,
+                marginBottom: '16px',
+              }}>
+                Ciudades
+              </h4>
+              <div className="space-y-3">
+                {[
+                  { label: 'Madrid', link: '/es/madrid/bodas' },
+                  { label: 'Barcelona', link: '/es/barcelona/bodas' },
+                  { label: 'Valencia', link: '/es/valencia/bodas' },
+                  { label: 'Sevilla', link: '/es/sevilla/bodas' },
+                  { label: 'Bilbao', link: '/es/bilbao/bodas' },
+                  { label: 'Málaga', link: '/es/malaga/bodas' },
+                ].map((item, index) => (
+                  <div key={index}>
+                    <a
+                      href={item.link}
+                      style={{
+                        fontFamily: theme.fonts.body,
+                        fontSize: '14px',
+                        color: theme.colors.textSecondary,
+                        textDecoration: 'none',
+                        transition: 'color 200ms',
+                        display: 'block',
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
+                      onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.textSecondary}
+                    >
+                      {item.label}
+                    </a>
                   </div>
                 ))}
               </div>

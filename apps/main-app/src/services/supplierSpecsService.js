@@ -1,166 +1,90 @@
 /**
- * Servicio para gestionar especificaciones de proveedores dinámicamente
- * Permite editar specs desde el panel admin sin modificar código
+ * Supplier Specs Service - PostgreSQL Version
  */
 
-import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
 import { SUPPLIER_SPECS_TEMPLATE as DEFAULT_SPECS } from '../utils/supplierRequirementsTemplate';
 
-const SPECS_COLLECTION = 'systemConfig';
-const SPECS_DOC = 'supplierSpecs';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
-/**
- * Carga las especificaciones desde Firestore
- * Si no existen, devuelve las especificaciones por defecto del código
- */
 export async function loadSupplierSpecs() {
   try {
-    const specsRef = doc(db, SPECS_COLLECTION, SPECS_DOC);
-    const specsSnap = await getDoc(specsRef);
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_URL}/api/system-config/supplier-specs`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     
-    if (specsSnap.exists()) {
-      const data = specsSnap.data();
-      console.log('✅ Specs cargadas desde Firestore');
+    if (response.ok) {
+      const result = await response.json();
+      const data = result.specs || result.data;
       
-      // Merge con defaults para garantizar que todas las categorías existen
       return {
         ...DEFAULT_SPECS,
-        ...data.templates,
+        ...data,
         _customized: true,
         _lastUpdated: data.updatedAt,
       };
     }
     
-    console.log('ℹ️ Usando specs por defecto del código');
     return DEFAULT_SPECS;
   } catch (error) {
-    console.error('❌ Error cargando specs, usando defaults:', error);
+    console.error('Error loading specs, using defaults:', error);
     return DEFAULT_SPECS;
   }
 }
 
-/**
- * Guarda las especificaciones en Firestore
- * Solo admins pueden hacer esto
- */
 export async function saveSupplierSpecs(specs, userId) {
-  if (!userId) {
-    throw new Error('Usuario no autenticado');
-  }
+  if (!userId) throw new Error('Usuario no autenticado');
   
   try {
-    const specsRef = doc(db, SPECS_COLLECTION, SPECS_DOC);
-    
-    // Remover campos internos antes de guardar
     const { _customized, _lastUpdated, default: defaultTemplate, ...templates } = specs;
     
-    await setDoc(specsRef, {
-      templates,
-      updatedAt: new Date().toISOString(),
-      updatedBy: userId,
+    const token = localStorage.getItem('authToken');
+    await fetch(`${API_URL}/api/system-config/supplier-specs`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ templates, updatedBy: userId })
     });
     
-    console.log('✅ Specs guardadas en Firestore');
     return true;
   } catch (error) {
-    console.error('❌ Error guardando specs:', error);
+    console.error('Error saving specs:', error);
     throw error;
   }
 }
 
-/**
- * Restaura las especificaciones a los valores por defecto del código
- */
 export async function resetSupplierSpecs(userId) {
   try {
-    const specsRef = doc(db, SPECS_COLLECTION, SPECS_DOC);
-    
-    await setDoc(specsRef, {
-      templates: DEFAULT_SPECS,
-      updatedAt: new Date().toISOString(),
-      updatedBy: userId,
-      resetToDefaults: true,
+    const token = localStorage.getItem('authToken');
+    await fetch(`${API_URL}/api/system-config/supplier-specs/reset`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ updatedBy: userId })
     });
     
-    console.log('✅ Specs restauradas a valores por defecto');
     return true;
   } catch (error) {
-    console.error('❌ Error restaurando specs:', error);
+    console.error('Error resetting specs:', error);
     throw error;
   }
 }
 
-/**
- * Añade un nuevo campo a una categoría específica
- */
-export async function addFieldToCategory(categoryId, fieldName, fieldConfig, userId) {
-  try {
-    const currentSpecs = await loadSupplierSpecs();
-    
-    if (!currentSpecs[categoryId]) {
-      throw new Error(`Categoría ${categoryId} no existe`);
-    }
-    
-    // Añadir campo a specs
-    currentSpecs[categoryId].specs[fieldName] = fieldConfig.defaultValue;
-    
-    await saveSupplierSpecs(currentSpecs, userId);
-    
-    console.log(`✅ Campo ${fieldName} añadido a ${categoryId}`);
-    return true;
-  } catch (error) {
-    console.error('❌ Error añadiendo campo:', error);
-    throw error;
-  }
-}
-
-/**
- * Elimina un campo de una categoría específica
- */
-export async function removeFieldFromCategory(categoryId, fieldName, userId) {
-  try {
-    const currentSpecs = await loadSupplierSpecs();
-    
-    if (!currentSpecs[categoryId]) {
-      throw new Error(`Categoría ${categoryId} no existe`);
-    }
-    
-    delete currentSpecs[categoryId].specs[fieldName];
-    
-    await saveSupplierSpecs(currentSpecs, userId);
-    
-    console.log(`✅ Campo ${fieldName} eliminado de ${categoryId}`);
-    return true;
-  } catch (error) {
-    console.error('❌ Error eliminando campo:', error);
-    throw error;
-  }
-}
-
-/**
- * Obtiene el historial de cambios
- */
 export async function getSpecsHistory() {
   try {
-    const historyRef = collection(db, SPECS_COLLECTION, SPECS_DOC, 'history');
-    const historySnap = await getDocs(historyRef);
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_URL}/api/system-config/supplier-specs/history`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     
-    return historySnap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    })).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  } catch (error) {
-    console.error('❌ Error cargando historial:', error);
+    if (!response.ok) return [];
+    const result = await response.json();
+    return result.history || result.data || [];
+  } catch {
     return [];
   }
 }
-
-export default {
-  loadSupplierSpecs,
-  saveSupplierSpecs,
-  resetSupplierSpecs,
-  addFieldToCategory,
-  removeFieldFromCategory,
-  getSpecsHistory,
-};

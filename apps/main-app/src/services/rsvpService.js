@@ -1,58 +1,46 @@
-import { post } from './apiClient';
-import { db } from '../lib/firebase';
-import {
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-  serverTimestamp,
-  updateDoc,
-} from 'firebase/firestore';
-
-const RSVP_COLLECTION = 'craft-webs-rsvp';
-
 /**
- * Normalizar nombre para búsqueda (quitar acentos, minúsculas, etc.)
+ * RSVP Service - PostgreSQL Version
+ * Usa API backend en lugar de Firebase
  */
+
+import { post } from './apiClient';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
+
 const normalizeString = (str) => {
   return str
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
+    .replace(/[\u0300-\u036f]/g, '')
     .trim();
 };
 
 /**
- * Buscar invitado por nombre en la colección de guests de la boda
+ * Buscar invitado por nombre
  */
 export const findGuestByName = async (weddingId, nombreBuscado) => {
   try {
     console.log('🔍 Buscando invitado:', nombreBuscado, 'en boda:', weddingId);
 
-    // Buscar en la colección de guests de la boda
-    const guestsRef = collection(db, 'weddings', weddingId, 'guests');
-    const snapshot = await getDocs(guestsRef);
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_URL}/api/guests?weddingId=${weddingId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
-    const nombreNormalizado = normalizeString(nombreBuscado);
+    if (!response.ok) throw new Error('Error obteniendo invitados');
 
-    // Buscar coincidencia exacta o similar
-    const invitados = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const result = await response.json();
+    const invitados = result.guests || result.data || [];
 
     console.log(`📋 Total invitados en la boda: ${invitados.length}`);
 
-    // Buscar coincidencia exacta
+    const nombreNormalizado = normalizeString(nombreBuscado);
+
     let invitado = invitados.find((inv) => {
       const nombreInvitado = inv.name || inv.nombre || '';
       return normalizeString(nombreInvitado) === nombreNormalizado;
     });
 
-    // Si no hay coincidencia exacta, buscar parcial
     if (!invitado) {
       invitado = invitados.find((inv) => {
         const nombreInvitado = inv.name || inv.nombre || '';
@@ -64,21 +52,18 @@ export const findGuestByName = async (weddingId, nombreBuscado) => {
     if (invitado) {
       console.log('✅ Invitado encontrado:', invitado.name || invitado.nombre);
 
-      // Buscar si ya tiene respuesta RSVP guardada
-      const rsvpRef = collection(db, RSVP_COLLECTION);
-      const rsvpQuery = query(
-        rsvpRef,
-        where('weddingId', '==', weddingId),
-        where('guestId', '==', invitado.id)
+      // Buscar respuesta RSVP existente
+      const rsvpResponse = await fetch(
+        `${API_URL}/api/rsvp/${weddingId}/guest/${invitado.id}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
       );
-      const rsvpSnapshot = await getDocs(rsvpQuery);
 
-      if (!rsvpSnapshot.empty) {
-        const rsvpData = rsvpSnapshot.docs[0].data();
+      if (rsvpResponse.ok) {
+        const rsvpData = await rsvpResponse.json();
         console.log('📋 Respuesta RSVP existente encontrada');
         return {
           ...invitado,
-          rsvpId: rsvpSnapshot.docs[0].id,
+          rsvpId: rsvpData.id,
           respondido: rsvpData.respondido || false,
           asistira: rsvpData.asistira,
           numAcompañantes: rsvpData.numAcompañantes,
@@ -104,30 +89,30 @@ export const findGuestByName = async (weddingId, nombreBuscado) => {
  */
 export const createGuest = async (webId, guestData) => {
   try {
-    const guestId = `${webId}_${Date.now()}`;
-    const guestRef = doc(db, RSVP_COLLECTION, guestId);
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_URL}/api/guests`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        weddingId: webId,
+        name: guestData.nombre,
+        email: guestData.email || null,
+        phone: guestData.telefono || null,
+        maxCompanions: guestData.maxAcompañantes || 2,
+      })
+    });
 
-    const guest = {
-      webId,
-      nombre: guestData.nombre,
-      email: guestData.email || null,
-      telefono: guestData.telefono || null,
-      maxAcompañantes: guestData.maxAcompañantes || 2,
-      respondido: false,
-      createdAt: serverTimestamp(),
-    };
+    if (!response.ok) throw new Error('Error creando invitado');
 
-    await setDoc(guestRef, guest);
-
+    const result = await response.json();
     console.log('✅ Invitado creado:', guestData.nombre);
 
-    // Devolver guest con id incluido
     return {
       success: true,
-      guest: {
-        id: guestId,
-        ...guest,
-      },
+      guest: result.guest || result.data,
     };
   } catch (error) {
     console.error('❌ Error creando invitado:', error);
@@ -146,55 +131,37 @@ export const saveRSVPResponse = async (weddingId, guestId, responseData, rsvpId 
 
     console.log('💾 Guardando respuesta RSVP para invitado:', guestId);
 
-    const response = {
-      weddingId,
-      guestId,
-      respondido: true,
-      asistira: responseData.asistira,
-      numAcompañantes: responseData.numAcompañantes || 0,
-      nombresAcompañantes: responseData.nombresAcompañantes || [],
-      menuPreferencias: responseData.menuPreferencias || [],
-      restriccionesAlimentarias: responseData.restriccionesAlimentarias || '',
-      comentarios: responseData.comentarios || '',
-      emailConfirmacion: responseData.emailConfirmacion || '', // Email usado para confirmar
-      respondidoAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    };
+    const token = localStorage.getItem('authToken');
+    const method = rsvpId ? 'PUT' : 'POST';
+    const url = rsvpId 
+      ? `${API_URL}/api/rsvp/${rsvpId}`
+      : `${API_URL}/api/rsvp`;
 
-    let responseId = rsvpId;
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        weddingId,
+        guestId,
+        asistira: responseData.asistira,
+        numAcompañantes: responseData.numAcompañantes || 0,
+        nombresAcompañantes: responseData.nombresAcompañantes || [],
+        menuPreferencias: responseData.menuPreferencias || [],
+        restriccionesAlimentarias: responseData.restriccionesAlimentarias || '',
+        comentarios: responseData.comentarios || '',
+        emailConfirmacion: responseData.emailConfirmacion || '',
+      })
+    });
 
-    // 1. Guardar respuesta RSVP
-    if (rsvpId) {
-      // Actualizar respuesta existente
-      const invitationRef = doc(db, RSVP_COLLECTION, rsvpId);
-      await updateDoc(invitationRef, response);
-    } else {
-      // Crear nueva respuesta
-      responseId = `${weddingId}_${guestId}_${Date.now()}`;
-      const invitationRef = doc(db, RSVP_COLLECTION, responseId);
-      await setDoc(invitationRef, {
-        ...response,
-        createdAt: serverTimestamp(),
-      });
-    }
+    if (!response.ok) throw new Error('Error guardando respuesta RSVP');
 
+    const result = await response.json();
     console.log('✅ Respuesta RSVP guardada');
 
-    // 2. Actualizar el invitado en la colección de guests
-    const guestRef = doc(db, 'weddings', weddingId, 'guests', guestId);
-    const guestUpdate = {
-      status: responseData.asistira ? 'confirmed' : 'declined',
-      confirmed: responseData.asistira,
-      companions: responseData.numAcompañantes || 0,
-      dietaryRestrictions: responseData.restriccionesAlimentarias || '',
-      notes: responseData.comentarios || '',
-      updatedAt: serverTimestamp(),
-    };
-
-    await updateDoc(guestRef, guestUpdate);
-    console.log('✅ Invitado actualizado en la lista');
-
-    return { success: true, id: responseId };
+    return { success: true, id: result.id };
   } catch (error) {
     console.error('❌ Error guardando respuesta RSVP:', error);
     throw error;
@@ -207,14 +174,16 @@ export const saveRSVPResponse = async (weddingId, guestId, responseData, rsvpId 
 export const getWebRSVPResponses = async (webId) => {
   try {
     console.log('📊 Obteniendo respuestas RSVP de la web:', webId);
-    const rsvpRef = collection(db, RSVP_COLLECTION);
-    const q = query(rsvpRef, where('webId', '==', webId));
-    const snapshot = await getDocs(q);
+    
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_URL}/api/rsvp/${webId}/responses`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
-    const responses = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    if (!response.ok) throw new Error('Error obteniendo respuestas');
+
+    const result = await response.json();
+    const responses = result.responses || result.data || [];
 
     console.log(`✅ ${responses.length} respuestas RSVP encontradas`);
     return responses;
@@ -225,30 +194,34 @@ export const getWebRSVPResponses = async (webId) => {
 };
 
 /**
- * Crear múltiples invitados a la vez (para los novios)
+ * Crear múltiples invitados
  */
 export const createMultipleGuests = async (webId, guestsList) => {
   try {
     console.log('📝 Creando lista de invitados:', guestsList.length);
-    const createdGuests = [];
 
-    for (const guestData of guestsList) {
-      const guestId = `${webId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const guestRef = doc(db, RSVP_COLLECTION, guestId);
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_URL}/api/guests/bulk`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        weddingId: webId,
+        guests: guestsList.map(g => ({
+          name: g.nombre.trim(),
+          email: g.email || null,
+          phone: g.telefono || null,
+          maxCompanions: g.maxAcompañantes || 0,
+        }))
+      })
+    });
 
-      const guest = {
-        webId,
-        nombre: guestData.nombre.trim(),
-        email: guestData.email || null,
-        telefono: guestData.telefono || null,
-        maxAcompañantes: guestData.maxAcompañantes || 0,
-        respondido: false,
-        createdAt: serverTimestamp(),
-      };
+    if (!response.ok) throw new Error('Error creando invitados');
 
-      await setDoc(guestRef, guest);
-      createdGuests.push({ id: guestId, ...guest });
-    }
+    const result = await response.json();
+    const createdGuests = result.guests || result.data || [];
 
     console.log(`✅ ${createdGuests.length} invitados creados`);
     return { success: true, guests: createdGuests };
@@ -258,7 +231,9 @@ export const createMultipleGuests = async (webId, guestsList) => {
   }
 };
 
-// Función existente del backend
+/**
+ * Generar link RSVP
+ */
 export async function generateRsvpLink({ weddingId, guestId }) {
   if (!weddingId || !guestId) throw new Error('weddingId and guestId are required');
   const res = await post('/api/rsvp/generate-link', { weddingId, guestId }, { auth: true });

@@ -22,8 +22,12 @@ export default function useActiveWeddingInfo() {
       }
       setLoading(true);
       try {
+        const token = localStorage.getItem('authToken');
         const response = await fetch(`${API_URL}/wedding-info/${activeWedding}`, {
           credentials: 'include',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         
         if (!response.ok) {

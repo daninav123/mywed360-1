@@ -1,112 +1,110 @@
-import {
-  collection,
-  addDoc,
-  onSnapshot,
-  updateDoc,
-  doc,
-  serverTimestamp,
-  deleteDoc,
-} from 'firebase/firestore';
 import { useEffect, useState, useCallback } from 'react';
-
+import axios from 'axios';
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
 
-// Manages allocations under weddings/{wId}/supplierGroups/{groupId}/allocations
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
+
 export default function useGroupAllocations(groupId) {
   const { activeWedding } = useWedding();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const loadAllocations = useCallback(async () => {
     if (!activeWedding || !groupId) {
       setItems([]);
       return;
     }
+
     setLoading(true);
-    const col = collection(db, 'weddings', activeWedding, 'supplierGroups', groupId, 'allocations');
-    const unsub = onSnapshot(
-      col,
-      (snap) => {
-        setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-        setLoading(false);
-      },
-      (err) => {
-        setError(err.message);
-        setLoading(false);
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await axios.get(
+        `${API_URL}/group-allocations/${activeWedding}/${groupId}`,
+        {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      );
+
+      if (response.data.success) {
+        setItems(response.data.data || []);
       }
-    );
-    return () => unsub();
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
   }, [activeWedding, groupId]);
+
+  useEffect(() => {
+    loadAllocations();
+  }, [loadAllocations]);
 
   const addAllocation = useCallback(
     async (payload) => {
       if (!activeWedding || !groupId) return { success: false };
       try {
-        const col = collection(
-          db,
-          'weddings',
-          activeWedding,
-          'supplierGroups',
-          groupId,
-          'allocations'
+        const token = localStorage.getItem('authToken');
+        const response = await axios.post(
+          `${API_URL}/group-allocations/${activeWedding}/${groupId}`,
+          payload,
+          {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }
         );
-        const docRef = await addDoc(col, {
-          ...payload,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-        return { success: true, id: docRef.id };
+
+        await loadAllocations();
+        return { success: true, id: response.data.data.id };
       } catch (e) {
         return { success: false, error: e.message };
       }
     },
-    [activeWedding, groupId]
+    [activeWedding, groupId, loadAllocations]
   );
 
   const updateAllocation = useCallback(
     async (id, payload) => {
       if (!activeWedding || !groupId || !id) return { success: false };
       try {
-        const ref = doc(
-          db,
-          'weddings',
-          activeWedding,
-          'supplierGroups',
-          groupId,
-          'allocations',
-          id
+        const token = localStorage.getItem('authToken');
+        await axios.put(
+          `${API_URL}/group-allocations/${activeWedding}/${groupId}/${id}`,
+          payload,
+          {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }
         );
-        await updateDoc(ref, { ...payload, updatedAt: serverTimestamp() });
+
+        await loadAllocations();
         return { success: true };
       } catch (e) {
         return { success: false, error: e.message };
       }
     },
-    [activeWedding, groupId]
+    [activeWedding, groupId, loadAllocations]
   );
 
   const removeAllocation = useCallback(
     async (id) => {
       if (!activeWedding || !groupId || !id) return { success: false };
       try {
-        const ref = doc(
-          db,
-          'weddings',
-          activeWedding,
-          'supplierGroups',
-          groupId,
-          'allocations',
-          id
+        const token = localStorage.getItem('authToken');
+        await axios.delete(
+          `${API_URL}/group-allocations/${activeWedding}/${groupId}/${id}`,
+          {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }
         );
-        await deleteDoc(ref);
+
+        await loadAllocations();
         return { success: true };
       } catch (e) {
         return { success: false, error: e.message };
       }
     },
-    [activeWedding, groupId]
+    [activeWedding, groupId, loadAllocations]
   );
 
   return { items, loading, error, addAllocation, updateAllocation, removeAllocation };

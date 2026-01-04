@@ -1,33 +1,26 @@
-/**
- * Hook para gestionar las categorías/servicios activos de una boda
- * Permite al owner personalizar qué servicios necesita
- * Auto-añade servicios cuando guarda favoritos de nuevas categorías
- */
-
 import { useState, useEffect, useCallback } from 'react';
-import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import axios from 'axios';
 import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
 import { SUPPLIER_CATEGORIES } from '../shared/supplierCategories';
 import { toast } from 'react-toastify';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
+
 export function useWeddingCategories() {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const { activeWedding } = useWedding();
   const [activeCategories, setActiveCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ⚡ DINÁMICO: Categorías por defecto basadas en coverage (alta/media)
-  // Esto garantiza que siempre usamos IDs válidos de SUPPLIER_CATEGORIES
+  // Categorías por defecto basadas en coverage (alta/media)
   const DEFAULT_CATEGORIES = SUPPLIER_CATEGORIES.filter(
     (cat) => cat.coverage === 'high' || cat.coverage === 'medium'
   )
-    .slice(0, 8) // Limitar a las 8 más importantes
+    .slice(0, 8)
     .map((cat) => cat.id);
 
-  // ⚡ OPTIMIZACIÓN: Usar onSnapshot para actualización en tiempo real
-  // Esto permite que las tarjetas se actualicen instantáneamente sin recargar
+  // Cargar categorías desde PostgreSQL
   useEffect(() => {
     if (!activeWedding) {
       setLoading(false);
@@ -35,43 +28,35 @@ export function useWeddingCategories() {
       return;
     }
 
-    console.log('🔄 [useWeddingCategories] Iniciando listener en weddings/{id}...');
-    setLoading(true);
+    const loadCategories = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('authToken');
+        
+        const response = await axios.get(
+          `${API_URL}/wedding-categories/${activeWedding}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
 
-    // ✅ LEER DESDE DOCUMENTO COMPARTIDO: weddings/{id}
-    const weddingRef = doc(db, 'weddings', activeWedding);
-
-    // ✅ LISTENER EN TIEMPO REAL: Se actualiza automáticamente cuando cambia Firestore
-    const unsubscribe = onSnapshot(
-      weddingRef,
-      (snapshot) => {
-        console.log('📡 [useWeddingCategories] Snapshot recibido desde weddings/{id}');
-
-        if (snapshot.exists()) {
-          const data = snapshot.data();
-          const categories = data.activeCategories || DEFAULT_CATEGORIES;
-
-          console.log('   ✅ Categorías actualizadas:', categories);
+        if (response.data.success) {
+          const categories = response.data.data.activeCategories || DEFAULT_CATEGORIES;
           setActiveCategories(categories);
         } else {
-          console.log('   ⚠️ Documento no existe, usando defaults');
           setActiveCategories(DEFAULT_CATEGORIES);
         }
-
-        setLoading(false);
-      },
-      (error) => {
-        // console.error('❌ [useWeddingCategories] Error en snapshot:', error);
+      } catch (error) {
+        console.error('[useWeddingCategories] Error loading:', error);
         setActiveCategories(DEFAULT_CATEGORIES);
+      } finally {
         setLoading(false);
       }
-    );
-
-    // Cleanup: Desuscribirse cuando el componente se desmonte o cambien las dependencias
-    return () => {
-      console.log('🔌 [useWeddingCategories] Deteniendo listener...');
-      unsubscribe();
     };
+
+    loadCategories();
   }, [activeWedding]);
 
   // Actualizar categorías activas
@@ -81,68 +66,53 @@ export function useWeddingCategories() {
     }
 
     try {
-      console.log('📝 [useWeddingCategories] Actualizando en weddings/{id}...');
-      console.log('   Categorías:', categories);
+      const token = localStorage.getItem('authToken');
 
       // Convertir IDs de categorías a nombres completos para wantedServices
       const categoryNames = categories
         .map((catId) => SUPPLIER_CATEGORIES.find((c) => c.id === catId)?.name)
         .filter(Boolean);
 
-      console.log('   Nombres para wantedServices:', categoryNames);
-
-      // ✅ ESCRIBIR EN DOCUMENTO COMPARTIDO: weddings/{id}
-      const weddingRef = doc(db, 'weddings', activeWedding);
-
-      await setDoc(
-        weddingRef,
+      const response = await axios.put(
+        `${API_URL}/wedding-categories/${activeWedding}`,
         {
           activeCategories: categories,
-          wantedServices: categoryNames,
-          updatedAt: new Date().toISOString(),
+          wantedServices: categoryNames
         },
-        { merge: true }
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
       );
 
-      // ⚠️ CRÍTICO: Crear una NUEVA referencia del array para que React detecte el cambio
-      setActiveCategories([...categories]);
-      // console.log('   ✅ Estado actualizado en hook (nueva referencia del array)');
-      // console.log('   Nueva referencia:', [...categories]);
-      // No mostrar toast aquí - se muestra en addCategory/removeCategory
+      if (response.data.success) {
+        setActiveCategories([...categories]);
+      }
     } catch (error) {
-      // console.error('Error updating active categories:', error);
+      console.error('[useWeddingCategories] Error updating:', error);
       toast.error('Error al actualizar servicios');
       throw error;
     }
   };
 
-  // Añadir una categoría (por ejemplo, al guardar favorito de nueva categoría)
+  // Añadir una categoría
   const addCategory = async (categoryId) => {
-    // console.log('➕ [useWeddingCategories] addCategory:', categoryId);
-
     if (!activeCategories.includes(categoryId)) {
       const newCategories = [...activeCategories, categoryId];
       const category = SUPPLIER_CATEGORIES.find((c) => c.id === categoryId);
 
-      // console.log('   Añadiendo categoría:', category?.name);
       await updateActiveCategories(newCategories);
-
       toast.success(`✅ "${category?.name || categoryId}" añadido`);
-    } else {
-      // console.log('   ⚠️ Ya está activa, no se hace nada');
     }
   };
 
   // Remover una categoría
   const removeCategory = async (categoryId) => {
-    // console.log('➖ [useWeddingCategories] removeCategory:', categoryId);
-
     const category = SUPPLIER_CATEGORIES.find((c) => c.id === categoryId);
-    // console.log('   Removiendo categoría:', category?.name);
-
     const newCategories = activeCategories.filter((id) => id !== categoryId);
+    
     await updateActiveCategories(newCategories);
-
     toast.info(`❌ "${category?.name || categoryId}" desactivado`);
   };
 
@@ -159,11 +129,10 @@ export function useWeddingCategories() {
   const getActiveCategoriesDetails = useCallback(() => {
     return activeCategories
       .map((id) => SUPPLIER_CATEGORIES.find((cat) => cat.id === id))
-      .filter(Boolean); // Filtrar undefined
+      .filter(Boolean);
   }, [activeCategories]);
 
   // Verificar si una categoría está activa
-  // ⭐ CRÍTICO: Usar useCallback para que la función no se recree en cada render
   const isCategoryActive = useCallback(
     (categoryId) => {
       return activeCategories.includes(categoryId);

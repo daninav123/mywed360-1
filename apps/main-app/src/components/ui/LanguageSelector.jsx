@@ -102,29 +102,63 @@ const LanguageSelector = ({
       <div className={`relative language-selector ${className}`}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-full transition-all"
+          className="p-2.5 rounded-full transition-all duration-200 hover:scale-105"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            border: '2px solid rgba(255,255,255,0.8)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            backgroundColor: 'rgba(255, 255, 255, 0.98)',
+            border: '1px solid rgba(200, 200, 200, 0.3)',
+            boxShadow: isOpen ? '0 4px 16px rgba(0, 0, 0, 0.2)' : '0 2px 8px rgba(0, 0, 0, 0.12)',
           }}
           title={t('navigation.settings', { defaultValue: 'Ajustes' })}
           disabled={isChanging}
         >
-          <Globe size={20} className={isChanging ? 'animate-spin' : ''} />
+          <Globe size={20} className={isChanging ? 'animate-spin' : ''} style={{ color: '#6B4C93' }} />
         </button>
 
         {isOpen && (
-          <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-[150px] max-h-80 overflow-y-auto">
-            {availableLanguages.map((language) => (
+          <div 
+            className="absolute right-0 top-full mt-2 bg-white rounded-lg z-50 min-w-[220px] max-h-96 overflow-y-auto"
+            style={{
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08)',
+              backdropFilter: 'blur(8px)',
+            }}
+          >
+            {availableLanguages.map((language, index) => (
               <button
                 key={language.code}
                 onClick={() => handleLanguageChange(language.code)}
-                className={`w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 ${language.code === currentLanguage ? 'bg-blue-50 text-blue-600' : 'text-gray-700'}`}
+                className="w-full px-4 py-3 text-left flex items-center gap-3 transition-all duration-150"
+                style={{
+                  backgroundColor: language.code === currentLanguage ? 'rgba(107, 76, 147, 0.08)' : 'transparent',
+                  borderTop: index > 0 ? '1px solid rgba(0, 0, 0, 0.05)' : 'none',
+                  color: language.code === currentLanguage ? '#6B4C93' : '#374151',
+                  fontWeight: language.code === currentLanguage ? '600' : '500',
+                  fontSize: '14px',
+                }}
+                onMouseEnter={(e) => {
+                  if (language.code !== currentLanguage) {
+                    e.currentTarget.style.backgroundColor = 'rgba(107, 76, 147, 0.04)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (language.code !== currentLanguage) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
               >
-                <span className="text-lg">{language.flag}</span>
+                <span 
+                  className="flex items-center justify-center w-8 h-8 rounded-md" 
+                  style={{
+                    backgroundColor: language.code === currentLanguage ? 'rgba(107, 76, 147, 0.12)' : 'rgba(243, 244, 246, 1)',
+                    fontSize: '18px',
+                  }}
+                >
+                  {language.flag}
+                </span>
                 <span className="flex-1">{language.name}</span>
-                {language.code === currentLanguage && <Check size={16} className="text-blue-600" />}
+                {language.code === currentLanguage && (
+                  <Check size={18} style={{ color: '#6B4C93', strokeWidth: 2.5 }} />
+                )}
               </button>
             ))}
           </div>

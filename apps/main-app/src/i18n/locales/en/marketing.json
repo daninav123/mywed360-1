@@ -21,8 +21,9 @@
       "title": "Plan Your Perfect Wedding",
       "subtitle": "From 'Yes!' to 'I Do' - organize every magical moment with the platform loved by thousands of couples worldwide",
       "cta": {
-        "primary": "Start Planning Free",
-        "secondary": "See How It Works"
+        "primary": "Start Planning for Free",
+        "secondary": "See How It Works",
+        "subtitle": "No credit card required. Start free today."
       },
       "brandLabel": "Planivia",
       "logoAlt": "Planivia logo",
@@ -1247,6 +1248,8 @@
     "support": "Support",
     "help": "Help Center",
     "privacy": "Privacy",
-    "terms": "Terms"
+    "terms": "Terms",
+    "servicesIn": "Services in {{city}}",
+    "nearbyCities": "Nearby Cities"
   }
 }

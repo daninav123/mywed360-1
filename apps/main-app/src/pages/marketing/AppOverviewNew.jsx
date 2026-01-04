@@ -102,6 +102,17 @@ export default function AppOverviewNew() {
         <meta property="og:title" content="Funcionalidades de Planivia" />
         <meta property="og:description" content="Plataforma completa con todos los módulos para planificar tu boda" />
         <meta property="og:url" content="https://planivia.net/app" />
+        <meta property="og:image" content="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&h=630&fit=crop&fm=jpg&q=80" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Funcionalidades completas de la app Planivia" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Funcionalidades de Planivia" />
+        <meta name="twitter:description" content="Plataforma completa con todos los módulos para planificar tu boda" />
+        <meta name="twitter:image" content="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&h=630&fit=crop&fm=jpg&q=80" />
+        <meta name="twitter:image:alt" content="Funcionalidades completas de la app Planivia" />
         
         {/* Canonical */}
         <link rel="canonical" href="https://planivia.net/app" />

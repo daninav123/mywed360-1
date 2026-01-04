@@ -1,31 +1,27 @@
 /**
- * Supplier Service - Sprint 8
+ * Supplier Service - PostgreSQL Version
+ * DEPRECADO - Usar useProveedores hook en su lugar
  */
 
-import { collection, addDoc, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
-
-class SupplierService {
-  async add(weddingId, supplier) {
-    const ref = collection(db, 'weddings', weddingId, 'suppliers');
-    const docRef = await addDoc(ref, { ...supplier, createdAt: new Date().toISOString() });
-    return { id: docRef.id, ...supplier };
+const supplierService = {
+  async add() {
+    console.warn('[supplierService] Deprecado - usar useProveedores hook');
+    return null;
+  },
+  
+  async getAll() {
+    console.warn('[supplierService] Deprecado - usar useProveedores hook');
+    return [];
+  },
+  
+  async update() {
+    console.warn('[supplierService] Deprecado - usar useProveedores hook');
+  },
+  
+  async getByCategory() {
+    console.warn('[supplierService] Deprecado - usar useProveedores hook');
+    return [];
   }
+};
 
-  async getAll(weddingId) {
-    const snapshot = await getDocs(collection(db, 'weddings', weddingId, 'suppliers'));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  }
-
-  async update(weddingId, supplierId, updates) {
-    const ref = doc(db, 'weddings', weddingId, 'suppliers', supplierId);
-    await updateDoc(ref, { ...updates, updatedAt: new Date().toISOString() });
-  }
-
-  async getByCategory(weddingId, category) {
-    const all = await this.getAll(weddingId);
-    return all.filter(s => s.category === category);
-  }
-}
-
-export default new SupplierService();
+export default supplierService;

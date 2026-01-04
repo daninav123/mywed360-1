@@ -1,8 +1,8 @@
 /**
- * AI Task Service - Sprint 8 - S8-T002
+ * AI Task Service - PostgreSQL Version
  */
-import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
 class AITaskService {
   async generateSuggestions(weddingData) {
@@ -21,14 +21,34 @@ class AITaskService {
   }
 
   async saveSuggestions(weddingId, tasks) {
-    const ref = collection(db, 'weddings', weddingId, 'aiTasks');
-    const promises = tasks.map(task => addDoc(ref, { ...task, createdAt: new Date().toISOString(), source: 'ai' }));
+    const token = localStorage.getItem('authToken');
+    const promises = tasks.map(task => 
+      fetch(`${API_URL}/api/tasks`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          weddingId, 
+          ...task, 
+          source: 'ai' 
+        })
+      })
+    );
     return Promise.all(promises);
   }
 
   async getTasks(weddingId) {
-    const snapshot = await getDocs(collection(db, 'weddings', weddingId, 'aiTasks'));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(
+      `${API_URL}/api/tasks?weddingId=${weddingId}&source=ai`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
+    
+    if (!response.ok) return [];
+    const result = await response.json();
+    return result.tasks || result.data || [];
   }
 }
 

@@ -72,9 +72,80 @@ export default function ForPlannersNew() {
         <meta property="og:title" content="Planivia para Wedding Planners" />
         <meta property="og:description" content="Gestiona tu negocio de wedding planning con herramientas profesionales" />
         <meta property="og:url" content="https://planivia.net/para-planners" />
+        <meta property="og:image" content="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1200&h=630&fit=crop&fm=jpg&q=80" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Software profesional para wedding planners" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Planivia para Wedding Planners" />
+        <meta name="twitter:description" content="Gestiona tu negocio de wedding planning con herramientas profesionales" />
+        <meta name="twitter:image" content="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1200&h=630&fit=crop&fm=jpg&q=80" />
+        <meta name="twitter:image:alt" content="Software profesional para wedding planners" />
         
         {/* Canonical */}
         <link rel="canonical" href="https://planivia.net/para-planners" />
+        
+        {/* Structured Data - Service */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "serviceType": "Wedding Planning Software for Professionals",
+            "provider": {
+              "@type": "Organization",
+              "name": "Planivia"
+            },
+            "name": "Planivia para Wedding Planners",
+            "description": "Software profesional para wedding planners que gestionan múltiples bodas. Incluye plantillas reutilizables, colaboración en equipo y analíticas de negocio.",
+            "offers": {
+              "@type": "AggregateOffer",
+              "priceCurrency": "EUR",
+              "lowPrice": "29",
+              "highPrice": "299",
+              "offerCount": "4",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Planner Pack 5",
+                  "price": "29",
+                  "priceCurrency": "EUR",
+                  "description": "Hasta 5 bodas activas simultáneamente"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Planner Pack 15",
+                  "price": "79",
+                  "priceCurrency": "EUR",
+                  "description": "Hasta 15 bodas activas con analíticas avanzadas"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Teams 40",
+                  "price": "149",
+                  "priceCurrency": "EUR",
+                  "description": "40 bodas activas y colaboración en equipo"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Teams Unlimited",
+                  "price": "299",
+                  "priceCurrency": "EUR",
+                  "description": "Bodas ilimitadas con white-label"
+                }
+              ]
+            },
+            "audience": {
+              "@type": "Audience",
+              "audienceType": "Wedding Planners"
+            },
+            "areaServed": {
+              "@type": "Place",
+              "name": "España y Latinoamérica"
+            }
+          })}
+        </script>
       </Helmet>
       
       <PageWrapper>

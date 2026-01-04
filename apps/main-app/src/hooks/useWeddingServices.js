@@ -2,15 +2,13 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
-import { auth } from '../firebaseConfig';
 
-// Helper para obtener token (igual que FavoritesContext)
+// Helper para obtener token desde localStorage (PostgreSQL)
 async function getAuthToken() {
   try {
-    const firebaseUser = auth?.currentUser;
-    if (firebaseUser && typeof firebaseUser.getIdToken === 'function') {
-      return await firebaseUser.getIdToken();
-    }
+    const token = localStorage.getItem('authToken');
+    if (token) return token;
+    
     // Fallback: admin session
     const adminSession = localStorage.getItem('adminSession');
     if (adminSession) {
@@ -19,7 +17,7 @@ async function getAuthToken() {
     }
     return null;
   } catch (err) {
-    // console.error('[useWeddingServices] Error obteniendo token:', err);
+    console.error('[useWeddingServices] Error obteniendo token:', err);
     return null;
   }
 }

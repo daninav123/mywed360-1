@@ -2,7 +2,6 @@
 import { Link } from 'react-router-dom';
 import { Mail, Send, Trash2, Archive, Star, Clock, CheckCircle, User, Moon, LogOut } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { onAuthStateChanged } from 'firebase/auth';
 import useTranslations from '../hooks/useTranslations';
 import { useAuth } from '../hooks/useAuth.jsx';
 import DarkModeToggle from '../components/DarkModeToggle';
@@ -23,7 +22,6 @@ import ComposeEmailModal from '../components/email/ComposeEmailModal';
 import { useWedding } from '../context/WeddingContext';
 import useEmailUsername from '../hooks/useEmailUsername';
 import useWeddingCollection from '../hooks/useWeddingCollection';
-import { auth } from '../firebaseConfig';
 import EmailRecommendationService from '../services/EmailRecommendationService';
 import {
   getMails,
@@ -210,22 +208,23 @@ const UnifiedEmail = () => {
       cancelled = true;
     };
   }, [emails, activeWedding]);
-  // Obtener email del usuario desde PostgreSQL
+  
+  // Obtener email del usuario desde PostgreSQL (sin Firebase Auth)
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) return;
+    const initUserEmail = async () => {
+      if (!currentUser) return;
 
       console.log('[UnifiedEmail] Auth state changed, userProfile:', userProfile);
-      setUserId(user.uid);
+      setUserId(currentUser.uid);
       
       // Usar myWed360Email del perfil de PostgreSQL
       if (userProfile?.myWed360Email) {
         const resolvedEmail = userProfile.myWed360Email;
         console.log('[UnifiedEmail] ✅ Usando email del perfil:', resolvedEmail);
         await initEmailService({
-          uid: user.uid,
+          uid: currentUser.uid,
           myWed360Email: resolvedEmail,
-          email: user.email,
+          email: currentUser.email,
         });
         setMyEmail(resolvedEmail);
       } else {
@@ -236,19 +235,20 @@ const UnifiedEmail = () => {
           const resolvedEmail = `${username}@planivia.net`;
           console.log('[UnifiedEmail] Fallback email:', resolvedEmail);
           await initEmailService({
-            uid: user.uid,
+            uid: currentUser.uid,
             emailUsername: username,
             myWed360Email: resolvedEmail,
-            email: user.email,
+            email: currentUser.email,
           });
           setMyEmail(resolvedEmail);
         } else {
           console.log('[UnifiedEmail] ❌ No username disponible');
         }
       }
-    });
-    return () => unsub();
-  }, [userProfile, getCurrentUsername]);
+    };
+    
+    initUserEmail();
+  }, [currentUser, userProfile, getCurrentUsername]);
 
   // Carga inicial + polling
   useEffect(() => {

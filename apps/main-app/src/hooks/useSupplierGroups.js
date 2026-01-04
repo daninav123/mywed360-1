@@ -1,24 +1,9 @@
-import {
-  collection,
-  addDoc,
-  onSnapshot,
-  updateDoc,
-  doc,
-  getDoc,
-  deleteDoc,
-  serverTimestamp,
-} from 'firebase/firestore';
 import { useState, useEffect, useCallback } from 'react';
-
+import axios from 'axios';
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
 
-/**
- * Gestiona grupos manuales de proveedores (unificar/separar tarjetas)
- * Estructura en Firestore: weddings/{weddingId}/supplierGroups/{groupId}
- *  { name, memberIds: string[], createdAt, updatedAt, notes? }
- * Además, setea `groupId` y `groupName` en cada proveedor miembro para facilitar UI.
- */
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
+
 export default function useSupplierGroups() {
   const { activeWedding } = useWedding();
   const [groups, setGroups] = useState([]);
@@ -33,11 +18,21 @@ export default function useSupplierGroups() {
     }
     setLoading(true);
     try {
-      const data = await supplierGroupsAPI.getAll(activeWedding);
-      setGroups(Array.isArray(data) ? data : []);
+      const token = localStorage.getItem('authToken');
+      const response = await axios.get(
+        `${API_URL}/supplier-groups/${activeWedding}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      setGroups(Array.isArray(response.data) ? response.data : []);
+      setError(null);
     } catch (err) {
       console.error('Error loading supplier groups:', err);
       setError(err.message);
+      setGroups([]);
     } finally {
       setLoading(false);
     }
@@ -53,142 +48,80 @@ export default function useSupplierGroups() {
       if (!name || memberIds.length < 1)
         return { success: false, error: 'Nombre y al menos 1 proveedor' };
       try {
-        const col = collection(db, 'weddings', activeWedding, 'supplierGroups');
-        const now = serverTimestamp();
-        const ref = await addDoc(col, { name, memberIds, notes, createdAt: now, updatedAt: now });
-        // actualizar proveedores con groupId
-        await Promise.all(
-          memberIds.map((pid) =>
-            updateDoc(doc(db, 'weddings', activeWedding, 'suppliers', pid), {
-              groupId: ref.id,
-              groupName: name,
-              updated: serverTimestamp(),
-            }).catch(() => {})
-          )
+        const token = localStorage.getItem('authToken');
+        const response = await axios.post(
+          `${API_URL}/supplier-groups/${activeWedding}`,
+          { name, memberIds, notes },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
         );
-        return { success: true, id: ref.id };
+        await loadGroups(); // Recargar lista
+        return { success: true, id: response.data.id };
       } catch (e) {
-        // console.error('Error creando grupo proveedores:', e);
+        console.error('Error creando grupo proveedores:', e);
         return { success: false, error: e.message };
       }
     },
-    [activeWedding]
+    [activeWedding, loadGroups]
   );
 
   const dissolveGroup = useCallback(
     async (groupId) => {
       if (!activeWedding || !groupId) return { success: false, error: 'Missing params' };
       try {
-        await supplierGroupsAPI.delete(activeWedding, groupId);
-        setGroups(prev => prev.filter(g => g.id !== groupId));
-        return { success: true };
-      } catch (e) {
-        console.error('Error disolviendo grupo proveedores:', e);
-        return { success: false, error: e.message };
-      }
-    },
-    [activeWedding]
-  );
-
-  const removeMember = useCallback(
-    async (groupId, memberId) => {
-      if (!activeWedding || !groupId || !memberId)
-        return { success: false, error: 'Missing params' };
-      try {
-        const gRef = doc(db, 'weddings', activeWedding, 'supplierGroups', groupId);
-        const gSnap = await getDoc(gRef);
-        if (!gSnap.exists()) return { success: false, error: 'Group not found' };
-        const data = gSnap.data();
-        const nextMembers = (data.memberIds || []).filter((id) => id !== memberId);
-        await updateDoc(gRef, { memberIds: nextMembers, updatedAt: serverTimestamp() });
-        await updateDoc(doc(db, 'weddings', activeWedding, 'suppliers', memberId), {
-          groupId: null,
-          groupName: null,
-          updated: serverTimestamp(),
-        });
-        // si <2 miembros, disolver
-        if (nextMembers.length < 2) {
-          await deleteDoc(gRef);
-        }
-        return { success: true };
-      } catch (e) {
-        // console.error('Error quitando miembro del grupo:', e);
-        return { success: false, error: e.message };
-      }
-    },
-    [activeWedding]
-  );
-
-  const addMembers = useCallback(
-    async (groupId, memberIds = []) => {
-      if (!activeWedding || !groupId || memberIds.length === 0)
-        return { success: false, error: 'Missing params' };
-      try {
-        const gRef = doc(db, 'weddings', activeWedding, 'supplierGroups', groupId);
-        const gSnap = await getDoc(gRef);
-        if (!gSnap.exists()) return { success: false, error: 'Group not found' };
-        const data = gSnap.data();
-        const merged = Array.from(new Set([...(data.memberIds || []), ...memberIds]));
-        await updateDoc(gRef, { memberIds: merged, updatedAt: serverTimestamp() });
-        // set groupId en los nuevos miembros
-        await Promise.all(
-          memberIds.map((pid) =>
-            updateDoc(doc(db, 'weddings', activeWedding, 'suppliers', pid), {
-              groupId: gRef.id,
-              groupName: data?.name || '',
-              updated: serverTimestamp(),
-            }).catch(() => {})
-          )
+        const token = localStorage.getItem('authToken');
+        await axios.delete(
+          `${API_URL}/supplier-groups/${activeWedding}/${groupId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
         );
+        await loadGroups(); // Recargar lista
         return { success: true };
       } catch (e) {
-        // console.error('Error añadiendo miembros al grupo:', e);
+        console.error('Error disolviendo grupo:', e);
         return { success: false, error: e.message };
       }
     },
-    [activeWedding]
+    [activeWedding, loadGroups]
   );
 
   const updateGroup = useCallback(
-    async (groupId, { name, notes, targetBudget }) => {
+    async (groupId, { name, memberIds, notes }) => {
       if (!activeWedding || !groupId) return { success: false, error: 'Missing params' };
       try {
-        const gRef = doc(db, 'weddings', activeWedding, 'supplierGroups', groupId);
-        const snap = await getDoc(gRef);
-        if (!snap.exists()) return { success: false, error: 'Group not found' };
-        const data = snap.data();
-        const newName = typeof name === 'string' ? name : data?.name || '';
-        const newNotes = typeof notes === 'string' ? notes : data?.notes || '';
-        const payload = { name: newName, notes: newNotes, updatedAt: serverTimestamp() };
-        if (typeof targetBudget === 'number') payload.targetBudget = targetBudget;
-        await updateDoc(gRef, payload);
-        // Propagar cambio de nombre a miembros
-        const memberIds = Array.isArray(data?.memberIds) ? data.memberIds : [];
-        await Promise.all(
-          memberIds.map((pid) =>
-            updateDoc(doc(db, 'weddings', activeWedding, 'suppliers', pid), {
-              groupName: newName,
-              updated: serverTimestamp(),
-            }).catch(() => {})
-          )
+        const token = localStorage.getItem('authToken');
+        await axios.put(
+          `${API_URL}/supplier-groups/${activeWedding}/${groupId}`,
+          { name, memberIds, notes },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
         );
+        await loadGroups(); // Recargar lista
         return { success: true };
       } catch (e) {
-        // console.error('Error actualizando grupo de proveedores:', e);
+        console.error('Error actualizando grupo:', e);
         return { success: false, error: e.message };
       }
     },
-    [activeWedding]
+    [activeWedding, loadGroups]
   );
 
   return {
     groups,
     loading,
     error,
+    reload: loadGroups,
     createGroup,
     dissolveGroup,
-    removeMember,
-    addMembers,
     updateGroup,
   };
 }

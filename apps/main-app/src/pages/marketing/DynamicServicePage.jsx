@@ -1,7 +1,9 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
-import { ArrowRight, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { ArrowRight, Check, Users, DollarSign, Search, CheckCircle, Mail, PieChart, Bell, Grid3x3, MousePointer2, Calendar, TrendingUp, Sparkles, Send, Heart } from 'lucide-react';
+import LanguageSelector from '../../components/ui/LanguageSelector';
 import { 
   PageWrapper, 
   HeroSection, 
@@ -32,9 +34,31 @@ import {
   generateOrganizationSchema
 } from '../../data/dataLoader';
 
+// Mapeo de strings de iconos a componentes de Lucide
+const iconMap = {
+  Users,
+  DollarSign,
+  Search,
+  CheckCircle,
+  Mail,
+  PieChart,
+  Bell,
+  Grid3x3,
+  MousePointer2,
+  Calendar,
+  TrendingUp,
+  Sparkles,
+  Send,
+  Heart,
+};
+
+// Helper para obtener el componente de icono
+const getIconComponent = (iconName) => iconMap[iconName] || Heart;
+
 export default function DynamicServicePage() {
   const { country, city, service } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation(['marketing']);
 
   // Cargar datos
   const cityData = getCityData(city);
@@ -149,6 +173,11 @@ export default function DynamicServicePage() {
       </Helmet>
       
       <PageWrapper>
+        {/* Selector de idioma discreto */}
+        <div className="fixed top-4 right-4 z-50">
+          <LanguageSelector variant="minimal" persist={false} />
+        </div>
+
         {/* Hero Section */}
         <HeroSection
           title={`${serviceData.name} en ${cityData.name}`}
@@ -279,7 +308,7 @@ export default function DynamicServicePage() {
                 {serviceData.features.map((feature, index) => (
                   <FeatureCard
                     key={index}
-                    icon={feature.icon}
+                    icon={getIconComponent(feature.icon)}
                     title={feature.title}
                     description={feature.description}
                     color={theme.colors.pink}
@@ -1067,6 +1096,257 @@ export default function DynamicServicePage() {
               <ArrowRight size={20} style={{ marginLeft: '8px' }} />
             </PrimaryButton>
           </div>
+
+          {/* Footer con enlaces SEO */}
+          <footer 
+            className="border-t mx-6 py-12 mt-16"
+            style={{ borderColor: theme.colors.borderSubtle }}
+          >
+            <div className="max-w-6xl mx-auto">
+              <div className="grid md:grid-cols-6 gap-8 mb-8">
+                <div>
+                  <h4 style={{
+                    fontFamily: theme.fonts.body,
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: theme.colors.textPrimary,
+                    marginBottom: '16px',
+                  }}>
+                    {t('marketing:footer.product')}
+                  </h4>
+                  <div className="space-y-3">
+                    {[
+                      { label: t('marketing:footer.features'), link: '/app' },
+                      { label: t('marketing:footer.pricing'), link: '/precios' },
+                      { label: t('marketing:footer.demo'), link: '/signup' },
+                    ].map((item, index) => (
+                      <div key={index}>
+                        <button
+                          onClick={() => navigate(item.link)}
+                          style={{
+                            fontFamily: theme.fonts.body,
+                            fontSize: '14px',
+                            color: theme.colors.textSecondary,
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            transition: 'color 200ms',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
+                          onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.textSecondary}
+                        >
+                          {item.label}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 style={{
+                    fontFamily: theme.fonts.body,
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: theme.colors.textPrimary,
+                    marginBottom: '16px',
+                  }}>
+                    {t('marketing:footer.forProfessionals')}
+                  </h4>
+                  <div className="space-y-3">
+                    {[
+                      { label: t('marketing:footer.suppliers'), link: '/para-proveedores' },
+                      { label: t('marketing:footer.planners'), link: '/para-planners' },
+                      { label: t('marketing:footer.partners'), link: '/partners' },
+                    ].map((item, index) => (
+                      <div key={index}>
+                        <button
+                          onClick={() => navigate(item.link)}
+                          style={{
+                            fontFamily: theme.fonts.body,
+                            fontSize: '14px',
+                            color: theme.colors.textSecondary,
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            transition: 'color 200ms',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
+                          onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.textSecondary}
+                        >
+                          {item.label}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 style={{
+                    fontFamily: theme.fonts.body,
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: theme.colors.textPrimary,
+                    marginBottom: '16px',
+                  }}>
+                    {t('marketing:footer.company')}
+                  </h4>
+                  <div className="space-y-3">
+                    {[
+                      { label: t('marketing:footer.about'), link: '/about' },
+                      { label: t('marketing:footer.contact'), link: '/contacto' },
+                      { label: t('marketing:footer.blog'), link: '/blog' },
+                    ].map((item, index) => (
+                      <div key={index}>
+                        <button
+                          onClick={() => navigate(item.link)}
+                          style={{
+                            fontFamily: theme.fonts.body,
+                            fontSize: '14px',
+                            color: theme.colors.textSecondary,
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            transition: 'color 200ms',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
+                          onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.textSecondary}
+                        >
+                          {item.label}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 style={{
+                    fontFamily: theme.fonts.body,
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: theme.colors.textPrimary,
+                    marginBottom: '16px',
+                  }}>
+                    {t('marketing:footer.support')}
+                  </h4>
+                  <div className="space-y-3">
+                    {[
+                      { label: t('marketing:footer.help'), link: '/help' },
+                      { label: t('marketing:footer.privacy'), link: '/privacy' },
+                      { label: t('marketing:footer.terms'), link: '/terms' },
+                    ].map((item, index) => (
+                      <div key={index}>
+                        <button
+                          onClick={() => navigate(item.link)}
+                          style={{
+                            fontFamily: theme.fonts.body,
+                            fontSize: '14px',
+                            color: theme.colors.textSecondary,
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            transition: 'color 200ms',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
+                          onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.textSecondary}
+                        >
+                          {item.label}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Enlaces SEO de servicios - Dinámicos según ciudad actual */}
+                <div>
+                  <h4 style={{
+                    fontFamily: theme.fonts.body,
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: theme.colors.textPrimary,
+                    marginBottom: '16px',
+                  }}>
+                    {t('marketing:footer.servicesIn', { city: cityData.name })}
+                  </h4>
+                  <div className="space-y-3">
+                    {[
+                      { label: 'Bodas', slug: 'bodas' },
+                      { label: 'Gestión de Invitados', slug: 'gestion-invitados-boda' },
+                      { label: 'Presupuesto', slug: 'presupuesto-boda-online' },
+                      { label: 'Seating Plan', slug: 'seating-plan-boda' },
+                      { label: 'Catering', slug: 'catering-boda' },
+                      { label: 'Fotografía', slug: 'fotografia-boda' },
+                    ].filter(item => cityData.services && cityData.services[item.slug]).slice(0, 6).map((item, index) => (
+                      <div key={index}>
+                        <a
+                          href={`/${country}/${city}/${item.slug}`}
+                          style={{
+                            fontFamily: theme.fonts.body,
+                            fontSize: '14px',
+                            color: theme.colors.textSecondary,
+                            textDecoration: 'none',
+                            transition: 'color 200ms',
+                            display: 'block',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
+                          onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.textSecondary}
+                        >
+                          {item.label}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Enlaces SEO de ciudades - Dinámicos según ciudades cercanas */}
+                <div>
+                  <h4 style={{
+                    fontFamily: theme.fonts.body,
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: theme.colors.textPrimary,
+                    marginBottom: '16px',
+                  }}>
+                    {t('marketing:footer.nearbyCities')}
+                  </h4>
+                  <div className="space-y-3">
+                    {nearbyCities.slice(0, 6).map((nearbyCity, index) => (
+                      <div key={index}>
+                        <a
+                          href={`/${nearbyCity.country}/${nearbyCity.slug}/bodas`}
+                          style={{
+                            fontFamily: theme.fonts.body,
+                            fontSize: '14px',
+                            color: theme.colors.textSecondary,
+                            textDecoration: 'none',
+                            transition: 'color 200ms',
+                            display: 'block',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
+                          onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.textSecondary}
+                        >
+                          {nearbyCity.name}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-8 border-t text-center" style={{ borderColor: theme.colors.borderSubtle }}>
+                <p style={{
+                  fontFamily: theme.fonts.body,
+                  fontSize: '14px',
+                  color: theme.colors.textSecondary,
+                }}>
+                  © 2025 Planivia. Making dream weddings come true.
+                </p>
+              </div>
+            </div>
+          </footer>
         </Container>
       </PageWrapper>
     </>

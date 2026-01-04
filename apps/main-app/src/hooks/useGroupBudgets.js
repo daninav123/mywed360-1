@@ -1,13 +1,9 @@
-import { collection, getDocs } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-
+import axios from 'axios';
 import { useWedding } from '../context/WeddingContext';
-import { db } from '../firebaseConfig';
 
-/**
- * Carga presupuestos de un conjunto de proveedores (una sola vez por cambio de miembros)
- * Retorna un objeto { [supplierId]: Budget[] }
- */
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
+
 export default function useGroupBudgets(memberIds = []) {
   const { activeWedding } = useWedding();
   const [budgetsBySupplier, setBudgetsBySupplier] = useState({});
@@ -16,32 +12,44 @@ export default function useGroupBudgets(memberIds = []) {
 
   useEffect(() => {
     let cancelled = false;
+    
     async function fetchAll() {
       if (!activeWedding || !Array.isArray(memberIds) || memberIds.length === 0) {
         setBudgetsBySupplier({});
         return;
       }
+      
       setLoading(true);
       setError(null);
+      
       try {
-        const result = {};
-        for (const pid of memberIds) {
-          try {
-            const col = collection(db, 'weddings', activeWedding, 'suppliers', pid, 'budgets');
-            const snap = await getDocs(col);
-            result[pid] = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-          } catch (_) {
-            result[pid] = [];
+        const token = localStorage.getItem('authToken');
+        const response = await axios.post(
+          `${API_URL}/group-budgets/${activeWedding}`,
+          { memberIds },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
           }
+        );
+        
+        if (!cancelled && response.data.success) {
+          setBudgetsBySupplier(response.data.data || {});
         }
-        if (!cancelled) setBudgetsBySupplier(result);
       } catch (e) {
-        if (!cancelled) setError(e.message);
+        if (!cancelled) {
+          console.error('[useGroupBudgets] Error:', e);
+          setError(e.message);
+          setBudgetsBySupplier({});
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
+    
     fetchAll();
+    
     return () => {
       cancelled = true;
     };

@@ -1,32 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import axios from 'axios';
 
-import { db } from '../firebaseConfig';
-
-const computeGuestBucket = (guestCount) => {
-  const count = Number(guestCount) || 0;
-  if (count <= 0) return '0-0';
-  const size = 50;
-  const start = Math.floor((count - 1) / size) * size + 1;
-  const end = start + size - 1;
-  return `${start}-${end}`;
-};
-
-const normalizeRegionKey = (country, region) => {
-  const parts = [country, region]
-    .map((value) =>
-      value
-        ? String(value)
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9]+/gi, '-')
-            .trim()
-            .toLowerCase()
-        : ''
-    )
-    .filter(Boolean);
-  return parts.length ? parts.join('_') : 'global';
-};
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004/api';
 
 const computeConfidence = (count) => {
   if (count >= 20) return 'high';
@@ -56,26 +31,11 @@ const formatSuggestion = (categories, strategy) => {
   }));
 };
 
-const readBenchmarkDocument = async (regionKey, bucket) => {
-  try {
-    const docRef = doc(db, 'budgetBenchmarks', `${regionKey}_${bucket}`);
-    const snap = await getDoc(docRef);
-    if (!snap.exists()) return null;
-    return snap.data();
-  } catch (error) {
-    // Silenciar errores de permisos - benchmarks son opcionales
-    return null;
-  }
-};
-
 export default function useBudgetBenchmarks({ country, region, guestCount, enabled = true } = {}) {
   const [state, setState] = useState({
     loading: enabled,
     data: null,
   });
-
-  const regionKey = normalizeRegionKey(country, region);
-  const bucket = computeGuestBucket(guestCount);
 
   useEffect(() => {
     if (!enabled) {
@@ -87,37 +47,30 @@ export default function useBudgetBenchmarks({ country, region, guestCount, enabl
     setState((prev) => ({ ...prev, loading: true }));
 
     (async () => {
-      const attempts = [
-        { regionKey, bucket },
-        { regionKey, bucket: 'global' },
-        { regionKey: 'global', bucket },
-        { regionKey: 'global', bucket: 'global' },
-      ];
+      try {
+        const response = await axios.get(`${API_URL}/budget-benchmarks`, {
+          params: { country, region, guestCount }
+        });
 
-      for (const attempt of attempts) {
-        const data = await readBenchmarkDocument(attempt.regionKey, attempt.bucket);
-        if (data) {
-          if (!isMounted) return;
+        if (isMounted && response.data.success) {
           setState({
             loading: false,
-            data: {
-              ...data,
-              source: attempt,
-            },
+            data: response.data.data
           });
-          return;
+        } else if (isMounted) {
+          setState({ loading: false, data: null });
         }
-      }
-
-      if (isMounted) {
-        setState({ loading: false, data: null });
+      } catch (error) {
+        if (isMounted) {
+          setState({ loading: false, data: null });
+        }
       }
     })();
 
     return () => {
       isMounted = false;
     };
-  }, [regionKey, bucket, enabled]);
+  }, [country, region, guestCount, enabled]);
 
   const result = useMemo(() => {
     if (!state.data) {

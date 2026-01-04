@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-01-03T23:48:46.703Z",
+  "filesAnalyzed": 21,
+  "totalKeys": 199,
+  "missingKeys": [
+    {
+      "key": "marketing:landing.cta.subtitle",
+      "namespace": "marketing",
+      "keyPath": "landing.cta.subtitle",
+      "files": [
+        "apps/main-app/src/pages/marketing/LandingNew.jsx"
+      ],
+      "missingInLocales": [
+        {
+          "locale": "es",
+          "reason": "key_not_found"
+        },
+        {
+          "locale": "en",
+          "reason": "key_not_found"
+        }
+      ]
+    },
+    {
+      "key": "common:forPlanners.agencyNamePlaceholder",
+      "namespace": "common",
+      "keyPath": "forPlanners.agencyNamePlaceholder",
+      "files": [
+        "apps/main-app/src/pages/marketing/ForPlannersNew.jsx"
+      ],
+      "missingInLocales": [
+        {
+          "locale": "en",
+          "reason": "key_not_found"
+        }
+      ]
+    },
+    {
+      "key": "common:\\n\\n",
+      "namespace": "common",
+      "keyPath": "\\n\\n",
+      "files": [
+        "apps/main-app/src/pages/marketing/DynamicServicePage.jsx"
+      ],
+      "missingInLocales": [
+        {
+          "locale": "es",
+          "reason": "key_not_found"
+        },
+        {
+          "locale": "en",
+          "reason": "key_not_found"
+        }
+      ]
+    }
+  ]
+}

@@ -19,8 +19,9 @@ export default function useSupplierShortlist() {
       const data = await favoritesAPI.getAll(activeWedding);
       setItems(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('[useSupplierShortlist] load failed', err);
-      setError(err);
+      // Silently handle favorites error (Firebase disabled)
+      setItems([]);
+      setError(null);
     } finally {
       setLoading(false);
     }

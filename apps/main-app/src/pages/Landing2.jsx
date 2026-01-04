@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, Heart, CheckCircle, Sparkles, Gift } from 'lucide-react';
 import LanguageSelector from '../components/ui/LanguageSelector';
-import LocalServicesBanner from '../components/dashboard/LocalServicesBanner';
 
 export default function Landing2() {
   const navigate = useNavigate();
@@ -480,17 +479,86 @@ export default function Landing2() {
 
       {/* Footer */}
       <footer 
-        className="border-t mx-6 py-8"
+        className="border-t mx-6 py-12"
         style={{ borderColor: '#E5E7EB' }}
       >
-        <div className="max-w-6xl mx-auto text-center">
-          <p style={{
-            fontFamily: "'DM Sans', 'Inter', sans-serif",
-            fontSize: '14px',
-            color: '#718096',
-          }}>
-            © 2025 Wedding Planner. Making dream weddings come true.
-          </p>
+        <div className="max-w-6xl mx-auto">
+          {/* Enlaces SEO de servicios */}
+          <div className="mb-8 pb-8 border-b" style={{ borderColor: '#F3F4F6' }}>
+            <h3 style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              marginBottom: '12px'
+            }}>
+              Servicios
+            </h3>
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '16px',
+              fontSize: '14px'
+            }}>
+              <a href="/es/madrid/bodas" style={{ color: '#6B7280', textDecoration: 'none' }}>Bodas</a>
+              <span style={{ color: '#D1D5DB' }}>•</span>
+              <a href="/es/madrid/gestion-invitados-boda" style={{ color: '#6B7280', textDecoration: 'none' }}>Gestión de Invitados</a>
+              <span style={{ color: '#D1D5DB' }}>•</span>
+              <a href="/es/madrid/presupuesto-boda-online" style={{ color: '#6B7280', textDecoration: 'none' }}>Presupuesto</a>
+              <span style={{ color: '#D1D5DB' }}>•</span>
+              <a href="/es/madrid/seating-plan-boda" style={{ color: '#6B7280', textDecoration: 'none' }}>Seating Plan</a>
+              <span style={{ color: '#D1D5DB' }}>•</span>
+              <a href="/es/madrid/catering-boda" style={{ color: '#6B7280', textDecoration: 'none' }}>Catering</a>
+              <span style={{ color: '#D1D5DB' }}>•</span>
+              <a href="/es/madrid/fotografia-boda" style={{ color: '#6B7280', textDecoration: 'none' }}>Fotografía</a>
+            </div>
+          </div>
+
+          {/* Enlaces SEO de ciudades */}
+          <div className="mb-8">
+            <h3 style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              marginBottom: '12px'
+            }}>
+              Ciudades principales
+            </h3>
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '16px',
+              fontSize: '14px'
+            }}>
+              <a href="/es/madrid/bodas" style={{ color: '#6B7280', textDecoration: 'none' }}>Madrid</a>
+              <span style={{ color: '#D1D5DB' }}>•</span>
+              <a href="/es/barcelona/bodas" style={{ color: '#6B7280', textDecoration: 'none' }}>Barcelona</a>
+              <span style={{ color: '#D1D5DB' }}>•</span>
+              <a href="/es/valencia/bodas" style={{ color: '#6B7280', textDecoration: 'none' }}>Valencia</a>
+              <span style={{ color: '#D1D5DB' }}>•</span>
+              <a href="/es/sevilla/bodas" style={{ color: '#6B7280', textDecoration: 'none' }}>Sevilla</a>
+              <span style={{ color: '#D1D5DB' }}>•</span>
+              <a href="/es/bilbao/bodas" style={{ color: '#6B7280', textDecoration: 'none' }}>Bilbao</a>
+              <span style={{ color: '#D1D5DB' }}>•</span>
+              <a href="/es/malaga/bodas" style={{ color: '#6B7280', textDecoration: 'none' }}>Málaga</a>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="text-center pt-8 border-t" style={{ borderColor: '#F3F4F6' }}>
+            <p style={{
+              fontFamily: "'DM Sans', 'Inter', sans-serif",
+              fontSize: '14px',
+              color: '#9CA3AF',
+            }}>
+              © 2025 Planivia. Making dream weddings come true.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

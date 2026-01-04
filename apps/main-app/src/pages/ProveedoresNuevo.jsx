@@ -22,7 +22,7 @@ import {
   Moon,
   LogOut,
 } from 'lucide-react';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -43,7 +43,9 @@ import Card from '../components/ui/Card';
 import PageWrapper from '../components/PageWrapper';
 
 import { useWedding } from '../context/WeddingContext';
+import { useAuth } from '../hooks/useAuth';
 import useWeddingData from '../hooks/useWeddingData';
+import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 import useAISearch from '../hooks/useAISearch';
 import useProveedores from '../hooks/useProveedores';
 import useSupplierShortlist from '../hooks/useSupplierShortlist';
@@ -358,8 +360,12 @@ const Proveedores = () => {
     
     (async () => {
       try {
+        const token = localStorage.getItem('authToken');
         const response = await fetch(`${API_URL}/wedding-info/${activeWedding}`, {
           credentials: 'include',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         
         if (!response.ok) {

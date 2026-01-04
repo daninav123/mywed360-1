@@ -22,7 +22,8 @@
         "subtitle": "Desde '¡Sí!' hasta 'Sí, acepto' - organiza cada momento mágico con la plataforma amada por miles de parejas en todo el mundo",
         "cta": {
           "primary": "Empezar a Planificar Gratis",
-          "secondary": "Ver Cómo Funciona"
+          "secondary": "Ver Cómo Funciona",
+          "subtitle": "Sin tarjeta de crédito necesaria. Empieza gratis hoy."
         },
         "brandLabel": "MaLove.App",
         "logoAlt": "Logotipo de MaLove.App",
@@ -1260,6 +1261,8 @@
     "support": "Soporte",
     "help": "Centro de Ayuda",
     "privacy": "Privacidad",
-    "terms": "Términos"
+    "terms": "Términos",
+    "servicesIn": "Servicios en {{city}}",
+    "nearbyCities": "Ciudades Cercanas"
   }
 }

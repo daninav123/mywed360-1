@@ -168,32 +168,34 @@ export default function PartnersNew() {
         <meta property="og:title" content="Planivia para Proveedores de Bodas" />
         <meta property="og:description" content="Genera leads cualificados y haz crecer tu negocio de bodas con Planivia. Sistema justo de pago por vista." />
         <meta property="og:url" content="https://planivia.net/para-proveedores" />
+        <meta property="og:image" content="https://images.unsplash.com/photo-1464047736614-af63643285bf?w=1200&h=630&fit=crop&fm=jpg&q=80" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Plataforma para proveedores de bodas" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Planivia para Proveedores de Bodas" />
         <meta name="twitter:description" content="Genera leads y haz crecer tu negocio de bodas" />
+        <meta name="twitter:image" content="https://images.unsplash.com/photo-1464047736614-af63643285bf?w=1200&h=630&fit=crop&fm=jpg&q=80" />
+        <meta name="twitter:image:alt" content="Plataforma para proveedores de bodas" />
         
         {/* Canonical */}
         <link rel="canonical" href="https://planivia.net/para-proveedores" />
         
-        {/* Structured Data */}
+        {/* Structured Data - Service */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Service",
-            "name": "Planivia para Proveedores",
-            "serviceType": "Generación de leads cualificados para proveedores de bodas",
+            "serviceType": "Wedding Vendor Marketplace",
             "provider": {
               "@type": "Organization",
               "name": "Planivia",
               "url": "https://planivia.net"
             },
-            "areaServed": {
-              "@type": "Country",
-              "name": "España"
-            },
-            "serviceAudience": {
+            "name": "Planivia para Proveedores de Bodas",
+            "description": "Plataforma para proveedores de bodas. Recibe contactos cualificados de parejas buscando servicios para su boda. Sistema justo de pago por vista.",
               "@type": "Audience",
               "audienceType": "Proveedores y profesionales de bodas"
             },

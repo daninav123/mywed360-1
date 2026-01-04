@@ -1,10 +1,8 @@
 /**
- * Legal Documents Service
- * Sprint 6 - S6-T002
+ * Legal Documents Service - PostgreSQL Version
  */
 
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
 const LEGAL_TEMPLATES = {
   privacy: {
@@ -23,14 +21,31 @@ const LEGAL_TEMPLATES = {
 
 class LegalDocsService {
   async getDoc(weddingId, docType) {
-    const docRef = doc(db, 'weddings', weddingId, 'legal', docType);
-    const docSnap = await getDoc(docRef);
-    return docSnap.exists() ? docSnap.data() : LEGAL_TEMPLATES[docType];
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(
+        `${API_URL}/api/weddings/${weddingId}/legal/${docType}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+      
+      if (response.ok) {
+        const result = await response.json();
+        return result.document || result.data;
+      }
+    } catch {}
+    return LEGAL_TEMPLATES[docType];
   }
 
   async saveDoc(weddingId, docType, content) {
-    const docRef = doc(db, 'weddings', weddingId, 'legal', docType);
-    await setDoc(docRef, { content, updatedAt: new Date().toISOString() });
+    const token = localStorage.getItem('authToken');
+    await fetch(`${API_URL}/api/weddings/${weddingId}/legal/${docType}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ content })
+    });
   }
 
   getTemplates() {

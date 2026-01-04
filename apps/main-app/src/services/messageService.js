@@ -1,28 +1,38 @@
 /**
- * Message Service - Sprint 7
+ * Message Service - PostgreSQL Version
  */
 
-import { collection, addDoc, getDocs, query, where, orderBy } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
 class MessageService {
   async send(weddingId, message) {
-    const ref = collection(db, 'weddings', weddingId, 'messages');
-    const doc = await addDoc(ref, {
-      ...message,
-      sentAt: new Date().toISOString(),
-      status: 'sent'
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_URL}/api/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ weddingId, ...message })
     });
-    return { id: doc.id, ...message };
+    
+    if (!response.ok) throw new Error('Error enviando mensaje');
+    const result = await response.json();
+    return result.message || result.data;
   }
 
   async getMessages(weddingId, guestId = null) {
-    let q = collection(db, 'weddings', weddingId, 'messages');
-    if (guestId) q = query(q, where('guestId', '==', guestId));
-    q = query(q, orderBy('sentAt', 'desc'));
+    const token = localStorage.getItem('authToken');
+    const params = new URLSearchParams({ weddingId });
+    if (guestId) params.append('guestId', guestId);
     
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const response = await fetch(`${API_URL}/api/messages?${params.toString()}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) return [];
+    const result = await response.json();
+    return result.messages || result.data || [];
   }
 
   async bulkSend(weddingId, recipients, template) {

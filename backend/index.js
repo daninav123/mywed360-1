@@ -1,4 +1,4 @@
-// Express backend for MaLoveApp
+// Express backend for Planivia
 
 // Provides:
 //   GET /api/transactions - proxy or mock to bank aggregator (Nordigen)
@@ -972,7 +972,7 @@ app.use('/api/test', testHelpersRouter); // Test helpers para E2E (solo en desar
 app.use('/api/metrics', metricsSeatingRouter);
 
 app.get('/', (_req, res) => {
-  res.send({ status: 'ok', service: 'maloveapp-backend' });
+  res.send({ status: 'ok', service: 'planivia-backend' });
 });
 
 // Health check explícito para plataformas de despliegue
@@ -1106,8 +1106,8 @@ app.use((err, req, res, _next) => {
 });
 
 // Captura de errores globales para que se muestren en CMD
-if (!globalThis.__malove_backend_process_handlers_registered) {
-  globalThis.__malove_backend_process_handlers_registered = true;
+if (!globalThis.__planivia_backend_process_handlers_registered) {
+  globalThis.__planivia_backend_process_handlers_registered = true;
   process.on('unhandledRejection', (reason) => {
     logger.error('UnhandledRejection:', reason);
   });
@@ -1168,7 +1168,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 if (process.env.NODE_ENV !== 'test') {
   const server = app.listen(PORT, () => {
-    console.log(`MaLoveApp backend up on http://localhost:${PORT}`);
+    console.log(`Planivia backend up on http://localhost:${PORT}`);
   });
 
   server.on('error', (err) => {

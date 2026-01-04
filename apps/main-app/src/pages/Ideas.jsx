@@ -712,7 +712,7 @@ export default function Ideas() {
                   </div>
                   <button
                     onClick={() => handleDeletePhoto(index)}
-                    className="absolute top-1 right-1 /90 text-xs px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition" className="bg-surface"
+                    className="absolute top-1 right-1 bg-red-500/90 text-white text-xs px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition"
                   >
                     Eliminar
                   </button>

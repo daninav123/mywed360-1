@@ -1,23 +1,11 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
-} from 'firebase/firestore';
-
-import { db } from '../firebaseConfig';
-
 /**
- * Servicio de comentarios internos por correo.
- * Sincroniza contra Firestore cuando está disponible y mantiene un fallback local.
+ * Comment Service - PostgreSQL Version
+ * Gestión de comentarios en emails usando API backend
  */
 
-const COMMENTS_KEY_PREFIX = 'maloveapp_email_comments_';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
+const COMMENTS_KEY_PREFIX = 'maloveapp_email_comments_';
 const getStorageKey = (userId) => `${COMMENTS_KEY_PREFIX}${userId}`;
 
 const safeLocalStorage = () => {
@@ -33,8 +21,7 @@ const loadAllComments = (userId) => {
   try {
     const raw = store.getItem(getStorageKey(userId));
     return raw ? JSON.parse(raw) : {};
-  } catch (error) {
-    // console.error('Error leyendo comentarios de localStorage', error);
+  } catch {
     return {};
   }
 };
@@ -44,95 +31,110 @@ const saveAllComments = (userId, mapping) => {
   if (!store) return;
   try {
     store.setItem(getStorageKey(userId), JSON.stringify(mapping));
-  } catch (error) {
-    // console.error('Error guardando comentarios de localStorage', error);
-  }
-};
-
-const generateId = () => `c_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-
-const hasFirestore = () => Boolean(db);
-
-const mapCloudComment = (docSnap) => {
-  const data = docSnap.data() || {};
-  return {
-    id: docSnap.id,
-    authorId: data.authorId || '',
-    authorName: data.authorName || 'Usuario',
-    body: data.body || '',
-    date: data.createdAt?.toDate?.()?.toISOString?.() || data.createdAt || new Date().toISOString(),
-  };
+  } catch {}
 };
 
 export async function getComments(userId, emailId) {
   if (!userId || !emailId) return [];
 
   const local = loadAllComments(userId)[emailId] || [];
-  if (!hasFirestore()) return local;
 
   try {
-    const ref = collection(db, 'users', userId, 'emailComments', emailId, 'comments');
-    const snap = await getDocs(query(ref, orderBy('createdAt', 'asc')));
-    const comments = snap.docs.map(mapCloudComment);
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_URL}/api/mail/${emailId}/comments`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) return local;
+
+    const result = await response.json();
+    const comments = result.comments || result.data || [];
+
     if (comments.length) {
       const mapping = loadAllComments(userId);
       mapping[emailId] = comments;
       saveAllComments(userId, mapping);
     }
-    return comments.length ? comments : local;
-  } catch (error) {
-    // console.warn('getComments fallback to local', error?.message || error);
+
+    return comments;
+  } catch {
     return local;
   }
 }
 
-export async function addComment(userId, emailId, comment) {
-  if (!userId || !emailId) return [];
-  const payload = {
-    id: generateId(),
-    ...comment,
+export async function addComment(userId, emailId, authorName, body) {
+  if (!userId || !emailId || !body?.trim()) return null;
+
+  const commentData = {
+    authorId: userId,
+    authorName: authorName || 'Usuario',
+    body: body.trim(),
     date: new Date().toISOString(),
   };
 
-  if (hasFirestore()) {
-    try {
-      const ref = collection(db, 'users', userId, 'emailComments', emailId, 'comments');
-      await addDoc(ref, {
-        authorId: payload.authorId || '',
-        authorName: payload.authorName || 'Usuario',
-        body: payload.body || '',
-        createdAt: serverTimestamp(),
-      });
-      return getComments(userId, emailId);
-    } catch (error) {
-      // console.warn('addComment Firestore failed, using local fallback', error?.message || error);
-    }
-  }
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_URL}/api/mail/${emailId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(commentData)
+    });
 
-  const mapping = loadAllComments(userId);
-  if (!mapping[emailId]) mapping[emailId] = [];
-  mapping[emailId].push(payload);
-  saveAllComments(userId, mapping);
-  return mapping[emailId];
+    if (!response.ok) throw new Error('Error añadiendo comentario');
+
+    const result = await response.json();
+    const comment = result.comment || result.data;
+
+    const mapping = loadAllComments(userId);
+    if (!mapping[emailId]) mapping[emailId] = [];
+    mapping[emailId].push(comment);
+    saveAllComments(userId, mapping);
+
+    return comment;
+  } catch (error) {
+    console.error('Error añadiendo comentario:', error);
+
+    const tempId = `c_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const tempComment = { ...commentData, id: tempId };
+    
+    const mapping = loadAllComments(userId);
+    if (!mapping[emailId]) mapping[emailId] = [];
+    mapping[emailId].push(tempComment);
+    saveAllComments(userId, mapping);
+
+    return tempComment;
+  }
 }
 
 export async function deleteComment(userId, emailId, commentId) {
-  if (!userId || !emailId || !commentId) return [];
+  if (!userId || !emailId || !commentId) return false;
 
-  if (hasFirestore()) {
-    try {
-      const ref = doc(db, 'users', userId, 'emailComments', emailId, 'comments', commentId);
-      await deleteDoc(ref);
-      return getComments(userId, emailId);
-    } catch (error) {
-      // console.warn('deleteComment Firestore failed, using local fallback', error?.message || error);
+  try {
+    const token = localStorage.getItem('authToken');
+    await fetch(`${API_URL}/api/mail/${emailId}/comments/${commentId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    const mapping = loadAllComments(userId);
+    if (mapping[emailId]) {
+      mapping[emailId] = mapping[emailId].filter(c => c.id !== commentId);
+      saveAllComments(userId, mapping);
     }
+
+    return true;
+  } catch (error) {
+    console.error('Error eliminando comentario:', error);
+
+    const mapping = loadAllComments(userId);
+    if (mapping[emailId]) {
+      mapping[emailId] = mapping[emailId].filter(c => c.id !== commentId);
+      saveAllComments(userId, mapping);
+    }
+
+    return false;
   }
-
-  const mapping = loadAllComments(userId);
-  if (!mapping[emailId]) return [];
-  mapping[emailId] = mapping[emailId].filter((c) => c.id !== commentId);
-  saveAllComments(userId, mapping);
-  return mapping[emailId];
 }
-
