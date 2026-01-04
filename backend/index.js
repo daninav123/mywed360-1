@@ -45,7 +45,7 @@ import {
   requireAdmin,
   optionalAuth,
   requireMailAccess,
-  requireSupplier
+  requireSupplier,
 } from './middleware/authMiddleware.js';
 
 import mailRouter from './routes/mail.js';
@@ -156,6 +156,15 @@ import suppliersAnalyzeWebRouter from './routes/suppliers-analyze-web.js';
 import checklistRouter from './routes/checklist.js';
 import geolocationRouter from './routes/geolocation.js';
 import suppliersRouter from './routes/suppliers.js';
+import weddingCategoriesRouter from './routes/wedding-categories.js';
+import tasksHierarchyRouter from './routes/tasks-hierarchy.js';
+import groupBudgetsRouter from './routes/group-budgets.js';
+import supplierBudgetsRouter from './routes/supplier-budgets.js';
+import groupAllocationsRouter from './routes/group-allocations.js';
+import supplierRFQHistoryRouter from './routes/supplier-rfq-history.js';
+import userCollectionsRouter from './routes/user-collections.js';
+import emailUsernameRouter from './routes/email-username.js';
+import budgetBenchmarksRouter from './routes/budget-benchmarks.js';
 
 import ipAllowlist from './middleware/ipAllowlist.js';
 import adminAuthRouter from './routes/admin-auth.js';
@@ -641,13 +650,19 @@ app.use('/api/rsvp', rsvpRouter); // Endpoints públicos por token para RSVP
 app.use('/api/task-templates', taskTemplatesRouter); // Plantillas de tareas (endpoint público para obtener activa)
 
 // Rutas que requieren autenticación específica para correo
-app.use('/api/mail', (req, res, next) => {
-  console.error(`🚨 [INDEX] PRE-AUTH: ${req.method} ${req.url}`);
-  next();
-}, requireAuth, (req, res, next) => {
-  console.error(`✅ [INDEX] POST-AUTH: ${req.method} ${req.url} user=${req.user?.uid}`);
-  next();
-}, mailRouter);
+app.use(
+  '/api/mail',
+  (req, res, next) => {
+    console.error(`🚨 [INDEX] PRE-AUTH: ${req.method} ${req.url}`);
+    next();
+  },
+  requireAuth,
+  (req, res, next) => {
+    console.error(`✅ [INDEX] POST-AUTH: ${req.method} ${req.url} user=${req.user?.uid}`);
+    next();
+  },
+  mailRouter
+);
 app.use('/api/mail', mailOpsRouter);
 app.use('/api/mail', mailStatsRouter);
 app.use('/api/mail', mailSearchRouter);
@@ -671,6 +686,15 @@ app.use('/api/notifications', requireAuth, notificationsRouter);
 app.use('/api/guests', requireAuth, guestsRouter);
 app.use('/api/checklist', requireAuth, checklistRouter);
 app.use('/api/wedding-suppliers', requireAuth, suppliersRouter); // PostgreSQL suppliers
+app.use('/api/wedding-categories', requireAuth, weddingCategoriesRouter);
+app.use('/api/tasks-hierarchy', requireAuth, tasksHierarchyRouter);
+app.use('/api/group-budgets', requireAuth, groupBudgetsRouter);
+app.use('/api/supplier-budgets', requireAuth, supplierBudgetsRouter);
+app.use('/api/group-allocations', requireAuth, groupAllocationsRouter);
+app.use('/api/supplier-rfq-history', requireAuth, supplierRFQHistoryRouter);
+app.use('/api/user-collections', requireAuth, userCollectionsRouter);
+app.use('/api/email-username', emailUsernameRouter);
+app.use('/api/budget-benchmarks', budgetBenchmarksRouter);
 app.use('/api/events', requireAuth, eventsRouter);
 app.use('/api/roles', requireAuth, rolesRouter);
 app.use('/api/ai-image', requireAuth, aiImageRouter);

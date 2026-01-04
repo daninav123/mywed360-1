@@ -94,6 +94,8 @@ model Wedding {
   weddingInfo        Json?
   ceremonyData       Json?
   supplierGroupsData Json?
+  activeCategories   String[]         @default([])
+  wantedServices     String[]         @default([])
   craftWebs          CraftWeb[]
   guests             Guest[]
   access             WeddingAccess[]
@@ -345,6 +347,7 @@ enum WeddingRole {
 model Task {
   id          String    @id @default(uuid())
   weddingId   String
+  parentId    String?
   title       String
   description String?
   category    String    @default("general")
@@ -628,4 +631,13 @@ model ChecklistTask {
   @@index([completed])
   @@index([position])
   @@map("checklist_tasks")
+}
+
+model SystemMetadata {
+  key       String   @id
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_metadata")
 }

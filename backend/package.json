@@ -54,6 +54,8 @@
     "zod": "^3.23.8"
   },
   "optionalDependencies": {
+    "canvas": "^3.2.0",
+    "imagetracerjs": "^1.2.6",
     "tesseract.js": "^5.0.5"
   },
   "devDependencies": {

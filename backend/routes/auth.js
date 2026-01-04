@@ -4,11 +4,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import { sendPasswordResetEmail } from '../services/emailResetService.js';
-import {
-  sendSuccess,
-  sendValidationError,
-  sendInternalError,
-} from '../utils/apiResponse.js';
+import { sendSuccess, sendValidationError, sendInternalError } from '../utils/apiResponse.js';
 import { generateUserEmailAliases } from '../utils/emailAliasGenerator.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
 
@@ -32,9 +28,21 @@ function generateRefreshToken() {
 // POST /api/auth/register - Registro de nuevo usuario
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, role = 'particular', fullName, weddingInfo, plannerInfo, assistantInfo } = req.body;
-    
-    console.log('[Auth] Register attempt:', { email, hasPassword: !!password, passwordLength: password?.length });
+    const {
+      email,
+      password,
+      role = 'particular',
+      fullName,
+      weddingInfo,
+      plannerInfo,
+      assistantInfo,
+    } = req.body;
+
+    console.log('[Auth] Register attempt:', {
+      email,
+      hasPassword: !!password,
+      passwordLength: password?.length,
+    });
 
     // Validación
     if (!email || !password) {
@@ -42,7 +50,9 @@ router.post('/register', async (req, res) => {
     }
 
     if (password.length < 8) {
-      return sendValidationError(req, res, [{ message: 'Password debe tener al menos 8 caracteres' }]);
+      return sendValidationError(req, res, [
+        { message: 'Password debe tener al menos 8 caracteres' },
+      ]);
     }
 
     // Verificar si el email ya existe
@@ -64,10 +74,10 @@ router.post('/register', async (req, res) => {
 
     // Mapear rol del formulario a UserRole de Prisma
     const roleMap = {
-      'particular': 'OWNER',
-      'planner': 'PLANNER',
-      'assistant': 'ASSISTANT',
-      'supplier': 'SUPPLIER'
+      particular: 'OWNER',
+      planner: 'PLANNER',
+      assistant: 'ASSISTANT',
+      supplier: 'SUPPLIER',
     };
     const prismaRole = roleMap[role] || 'OWNER';
 
@@ -85,13 +95,14 @@ router.post('/register', async (req, res) => {
         profile: {
           create: {
             role: role,
-            phone: weddingInfo?.phone || plannerInfo?.professionalPhone || assistantInfo?.phone || null,
+            phone:
+              weddingInfo?.phone || plannerInfo?.professionalPhone || assistantInfo?.phone || null,
             planiviaEmail: emailAliases.planiviaEmail,
             settings: {},
             metadata: {
               fullName: fullName || null,
               ...(plannerInfo && { plannerInfo }),
-              ...(assistantInfo && { assistantInfo })
+              ...(assistantInfo && { assistantInfo }),
             },
           },
         },
@@ -123,7 +134,7 @@ router.post('/register', async (req, res) => {
     if (role === 'particular') {
       try {
         const weddingDate = weddingInfo?.weddingDate ? new Date(weddingInfo.weddingDate) : null;
-        
+
         const wedding = await prisma.wedding.create({
           data: {
             userId: user.id,
@@ -142,9 +153,9 @@ router.post('/register', async (req, res) => {
                 userId: user.id,
                 role: 'OWNER',
                 permissions: {},
-                status: 'active'
-              }
-            }
+                status: 'active',
+              },
+            },
           },
         });
         console.log('[Auth] Boda inicial creada para particular:', wedding.id);
@@ -156,9 +167,14 @@ router.post('/register', async (req, res) => {
     }
 
     // Respuesta (sin password hash)
-    const { passwordHash: _, verificationToken: __, ...userData } = user;
+    const { passwordHash: _, verificationToken: __, resetToken: ___, ...userData } = user;
 
-    console.log('[Auth] Usuario creado exitosamente:', user.id);
+    // COMPATIBILIDAD: Alias temporal myWed360Email -> planiviaEmail
+    if (userData.profile?.planiviaEmail && !userData.profile?.myWed360Email) {
+      userData.profile.myWed360Email = userData.profile.planiviaEmail;
+    }
+
+    console.log('[Auth] Registro exitoso:', userData.email);
     return sendSuccess(
       req,
       res,
@@ -214,7 +230,7 @@ router.post('/login', async (req, res) => {
     // Verificar password
     const validPassword = await bcrypt.compare(password, user.passwordHash);
     console.log('[Auth] Password válida:', validPassword);
-    
+
     if (!validPassword) {
       return sendValidationError(req, res, [{ message: 'Credenciales inválidas' }]);
     }
@@ -223,7 +239,12 @@ router.post('/login', async (req, res) => {
     // Generar tokens
     const token = generateToken(user.id);
     const refreshToken = generateRefreshToken();
-    console.log('[Auth] Tokens generados. Token length:', token?.length, 'RefreshToken length:', refreshToken?.length);
+    console.log(
+      '[Auth] Tokens generados. Token length:',
+      token?.length,
+      'RefreshToken length:',
+      refreshToken?.length
+    );
 
     // Crear sesión
     console.log('[Auth] Creando sesión...');
@@ -244,16 +265,17 @@ router.post('/login', async (req, res) => {
     // Respuesta
     const { passwordHash: _, verificationToken: __, resetToken: ___, ...userData } = user;
 
+    // COMPATIBILIDAD: Alias temporal myWed360Email -> planiviaEmail
+    if (userData.profile?.planiviaEmail && !userData.profile?.myWed360Email) {
+      userData.profile.myWed360Email = userData.profile.planiviaEmail;
+    }
+
     console.log('[Auth] Enviando respuesta exitosa');
-    return sendSuccess(
-      req,
-      res,
-      {
-        user: userData,
-        token,
-        refreshToken,
-      }
-    );
+    return sendSuccess(req, res, {
+      user: userData,
+      token,
+      refreshToken,
+    });
   } catch (error) {
     console.error('[Auth] Error en login:', error);
     return sendInternalError(req, res, error);
@@ -269,10 +291,10 @@ router.get('/me', async (req, res) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    
+
     // Verificar JWT
     const decoded = jwt.verify(token, JWT_SECRET);
-    
+
     // Buscar usuario
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
@@ -295,6 +317,11 @@ router.get('/me', async (req, res) => {
 
     // Respuesta sin datos sensibles
     const { passwordHash: _, verificationToken: __, resetToken: ___, ...userData } = user;
+
+    // COMPATIBILIDAD: Alias temporal myWed360Email -> planiviaEmail
+    if (userData.profile?.planiviaEmail && !userData.profile?.myWed360Email) {
+      userData.profile.myWed360Email = userData.profile.planiviaEmail;
+    }
 
     return sendSuccess(req, res, { user: userData });
   } catch (error) {
@@ -396,12 +423,12 @@ router.post('/forgot-password', async (req, res) => {
 
     // Enviar email con link de reset
     const emailResult = await sendPasswordResetEmail(user.email, resetToken);
-    
+
     if (!emailResult.success) {
       console.error('[Auth] Error al enviar email de reset:', emailResult.error);
       // No revelamos el error al usuario por seguridad
     }
-    
+
     return sendSuccess(req, res, {
       message: 'Si el email existe, recibirás instrucciones',
       // Solo en desarrollo, devolver token para testing
@@ -423,7 +450,9 @@ router.post('/reset-password', async (req, res) => {
     }
 
     if (newPassword.length < 6) {
-      return sendValidationError(req, res, [{ message: 'Password debe tener al menos 6 caracteres' }]);
+      return sendValidationError(req, res, [
+        { message: 'Password debe tener al menos 6 caracteres' },
+      ]);
     }
 
     // Buscar usuario con token válido
@@ -483,7 +512,9 @@ router.patch('/change-password', async (req, res) => {
     }
 
     if (newPassword.length < 6) {
-      return sendValidationError(req, res, [{ message: 'Nueva password debe tener al menos 6 caracteres' }]);
+      return sendValidationError(req, res, [
+        { message: 'Nueva password debe tener al menos 6 caracteres' },
+      ]);
     }
 
     // Buscar usuario
@@ -530,18 +561,18 @@ router.get('/verify', requireAuth, async (req, res) => {
         role: true,
         createdAt: true,
         lastLogin: true,
-      }
+      },
     });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        error: 'Usuario no encontrado'
+        error: 'Usuario no encontrado',
       });
     }
 
     return sendSuccess(req, res, {
-      user: user
+      user: user,
     });
   } catch (error) {
     console.error('[Auth] Error en verify:', error);

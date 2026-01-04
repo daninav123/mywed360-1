@@ -21,8 +21,7 @@ router.get('/email-alias', requireAuth, async (req, res) => {
     let profile = await prisma.userProfile.findUnique({
       where: { userId },
       select: {
-        myWed360Email: true,
-        maLoveEmail: true,
+        planiviaEmail: true,
       },
     });
 
@@ -33,32 +32,30 @@ router.get('/email-alias', requireAuth, async (req, res) => {
     }
 
     // Auto-asignar email alias si no existe (usuarios antiguos)
-    if (!profile.myWed360Email || !profile.maLoveEmail) {
+    if (!profile.planiviaEmail) {
       console.log('[Email Alias GET] Usuario sin email alias, generando...');
-      
+
       // Obtener usuario para usar su email/nombre
       const user = await prisma.user.findUnique({
         where: { id: userId },
-        select: { email: true }
+        select: { email: true },
       });
-      
+
       const emailAliases = await generateUserEmailAliases(user.email, prisma);
       console.log('[Email Alias GET] Aliases generados:', emailAliases);
-      
-      // Actualizar perfil con los nuevos aliases
+
+      // Actualizar perfil con el nuevo alias
       profile = await prisma.userProfile.update({
         where: { userId },
         data: {
-          myWed360Email: emailAliases.myWed360Email,
-          maLoveEmail: emailAliases.maLoveEmail,
+          planiviaEmail: emailAliases.planiviaEmail,
         },
         select: {
-          myWed360Email: true,
-          maLoveEmail: true,
-        }
+          planiviaEmail: true,
+        },
       });
-      
-      console.log('[Email Alias GET] Perfil actualizado con aliases');
+
+      console.log('[Email Alias GET] Perfil actualizado con alias');
     }
 
     // Verificar si el usuario ha enviado o recibido mails
@@ -69,8 +66,10 @@ router.get('/email-alias', requireAuth, async (req, res) => {
     const canEdit = mailCount === 0;
 
     const response = {
-      myWed360Email: profile.myWed360Email,
-      maLoveEmail: profile.maLoveEmail,
+      planiviaEmail: profile.planiviaEmail,
+      // Alias de compatibilidad para frontend
+      myWed360Email: profile.planiviaEmail,
+      maLoveEmail: profile.planiviaEmail,
       domain: EMAIL_DOMAIN,
       canEdit,
       mailCount,
@@ -88,7 +87,7 @@ router.get('/email-alias', requireAuth, async (req, res) => {
 /**
  * PUT /api/user/email-alias
  * Actualizar el alias de email del usuario
- * 
+ *
  * Body: { newAlias: "nuevo-nombre" } (sin @planivia.net)
  */
 router.put('/email-alias', requireAuth, async (req, res) => {
@@ -103,9 +102,10 @@ router.put('/email-alias', requireAuth, async (req, res) => {
 
     if (mailCount > 0) {
       return sendValidationError(req, res, [
-        { 
-          message: 'No puedes cambiar tu alias porque ya has enviado o recibido emails. El alias solo se puede editar una vez antes de usar el sistema de correo.' 
-        }
+        {
+          message:
+            'No puedes cambiar tu alias porque ya has enviado o recibido emails. El alias solo se puede editar una vez antes de usar el sistema de correo.',
+        },
       ]);
     }
 
@@ -116,16 +116,16 @@ router.put('/email-alias', requireAuth, async (req, res) => {
 
     // Limpiar y validar el slug
     const cleanSlug = generateEmailSlug(newAlias);
-    
+
     if (!cleanSlug || cleanSlug.length < 3) {
       return sendValidationError(req, res, [
-        { message: 'El alias debe tener al menos 3 caracteres válidos' }
+        { message: 'El alias debe tener al menos 3 caracteres válidos' },
       ]);
     }
 
     if (cleanSlug.length > 30) {
       return sendValidationError(req, res, [
-        { message: 'El alias no puede exceder 30 caracteres' }
+        { message: 'El alias no puede exceder 30 caracteres' },
       ]);
     }
 
@@ -134,24 +134,21 @@ router.put('/email-alias', requireAuth, async (req, res) => {
     // Verificar que el nuevo email no esté en uso
     const existingProfile = await prisma.userProfile.findFirst({
       where: {
-        OR: [
-          { myWed360Email: newEmail },
-          { maLoveEmail: newEmail },
-        ],
+        planiviaEmail: newEmail,
         userId: { not: userId }, // Excluir el propio usuario
       },
     });
 
     if (existingProfile) {
       return sendValidationError(req, res, [
-        { message: 'Este alias ya está en uso. Por favor, elige otro.' }
+        { message: 'Este alias ya está en uso. Por favor, elige otro.' },
       ]);
     }
 
     // Obtener perfil actual
     const currentProfile = await prisma.userProfile.findUnique({
       where: { userId },
-      select: { myWed360Email: true, maLoveEmail: true },
+      select: { planiviaEmail: true },
     });
 
     if (!currentProfile) {
@@ -162,14 +159,13 @@ router.put('/email-alias', requireAuth, async (req, res) => {
     const updatedProfile = await prisma.userProfile.update({
       where: { userId },
       data: {
-        myWed360Email: newEmail,
-        maLoveEmail: newEmail,
+        planiviaEmail: newEmail,
         updatedAt: new Date(),
       },
     });
 
     console.log(`[Email Alias] Usuario ${userId} cambió alias:`, {
-      old: currentProfile.myWed360Email,
+      old: currentProfile.planiviaEmail,
       new: newEmail,
     });
 
@@ -178,9 +174,11 @@ router.put('/email-alias', requireAuth, async (req, res) => {
 
     return sendSuccess(req, res, {
       message: 'Alias de email actualizado correctamente',
-      myWed360Email: updatedProfile.myWed360Email,
-      maLoveEmail: updatedProfile.maLoveEmail,
-      previousAlias: currentProfile.myWed360Email,
+      planiviaEmail: updatedProfile.planiviaEmail,
+      // Alias de compatibilidad
+      myWed360Email: updatedProfile.planiviaEmail,
+      maLoveEmail: updatedProfile.planiviaEmail,
+      previousAlias: currentProfile.planiviaEmail,
     });
   } catch (error) {
     console.error('[Email Alias] Error actualizando alias:', error);
@@ -191,7 +189,7 @@ router.put('/email-alias', requireAuth, async (req, res) => {
 /**
  * POST /api/user/email-alias/check
  * Verificar si un alias está disponible (sin guardar)
- * 
+ *
  * Body: { alias: "nombre-a-verificar" }
  */
 router.post('/email-alias/check', requireAuth, async (req, res) => {
@@ -209,10 +207,7 @@ router.post('/email-alias/check', requireAuth, async (req, res) => {
     // Verificar disponibilidad
     const existingProfile = await prisma.userProfile.findFirst({
       where: {
-        OR: [
-          { myWed360Email: fullEmail },
-          { maLoveEmail: fullEmail },
-        ],
+        planiviaEmail: fullEmail,
         userId: { not: userId },
       },
     });
@@ -223,9 +218,7 @@ router.post('/email-alias/check', requireAuth, async (req, res) => {
       alias: cleanSlug,
       fullEmail,
       available: isAvailable,
-      message: isAvailable 
-        ? 'Este alias está disponible' 
-        : 'Este alias ya está en uso',
+      message: isAvailable ? 'Este alias está disponible' : 'Este alias ya está en uso',
     });
   } catch (error) {
     console.error('[Email Alias] Error verificando disponibilidad:', error);
