@@ -1,0 +1,6 @@
+# Force Railway to use Nixpacks instead of Docker
+[phases.build]
+  cmds = ["npm ci --omit=dev"]
+
+[start]
+  cmd = "node index.js"
